@@ -1,5 +1,5 @@
 <template>
-   <PrintedSearchResults v-if="systemStore.printing" />
+   <PrintedSearchResults  v-if="systemStore.printing"/>
    <div tabindex="-1" id="results-container" class="search-results" aria-describedby="search-summary">
       <SearchSuggestions />
       <div class="results-header" role="heading" aria-level="2">
@@ -32,6 +32,7 @@
          </div>
       </div>
    </div>
+   <iframe name="printFrame" style="display:none"></iframe>
 </template>
 
 <script setup>
@@ -56,6 +57,46 @@ const routeUtils = useRouteUtils(router, route)
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
+
+const printStyle = `
+<style type="text/css">
+#print-results {
+   background: white;
+   text-align: left;
+   margin-left: 10px;
+}
+.hit-wrapper {
+   margin-bottom: 15px;
+   padding-bottom: 15px;
+   border-bottom: 2px solid black;
+}
+.hit-wrapper.group {
+   border-bottom: 0;
+   margin: 15px 0 0 0;
+   padding: 15px 0 0 0;
+   border-top: 2px solid black;
+}
+.hit-title {
+   font-weight: bold;
+}
+.number {
+   margin-right: 5px;
+   font-weight: normal;
+}
+.author {
+   margin-left: 10px;
+}
+.fields {
+   font-size: 0.85em;
+   margin: 5px 0 0 5px;
+}
+.label {
+   font-weight: bold;
+   margin-right: 5px;
+   text-align: right;
+   padding-right: 5px;
+}
+</style>`
 
 const showPrintButton = computed(()=>{
    return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
@@ -82,26 +123,15 @@ const printResults = (() => {
    analytics.trigger('Results', 'PRINT_RESULTS', queryStore.mode)
 
    nextTick( () => {
+      // Setting systemStore.printing = true renders a simplified list in a hidden div. nextTick is
+      // needed to allow time for the content to be rendered. After that,
+      // get the conntent and set that as the innerHTML for the iframe embeddded on the results page.
+      // Print from the iframe and remove content
       let contents = document.getElementById("print-results").innerHTML
-      let printFrame = document.createElement('iframe')
-      printFrame.name = "printFrame"
-      printFrame.style.position = "absolute"
-      printFrame.style.right = "1000000px"
-      document.body.appendChild(printFrame)
-      let frameDoc = printFrame.contentWindow.document
-      frameDoc.open()
-      frameDoc.write('<html lang="en"><head><title>Search Results</title>')
-      frameDoc.write('<link rel="stylesheet" type="text/css" href="/print.css"/>')
-      frameDoc.write('</head><body>')
-      frameDoc.write(contents)
-      frameDoc.write('</body></html>')
-      frameDoc.close()
-      setTimeout( () => {
-         window.frames["printFrame"].focus()
-         window.frames["printFrame"].print()
-         document.body.removeChild(printFrame)
-         systemStore.printing = false
-      }, 500)
+      window.frames["printFrame"].document.body.innerHTML = (printStyle+contents)
+      window.frames["printFrame"].print()
+      window.frames["printFrame"].document.body.innerHTML = ""
+      systemStore.printing = false
    })
 })
 
