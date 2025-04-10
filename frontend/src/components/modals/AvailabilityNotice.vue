@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton text ref="trigger" @click="showDialog = true">
+   <VirgoButton severity="secondary" variant="outlined" ref="trigger" @click="showDialog = true">
       <i class="icon fas fa-exclamation-triangle"></i>
       {{props.label}}
    </VirgoButton>
