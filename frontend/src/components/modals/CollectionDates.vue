@@ -4,7 +4,13 @@
 
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog" @show="opened" :draggable="false">
       <DatePicker v-model="picked"  inline dateFormat="yy-mm-dd" :disabledDates="collection.notPublishedDates"
-         :minDate="minDate" :maxDate="maxDate" @year-change="yearChanged" @month-change="monthChanged" @update:model-value="datePicked"/>
+         :minDate="minDate" :maxDate="maxDate" @year-change="yearChanged" @month-change="monthChanged" @update:model-value="datePicked"
+         :pt="{
+            day: {
+               'role': 'button'
+            }
+         }"
+      />
       <div class="error">
          {{error}}
       </div>
