@@ -32,14 +32,23 @@ import CollectionDates from "@/components/modals/CollectionDates.vue"
 import { useCollectionStore } from "@/stores/collection"
 import { useSystemStore } from "@/stores/system"
 import { useItemStore } from "@/stores/item"
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useWindowSize } from '@vueuse/core'
 
+const { width } = useWindowSize()
 const route = useRoute()
 const router = useRouter()
 const collection = useCollectionStore ()
 const item = useItemStore()
 const system = useSystemStore()
+
+const curioWidth = ref()
+const curioHeight = ref()
+
+watch( width, () => {
+   setCurioDimensions()
+})
 
 const publishedDate = computed(()=>{
    let field = item.details.fields.find( f => f.name == "published_date")
@@ -109,17 +118,15 @@ const curioURL = computed(()=>{
    return url
 })
 
-const curioWidth = computed(()=>{
+const setCurioDimensions = (() => {
    let mainPanelW = document.getElementById("v4main").offsetWidth
-   return `${mainPanelW*0.95}px`
-})
-
-const curioHeight = computed(()=>{
-   let viewerW = parseInt(curioWidth.value,10)
-   return `${viewerW*0.75}px`
+   let w = mainPanelW * 0.95
+   curioWidth.value = `${w}px`
+   curioHeight.value = `${w*0.75}px`
 })
 
 onMounted(()=>{
+   setCurioDimensions()
    window.onmessage = (e) => {
       if ( e.data.name == "curio") {
          // convert the curio params object into a query string and use replaceState to update the URL in place

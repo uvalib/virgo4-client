@@ -135,15 +135,8 @@ const selectedDigitalObjectIdx = ref(0)
 const pdfTimerIDs = ref(new Map())
 const ocrTimerIDs = ref(new Map())
 const fsView = ref(false)
-const curioHeight = ref("700px")
-const defaultWidth = ()=>{
-   let w = 800
-   if ( width.value < 800) {
-      w = width.value * 0.95
-   }
-   return w + "px"
-}
-const curioWidth = ref(defaultWidth())
+const curioHeight = ref()
+const curioWidth = ref()
 const carouselTabIndex = ref([])
 
 const { loadingDigitalContent } = storeToRefs(item)
@@ -153,6 +146,20 @@ watch( loadingDigitalContent, (newValue) => {
       carouselTabIndex.value = Array(item.digitalContent.length).fill(0)
       carouselTabIndex.value.fill(-1,7)
    }
+})
+
+watch( width, () => {
+   setCurioDimensions()
+})
+
+const setCurioDimensions = (() => {
+   let mainPanelW = document.getElementById("v4main").offsetWidth
+   let w = mainPanelW * 0.95
+   if (w > 1000) {
+      w = 1000
+   }
+   curioWidth.value = `${w}px`
+   curioHeight.value = `${w*0.75}px`
 })
 
 const carouselPaged = ( (pg) => {
@@ -236,6 +243,8 @@ const hasImage = computed(()=>{
 })
 
 onMounted(()=>{
+   setCurioDimensions()
+
    // if the selected digital object index is present in the URL, apply it
    let tgtIdx = route.query.idx
    if (tgtIdx) {
@@ -266,9 +275,6 @@ onMounted(()=>{
             qp.push(`page=${curio.page}`)
          }
          history.replaceState(history.state, '', "?"+qp.join("&"))
-      } else if (e.data.dimensions && e.data.dimensions.height != "0px"){
-         curioHeight.value = e.data.dimensions.height
-         // let Virgo determine the screen width
       }
    }
 })
