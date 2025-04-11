@@ -12,7 +12,7 @@
             <div v-if="fsView" class="restore-view">
                <VirgoButton severity="info"  @click="toggleFullView" label="Exit full screen" />
             </div>
-            <iframe class="curio" :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"
+            <iframe tabindex="0" class="curio" :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"
                allowfullscreen frameborder="0" :title="`viewer for ${item.details.header.title}`" />
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
