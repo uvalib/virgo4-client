@@ -44,7 +44,7 @@ const backToTop = (()=> {
    bottom: 20px;
    right: 30px;
    z-index: 99;
-   outline: 2px solid #fff;
+   border: 2px solid #fff;
    background-color: $uva-brand-blue;
    color: #fff;
    cursor: pointer;
@@ -55,6 +55,10 @@ const backToTop = (()=> {
    &:hover {
       color: white;
       background-color: $uva-grey-A;
+   }
+   &:focus {
+      outline: 2px dotted white;
+      outline-offset: 3px;
    }
 }
 </style>

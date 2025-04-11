@@ -111,6 +111,9 @@ const UVA = definePreset(Aura, {
                   hoverBorderColor: colors.grey,
                   borderColor: colors.grey100,
                   color: colors.textDark,
+                  focusRing: {
+                     color: colors.brandBlue100,
+                  },
                },
                contrast: {
                   background: colors.brandOrangeDark,
@@ -136,11 +139,19 @@ const UVA = definePreset(Aura, {
                   primary: {
                      hoverBackground: colors.grey200,
                      activeBackground: colors.grey200,
-                     color: colors.textDark
-                 },
+                     color: colors.textDark,
+                  },
                },
                link: {
                   color: colors.linkBase,
+               },
+               outlined: {
+                  secondary: {
+                      hoverBackground:colors.grey200,
+                      borderColor: colors.grey100,
+                      color: colors.textDark,
+
+                  },
                }
             }
          }
