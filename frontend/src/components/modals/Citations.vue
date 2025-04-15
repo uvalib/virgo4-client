@@ -23,7 +23,9 @@
                   </div>
                </div>
             </div>
+            <Message v-if="copied" severity="success" :life="3000" @life-end="copied=false">{{ message }}</Message>
          </template>
+
       </div>
       <template #footer>
          <VirgoButton @click="closeDialog" label="Cancel" severity="secondary"/>
@@ -37,7 +39,7 @@ import { useItemStore } from "@/stores/item"
 import { ref} from 'vue'
 import { useClipboard } from '@vueuse/core'
 import Dialog from 'primevue/dialog'
-import { useToast } from "primevue/usetoast"
+import Message from 'primevue/message'
 
 const props = defineProps({
    itemURL: {
@@ -52,7 +54,6 @@ const props = defineProps({
 
 const { copy } = useClipboard()
 const itemStore = useItemStore()
-const toast = useToast()
 
 const loading = ref(true)
 const failed = ref(false)
@@ -60,6 +61,8 @@ const citations = ref(null)
 const selectedIdx = ref(0)
 const showDialog = ref(false)
 const trigger = ref(null)
+const message = ref("")
+const copied = ref(false)
 
 const citationSelected = ((idx) => {
    selectedIdx.value = idx
@@ -93,19 +96,21 @@ const copyCitation = (() => {
    div.innerHTML = citation.value
    const text = div.textContent
    copy(text )
-   toast.add({severity:'success', summary: "Citation Copied", detail: citation.label+" citation copied to clipboard."})
+   message.value =  citation.label+" citation copied to clipboard."
+   copied.value = true
 })
 </script>
 
 <style lang="scss" scoped>
 .citations-content {
    max-height: 500px;
-   width: 500px;
+   max-width: 600px;
 
    .citations {
       display: flex;
       flex-direction: column;
       gap: 1rem;
+      margin-bottom: 15px;
       label {
          font-weight: bold;
       }
