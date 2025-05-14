@@ -322,13 +322,6 @@ export const useUserStore = defineStore('user', {
             }
          }
 
-         if (this.isSignedIn && parsed.barcode == "") {
-            console.log("BAD CLAIMS; EXPIRE SESSION")
-            await this.signout(false)
-            useSystemStore().setSessionExpired()
-            return
-         }
-
          localStorage.setItem("v4_jwt", jwtStr)
 
          // Use the new JWT token in auth headers for all a requests and handle reauth if it expires
