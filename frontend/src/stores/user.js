@@ -65,22 +65,7 @@ export const useUserStore = defineStore('user', {
          if (state.noILSAccount == false ) return false
          if (!state.accountInfo.description ) return false
          if (state.sirsiUnavailable) return false
-
-         let desc = state.accountInfo.description.toLowerCase()
-         let allowed = desc.includes("alumni") == false
-         if (allowed) return true
-
-         // Description includes alumni, so this user can't create a sirsi account.. unless they
-         // also have one of these in their description too
-         let roles = ["continuing and professional studies student", "contractor", "faculty",
-            "staff", "graduate student", "instructor", "sponsored account",
-            "student worker", "undergraduate student"]
-         desc.split(",").forEach( r => {
-            if ( roles.includes( r.trim() ) ) {
-               allowed = true
-            }
-         })
-         return allowed
+         return true
       },
       isGuest: (state) => {
          return (state.role == 'guest' || state.role == '')
