@@ -28,10 +28,6 @@ const props = defineProps({
       type: Object,
       required: true
    },
-   origin: {
-      type: String,
-      required: true
-   },
    labeled: {
       type: Boolean,
       default: false
@@ -61,7 +57,7 @@ const bookmarkCount = computed(()=>{
 const bookmarkClicked = (() => {
    emit("clicked")
    if ( bookmarkCount.value == 0) {
-      bookmarkStore.showAddBookmark( props.pool, props.hit, bookmarkbtn.value.$el, props.origin )
+      bookmarkStore.showAddBookmark( props.pool, props.hit, bookmarkbtn.value.$el )
       return
    }
 

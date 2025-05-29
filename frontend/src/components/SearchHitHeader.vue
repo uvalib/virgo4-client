@@ -13,7 +13,7 @@
             <span v-if="props.hit.header.subtitle" class="hit-subtitle" v-html="props.hit.header.subtitle"></span>
          </router-link>
       </div>
-      <SearchHitActions :hit="props.hit" :pool="props.pool" :from="props.from" />
+      <SearchHitActions :hit="props.hit" :pool="props.pool" />
    </div>
    <div v-if="props.hit.header.author_display" class="author-wrapper">
       <span v-if="props.expand" :id="`${props.hit.identifier}-author`" v-html="props.hit.header.author_display"></span>
@@ -45,10 +45,6 @@ const props = defineProps({
    count: {
       type: Number,
       default: 0
-   },
-   from: {
-      type: String,
-      default: ""
    },
    expand: {
       type: Boolean,

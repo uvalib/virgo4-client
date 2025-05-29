@@ -108,8 +108,10 @@ const getInitialBrowseData = ( async () => {
    let tgt = props.hit.identifier
 
    let newBM = null
-   if ( restore.pendingBookmark && restore.pendingBookmark.origin == "SHELF_BROWSE" ) {
+   if ( restore.pendingBookmark ) {
       // if a bookmark add was restored, make it the target of shelf browse (center option)
+      // NOTE: this component is loaded from the item page, which has the first shot at
+      // handling a pending bookmark. If it is handled there, pendingBookmark will be cleared.
       newBM = restore.pendingBookmark
       tgt = newBM.hit.identifier
       restore.clear()

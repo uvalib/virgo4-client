@@ -13,7 +13,7 @@
 <script setup>
 import ItemView from "@/components/details/ItemView.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
-import { onMounted, onUpdated, ref, nextTick } from 'vue'
+import { onMounted, onUpdated, ref } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { useCollectionStore } from "@/stores/collection"
@@ -50,18 +50,16 @@ const getDetails = ( async (src, id, initialPage) => {
    getCollectionContext()
 
    if ( initialPage ) {
-      nextTick( async () => {
-         if ( restore.pendingBookmark && (restore.pendingBookmark.origin == "DETAIL" || restore.pendingBookmark.origin == "COLLECTION") ) {
-            let newBM = restore.pendingBookmark
-            let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier ) == 0 )
-            if (showAdd) {
-               let triggerBtn = document.querySelector(".icon-wrap .bookmark")
-               bookmarks.showAddBookmark( newBM.pool, newBM.hit, triggerBtn, "DETAIL")
-            }
-            restore.clear()
+      if ( restore.pendingBookmark && restore.pendingBookmark.hit.identifier == id) {
+         let newBM = restore.pendingBookmark
+         let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier ) == 0 )
+         if (showAdd) {
+            let triggerBtn = document.querySelector(".icon-wrap .bookmark")
+            bookmarks.showAddBookmark( newBM.pool, newBM.hit, triggerBtn, "DETAIL")
          }
-         loadingDetails.value = false
-      })
+         restore.clear()
+      }
+      loadingDetails.value = false
    } else {
       loadingDetails.value = false
    }

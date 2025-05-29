@@ -1,7 +1,7 @@
 <template>
    <div class="icon-wrap">
       <Citations :itemURL="props.hit.itemURL" />
-      <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from"/>
+      <BookmarkButton :pool="props.pool" :hit="props.hit" />
    </div>
 </template>
 
@@ -17,10 +17,6 @@ const props = defineProps({
    pool: {
       type: String,
       required: true
-   },
-   from: {
-      type: String,
-      default: ""
    },
 })
 </script>

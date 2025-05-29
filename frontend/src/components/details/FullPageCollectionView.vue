@@ -4,7 +4,7 @@
    </div>
    <div v-else class="details-content" v-bind:style="{width: curioWidth }">
       <h1>{{ item.details.header.title }}</h1>
-      <ActionsPanel :hit="item.details" :pool="item.details.source" from="COLLECTION" />
+      <ActionsPanel :hit="item.details" :pool="item.details.source" :pdf="item.hasDigitalContent" />
 
       <h2>View online</h2>
       <div class="issue-info">{{item.details.header.title}}</div>

@@ -1,7 +1,7 @@
 <template>
    <div class="inner-hit-wrapper" :class="{group: props.hit.grouped}">
       <div class="hit" :id="props.hit.identifier">
-         <SearchHitHeader :count="props.count" :hit="props.hit" :pool="props.pool" from="SEARCH"/>
+         <SearchHitHeader :count="props.count" :hit="props.hit" :pool="props.pool" />
          <ContentAdvisory v-if="hasContentAdvisory" mode="brief"/>
          <SearchHitDetail :hit="props.hit" :pool="props.pool"/>
       </div>
@@ -14,7 +14,7 @@
             class="group-hit" :id="groupHit.identifier"
             :class="{last: idx==props.hit.group.length-1, first: idx==0}"
          >
-            <SearchHitHeader :count="groupHit.number" :hit="groupHit" :pool="pool" from="SEARCH"/>
+            <SearchHitHeader :count="groupHit.number" :hit="groupHit" :pool="pool" />
             <ContentAdvisory v-if="hasContentAdvisory" mode="brief"/>
             <SearchHitDetail :hit="groupHit" :pool="pool"/>
          </div>

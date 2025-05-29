@@ -112,7 +112,7 @@ const handleQueryParamChange = ( async( ) => {
       } else {
          await resultStore.searchPool({pool: poolStore.poolDetails(pool)})
       }
-      if ( restore.pendingBookmark && restore.pendingBookmark.origin == "SEARCH" ) {
+      if ( restore.pendingBookmark ) {
          handlePendingBookmark()
          restore.clear()
       } else {

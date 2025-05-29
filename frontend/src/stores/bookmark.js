@@ -6,7 +6,7 @@ import axios from 'axios'
 export const useBookmarkStore = defineStore('bookmark', {
 	state: () => ({
       showAddDialog: false,
-      newBookmark: {hit: null, pool: "", origin: ""},
+      newBookmark: {hit: null, pool: ""},
       addBoomkarkTrigger: null,
       searching: false,
       public: [],
@@ -86,9 +86,8 @@ export const useBookmarkStore = defineStore('bookmark', {
          this.$reset()
       },
 
-      // origin: SEARCH, DETAIL, COLLECTION, SHELF_BROWSE
-      showAddBookmark( pool, hit, trigger, origin ) {
-         this.newBookmark = {hit: hit, pool: pool, origin: origin}
+      showAddBookmark( pool, hit, trigger ) {
+         this.newBookmark = {hit: hit, pool: pool}
          this.showAddDialog = true
          this.addBoomkarkTrigger = trigger
       },

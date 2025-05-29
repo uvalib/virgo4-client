@@ -4,7 +4,7 @@
          <span class="group-cnt" v-if="props.hit.grouped">{{props.hit.count}} images</span>
          <span class="group-cnt" v-else>1 image</span>
          <span class="buttons">
-            <BookmarkButton :pool="props.pool" :hit="props.hit" origin="SEARCH"/>
+            <BookmarkButton :pool="props.pool" :hit="props.hit" />
          </span>
       </div>
       <router-link @mousedown="detailClicked" class="img-link" :to="detailsURL">

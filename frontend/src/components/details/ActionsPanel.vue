@@ -4,10 +4,10 @@
       <div class="panel">
          <div class="gutter"></div>
          <div class="content">
-            <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from" :labeled="true"/>
+            <BookmarkButton :pool="props.pool" :hit="props.hit" :labeled="true"/>
             <Citations :itemURL="props.hit.itemURL" />
             <VirgoButton icon="fal fa-download fa-lg" text rounded label="Download RIS" @click="downloadRISClicked"/>
-            <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
+            <span class="pdf-wrap" v-if="props.pdf"  >
                <VirgoButton  v-if="!pdfDownloading" icon="fal fa-file-pdf fa-lg"
                   label="Download PDF" text rounded @click="pdfClicked"/>
                <div v-else class="progress">
@@ -49,9 +49,9 @@ const props = defineProps({
       type: String,
       required: true
    },
-   from: {
-      type: String,
-      default: ""
+   pdf: {
+      type: Boolean,
+      required: true
    },
 })
 
