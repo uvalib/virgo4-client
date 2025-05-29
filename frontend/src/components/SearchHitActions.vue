@@ -1,6 +1,6 @@
 <template>
    <div class="icon-wrap">
-      <Citations v-if="showCitations" :itemURL="props.hit.itemURL" :from="from"/>
+      <Citations :itemURL="props.hit.itemURL" />
       <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from"/>
    </div>
 </template>
@@ -8,8 +8,6 @@
 <script setup>
 import BookmarkButton from "@/components/BookmarkButton.vue"
 import Citations from "@/components/modals/Citations.vue"
-import { computed } from 'vue'
-import { useToast } from "primevue/usetoast"
 
 const props = defineProps({
    hit: {
@@ -24,15 +22,6 @@ const props = defineProps({
       type: String,
       default: ""
    },
-})
-
-const toast = useToast()
-
-const showCitations = computed(()=>{
-   if (props.from.toUpperCase() == 'SEARCH' || props.from.toUpperCase() == 'COLLECTION') {
-      return true
-   }
-   return false
 })
 </script>
 

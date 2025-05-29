@@ -5,7 +5,7 @@
          <div class="gutter"></div>
          <div class="content">
             <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from" :labeled="true"/>
-            <Citations :itemURL="props.hit.itemURL" :from="props.from"/>
+            <Citations :itemURL="props.hit.itemURL" />
             <VirgoButton icon="fal fa-download fa-lg" text rounded label="Download RIS" @click="downloadRISClicked"/>
             <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
                <VirgoButton  v-if="!pdfDownloading" icon="fal fa-file-pdf fa-lg"
