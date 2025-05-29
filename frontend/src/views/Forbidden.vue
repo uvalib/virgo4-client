@@ -9,8 +9,8 @@
 
 <style scoped lang="scss">
 .notfound {
-   padding: 5px;
-   margin-bottom:150px;
+   margin: 0;
+   padding:0 0 150px 0;
    font-size: 1.15em;
 }
 </style>
