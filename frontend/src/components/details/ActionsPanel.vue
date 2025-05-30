@@ -4,7 +4,7 @@
       <div class="panel">
          <div class="gutter"></div>
          <div class="content">
-            <BookmarkButton :pool="props.pool" :hit="props.hit" :labeled="true"/>
+            <BookmarkButton :pool="props.pool" :identifier="props.hit.identifier" :labeled="true"/>
             <Citations :itemURL="props.hit.itemURL" />
             <VirgoButton icon="fal fa-download fa-lg" text rounded label="Download RIS" @click="downloadRISClicked"/>
             <span class="pdf-wrap" v-if="props.pdf"  >
@@ -40,6 +40,7 @@ const item = useItemStore()
 const pdfDownloading = ref(false)
 const pdfTimerID = ref(-1)
 
+// TODO this is not needed... just use the item store
 const props = defineProps({
    hit: {
       type: Object,

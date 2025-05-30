@@ -98,7 +98,7 @@ func (svc *ServiceContext) GetRSSFeed(c *gin.Context) {
 	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
 	signedStr, err := v4jwt.Mint(guestClaim, time.Minute, svc.JWTKey)
 
-	searchResp, _ := svc.SearchPost(searchData, signedStr)
+	searchResp, _ := svc.PoolPost(svc.CatalogPoolURL, searchData, signedStr)
 
 	var searchResult v4api.PoolResult
 	if err := json.Unmarshal(searchResp, &searchResult); err != nil {

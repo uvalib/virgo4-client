@@ -6,7 +6,7 @@ import axios from 'axios'
 export const useBookmarkStore = defineStore('bookmark', {
 	state: () => ({
       showAddDialog: false,
-      newBookmark: {hit: null, pool: ""},
+      newBookmark: {identifier: null, pool: ""},
       addBoomkarkTrigger: null,
       searching: false,
       public: [],
@@ -86,8 +86,8 @@ export const useBookmarkStore = defineStore('bookmark', {
          this.$reset()
       },
 
-      showAddBookmark( pool, hit, trigger ) {
-         this.newBookmark = {hit: hit, pool: pool}
+      showAddBookmark( pool, identifier, trigger ) {
+         this.newBookmark = {identifier: identifier, pool: pool}
          this.showAddDialog = true
          this.addBoomkarkTrigger = trigger
       },
@@ -96,31 +96,12 @@ export const useBookmarkStore = defineStore('bookmark', {
          const userStore = useUserStore()
          let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/add`
-         let data = {folder: folder, pool: this.newBookmark.pool, identifier: this.newBookmark.hit.identifier}
-         let detail = {title : this.newTitle, author: this.newAuthor}
-
-         if ( this.newBookmark.hit.fields ) {
-            this.newBookmark.hit.fields.forEach( f => {
-               if ( f.name == "format") {
-                  if ( Array.isArray(f.value)) {
-                     detail.format = f.value.join("; ")
-                  } else {
-                     detail.format = f.value
-                  }
-               }
-               if ( f.name == "call_number") {
-                  detail.callNumber = f.value
-               }
-               if ( f.name == "library") {
-                  detail.library = f.value
-               }
-            })
-         }
-
-         data['details'] = JSON.stringify(detail)
+         let data = {folder: folder, pool: this.newBookmark.pool, identifier: this.newBookmark.identifier}
          return axios.post(url, data).then((response) => {
             this.setBookmarks(response.data)
-         })
+         }).catch(() => {
+            useSystemStore().setError(error)
+          })
       },
 
       clearAddBookmark() {

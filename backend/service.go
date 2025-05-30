@@ -468,26 +468,37 @@ func (svc *ServiceContext) PDAGet(path string, jwt string) ([]byte, *RequestErro
 	return resp, err
 }
 
-// SearchPost sends a POST to the search pool and returns results
-func (svc *ServiceContext) SearchPost(body any, jwt string) ([]byte, *RequestError) {
-	url := svc.CatalogPoolURL
-	log.Printf("Seach Pool POST request: %s", url)
-	startTime := time.Now()
+// PoolPost sends a POST to the specified pool
+func (svc *ServiceContext) PoolPost(url string, body any, jwt string) ([]byte, *RequestError) {
+	log.Printf("INFO: pool post request: %s %v", url, body)
 	b, _ := json.Marshal(body)
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	req.Header.Add("Content-type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
-	httpClient := svc.HTTPClient
-	rawResp, rawErr := httpClient.Do(req)
+	return svc.sendRequest(req)
+}
+
+// PoolGet sends a GET to the specified pool
+func (svc *ServiceContext) PoolGet(url string, jwt string) ([]byte, *RequestError) {
+	log.Printf("INFO: pool get request: %s", url)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
+	return svc.sendRequest(req)
+}
+
+func (svc *ServiceContext) sendRequest(req *http.Request) ([]byte, *RequestError) {
+	startTime := time.Now()
+	url := req.URL.String()
+	rawResp, rawErr := svc.HTTPClient.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
 
 	if err != nil {
-		log.Printf("ERROR: Failed response from Search POST %s - %d:%s. Elapsed Time: %d (ms)",
-			url, err.StatusCode, err.Message, elapsedMS)
+		log.Printf("ERROR: failed response from %s %s - %d:%s. Elapsed Time: %d (ms)",
+			req.Method, url, err.StatusCode, err.Message, elapsedMS)
 	} else {
-		log.Printf("Successful response from Search POST %s. Elapsed Time: %d (ms)", url, elapsedMS)
+		log.Printf("INFO: successful response from %s %s. Elapsed Time: %d (ms)", req.Method, url, elapsedMS)
 	}
 	return resp, err
 }
@@ -573,14 +584,14 @@ func handleAPIResponse(logURL string, resp *http.Response, err error) ([]byte, *
 		return nil, &RequestError{StatusCode: status, Message: errMsg}
 	} else if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		defer resp.Body.Close()
-		bodyBytes, _ := ioutil.ReadAll(resp.Body)
+		bodyBytes, _ := io.ReadAll(resp.Body)
 		status := resp.StatusCode
 		errMsg := string(bodyBytes)
 		return nil, &RequestError{StatusCode: status, Message: errMsg}
 	}
 
 	defer resp.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	bodyBytes, _ := io.ReadAll(resp.Body)
 	return bodyBytes, nil
 }
 

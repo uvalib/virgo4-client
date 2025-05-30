@@ -24,8 +24,8 @@ const props = defineProps({
       type: String,
       required: true
    },
-   hit: {
-      type: Object,
+   identifier: {
+      type: String,
       required: true
    },
    labeled: {
@@ -51,13 +51,13 @@ const bookmarkIcon = computed(() => {
 })
 
 const bookmarkCount = computed(()=>{
-   return bookmarkStore.bookmarkCount( props.pool, props.hit.identifier)
+   return bookmarkStore.bookmarkCount( props.pool, props.identifier)
 })
 
 const bookmarkClicked = (() => {
    emit("clicked")
    if ( bookmarkCount.value == 0) {
-      bookmarkStore.showAddBookmark( props.pool, props.hit, bookmarkbtn.value.$el )
+      bookmarkStore.showAddBookmark( props.pool, props.identifier, bookmarkbtn.value.$el )
       return
    }
 
@@ -89,12 +89,12 @@ const bookmarkClicked = (() => {
 const removeBookmark = ( () => {
    bookmarkStore.bookmarks.forEach( folder => {
       folder.bookmarks.forEach( item => {
-         if (item.pool == props.pool && item.identifier == props.hit.identifier) {
+         if (item.pool == props.pool && item.identifier == props.identifier) {
             bookmarkStore.removeBookmark(folder.id, item.id)
          }
       })
    })
-   analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', props.hit.identifier)
+   analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', props.identifier)
    bookmarkbtn.value.$el.focus()
 })
 </script>

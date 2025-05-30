@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -46,6 +47,25 @@ type Bookmark struct {
 	AddedAt    time.Time `json:"addedAt"`
 	Identifier string    `json:"identifier"`
 	Details    string    `json:"details"`
+}
+
+type bookmarkDetails struct {
+	Title      string `json:"title"`
+	Author     string `json:"author"`
+	CallNumber string `json:"callNumber"`
+	Format     string `json:"format"`
+	Library    string `json:"library"`
+}
+
+type itemField struct {
+	Type      string `json:"type"`
+	Name      string `json:"name"`
+	Value     string `json:"value"`
+	Separator string `json:"separator,omitempty"`
+}
+
+type itemDetails struct {
+	Fields []itemField `json:"fields"`
 }
 
 func (svc *ServiceContext) preloadBookmarks() *gorm.DB {
@@ -179,52 +199,101 @@ func (svc *ServiceContext) DeleteBookmarkFolder(c *gin.Context) {
 func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 	userID := c.GetInt("v4id")
 	v4UserID := c.Param("uid")
-	var item struct {
-		Folder     string
-		Pool       string
-		Identifier string
-		Details    string
+	var addRequest struct {
+		Folder     string `json:"folder"`
+		Pool       string `json:"pool"`
+		Identifier string `json:"identifier"`
 	}
-	err := c.ShouldBindJSON(&item)
+	err := c.ShouldBindJSON(&addRequest)
 	if err != nil {
 		log.Printf("ERROR: user %s invalid item add bookmark payload: %s", v4UserID, err.Error())
 		c.String(http.StatusBadRequest, "Invalid bookmark request")
 		return
 	}
-	log.Printf("INFO: user %s:%d add bookmark %+v requested", v4UserID, userID, item)
+	log.Printf("INFO: user %s:%d add bookmark %+v requested", v4UserID, userID, addRequest)
 
-	log.Printf("INFO: looking up source %s", item.Pool)
+	log.Printf("INFO: looking up source %s", addRequest.Pool)
 	var source Source
-	resp := svc.GDB.Where("name=?", item.Pool).First(&source)
+	resp := svc.GDB.Where("name=?", addRequest.Pool).First(&source)
 	if resp.Error != nil {
-		log.Printf("ERROR: unable to find source %s: %s", item.Pool, resp.Error.Error())
-		c.String(http.StatusNotFound, "source %s not found", item.Pool)
+		log.Printf("ERROR: unable to find source %s: %s", addRequest.Pool, resp.Error.Error())
+		c.String(http.StatusNotFound, "source %s not found", addRequest.Pool)
 		return
 	}
 
-	log.Printf("INFO: lookup folder %s", item.Folder)
+	log.Printf("INFO: request details for %s:%s from %s", addRequest.Pool, addRequest.Identifier, source.PrivateURL)
+	itemURL := fmt.Sprintf("%s/api/resource/%s", source.PrivateURL, addRequest.Identifier)
+	jwtIface, _ := c.Get("jwt")
+	jwt, _ := jwtIface.(string)
+	rawResp, getErr := svc.PoolGet(itemURL, jwt)
+	if getErr != nil {
+		c.String(getErr.StatusCode, getErr.Message)
+		return
+	}
+
+	var item itemDetails
+	err = json.Unmarshal(rawResp, &item)
+	if err != nil {
+		log.Printf("ERROR: unable to parse item data: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	bmData := bookmarkDetails{}
+	for _, field := range item.Fields {
+		if field.Type == "title" {
+			bmData.Title = field.Value
+		} else if field.Name == "author" {
+			if bmData.Author == "" {
+				bmData.Author = field.Value
+			} else {
+				bmData.Author += fmt.Sprintf("%s%s", field.Separator, field.Value)
+			}
+		} else if field.Name == "format" {
+			if bmData.Format == "" {
+				bmData.Format = field.Value
+			} else {
+				bmData.Format += fmt.Sprintf("%s%s", field.Separator, field.Value)
+			}
+		} else if field.Name == "call_number" {
+			if bmData.CallNumber == "" {
+				bmData.CallNumber = field.Value
+			} else {
+				bmData.CallNumber += fmt.Sprintf("%s%s", field.Separator, field.Value)
+			}
+		} else if field.Name == "library" {
+			if bmData.Library == "" {
+				bmData.Library = field.Value
+			} else {
+				bmData.Library += fmt.Sprintf("%s%s", field.Separator, field.Value)
+			}
+		}
+	}
+	detailJSON, _ := json.Marshal(bmData)
+
+	log.Printf("INFO: lookup folder %s", addRequest.Folder)
 	var folder BookmarkFolder
-	resp = svc.GDB.Preload("Bookmarks").Where("name=? and user_id=?", item.Folder, userID).First(&folder)
+	resp = svc.GDB.Preload("Bookmarks").Where("name=? and user_id=?", addRequest.Folder, userID).First(&folder)
 	if resp.Error != nil {
 		if errors.Is(resp.Error, gorm.ErrRecordNotFound) == false {
-			log.Printf("ERROR: failed lookup for folder %s: %s", item.Folder, resp.Error.Error())
+			log.Printf("ERROR: failed lookup for folder %s: %s", addRequest.Folder, resp.Error.Error())
 			c.String(http.StatusInternalServerError, resp.Error.Error())
 			return
 		}
-		log.Printf("INFO: user %s folder %s not found; creating...", v4UserID, item.Folder)
-		folder.Name = item.Folder
+		log.Printf("INFO: user %s folder %s not found; creating...", v4UserID, addRequest.Folder)
+		folder.Name = addRequest.Folder
 		folder.AddedAt = time.Now()
 		folder.UserID = userID
 		addResp := svc.GDB.Create(&folder)
 		if addResp.Error != nil {
-			log.Printf("ERROR: user %s create folder %s failed: %s", v4UserID, item.Folder, resp.Error.Error())
+			log.Printf("ERROR: user %s create folder %s failed: %s", v4UserID, addRequest.Folder, resp.Error.Error())
 			c.String(http.StatusInternalServerError, addResp.Error.Error())
 			return
 		}
 	}
 
-	log.Printf("INFO: %s adding new bookmark to %s", v4UserID, item.Folder)
-	bm := Bookmark{UserID: userID, FolderID: folder.ID, SourceID: source.ID, AddedAt: time.Now(), Identifier: item.Identifier, Details: item.Details}
+	log.Printf("INFO: %s adding new bookmark to %s", v4UserID, addRequest.Folder)
+	bm := Bookmark{UserID: userID, FolderID: folder.ID, SourceID: source.ID, AddedAt: time.Now(), Identifier: addRequest.Identifier, Details: string(detailJSON)}
 	resp = svc.GDB.Create(&bm)
 	if resp.Error != nil {
 		log.Printf("ERROR: user %s unable to add bookmark %+v: %s", v4UserID, item, resp.Error.Error())

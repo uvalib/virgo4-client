@@ -25,7 +25,7 @@
             <span class="year">[{{props.data.published_date}}]</span>
             <span class="loc">{{props.data.location}}</span>
          </div>
-         <BookmarkButton :pool="props.pool" :hit="data" @clicked="bookmarkClicked(props.data.id)"/>
+         <BookmarkButton :pool="props.pool" :identifier="data.id" @clicked="bookmarkClicked(props.data.id)"/>
       </template>
       <template v-else>
          <div class="list details">
@@ -42,7 +42,7 @@
                   </template>
                </span>
             </span>
-            <BookmarkButton :pool="props.pool" :hit="props.data" @clicked="bookmarkClicked(props.data.id)"/>
+            <BookmarkButton :pool="props.pool" :identifier="props.data.id" @clicked="bookmarkClicked(props.data.id)"/>
          </div>
       </template>
    </div>

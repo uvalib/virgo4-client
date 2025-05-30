@@ -9,7 +9,7 @@
          </p>
       </div>
       <div v-else class="add-content">
-         <div>{{bookmarkStore.newBookmark.hit.identifier}}: <b>{{bookmarkStore.newTitle}}</b></div>
+         <div><b>{{bookmarkStore.newTitle}}</b></div>
          <TruncatedText v-if="bookmarkStore.newAuthor" id="bookmark-author" :text="bookmarkStore.newAuthor" :limit="120" ></TruncatedText>
          <div class="select" >
             <template v-if="showAdd==false">

@@ -13,7 +13,10 @@
             <span v-if="props.hit.header.subtitle" class="hit-subtitle" v-html="props.hit.header.subtitle"></span>
          </router-link>
       </div>
-      <SearchHitActions :hit="props.hit" :pool="props.pool" />
+      <div class="icon-wrap">
+         <Citations :itemURL="props.hit.itemURL" />
+         <BookmarkButton :pool="props.pool" :identifier="props.hit.identifier" />
+      </div>
    </div>
    <div v-if="props.hit.header.author_display" class="author-wrapper">
       <span v-if="props.expand" :id="`${props.hit.identifier}-author`" v-html="props.hit.header.author_display"></span>
@@ -24,7 +27,8 @@
 
 <script setup>
 import TruncatedText from "@/components/TruncatedText.vue"
-import SearchHitActions from "@/components/SearchHitActions.vue"
+import BookmarkButton from "@/components/BookmarkButton.vue"
+import Citations from "@/components/modals/Citations.vue"
 import { computed } from 'vue'
 import analytics from '@/analytics'
 import { useResultStore } from "@/stores/result"
@@ -93,6 +97,14 @@ const detailClicked = (() => {
       flex-flow: row nowrap;
       align-items: flex-start;
       justify-content: flex-start;
+   }
+
+   .icon-wrap {
+      display: flex;
+      flex-flow: row nowrap;
+      margin-left: auto;
+      justify-content: flex-end;
+      align-items: center;
    }
 
    .count-wrap {
