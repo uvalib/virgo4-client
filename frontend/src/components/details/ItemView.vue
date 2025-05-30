@@ -78,7 +78,7 @@
          </dl>
       </div>
    </div>
-   <ActionsPanel :hit="details" :pool="details.source" :pdf="false" />
+   <ActionsPanel />
    <DigitalContent />
    <template v-if="details.source != 'images'">
       <InterLibraryLoan v-if="system.isKiosk == false && poolStore.hasInterLibraryLoan(details.source)" /> <!-- pools that support ILL (WorldCat) should not show any other availabilty UI-->

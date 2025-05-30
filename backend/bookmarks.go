@@ -231,6 +231,7 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 		return
 	}
 
+	// log.Printf("%s", rawResp)
 	var item itemDetails
 	err = json.Unmarshal(rawResp, &item)
 	if err != nil {
@@ -241,6 +242,9 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 
 	bmData := bookmarkDetails{}
 	for _, field := range item.Fields {
+		if field.Separator == "" {
+			field.Separator = "; "
+		}
 		if field.Type == "title" {
 			bmData.Title = field.Value
 		} else if field.Name == "author" {

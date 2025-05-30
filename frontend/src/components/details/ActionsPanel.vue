@@ -4,10 +4,10 @@
       <div class="panel">
          <div class="gutter"></div>
          <div class="content">
-            <BookmarkButton :pool="props.pool" :identifier="props.hit.identifier" :labeled="true"/>
-            <Citations :itemURL="props.hit.itemURL" />
+            <BookmarkButton :pool="item.details.source" :identifier="item.details.identifier" :labeled="true"/>
+            <Citations :itemURL="item.details.itemURL" />
             <VirgoButton icon="fal fa-download fa-lg" text rounded label="Download RIS" @click="downloadRISClicked"/>
-            <span class="pdf-wrap" v-if="props.pdf"  >
+            <span class="pdf-wrap" v-if="showPDF"  >
                <VirgoButton  v-if="!pdfDownloading" icon="fal fa-file-pdf fa-lg"
                   label="Download PDF" text rounded @click="pdfClicked"/>
                <div v-else class="progress">
@@ -27,42 +27,32 @@ import Citations from "@/components/modals/Citations.vue"
 import analytics from '@/analytics'
 import { useSystemStore } from "@/stores/system"
 import { useItemStore } from "@/stores/item"
+import { useCollectionStore } from "@/stores/collection"
 import { useClipboard } from '@vueuse/core'
 import { useToast } from "primevue/usetoast"
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import ProgressBar from 'primevue/progressbar'
 
 const { copy } = useClipboard()
 const toast = useToast()
 const system = useSystemStore()
 const item = useItemStore()
+const collection = useCollectionStore()
 
 const pdfDownloading = ref(false)
 const pdfTimerID = ref(-1)
 
-// TODO this is not needed... just use the item store
-const props = defineProps({
-   hit: {
-      type: Object,
-      required: true
-   },
-   pool: {
-      type: String,
-      required: true
-   },
-   pdf: {
-      type: Boolean,
-      required: true
-   },
+const showPDF = computed(() => {
+   return ( collection.isFullPage && item.hasDigitalContent )
 })
 
 const downloadRISClicked = (() => {
-   analytics.trigger('Export', 'RIS_FROM_DETAIL', props.hit.identifier)
-   window.location.href = `${system.citationsURL}/format/ris?item=${encodeURI(props.hit.itemURL)}`
+   analytics.trigger('Export', 'RIS_FROM_DETAIL', item.details.identifier)
+   window.location.href = `${system.citationsURL}/format/ris?item=${encodeURI(item.details.itemURL)}`
 })
 
 const permalinkClicked = ( () => {
-   analytics.trigger('Results', 'SHARE_ITEM_CLICKED', props.hit.identifier)
+   analytics.trigger('Results', 'SHARE_ITEM_CLICKED', item.details.identifier)
    copy( window.location.href )
    toast.add({severity:'success', summary:  "Copied", detail:  "Item URL copied to clipboard.", life: 5000})
 })
