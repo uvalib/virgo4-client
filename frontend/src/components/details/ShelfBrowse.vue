@@ -7,7 +7,7 @@
          <h2 id="shelf-title">Shelf browse</h2>
          <ul class="browse-cards" role="list">
             <li v-for="(b,idx) in shelfStore.browse" class="card-wrap" :key="`b${b.id}`">
-               <BrowseCard :current="isCurrent(idx)" :pool="props.pool" :data="b" style="height:100%"/>
+               <BrowseCard :current="isCurrent(idx)" :data="b" style="height:100%"/>
             </li>
          </ul>
          <div class="browse-controls">

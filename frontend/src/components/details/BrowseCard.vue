@@ -3,7 +3,7 @@
       <template v-if="props.mode=='gallery'">
          <div class="thumb-wrap">
             <span v-if="props.data.status=='ready'" class="vertical-spacer"></span>
-            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`"
+            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.data.source}/items/${props.data.id}`"
                tabindex="-1" :aria-label="`view item titled ${props.data.title}`"
             >
                <template v-if="props.data.status=='ready' || props.data.status=='url'">
@@ -19,19 +19,19 @@
          </div>
          <div class="details">
             <span class="call">{{props.data.call_number}}</span>
-            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" class="title">
+            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.data.source}/items/${props.data.id}`" class="title">
                {{truncateTitle(props.data.title)}}
             </router-link>
             <span class="year">[{{props.data.published_date}}]</span>
             <span class="loc">{{props.data.location}}</span>
          </div>
-         <BookmarkButton :pool="props.pool" :identifier="data.id" @clicked="bookmarkClicked(props.data.id)"/>
+         <BookmarkButton :pool="props.data.source" :identifier="data.id" @clicked="bookmarkClicked(props.data.id)"/>
       </template>
       <template v-else>
          <div class="list details">
             <span class="index">{{props.index}}.</span>
             <span class="stuff">
-               <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" class="title">
+               <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.data.source}/items/${props.data.id}`" class="title">
                   {{truncateTitle(props.data.title)}}
                </router-link>
                <span class="year">[{{props.data.published_date}}]</span>
@@ -42,7 +42,7 @@
                   </template>
                </span>
             </span>
-            <BookmarkButton :pool="props.pool" :identifier="props.data.id" @clicked="bookmarkClicked(props.data.id)"/>
+            <BookmarkButton :pool="props.data.source" :identifier="props.data.id" @clicked="bookmarkClicked(props.data.id)"/>
          </div>
       </template>
    </div>
@@ -55,10 +55,6 @@ import analytics from '@/analytics'
 const props = defineProps({
    current: {
       type: Boolean,
-      required: true
-   },
-   pool: {
-      type: String,
       required: true
    },
    data: {

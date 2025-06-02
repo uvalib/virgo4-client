@@ -91,7 +91,7 @@ const UVA = definePreset(Aura, {
             paddingY: '.5em',
             paddingX: '1em',
             gap: '1rem',
-            borderRadius: '0.3rem',
+            borderRadius: '.3rem',
             sm: {
                fontSize: '0.875rem',
                paddingX: '0.625rem',
@@ -105,35 +105,41 @@ const UVA = definePreset(Aura, {
          },
          colorScheme: {
             light: {
-               secondary: {
-                  background: colors.grey200,
-                  hoverBackground: colors.grey100,
-                  hoverBorderColor: colors.grey,
-                  borderColor: colors.grey100,
-                  color: colors.textDark,
-                  focusRing: {
-                     color: colors.brandBlue100,
+               root: {
+                  primary: {
+                     hoverBackground: colors.brandBlue200,
                   },
-               },
-               contrast: {
-                  background: colors.brandOrangeDark,
-                  hoverBackground: colors.brandOrange,
-                  activeBackground: colors.brandOrange,
-                  focusRing: {
-                     color: 'white',
-                     shadow: 'none'
-                  }
-               },
-               info: {
-                  background: colors.blueAlt300,
-                  activeBackground: colors.blueAlt300,
-                  activeColor: '#000000',
-                  hoverBackground: '#91d8f2',
-                  hoverBorderColor: '#007BAC',
-                  borderColor: '#007BAC',
-                  color: '#000000',
-                  hoverColor: '#000000',
-                  borderWidth: '2px'
+                  secondary: {
+                     background: colors.grey200,
+                     hoverBackground: colors.grey100,
+                     hoverBorderColor: colors.grey,
+                     borderColor: colors.grey100,
+                     activeBackground: colors.grey100,
+                     color: colors.textDark,
+                     focusRing: {
+                        color: colors.brandBlue100,
+                     },
+                  },
+                  contrast: {
+                     background: colors.brandOrangeDark,
+                     hoverBackground: colors.brandOrange,
+                     activeBackground: colors.brandOrange,
+                     focusRing: {
+                        color: 'white',
+                        shadow: 'none'
+                     }
+                  },
+                  info: {
+                     background: colors.blueAlt300,
+                     activeBackground: colors.blueAlt300,
+                     activeColor: '#000000',
+                     hoverBackground: '#91d8f2',
+                     hoverBorderColor: '#007BAC',
+                     borderColor: '#007BAC',
+                     color: '#000000',
+                     hoverColor: '#000000',
+                     borderWidth: '2px'
+                  },
                },
                text: {
                   primary: {
@@ -143,7 +149,9 @@ const UVA = definePreset(Aura, {
                   },
                },
                link: {
-                  color: colors.linkBase,
+                  color: colors.blueAltDark,
+                  hoverColor: colors.blueAlt,
+                  activeColor: colors.blueAltDark,
                },
                outlined: {
                   secondary: {

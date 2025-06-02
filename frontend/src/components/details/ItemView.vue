@@ -35,7 +35,7 @@
                   />
                   <span class="related" v-else-if="field.type=='related-url'">
                      <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
-                        <VirgoButton as="a" :href="v.url" target="_blank" :label="v.label" />
+                        <VirgoButton as="a" :href="v.url" target="_blank" :label="v.label" size="small"/>
                      </div>
                   </span>
                   <span class="copyright" v-else-if="field.type=='copyright'">

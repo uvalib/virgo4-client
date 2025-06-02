@@ -21,7 +21,7 @@
                   </div>
                   <div class="links">
                      <template  v-for="l in s.links">
-                        <VirgoButton as="a" :label="linkLabel(l, s.provider)" :href="l.url" target="_blank" aria-describedby="external-link"/>
+                        <VirgoButton as="a" :label="linkLabel(l, s.provider)" :href="l.url" size="small" target="_blank" aria-describedby="external-link"/>
                      </template>
                   </div>
                </div>

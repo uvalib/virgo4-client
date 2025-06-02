@@ -40,7 +40,7 @@
          <div class="browse-detail" >
             <div class="browse-cards" :class="currViewMode">
                <BrowseCard  v-for="(b,idx) in shelfStore.browse" :current="isCurrent(idx)"
-                  :pool="route.params.src" :data="b"  :key="`b${b.id}`" :mode="currViewMode" :index="idx+1"
+                  :data="b"  :key="`b${b.id}`" :mode="currViewMode" :index="idx+1"
                />
             </div>
          </div>
