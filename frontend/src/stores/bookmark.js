@@ -99,8 +99,14 @@ export const useBookmarkStore = defineStore('bookmark', {
          let data = {folder: folder, pool: this.newBookmark.pool, identifier: this.newBookmark.identifier}
          return axios.post(url, data).then((response) => {
             this.setBookmarks(response.data)
-         }).catch(() => {
-            useSystemStore().setError(error)
+         }).catch((error) => {
+            console.error("Bookmark failed: "+error)
+            let errTxt = error
+            if (error.response && error.response.data) {
+               errTxt = error.response.data
+            }
+            let msg = `Unable to add bookmark for ${this.newBookmark.identifier}: ${errTxt}`
+            useSystemStore().setError(msg)
           })
       },
 
