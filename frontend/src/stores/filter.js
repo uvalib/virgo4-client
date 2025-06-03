@@ -106,6 +106,13 @@ export const useFilterStore = defineStore('filter', {
    },
 
    actions: {
+      setDirty() {
+         this.facets.forEach( f => {
+            if (f.pool != "presearch") {
+               f.dirty = true
+            }
+         })
+      },
       setPreSearchFilters(filters) {
          // Clear out PRESEARCH filter only. Leave others alone because they
          // may have been restored from query params
@@ -138,6 +145,7 @@ export const useFilterStore = defineStore('filter', {
             tgtPFObj = {pool: data.pool, facets: []}
             this.facets.push(tgtPFObj)
          }
+         delete tgtPFObj.dirty
          delete tgtPFObj.placeholder
          let tgtFacets = tgtPFObj.facets
          let selected = []
@@ -336,9 +344,13 @@ export const useFilterStore = defineStore('filter', {
             // check filter for either: no filters or placeholder filters (presearch promotions or restored from url)
             let poolFacetObj = this.facets.find( pf => pf.pool == pool.id)
             if ( poolFacetObj ) {
-               if ( !(poolFacetObj.placeholder === true || poolFacetObj.facets.length == 0) ) {
-                  console.log("Facets are current, do not refresh")
-                  return
+               if ( poolFacetObj.dirty === true ) {
+                  console.log("pool "+poolFacetObj.pool+" facets marked dirty by a new search; refreshing")
+               } else {
+                  if ( !(poolFacetObj.placeholder === true || poolFacetObj.facets.length == 0) ) {
+                     console.log("pool "+poolFacetObj.pool+" facets are current, do not refresh")
+                     return
+                  }
                }
             }
          }

@@ -96,7 +96,7 @@ async function retrySearch() {
       page: resultStore.selectedResults.page
    }
    await resultStore.searchPool(params)
-   filters.getSelectedResultFacets(false)
+   filters.getSelectedResultFacets(true)
 }
 async function loadMoreResults() {
    if ( resultStore.searching) return

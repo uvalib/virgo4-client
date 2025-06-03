@@ -22,7 +22,6 @@ export function useRouteUtils( router,route ) {
       }
 
       // Interrogate query params and convert them to a search in the model (if present)
-      let oldQ = queryStore.string
       if (query.mode == 'advanced') {
          queryStore.setAdvancedSearch()
       } else {
@@ -30,72 +29,60 @@ export function useRouteUtils( router,route ) {
       }
 
       let targetPool = "presearch"
-      let oldFilterParam = ""
-      let oldSort = ""
-      let poolChanged = false
-
       if (query.pool) {
-         poolChanged = (query.pool != queryStore.targetPool)
          targetPool = query.pool
          queryStore.setTargetPool(targetPool)
+      }
 
-         // get sort from URL (but preserve current sort)...
-         let oldSortObj = sortStore.poolSort(targetPool)
-         oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
-         if (query.sort) {
-            sortStore.setPoolSort(targetPool, query.sort)
-            sortStore.setActivePool(targetPool)
-         } else {
-            sortStore.setPoolSort(targetPool, oldSort)
-            sortStore.setActivePool(targetPool)
-         }
+      // get sort from URL (but preserve current sort)...
+      let oldSortObj = sortStore.poolSort(targetPool)
+      let oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
+      if (query.sort) {
+         sortStore.setPoolSort(targetPool, query.sort)
+         sortStore.setActivePool(targetPool)
+      } else {
+         sortStore.setPoolSort(targetPool, oldSort)
+         sortStore.setActivePool(targetPool)
       }
 
       // get pool filters from URL (but preserve current)...
-      oldFilterParam = filters.asQueryParam(targetPool)
+      let oldFilterParam = filters.asQueryParam(targetPool)
       if (query.filter) {
          filters.restoreFromURL(query.filter, targetPool)
       } else {
          filters.resetPoolFilters(targetPool)
       }
 
+      // get query and preserve current
+      let oldQ = queryStore.string
       if (query.q) {
          queryStore.restoreFromURL(query.q)
       }
 
-      // If there is a query or filter in params it may be necessary to run a search
-      if (query.q || query.filter) {
-         // console.log(`Q: ${queryStore.string} vs ${oldQ}`)
-         // console.log(`F: ${filters.asQueryParam(targetPool)} vs ${oldFilterParam}`)
-         // console.log(`S: ${sortStore.activeSort} vs ${oldSort}`)
-         // console.log(`U: ${queryStore.userSearched}`)
+      // only re-run search when query, sort or filtering has changed - or a user has initiated a search with a UI element
+      if ( queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam ||
+           sortStore.activeSort != oldSort || queryStore.userSearched == true) {
+         resultStore.resetSearchResults()
+         let refreshFacets = queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam || queryStore.userSearched == true
+         queryStore.userSearched = false
 
-         // only re-run search when query, sort or filtering has changed
-         if (queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam ||
-            sortStore.activeSort != oldSort || queryStore.userSearched == true) {
-            resultStore.resetSearchResults()
+         await searchCallback(queryStore.searchSources)
 
-            if (queryStore.userSearched) {
-               queryStore.userSearched = false
-            }
-
-            await searchCallback(queryStore.searchSources)
-
-            // don't refresh facets if only sorting changed
-            let refreshFacets = queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam || queryStore.userSearched == true
-            filters.getSelectedResultFacets(refreshFacets)
-
-            if (query.sort === undefined || query.pool != resultStore.selectedResults.pool.id) {
-               let newQ = Object.assign({}, query)
-               newQ.pool = resultStore.selectedResults.pool.id
-               newQ.sort = sortStore.activeSort
-               router.replace({path: "/search", query: newQ})
-            }
+         if (query.sort === undefined || query.pool != resultStore.selectedResults.pool.id) {
+            // Ensure pool and sort are always part of the URL. This will re-trigger queryParamsChanged.
+            let newQ = Object.assign({}, query)
+            newQ.pool = resultStore.selectedResults.pool.id
+            newQ.sort = sortStore.activeSort
+            router.replace({path: "/search", query: newQ})
          } else {
-            if (poolChanged) {
-               filters.getSelectedResultFacets(false)
-            }
+            // only request facets if the URL isn't replaced above since the URL replacement
+            // will trigger another pass thru queryParamsChanged and the facets will be requesed below
+            filters.getSelectedResultFacets(refreshFacets)
          }
+      } else {
+         // just a pool change, don't force a reload - but facets will reload if marked dirty, or none have previously been loaded
+         filters.getSelectedResultFacets(false)
+
       }
    })
 
@@ -116,6 +103,7 @@ export function useRouteUtils( router,route ) {
          sortStore.promotePreSearchSort( poolStore.list )
       }
 
+      filters.setDirty()   // new search entered; flag exisiting facets for refresh
       queryStore.userSearched = true
       router.push({path: "/search", query: newQ})
    })
@@ -126,15 +114,12 @@ export function useRouteUtils( router,route ) {
 
       let newQ = Object.assign({}, route.query)
       delete newQ.page
-      delete newQ.filter
-      delete newQ.q
-      if ( queryStore.queryEntered ) {
-         newQ.q = queryStore.string
-      }
+
+      queryStore.setBasicSearch()
+      newQ.q = queryStore.string
       newQ.filter = filters.asQueryParam( "presearch" )
       newQ.pool = queryStore.targetPool
 
-      queryStore.userSearched = true
       router.push({path: "/search", query: newQ })
    })
 
