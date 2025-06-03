@@ -11,6 +11,11 @@
             <div v-else-if="userStore.isHSLUser" class="subcontent">
                <a :href="systemStore.hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i></a>
             </div>
+            <div v-else-if="userStore.illiadBlocked" class="subcontent">
+               <p class="ils-error">Your Illiad account is blocked.<br/>
+                  Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
+               </p>
+            </div>
             <div v-else class="subcontent buttons">
                <VirgoButton @click="instructionalScanClick" label="Instructional Scanning"/>
                <VirgoButton @click="illBorrowClick" label="ILL Borrow Item"/>

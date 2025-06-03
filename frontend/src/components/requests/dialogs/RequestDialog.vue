@@ -10,7 +10,7 @@
       <template #footer>
          <template v-if="props.showSubmit">
             <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
-            <VirgoButton :label="props.request" :disabled="props.disabled" @click="emit('submit')" />
+            <VirgoButton :label="props.request" :disabled="props.disabled || props.submitDisabled" @click="emit('submit')" />
          </template>
          <VirgoButton v-else severity="secondary" id="request-done" @click="showDialog=false" label="Close"/>
       </template>
@@ -46,6 +46,10 @@ const props = defineProps({
       requitred: true
    },
    disabled: {
+      type: Boolean,
+      default: false
+   },
+   submitDisabled: {
       type: Boolean,
       default: false
    }

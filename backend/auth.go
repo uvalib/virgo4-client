@@ -362,6 +362,41 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 		v4Claims.UseSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
 	}
 
+	// ILLiad Claims
+	v4Claims.HasIlliad = false
+	respBytes, illErr := svc.ILLiadRequest("GET", fmt.Sprintf("Users/%s", v4Claims.UserID), nil)
+	if illErr != nil && illErr.StatusCode == 404 {
+		log.Printf("WARN: unable to get ILLiad user: %s", illErr.Message)
+	} else if illErr != nil {
+		log.Printf("ERROR: unable to get ILLiad user: %s", illErr.Message)
+	} else {
+		v4Claims.HasIlliad = true
+		type illiadResponse struct {
+			Department   string `json:"Department"`
+			Organization string `json:"Organization"`
+			Country      string `json:"Country"`
+			Cleared      string `json:"Cleared"`
+		}
+		var illResp illiadResponse
+		var locationParts []string
+		if err := json.Unmarshal(respBytes, &illResp); err != nil {
+			log.Printf("ERROR: unable to parse ILLiad user response: %s\n%s", err.Error(), respBytes)
+		} else {
+			if illResp.Department != "" {
+				locationParts = append(locationParts, illResp.Department)
+			}
+			if illResp.Organization != "" {
+				locationParts = append(locationParts, illResp.Organization)
+			}
+			if illResp.Country != "" {
+				locationParts = append(locationParts, illResp.Country)
+			}
+
+			v4Claims.LEOLocation = strings.Join(locationParts, ", ")
+			v4Claims.IlliadCleared = illResp.Cleared
+		}
+	}
+
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
 	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Minute, svc.JWTKey)

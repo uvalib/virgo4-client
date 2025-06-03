@@ -385,42 +385,12 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 		v4User = User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
 	}
 
-	log.Printf("Get leo delivery address")
-	leoLocation := make([]string, 0)
-	hasIlliad := false
-	respBytes, illErr := svc.ILLiadRequest("GET", fmt.Sprintf("Users/%s", userID), nil)
-	if illErr != nil {
-		log.Printf("WARN: unable to get leo address info: %s", illErr.Message)
-	} else {
-		var resp map[string]interface{}
-		if err := json.Unmarshal(respBytes, &resp); err != nil {
-			log.Printf("ERROR: unable to parse ILLIAD user response: %s", err.Error())
-		} else {
-			val, ok := resp["Department"].(string)
-			if ok && val != "" {
-				leoLocation = append(leoLocation, val)
-			}
-			val, ok = resp["Organization"].(string)
-			if ok && val != "" {
-				leoLocation = append(leoLocation, val)
-			}
-			val, ok = resp["Country"].(string)
-			if ok && val != "" {
-				leoLocation = append(leoLocation, val)
-				hasIlliad = true
-				log.Printf("INFO: %s has ILLiad account [%s]", userID, val)
-			}
-		}
-	}
-
 	// Combine local V4 database user info with ILS user info and return results to client
 	type fullUser struct {
 		*User
-		UserInfo      *ILSUserInfo `json:"user"`
-		ILLiadAccount bool         `json:"hasIlliadAccount"`
-		LeoLocation   string       `json:"leoLocation"`
+		UserInfo *ILSUserInfo `json:"user"`
 	}
-	user := fullUser{User: &v4User, UserInfo: &ilsUser, LeoLocation: strings.Join(leoLocation, ", "), ILLiadAccount: hasIlliad}
+	user := fullUser{User: &v4User, UserInfo: &ilsUser}
 	c.JSON(http.StatusOK, user)
 }
 

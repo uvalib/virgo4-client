@@ -46,7 +46,6 @@ export const useUserStore = defineStore('user', {
       lockedOut: false,
       parsedJWT: {},
       noILSAccount: false,
-      noILLiadAccount: false,
       accountRequest: {name: "", id: "", email: "", phone: "", department: "",
          address1: "", address2: "", city: "", state: "", zip: ""},
       tempAccount: {},
@@ -115,6 +114,21 @@ export const useUserStore = defineStore('user', {
       },
       isBarred: state => {
          return state.accountInfo.standing == "BARRED" ||  state.accountInfo.standing == "BARR-SUPERVISOR"
+      },
+      hasIlliad: state => {
+         if ( state.claims.hasIlliad ) return state.claims.hasIlliad
+         return false
+      },
+      illiadBlocked: (state) => {
+         if(state.claims.illiadCleared == "Yes"){
+            return false
+         }
+         console.log("INFO: Blocking ILLiad. Cleared: %s ", state.claims.illiadCleared)
+         return true
+      },
+      leoLocation: (state) => {
+         if ( state.claims.leoLocation ) return state.claims.leoLocation
+         return false
       },
       isHSLUser: state => {
          return state.claims.homeLibrary == "HEALTHSCI"
@@ -277,6 +291,9 @@ export const useUserStore = defineStore('user', {
             homeLibrary: parsed.homeLibrary,
             canLEO: parsed.canLEO,
             canLEOPlus: parsed.canLEOPlus,
+            leoLocation: parsed.leoLocation,
+            illiadCleared: parsed.illiadCleared,
+            hasIlliad: parsed.hasIlliad,
             canPlaceReserve: parsed.canPlaceReserve,
             useSIS: parsed.useSIS,
             isUVA: parsed.isUva,
@@ -356,8 +373,6 @@ export const useUserStore = defineStore('user', {
       },
       setAccountInfo(data) {
          this.accountInfo = data.user
-         this.accountInfo.leoAddress = data.leoLocation
-         this.noILLiadAccount = !data.hasIlliadAccount
          this.noILSAccount = data.user.noAccount
          this.sirsiUnavailable = data.user.sirsiUnavailable
          if (localStorage.getItem("v4_requested") ) {

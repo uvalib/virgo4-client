@@ -1,6 +1,7 @@
 <template>
    <RequestDialog trigger="Request an item" title="Request Item" request="Place Hold"
-      :show="request.activeRequest=='hold'" :showSubmit="submitted == false && user.isSignedIn" :disabled="request.working"
+      :show="request.activeRequest=='hold'" :showSubmit="submitted == false && user.isSignedIn"
+      :disabled="request.working" :submit-disabled="pickupLibrary == 'LEO' && user.illiadBlocked"
       @opened="dialogOpened" @closed="dialogClosed" @submit="holdForm.node.submit()"
    >
       <SignIn v-if="!user.isSignedIn" />
@@ -23,11 +24,22 @@
             </p>
          </div>
 
-         <div v-if="pickupLibrary == 'LEO' && (user.noILLiadAccount==true || user.accountInfo.leoAddress=='')"
+         <div v-if="pickupLibrary == 'LEO'"
             class="illiad-prompt ra-box ra-fiy"
          >
-            It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
-            <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
+            <template v-if="!user.hasIlliad">
+               No ILLiad account found.<br/>
+               To register <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
+               please complete this form. <i class='fal fa-external-link-alt'></i></a>
+            </template>
+            <template v-else-if="user.illiadBlocked">
+               Your ILLiad account is blocked.<br/>
+               Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
+            </template>
+            <template v-else-if="user.leoLocation==''">
+               It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
+               <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
+            </template>
          </div>
             <div class="medium-rare-message" v-if="pickupLibrary == 'SPEC-COLL' ">
             <p>

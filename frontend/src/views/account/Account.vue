@@ -176,18 +176,24 @@
 
          <div class="account-group" v-if="userStore.canUseLEO">
             <h3>ILLiad</h3>
-            <dl v-if="info.leoAddress">
+            <p class="sc" v-if="!userStore.hasIlliad">
+               No ILLiad account found.<br/>
+               To register <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
+               please complete this form. <i class='fal fa-external-link-alt'></i></a>
+            </p>
+            <p v-else-if="userStore.illiadBlocked" class="standing-info">
+               Your ILLiad account is blocked.<br/>
+               Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
+            </p>
+            <dl v-if="userStore.leoLocation">
                <dt>LEO Delivery Location:</dt>
                <dd>
-                  {{info.leoAddress}}
+                  {{userStore.leoLocation}}
                </dd>
                <p>
-                  <a target="_blank" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad Account">Visit ILLiad</a> to change your LEO delivery location.
+                  <a target="_blank" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad account">Visit ILLiad</a> to change your LEO delivery location.
                </p>
             </dl>
-            <p class="sc" v-else>
-               Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> to set up LEO Delivery.
-            </p>
          </div>
 
          <div class="account-group">
