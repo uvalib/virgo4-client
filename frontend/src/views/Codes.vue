@@ -1,53 +1,81 @@
 <template>
    <div class="codes">
-      <div class="working" v-if="systemStore.working" >
-         <V4Spinner message="Looking up codes..."/>
+      <div class="working" v-if="systemStore.working">
+         <V4Spinner message="Looking up codes..." />
       </div>
-      <AccordionContent id="lib-codes">
-         <template v-slot:title>Library Codes</template>
-         <table>
-            <tbody>
-               <tr>
-                  <th>ID</th><th>Code</th><th>Name</th>
-                  <th class="center">On Shelf</th><th class="center">Circulating</th>
-               </tr>
-               <tr v-for="lc in systemStore.libraryCodes" :key="`loc${lc.id}`">
-                  <td>{{lc.id}}</td>
-                  <td>{{lc.key}}</td>
-                  <td>{{lc.description}}</td>
-                  <td class="center"><span :class="getText(lc.on_shelf).toLowerCase()">{{ getText(lc.on_shelf) }}</span></td>
-                  <td class="center"><span :class="getText(lc.circulating).toLowerCase()">{{ getText(lc.circulating) }}</span></td>
-               </tr>
-            </tbody>
-         </table>
-      </AccordionContent>
-      <AccordionContent id="loc-codes">
-         <template v-slot:title>Location Codes</template>
-         <table>
-            <tbody>
-               <tr>
-                  <th>ID</th><th>Code</th><th>Description</th><th>Online</th>
-                  <th>Shadowed</th><th>On Shelf</th><th>Circulating</th>
-               </tr>
-               <tr v-for="lc in systemStore.locationCodes" :key="`loc${lc.id}`">
-                  <td>{{lc.id}}</td>
-                  <td>{{lc.key}}</td>
-                  <td>{{lc.description}}</td>
-                  <td class="center"><span :class="getText(lc.online).toLowerCase()">{{ getText(lc.online) }}</span></td>
-                  <td class="center"><span :class="getText(lc.shadowed).toLowerCase()">{{ getText(lc.shadowed) }}</span></td>
-                  <td class="center"><span :class="getText(lc.on_shelf).toLowerCase()">{{ getText(lc.on_shelf) }}</span></td>
-                  <td class="center"><span :class="getText(lc.circulating).toLowerCase()">{{ getText(lc.circulating) }}</span></td>
-               </tr>
-            </tbody>
-         </table>
-      </AccordionContent>
+      <Tabs value="lib-codes">
+         <TabList>
+            <Tab value="lib-codes">Library Codes</Tab>
+            <Tab value="loc-codes">Location Codes</Tab>
+         </TabList>
+         <TabPanels>
+            <TabPanel value="lib-codes">
+               <DataTable :value="systemStore.libraryCodes" size="small" exportFilename="libcodes"
+                  showGridlines stripedRows ref="libcodes" dataKey="id">
+                  <template #header>
+                     <VirgoButton severity="secondary" size="small" label="Export CSV" @click="exportLibCodes"/>
+                  </template>
+                  <Column field="id" header="ID" sortable/>
+                  <Column field="key" header="Code" sortable/>
+                  <Column field="description" header="Name" sortable/>
+                  <Column field="on_shelf" header="On Shelf" sortable>
+                     <template #body="slotProps">
+                        <span :class="getText(slotProps.data.on_shelf).toLowerCase()">{{ getText(slotProps.data.on_shelf) }}</span>
+                     </template>
+                  </Column>
+                  <Column field="circulating" header="Circulating" sortable>
+                     <template #body="slotProps">
+                        <span :class="getText(slotProps.data.circulating).toLowerCase()">{{ getText(slotProps.data.circulating) }}</span>
+                     </template>
+                  </Column>
+               </DataTable>
+            </TabPanel>
+            <TabPanel value="loc-codes">
+               <DataTable :value="systemStore.locationCodes" size="small" exportFilename="loccodes"
+                  showGridlines stripedRows ref="libcodes" dataKey="id">
+                  <template #header>
+                     <VirgoButton severity="secondary" size="small" label="Export CSV" @click="exportLocCodes"/>
+                  </template>
+                  <Column field="id" header="ID" sortable/>
+                  <Column field="key" header="Code" sortable/>
+                  <Column field="description" header="Name" sortable/>
+                  <Column field="online" header="Online" sortable>
+                     <template #body="slotProps">
+                        <span :class="getText(slotProps.data.online).toLowerCase()">{{ getText(slotProps.data.online) }}</span>
+                     </template>
+                  </Column>
+                  <Column field="shadowed" header="Shadowed" sortable>
+                     <template #body="slotProps">
+                        <span :class="getText(slotProps.data.shadowed).toLowerCase()">{{ getText(slotProps.data.shadowed) }}</span>
+                     </template>
+                  </Column>
+                  <Column field="on_shelf" header="On Shelf" sortable>
+                     <template #body="slotProps">
+                        <span :class="getText(slotProps.data.on_shelf).toLowerCase()">{{ getText(slotProps.data.on_shelf) }}</span>
+                     </template>
+                  </Column>
+                  <Column field="circulating" header="Circulating" sortable>
+                     <template #body="slotProps">
+                        <span :class="getText(slotProps.data.circulating).toLowerCase()">{{ getText(slotProps.data.circulating) }}</span>
+                     </template>
+                  </Column>
+               </DataTable>
+            </TabPanel>
+         </TabPanels>
+      </Tabs>
    </div>
 </template>
 
 <script setup>
-import AccordionContent from "@/components/AccordionContent.vue"
 import { useSystemStore } from "@/stores/system"
-import { onMounted } from "vue"
+import { onMounted,ref } from "vue"
+import Tabs from 'primevue/tabs'
+import TabList from 'primevue/tablist'
+import Tab from 'primevue/tab'
+import TabPanels from 'primevue/tabpanels'
+import TabPanel from 'primevue/tabpanel'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 const systemStore = useSystemStore()
 
@@ -58,12 +86,33 @@ function getText( flag ) {
    return 'No'
 }
 
+const libcodes = ref()
+const loccodes = ref()
+
 onMounted(() => {
   systemStore.getCodes()
 })
+
+const exportLibCodes = (() => {
+   libcodes.value.exportCSV()
+})
+
+const exportLocCodes = (() => {
+   loccodes.value.exportCSV()
+})
+
 </script>
 
 <style scoped lang="scss">
+:deep(td) {
+   border: 1px solid $uva-grey-200 !important;
+}
+:deep(th) {
+   padding: 0.5rem 0.75rem !important;
+   border: 1px solid $uva-grey-100 !important;
+   background-color: $uva-grey-200;
+   border-top: 0;
+}
 .codes {
    min-height: 400px;
    position: relative;
@@ -103,27 +152,5 @@ span.no {
    text-align: center;
    font-size: 1.25em;
 }
-.working img {
-   margin: 30px 0;
-}
-.accordion {
-   margin-bottom: 15px;
-}
-table {
-   width: 100%;
-   font-weight: normal;
-}
-table td {
-   padding: 4px 5px;
-   border-bottom: 1px solid $uva-grey-100;
-}
-.center {
-   text-align: center;
-}
-table th {
-   padding: 4px 5px;
-   background: $uva-grey-200;
-   border-bottom: 1px solid $uva-grey;
-   border-top: 1px solid $uva-grey;
-}
+
 </style>

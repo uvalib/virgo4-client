@@ -50,7 +50,9 @@ export const useUserStore = defineStore('user', {
          address1: "", address2: "", city: "", state: "", zip: ""},
       tempAccount: {},
       accountRequested: false,
-      sirsiUnavailable: false
+      sirsiUnavailable: false,
+      requestInterceptor: null,
+      responseInterceptor: null
    }),
 
    getters: {
@@ -327,8 +329,12 @@ export const useUserStore = defineStore('user', {
          localStorage.setItem("v4_jwt", jwtStr)
 
          // Use the new JWT token in auth headers for all a requests and handle reauth if it expires
+         if ( this.requestInterceptor ) {
+            console.log("remove existing request intercptor")
+            axios.interceptors.request.eject( this.requestInterceptor)
+         }
          const system = useSystemStore()
-         axios.interceptors.request.use( async config => {
+         this.requestInterceptor = axios.interceptors.request.use( async config => {
             if ( config.url.indexOf("/api") == 0 ) {
                config.headers['X-Virgo-Version'] = system.version
             }
@@ -344,7 +350,11 @@ export const useUserStore = defineStore('user', {
             return Promise.reject(error)
          })
 
-         axios.interceptors.response.use(
+         if ( this.responseInterceptor ) {
+            console.log("remove existing response intercptor")
+            axios.interceptors.response.eject(this.responseInterceptor )
+         }
+         this.responseInterceptor = axios.interceptors.response.use(
             res => res,
             async err => {
                if (err.response && err.response.status == 406) {

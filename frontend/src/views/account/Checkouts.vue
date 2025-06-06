@@ -45,7 +45,7 @@ import AccountActivities from "@/components/account/AccountActivities.vue"
 import ILLCheckoutsPanel from "@/components/account/ILLCheckoutsPanel.vue"
 import UVACheckoutsPanel from "@/components/account/UVACheckoutsPanel.vue"
 import RenewSummary from "@/components/modals/RenewSummary.vue"
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
 import analytics from '@/analytics'
