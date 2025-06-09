@@ -9,8 +9,8 @@
          </p>
       </div>
       <div v-else class="add-content">
-         <div><b>{{bookmarkStore.newTitle}}</b></div>
-         <TruncatedText v-if="bookmarkStore.newAuthor" id="bookmark-author" :text="bookmarkStore.newAuthor" :limit="120" ></TruncatedText>
+         <div><b>{{bookmarkStore.newBookmark.title}}</b></div>
+         <TruncatedText v-if="bookmarkStore.newBookmark.author" id="bookmark-author" :text="bookmarkStore.newBookmark.author" :limit="120" ></TruncatedText>
          <div class="select" >
             <template v-if="showAdd==false">
                <label for="folder">Select a folder for the bookmark</label>
@@ -119,6 +119,7 @@ const okBookmark = (async () => {
    margin-right: auto;
 }
 div.add-content {
+max-width: 450px;
    p {
       padding: 0;
       margin: 0 0 10px 0;

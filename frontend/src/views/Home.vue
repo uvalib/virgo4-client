@@ -129,19 +129,19 @@ const handleQueryParamChange = ( async( ) => {
 function handlePendingBookmark() {
    const bookmarks = useBookmarkStore()
    let newBM = restore.pendingBookmark
-   let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier ) == 0 )
+   let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
 
-   let triggerBtn = document.getElementById(`bm-btn-${ newBM.hit.identifier}`)
-   if (  newBM.hit.groupParent ) {
+   let triggerBtn = document.getElementById(`bm-btn-${ newBM.identifier}`)
+   if (  newBM.groupParent ) {
       // The group accordion watches this value. When set, the accordion will auto-expand,
       // adding the target item to the DOM
-      let parent = resultStore.selectedResults.hits.find( r=> r.identifier == newBM.hit.groupParent)
+      let parent = resultStore.selectedResults.hits.find( r=> r.identifier == newBM.groupParent)
       resultStore.autoExpandGroupID = `group-${parent.identifier}`
    }
-   scrollToItem(newBM.hit.identifier, false)
+   scrollToItem(newBM.identifier, false)
 
    if ( showAdd ) {
-      bookmarks.showAddBookmark( newBM.pool, newBM.hit, triggerBtn, "SEARCH")
+      bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn)
    }
 }
 

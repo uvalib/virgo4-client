@@ -6,7 +6,9 @@ import axios from 'axios'
 export const useBookmarkStore = defineStore('bookmark', {
 	state: () => ({
       showAddDialog: false,
-      newBookmark: {identifier: null, pool: ""},
+      // Note: only pool, identifier and groupParent are used. Title/Author are for temp display only
+      // and will be looked up when bookmark is made
+      newBookmark: {pool: "", identifier: null, groupParent: "", title: "", author: ""},
       addBoomkarkTrigger: null,
       searching: false,
       public: [],
@@ -14,26 +16,6 @@ export const useBookmarkStore = defineStore('bookmark', {
    }),
 
    getters: {
-      newAuthor: state => {
-         let author = ""
-         if ( state.newBookmark.hit) {
-            author = state.newBookmark.hit.author
-            if ( state.newBookmark.hit.header ) {
-               author = state.newBookmark.hit.header.author_display
-            }
-         }
-         return author
-      },
-      newTitle: state => {
-         let title = ""
-         if ( state.newBookmark.hit) {
-            title = state.newBookmark.hit.title
-            if ( state.newBookmark.hit.header ) {
-               title = state.newBookmark.hit.header.title
-            }
-         }
-         return title
-      },
       hasBookmarks: state => {
          if ( state.bookmarks.length === 0) return false
          return true
@@ -86,8 +68,36 @@ export const useBookmarkStore = defineStore('bookmark', {
          this.$reset()
       },
 
-      showAddBookmark( pool, identifier, trigger ) {
-         this.newBookmark = {identifier: identifier, pool: pool}
+      showAddBookmark( pool, details, trigger ) {
+         this.newBookmark = {pool: pool, identifier: details.identifier }
+
+          // normalize the various data sources into a simplified newBookmark struct
+          // The sources: search hit header, item details, shelf browse and restored bookmark
+         if ( details.groupParent) {
+            this.newBookmark.groupParent = details.groupParent
+         } else {
+            if (details.grouped) {
+               this.newBookmark.groupParent = details.group[0].groupParent
+            } else if ( details.groupParent ) {
+               this.newBookmark.groupParent =  details.groupParent
+            }
+         }
+
+         // shelf browse has title in top level data, and no author
+         // restored also has top level title and possibly top level author
+         if (details.title) {
+            this.newBookmark.title = details.title
+            if ( details.author ) {
+               this.newBookmark.author = details.author
+            }
+         } else {
+            // search hits and item details put the title and author in header
+            this.newBookmark.title = details.header.title
+            if ( details.header.author ) {
+               this.newBookmark.author = details.header.author.value.join(details.header.author.separator)
+            }
+         }
+
          this.showAddDialog = true
          this.addBoomkarkTrigger = trigger
       },

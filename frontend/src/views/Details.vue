@@ -50,12 +50,12 @@ const getDetails = ( async (src, id, initialPage) => {
    getCollectionContext()
 
    if ( initialPage ) {
-      if ( restore.pendingBookmark && restore.pendingBookmark.hit.identifier == id) {
+      if ( restore.pendingBookmark && restore.pendingBookmark.identifier == id) {
          let newBM = restore.pendingBookmark
-         let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier ) == 0 )
+         let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
          if (showAdd) {
             let triggerBtn = document.querySelector(".icon-wrap .bookmark")
-            bookmarks.showAddBookmark( newBM.pool, newBM.hit, triggerBtn, "DETAIL")
+            bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn)
          }
          restore.clear()
       }

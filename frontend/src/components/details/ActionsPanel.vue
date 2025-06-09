@@ -4,7 +4,7 @@
       <div class="panel">
          <div class="gutter"></div>
          <div class="content">
-            <BookmarkButton :pool="item.details.source" :identifier="item.details.identifier" :labeled="true"/>
+            <BookmarkButton :pool="item.details.source" :data="item.details" :labeled="true"/>
             <Citations :itemURL="item.details.itemURL" />
             <VirgoButton icon="fal fa-download fa-lg" text rounded label="Download RIS" @click="downloadRISClicked"/>
             <span class="pdf-wrap" v-if="showPDF"  >

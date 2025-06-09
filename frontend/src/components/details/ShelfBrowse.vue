@@ -113,7 +113,7 @@ const getInitialBrowseData = ( async () => {
       // NOTE: this component is loaded from the item page, which has the first shot at
       // handling a pending bookmark. If it is handled there, pendingBookmark will be cleared.
       newBM = restore.pendingBookmark
-      tgt = newBM.hit.identifier
+      tgt = newBM.identifier
       restore.clear()
    }
 
@@ -124,10 +124,10 @@ const getInitialBrowseData = ( async () => {
 
    if ( newBM ) {
       scrollToItem( `browse-${tgt}` )
-      let cnt =  bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier )
+      let cnt =  bookmarks.bookmarkCount( newBM.pool, newBM.identifier )
       if ( cnt == 0 ) {
-         let triggerBtn = document.getElementById(`bm-btn-${ newBM.hit.identifier}`)
-         bookmarks.showAddBookmark( props.pool, newBM.hit, triggerBtn, "SHELF_BROWSE")
+         let triggerBtn = document.getElementById(`bm-btn-${ newBM.identifier}`)
+         bookmarks.showAddBookmark( props.pool, newBM, triggerBtn)
       }
    }
 })

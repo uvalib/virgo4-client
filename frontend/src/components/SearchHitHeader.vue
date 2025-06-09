@@ -15,7 +15,7 @@
       </div>
       <div class="icon-wrap">
          <Citations :itemURL="props.hit.itemURL" />
-         <BookmarkButton :pool="props.pool" :identifier="props.hit.identifier" />
+         <BookmarkButton :pool="props.pool" :data="props.hit" />
       </div>
    </div>
    <div v-if="props.hit.header.author_display" class="author-wrapper">
