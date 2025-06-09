@@ -32,7 +32,7 @@
             </TabPanel>
             <TabPanel value="loc-codes">
                <DataTable :value="systemStore.locationCodes" size="small" exportFilename="loccodes"
-                  showGridlines stripedRows ref="libcodes" dataKey="id">
+                  showGridlines stripedRows ref="loccodes" dataKey="id">
                   <template #header>
                      <VirgoButton severity="secondary" size="small" label="Export CSV" @click="exportLocCodes"/>
                   </template>
