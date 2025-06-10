@@ -1,7 +1,7 @@
 #
 # build the target application
 #
-FROM public.ecr.aws/docker/library/golang:1.24.0-alpine3.21 AS builder
+FROM public.ecr.aws/docker/library/golang:1.24.4-alpine3.22 AS builder
 
 # update the packages
 RUN apk update && apk upgrade && apk add make npm yarn
@@ -19,7 +19,7 @@ RUN make linux-full
 #
 # build the target container
 #
-FROM public.ecr.aws/docker/library/alpine:3.21
+FROM public.ecr.aws/docker/library/alpine:3.22
 
 # update the packages
 RUN apk update && apk upgrade && apk add bash tzdata ca-certificates curl && rm -rf /var/cache/apk/*
@@ -40,7 +40,7 @@ RUN mkdir -p $APP_HOME $APP_HOME/bin $APP_HOME/scripts $APP_HOME/db
 RUN chown -R webservice $APP_HOME && chgrp -R webservice $APP_HOME
 
 # add the migrate tool
-ENV MIGRATE_VERSION=v4.18.1
+ENV MIGRATE_VERSION=v4.18.3
 RUN cd $APP_HOME/bin && curl -L https://github.com/golang-migrate/migrate/releases/download/${MIGRATE_VERSION}/migrate.linux-amd64.tar.gz | tar xvz && rm LICENSE README.md
 
 
