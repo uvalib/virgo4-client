@@ -180,17 +180,11 @@ const urlToText = ((url) => {
    out = out.replace("&filter=", ", filter: ")
    out = out.replace("&pool=", ", target: ")
    out = out.replace("&sort=", ", sort: ")
-   if (url.includes("=basic")) {
-      let stripped = out.replace("mode=basic&", "")
-      let i0 = stripped.indexOf("scope=")
-      let i1 = stripped.indexOf("&", i0)
-      let scope = stripped.substring(i0+6,i1)
-      stripped = stripped.substring(i1+1).replace("q=", "")
-      out = `Basic Search (${scope}) - ${decodeURI(stripped).replace("|", ", ")}`
-   } else {
-      let stripped = out.replace("mode=advanced&", "").replace("q=", "")
-      stripped = stripped.replace("&filter=", ", Filter: ")
+   if (url.includes("=advanced")) {
+      let stripped = out.replace("mode=advanced&", "")
       out = `Advanced Search - ${decodeURI(stripped).replace("|", ", ")}`
+   } else {
+      out = `Basic Search - ${decodeURI(out).replace("|", ", ")}`
    }
    return out
 })
