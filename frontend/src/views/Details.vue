@@ -20,7 +20,9 @@ import { useCollectionStore } from "@/stores/collection"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
+import { useToast } from "primevue/usetoast"
 
+const toast = useToast()
 const collection = useCollectionStore()
 const item = useItemStore()
 const restore = useRestoreStore()
@@ -56,6 +58,8 @@ const getDetails = ( async (src, id, initialPage) => {
          if (showAdd) {
             let triggerBtn = document.querySelector(".icon-wrap .bookmark")
             bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn)
+         } else {
+            toast.add({severity:'info', summary:  "Bookmark Info", detail:  `"${newBM.title}" has already been bookmarked.`, life: 10000})
          }
          restore.clear()
       }

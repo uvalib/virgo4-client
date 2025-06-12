@@ -51,7 +51,9 @@ import { usePoolStore } from "@/stores/pool"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { watchDeep } from '@vueuse/core'
 import { useRouteUtils } from '@/composables/routeutils'
+import { useToast } from "primevue/usetoast"
 
+const toast = useToast()
 const router = useRouter()
 const route = useRoute()
 const routeUtils = useRouteUtils(router, route)
@@ -142,6 +144,8 @@ function handlePendingBookmark() {
 
    if ( showAdd ) {
       bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn)
+   } else {
+       toast.add({severity:'info', summary:  "Bookmark Info", detail:  `"${newBM.title}" has already been bookmarked.`, life: 10000})
    }
 }
 

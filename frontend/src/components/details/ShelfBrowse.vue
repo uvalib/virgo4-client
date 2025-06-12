@@ -33,6 +33,7 @@ import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
 import { scrollToItem } from '@/utils'
 import { useWindowSize } from '@vueuse/core'
+import { useToast } from "primevue/usetoast"
 
 const props = defineProps({
    hit: {
@@ -47,6 +48,7 @@ const props = defineProps({
 
 const { width } = useWindowSize()
 const shelfStore = useShelfStore()
+const toast = useToast()
 
 watch( width, (newValue) => {
    var newRange = 4
@@ -128,6 +130,8 @@ const getInitialBrowseData = ( async () => {
       if ( cnt == 0 ) {
          let triggerBtn = document.getElementById(`bm-btn-${ newBM.identifier}`)
          bookmarks.showAddBookmark( props.pool, newBM, triggerBtn)
+      } else {
+         toast.add({severity:'info', summary:  "Bookmark Info", detail:  `"${newBM.title}" has already been bookmarked.`, life: 10000})
       }
    }
 })
