@@ -469,6 +469,7 @@ func (svc *ServiceContext) PDAGet(path string, jwt string) ([]byte, *RequestErro
 }
 
 // PoolPost sends a POST to the specified pool
+// Only used during RSS feed generation
 func (svc *ServiceContext) PoolPost(url string, body any, jwt string) ([]byte, *RequestError) {
 	log.Printf("INFO: pool post request: %s %v", url, body)
 	b, _ := json.Marshal(body)
