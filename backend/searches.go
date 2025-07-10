@@ -50,9 +50,10 @@ func (svc *ServiceContext) DeleteAllSavedSearches(c *gin.Context) {
 	}
 
 	var dbResp *gorm.DB
-	if clearType == "history" {
+	switch clearType {
+	case "history":
 		dbResp = svc.GDB.Delete(SearchHistory{}, "user_id=?", userID)
-	} else if clearType == "saved" {
+	case "saved":
 		dbResp = svc.GDB.Delete(SavedSearch{}, "user_id=?", userID)
 	}
 

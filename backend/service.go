@@ -303,11 +303,11 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 
 	v4HostHeader := c.Request.Header.Get("V4Host")
 	log.Printf("Config request V4Host header: %s", v4HostHeader)
-	if strings.Index(v4HostHeader, "-kiosk") > -1 || svc.Dev.Kiosk {
+	if strings.Contains(v4HostHeader, "-kiosk") || svc.Dev.Kiosk {
 		log.Printf("This request is from a kiosk")
 		cfg.KioskMode = true
 	}
-	if strings.Index(v4HostHeader, "-dev") > -1 || svc.Dev.AuthUser != "" {
+	if strings.Contains(v4HostHeader, "-dev") || svc.Dev.AuthUser != "" {
 		log.Printf("This request is from a dev server")
 		cfg.DevServer = true
 	}

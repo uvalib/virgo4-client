@@ -428,7 +428,7 @@ func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
 			if newField != oldField {
 				return fmt.Sprintf("\"%s\" => \"%s\"", oldField, newField)
 			}
-			return fmt.Sprintf("No Change")
+			return "No Change"
 		},
 	}
 
@@ -529,8 +529,6 @@ func (svc *ServiceContext) CreateTempAccount(c *gin.Context) {
 	}
 	log.Printf("INFO: Temp account created for %s", req.Email)
 	c.String(http.StatusCreated, "Temp account created")
-	return
-
 }
 
 // ActivateTempAccount accepts a user account request and creates a temporary account in Sirsi via ils-connector
@@ -552,6 +550,4 @@ func (svc *ServiceContext) ActivateTempAccount(c *gin.Context) {
 	}
 	log.Printf("INFO: Temp account activated")
 	c.Redirect(http.StatusFound, "/signin?activated=true")
-	return
-
 }
