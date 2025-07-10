@@ -45,7 +45,7 @@ type Bookmark struct {
 	SourceID   int       `json:"-"`         // foreign key to source
 	Source     Source    `gorm:"foreignKey:SourceID" json:"pool"`
 	AddedAt    time.Time `json:"addedAt"`
-	Identifier string    `json:"identifier"`
+	Identifier string    `json:"identifier"` // for items that are no longer available, identifier will be empty which blocks it from zotero
 	Details    string    `json:"details"`
 }
 
@@ -55,6 +55,19 @@ type bookmarkDetails struct {
 	CallNumber string `json:"callNumber"`
 	Format     string `json:"format"`
 	Library    string `json:"library"`
+}
+
+func (d bookmarkDetails) equals(other bookmarkDetails) bool {
+	return (d.Title == other.Title &&
+		d.Author == other.Author &&
+		d.CallNumber == other.CallNumber &&
+		d.Format == other.Format &&
+		d.Library == other.Library)
+}
+
+type bookmarkLookupResponse struct {
+	SourceID int
+	Details  bookmarkDetails
 }
 
 type itemField struct {
@@ -143,7 +156,7 @@ func (svc *ServiceContext) setFolderVisibility(c *gin.Context, folderID int, pub
 	c.String(http.StatusOK, "ok")
 }
 
-// UpdateBookmarkFolder will move update a folder name
+// UpdateBookmarkFolder will update a folder name
 func (svc *ServiceContext) UpdateBookmarkFolder(c *gin.Context) {
 	v4UserID := c.Param("uid")
 	userID := c.GetInt("v4id")
@@ -158,23 +171,33 @@ func (svc *ServiceContext) UpdateBookmarkFolder(c *gin.Context) {
 	}
 	log.Printf("User %s:%d updating folderID %s name to %s", v4UserID, userID, folderID, updateInfo.Name)
 
-	var folder BookmarkFolder
-	resp := svc.GDB.Preload("Bookmarks").Preload("Bookmarks.Source").Find(&folder, folderID)
-	if resp.Error != nil {
-		log.Printf("Folder %s not found: %s", folderID, resp.Error.Error())
-		c.String(http.StatusNotFound, "folder not found")
+	folder, err := svc.getBookmarkFolder(folderID)
+	if err != nil {
+		log.Printf("ERROR: unable to load folder %s: %s", folderID, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	folder.Name = updateInfo.Name
-	resp = svc.GDB.Model(&folder).Select("Name").Updates(folder)
-	if resp.Error != nil {
-		log.Printf("ERROR: unable to rename folder: %s", resp.Error.Error())
-		c.String(http.StatusBadRequest, resp.Error.Error())
+	err = svc.GDB.Model(&folder).Select("Name").Updates(folder).Error
+	if err != nil {
+		log.Printf("ERROR: unable to rename folder: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, folder)
+}
+
+func (svc *ServiceContext) getBookmarkFolder(folderID string) (*BookmarkFolder, error) {
+	var folder BookmarkFolder
+	bmErr := svc.GDB.Preload("Bookmarks", func(db *gorm.DB) *gorm.DB {
+		return db.Order("bookmarks.sequence, bookmarks.id asc")
+	}).Preload("Bookmarks.Source").Find(&folder, folderID).Error
+	if bmErr != nil {
+		return nil, bmErr
+	}
+	return &folder, nil
 }
 
 // DeleteBookmarkFolder will remove a folder and all of its content
@@ -212,32 +235,74 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 	}
 	log.Printf("INFO: user %s:%d add bookmark %+v requested", v4UserID, userID, addRequest)
 
-	log.Printf("INFO: looking up source %s", addRequest.Pool)
-	var source Source
-	resp := svc.GDB.Where("name=?", addRequest.Pool).First(&source)
+	jwtIface, _ := c.Get("jwt")
+	jwt, _ := jwtIface.(string)
+	bmData, luErr := svc.lookupBookmarkDetails(addRequest.Pool, addRequest.Identifier, jwt)
+	if luErr != nil {
+		log.Printf("ERROR: unable to get details for bookmark %s from pool %s: %s", addRequest.Identifier, addRequest.Pool, luErr.Error())
+		c.String(http.StatusInternalServerError, luErr.Error())
+		return
+	}
+	detailJSON, _ := json.Marshal(bmData.Details)
+
+	log.Printf("INFO: lookup folder %s", addRequest.Folder)
+	var folder BookmarkFolder
+	resp := svc.GDB.Where("name=? and user_id=?", addRequest.Folder, userID).First(&folder)
 	if resp.Error != nil {
-		log.Printf("ERROR: unable to find source %s: %s", addRequest.Pool, resp.Error.Error())
-		c.String(http.StatusNotFound, "source %s not found", addRequest.Pool)
+		if errors.Is(resp.Error, gorm.ErrRecordNotFound) == false {
+			log.Printf("ERROR: failed lookup for folder %s: %s", addRequest.Folder, resp.Error.Error())
+			c.String(http.StatusInternalServerError, resp.Error.Error())
+			return
+		}
+		log.Printf("INFO: user %s folder %s not found; creating...", v4UserID, addRequest.Folder)
+		folder.Name = addRequest.Folder
+		folder.AddedAt = time.Now()
+		folder.UserID = userID
+		addResp := svc.GDB.Create(&folder)
+		if addResp.Error != nil {
+			log.Printf("ERROR: user %s create folder %s failed: %s", v4UserID, addRequest.Folder, resp.Error.Error())
+			c.String(http.StatusInternalServerError, addResp.Error.Error())
+			return
+		}
+	}
+
+	log.Printf("INFO: %s adding new bookmark to %s", v4UserID, addRequest.Folder)
+	bm := Bookmark{UserID: userID, FolderID: folder.ID, SourceID: bmData.SourceID, AddedAt: time.Now(), Identifier: addRequest.Identifier, Details: string(detailJSON)}
+	resp = svc.GDB.Create(&bm)
+	if resp.Error != nil {
+		log.Printf("ERROR: user %s unable to add bookmark %s: %s", v4UserID, addRequest.Identifier, resp.Error.Error())
+		c.String(http.StatusInternalServerError, resp.Error.Error())
 		return
 	}
 
-	log.Printf("INFO: request details for %s:%s from %s", addRequest.Pool, addRequest.Identifier, source.PrivateURL)
-	itemURL := fmt.Sprintf("%s/api/resource/%s", source.PrivateURL, addRequest.Identifier)
-	jwtIface, _ := c.Get("jwt")
-	jwt, _ := jwtIface.(string)
+	var v4User User
+	svc.preloadBookmarks().Find(&v4User, userID)
+	c.JSON(http.StatusOK, v4User.BookmarkFolders)
+}
+
+func (svc *ServiceContext) lookupBookmarkDetails(pool, identifier, jwt string) (*bookmarkLookupResponse, error) {
+	log.Printf("INFO: looking up source %s", pool)
+	var source Source
+	resp := svc.GDB.Where("name=?", pool).First(&source)
+	if resp.Error != nil {
+		return nil, fmt.Errorf("unable to find source %s: %s", pool, resp.Error.Error())
+	}
+
+	log.Printf("INFO: request details for %s:%s from %s", pool, identifier, source.PrivateURL)
+	itemURL := fmt.Sprintf("%s/api/resource/%s", source.PrivateURL, identifier)
 	rawResp, getErr := svc.PoolGet(itemURL, jwt)
 	if getErr != nil {
-		c.String(getErr.StatusCode, getErr.Message)
-		return
+		if getErr.StatusCode == 404 {
+			return nil, fmt.Errorf("not found")
+		}
+		return nil, fmt.Errorf("%d: %s", getErr.StatusCode, getErr.Message)
 	}
 
 	// log.Printf("%s", rawResp)
 	var item itemDetails
-	err = json.Unmarshal(rawResp, &item)
+	err := json.Unmarshal(rawResp, &item)
 	if err != nil {
-		log.Printf("ERROR: unable to parse item data: %s", err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
-		return
+		return nil, err
 	}
 
 	bmData := bookmarkDetails{}
@@ -273,41 +338,8 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 			}
 		}
 	}
-	detailJSON, _ := json.Marshal(bmData)
-
-	log.Printf("INFO: lookup folder %s", addRequest.Folder)
-	var folder BookmarkFolder
-	resp = svc.GDB.Preload("Bookmarks").Where("name=? and user_id=?", addRequest.Folder, userID).First(&folder)
-	if resp.Error != nil {
-		if errors.Is(resp.Error, gorm.ErrRecordNotFound) == false {
-			log.Printf("ERROR: failed lookup for folder %s: %s", addRequest.Folder, resp.Error.Error())
-			c.String(http.StatusInternalServerError, resp.Error.Error())
-			return
-		}
-		log.Printf("INFO: user %s folder %s not found; creating...", v4UserID, addRequest.Folder)
-		folder.Name = addRequest.Folder
-		folder.AddedAt = time.Now()
-		folder.UserID = userID
-		addResp := svc.GDB.Create(&folder)
-		if addResp.Error != nil {
-			log.Printf("ERROR: user %s create folder %s failed: %s", v4UserID, addRequest.Folder, resp.Error.Error())
-			c.String(http.StatusInternalServerError, addResp.Error.Error())
-			return
-		}
-	}
-
-	log.Printf("INFO: %s adding new bookmark to %s", v4UserID, addRequest.Folder)
-	bm := Bookmark{UserID: userID, FolderID: folder.ID, SourceID: source.ID, AddedAt: time.Now(), Identifier: addRequest.Identifier, Details: string(detailJSON)}
-	resp = svc.GDB.Create(&bm)
-	if resp.Error != nil {
-		log.Printf("ERROR: user %s unable to add bookmark %+v: %s", v4UserID, item, resp.Error.Error())
-		c.String(http.StatusInternalServerError, resp.Error.Error())
-		return
-	}
-
-	var v4User User
-	svc.preloadBookmarks().Find(&v4User, userID)
-	c.JSON(http.StatusOK, v4User.BookmarkFolders)
+	luResp := bookmarkLookupResponse{SourceID: source.ID, Details: bmData}
+	return &luResp, nil
 }
 
 // ReorderBookmarks will update the seqence of all bookmarks in the target folder
@@ -343,6 +375,81 @@ func (svc *ServiceContext) ReorderBookmarks(c *gin.Context) {
 	c.String(http.StatusOK, "ok")
 }
 
+// RefreshBookmarks will refresh a list of bookmarks in a folder
+func (svc *ServiceContext) RefreshBookmarks(c *gin.Context) {
+	v4UserID := c.Param("uid")
+	userID := c.GetInt("v4id")
+	folderID := c.Param("id")
+	log.Printf("INFO: user %s:%d refreshes all bookmarks in folder %s", v4UserID, userID, folderID)
+
+	jwtIface, _ := c.Get("jwt")
+	jwt, _ := jwtIface.(string)
+
+	folder, err := svc.getBookmarkFolder(folderID)
+	if err != nil {
+		log.Printf("ERROR: unable to load folder %s: %s", folderID, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	updated := 0
+	missing := 0
+	for _, bm := range folder.Bookmarks {
+		log.Printf("INFO: begin refresh bookmark %s", bm.Identifier)
+		refreshedBM, luErr := svc.lookupBookmarkDetails(bm.Source.Name, bm.Identifier, jwt)
+		if luErr != nil {
+			if strings.Contains(luErr.Error(), "not found") {
+				// removing the identifier will block zotero from using this item and can be used
+				// by the front end to give special treatment to the item
+				log.Printf("INFO: bookmark %s details are no longer available", bm.Identifier)
+				upErr := svc.GDB.Model(&bm).Update("identifier", "").Error
+				if upErr != nil {
+					log.Printf("ERROR: unable to update unavailable bookmark %s: %s", bm.Identifier, upErr.Error())
+					continue
+				}
+				missing++
+			} else {
+				log.Printf("ERROR: unable to get details for bookmark %s from pool %s: %s", bm.Identifier, bm.Source.Name, luErr.Error())
+			}
+			continue
+		}
+
+		var currDetails bookmarkDetails
+		json.Unmarshal([]byte(bm.Details), &currDetails)
+		if currDetails.equals(refreshedBM.Details) == false {
+			log.Printf("INFO: bookmark %s details have changed; updating record", bm.Identifier)
+			refreshedDetails, _ := json.Marshal(refreshedBM.Details)
+			upErr := svc.GDB.Model(&bm).Update("details", refreshedDetails).Error
+			if upErr != nil {
+				log.Printf("ERROR: unable to update bookmark %s details: %s", bm.Identifier, upErr.Error())
+				continue
+			}
+			updated++
+		} else {
+			log.Printf("INFO: bookmark %s details are current; no update needed", bm.Identifier)
+		}
+	}
+	log.Printf("INFO: %d bookmarks in folder %s processed: %d have been updated, %d are no longer available", len(folder.Bookmarks), folder.Name, updated, missing)
+
+	folder, err = svc.getBookmarkFolder(folderID)
+	if err != nil {
+		log.Printf("ERROR: unable to load folder %s after refresh: %s", folderID, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	resp := struct {
+		Folder  *BookmarkFolder `json:"folder"`
+		Total   int             `json:"count"`
+		Updated int             `json:"updated"`
+		Missing int             `json:"missing"`
+	}{
+		Folder:  folder,
+		Total:   len(folder.Bookmarks),
+		Updated: updated,
+		Missing: missing,
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
 // DeleteBookmarks will remove a list of bookmarks from a folder
 func (svc *ServiceContext) DeleteBookmarks(c *gin.Context) {
 	v4UserID := c.Param("uid")
@@ -364,8 +471,12 @@ func (svc *ServiceContext) DeleteBookmarks(c *gin.Context) {
 		return
 	}
 
-	var folder BookmarkFolder
-	svc.GDB.Preload("Bookmarks").Preload("Bookmarks.Source").Find(&folder, folderID)
+	folder, err := svc.getBookmarkFolder(folderID)
+	if err != nil {
+		log.Printf("ERROR: unable to load folder %s after delete bookmarks: %s", folderID, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
 	c.JSON(http.StatusOK, folder)
 }
 

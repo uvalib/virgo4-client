@@ -59,6 +59,7 @@
                <div v-else class="bookmark-folder-content">
                   <div class="folder-menu">
                      <VirgoButton @click="exportBookmarks(folderInfo.folder)" label="Export all"/>
+                     <VirgoButton @click="refreshBookmarksClicked(folderInfo)" label="Refresh all" :loading="bookmarkStore.updating" />
                      <PrintBookmarks :srcFolder="folderInfo.id" :bookmarks="selections" />
                      <ManageBookmarks :srcFolder="folderInfo.id" :bookmarks="selections" />
                      <VirgoButton @click="deleteBookmarksClicked(folderInfo)" label="Delete" :disabled="!hasSelectedBookmarks" />
@@ -71,10 +72,13 @@
                      <Column selectionMode="multiple" headerStyle="width: 3rem" />
                      <Column field="title" header="Title">
                         <template #body="slotProps">
-                           <router-link @click="bookmarkFollowed(slotProps.data.identifier)" :to="detailsURL(slotProps.data)">
-                              {{slotProps.data.details.title}}
-                           </router-link>
-                           <abbr class="" :title="itemURL(slotProps.data)" :data-folder-id="folderInfo.id"></abbr>
+                           <template v-if="slotProps.data.identifier">
+                              <router-link @click="bookmarkFollowed(slotProps.data.identifier)" :to="detailsURL(slotProps.data)">
+                                 {{slotProps.data.details.title}}
+                              </router-link>
+                              <abbr class="" :title="itemURL(slotProps.data)" :data-folder-id="folderInfo.id"></abbr>
+                           </template>
+                           <AvailabilityNotice v-else :label="slotProps.data.details.title " message="This item is no longer available in Virgo."/>
                         </template>
                      </Column>
                      <Column field="details.author" header="Author">
@@ -127,6 +131,7 @@
 <script setup>
 import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
+import AvailabilityNotice from "@/components/modals/AvailabilityNotice.vue"
 import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import ManageBookmarks from "@/components/modals/ManageBookmarks.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
@@ -200,6 +205,10 @@ const valueDisplay = ( (val) => {
    return val
 })
 
+const refreshBookmarksClicked = ( (folderInfo) => {
+   bookmarkStore.refreshBookmarksFolder(userStore.signedInUser, folderInfo.id)
+})
+
 const deleteBookmarksClicked = ((folderInfo) => {
       confirm.require({
          message: `All selected bookmarks in ${folderInfo.folder} will be deleted.<br/><br/>This cannot be reversed.<br/><br/>Continue?`,
@@ -213,7 +222,7 @@ const deleteBookmarksClicked = ((folderInfo) => {
             label: 'Delete'
          },
          accept: () => {
-            bookmarkStore.removeSelectedBookmarks(folderInfo.id, selections.value.map( bm => bm.id))
+            bookmarkStore.removeSelectedBookmarks(userStore.signedInUser, folderInfo.id, selections.value.map( bm => bm.id))
          }
       })
 })
@@ -233,20 +242,20 @@ const deleteFolderClicked = ((folderInfo) => {
          label: 'Delete Folder'
       },
       accept: () => {
-         bookmarkStore.removeFolder(folderInfo.id)
+         bookmarkStore.removeFolder(userStore.signedInUser, folderInfo.id)
          setFocusClass("accordion-trigger")
       }
    })
 })
 
-function renameClicked( folderInfo) {
+const renameClicked = ( (folderInfo) => {
    renaming.value = true
    newFolderName.value = folderInfo.folder
-}
-async function doRename(folderInfo) {
-   await bookmarkStore.renameFolder({id: folderInfo.id, name: newFolderName.value})
+})
+const doRename = ((folderInfo) => {
+   bookmarkStore.renameFolder(userStore.signedInUser, {id: folderInfo.id, name: newFolderName.value})
    renaming.value = false
-}
+})
 function exportBookmarks(folder) {
    bookmarkStore.exportBookmarks(folder )
 }
@@ -436,7 +445,13 @@ div.bookmark-folder {
       }
    }
 }
-
+.unavailable {
+   display: flex;
+   flex-flow: row nowrap;
+   justify-content: flex-start;
+   align-items: center;
+   gap: 0.5rem;
+}
 .bookmarks {
    min-height: 400px;
    position: relative;

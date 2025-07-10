@@ -6,6 +6,7 @@ import axios from 'axios'
 export const useBookmarkStore = defineStore('bookmark', {
 	state: () => ({
       showAddDialog: false,
+      updating: false,
       // Note: only pool, identifier and groupParent are used. Title/Author are for temp display only
       // and will be looked up when bookmark is made
       newBookmark: {pool: "", identifier: null, groupParent: "", title: "", author: ""},
@@ -210,9 +211,7 @@ export const useBookmarkStore = defineStore('bookmark', {
             useSystemStore().setError(error)
          })
       },
-      renameFolder(folder) {
-         const userStore = useUserStore()
-         let v4UID = userStore.signedInUser
+      renameFolder(v4UID, folder) {
          let url = `/api/users/${v4UID}/bookmarks/folders/${folder.id}`
          axios.post(url, {name: folder.name}).then((response) => {
             this.updateFolder(response.data)
@@ -220,9 +219,7 @@ export const useBookmarkStore = defineStore('bookmark', {
             useSystemStore().setError(error)
          })
       },
-      async removeFolder(folderID) {
-         const userStore = useUserStore()
-         let v4UID = userStore.signedInUser
+      async removeFolder(v4UID, folderID) {
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}`
          try {
             await axios.delete(url)
@@ -234,9 +231,19 @@ export const useBookmarkStore = defineStore('bookmark', {
             useSystemStore().setError(error)
          }
       },
-      removeSelectedBookmarks( folderID, bookmarkIDs ) {
-         const userStore = useUserStore()
-         let v4UID = userStore.signedInUser
+      refreshBookmarksFolder(v4UID, folderID) {
+         this.updating = true
+         let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}/refresh`
+         axios.post(url).then((response) => {
+            this.updateFolder(response.data.folder)
+            console.log(response.data.count+" records. "+response.data.updated+" updated")
+            this.updating = false
+         }).catch((error) => {
+            useSystemStore().setError(error)
+            this.updating = false
+         })
+      },
+      removeSelectedBookmarks( v4UID, folderID, bookmarkIDs ) {
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}/delete`
          axios.post(url, {bookmarkIDs: bookmarkIDs}).then((response) => {
             let tgtFolder = this.bookmarks.find( f => f.id == folderID)
