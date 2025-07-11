@@ -48,14 +48,14 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from "@/stores/user"
+import { useSystemStore } from "@/stores/system"
 import { setErrors } from '@formkit/core'
 import Dialog from 'primevue/dialog'
-import { useToast } from "primevue/usetoast"
 
-const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const system = useSystemStore()
 
 const showDialog = ref(false)
 const currPassword = ref("")
@@ -113,7 +113,7 @@ const submitPasswordChange = (() => {
       userStore.changePasswordWithToken(data).then(() => {
          showDialog.value = false
          let msg = "Your password has been changed."
-         toast.add({severity:'success', summary:  "Success", detail:  msg, life: 10000})
+         system.setToast("Success", msg)
       }).catch((e) => {
          expiredToken.value = true
          if(e.response.data.message){
@@ -129,7 +129,7 @@ const submitPasswordChange = (() => {
       userStore.changePassword(data).then(() => {
          showDialog.value = false
          let msg = "Your password has been changed."
-         toast.add({severity:'success', summary:  "Success", detail:  msg, life: 6000})
+         system.setToast("Success", msg)
       }).catch((e) => {
          error.value = "Password change failed.</br>"
          if ( e.response.data.message ) {

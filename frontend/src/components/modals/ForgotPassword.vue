@@ -22,12 +22,12 @@
 
 <script setup>
 import { useUserStore } from "@/stores/user"
+import { useSystemStore } from "@/stores/system"
 import { ref } from 'vue'
 import Dialog from 'primevue/dialog'
-import { useToast } from "primevue/usetoast"
 import { setFocusID } from '@/utils'
 
-const toast = useToast()
+const system = useSystemStore()
 const userStore = useUserStore()
 const userId = ref("")
 const error = ref("")
@@ -55,7 +55,7 @@ const okClicked = (() => {
    userStore.forgotPassword(userId.value).then(() => {
       userStore.showForgotPW = false
       let msg = "An email has been sent to reset your password."
-      toast.add({severity:'success', summary:  "Request Submitted", detail:  msg, life: 5000})
+      system.setToast("Request Submitted", msg)
    }).catch((e) => {
       error.value = "There's a problem with your account. <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for help.<br/>"
       if(e.response.data.message){

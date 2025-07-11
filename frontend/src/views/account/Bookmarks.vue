@@ -123,6 +123,7 @@
                <VirgoButton @click="cancelCreate" :disabled="submitting" severity="secondary" label="Cancel"/>
                <VirgoButton @click="createFolder" :disabled="submitting" label="Create"/>
             </div>
+            <p class="error" v-if="missingName">A folder name is required</p>
          </div>
       </div>
    </div>
@@ -146,7 +147,6 @@ import analytics from '@/analytics'
 import { useClipboard } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import { useConfirm } from "primevue/useconfirm"
-import { useToast } from "primevue/usetoast"
 import Checkbox from 'primevue/checkbox'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -155,7 +155,6 @@ import color from '@/assets/theme/colors.module.scss'
 
 const { copy } = useClipboard()
 const confirm = useConfirm()
-const toast = useToast()
 const userStore = useUserStore()
 const systemStore = useSystemStore()
 const bookmarkStore = useBookmarkStore()
@@ -171,6 +170,7 @@ const newFolder = ref("")
 const submitting = ref(false)
 const expandedFolder = ref(-1)
 const selections = ref([])
+const missingName = ref(false)
 
 const onReorder = (( event) => {
    bookmarkStore.reorderFolder(expandedFolder.value, event.value )
@@ -178,13 +178,6 @@ const onReorder = (( event) => {
 
 const hasSelectedBookmarks = computed(() => {
    return selections.value.length > 0
-})
-
-const errorToast = ((title, msg) => {
-   toast.add({severity:'error', summary:  title, detail:  msg, life: 5000})
-})
-const infoToast = ((title, msg) => {
-   toast.add({severity:'success', summary:  title, detail:  msg, life: 3000})
 })
 
 const sourceName = ((poolID) => {
@@ -264,7 +257,7 @@ function bookmarkFollowed(identifier) {
 }
 function copyURL( folder ) {
    copy(getPublicURL(folder))
-   infoToast("Bookmark Copied", "Public bookmark URL copied to clipboard.")
+   systemStore.setToast("Bookmark Copied", "Public bookmark URL copied to clipboard.")
 }
 function getTitle(folderInfo) {
    let out = folderInfo.folder
@@ -319,18 +312,19 @@ function itemURL(bookmark) {
 }
 function openCreate() {
    createOpen.value = true
+   newFolder.value = ""
 }
 function cancelCreate() {
    if (submitting.value) return
    createOpen.value = false
-   systemStore.clearMessage()
+   missingName.value = false
 }
 async function createFolder() {
    if (submitting.value) return
    submitting.value = true
-   systemStore.clearMessage()
+   missingName.value = false
    if (newFolder.value == "") {
-      errorToast("Create Error", "A new folder name is required. Please add one and try again.")
+      missingName.value = true
       submitting.value = false
       setFocusID("newname")
       return
@@ -386,7 +380,7 @@ onMounted(()=>{
    font-size: 0.9em;
 }
 .na {
-   color: #ccc;
+   color: $uva-grey;
    font-style: italic;
 }
 .rename {
@@ -492,6 +486,9 @@ div.bookmark-folder {
       flex-grow: 1;
       margin:0;
    }
+}
+.error {
+   color: $uva-red-A;
 }
 
 .publish {

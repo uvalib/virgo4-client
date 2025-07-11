@@ -19,6 +19,12 @@ export const useSystemStore = defineStore('system', {
          detail: ""
       },
       showMessage: false,
+      toast: {
+         title: "",
+         message: "",
+         life: 0
+      },
+      showToast: false,
       version: "unknown",
       hsIlliadURL: "",
       citationsURL: "",
@@ -96,6 +102,18 @@ export const useSystemStore = defineStore('system', {
          this.fatal = err
          this.reportError(this.fatal)
          this.router.push( "/error" )
+      },
+      setToast(title, message, life = 5000) {
+         this.toast.life = life
+         this.toast.message = message
+         this.toast.title = title
+         this.showToast = true
+      },
+      clearToast() {
+         this.showToast = false
+         this.toast.life = 0
+         this.toast.message = ""
+         this.toast.title = ""
       },
       clearMessage() {
          this.message.type = "none"

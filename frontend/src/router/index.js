@@ -7,7 +7,7 @@ import { useSystemStore } from "@/stores/system"
 import { useRestoreStore } from "@/stores/restore"
 import { useUserStore } from "@/stores/user"
 import { setFocusID } from '@/utils'
-
+import { useToast } from "primevue/usetoast"
 import VueCookies from 'vue-cookies'
 
 const router = createRouter({
@@ -182,6 +182,7 @@ const router = createRouter({
 router.afterEach((to) => {
    const systemStore  = useSystemStore()
    systemStore.clearMessage()
+   useToast().removeAllGroups()
 
    // Page header is now in the main app template and driven by the pageTitle
    // model variable. Ensure it is set correctly for each new page

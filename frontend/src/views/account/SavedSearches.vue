@@ -83,10 +83,10 @@ import { ref, onMounted } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useSearchStore } from "@/stores/search"
 import { useResultStore } from "@/stores/result"
+import { useSystemStore } from "@/stores/system"
 import analytics from '@/analytics'
 import { useClipboard } from '@vueuse/core'
 import { useConfirm } from "primevue/useconfirm"
-import { useToast } from "primevue/usetoast"
 import Dialog from 'primevue/dialog'
 import Checkbox from 'primevue/checkbox'
 import { setFocusID } from '@/utils'
@@ -96,18 +96,11 @@ const results = useResultStore()
 const userStore = useUserStore()
 const searchStore = useSearchStore()
 const confirm = useConfirm()
-const toast = useToast()
+const system = useSystemStore()
 
 const showRSSModal = ref(false)
 const showRSSTriggerID = ref("")
 const currentFeed = ref({})
-
-const errorToast = ((title, msg) => {
-   toast.add({severity:'error', summary:  title, detail:  msg, life: 5000})
-})
-const infoToast = ((title, msg) => {
-   toast.add({severity:'success', summary:  title, detail:  msg, life: 3000})
-})
 
 const savedSearchClicked = (async (searchType) => {
    if (searchType == "history") {
@@ -115,7 +108,7 @@ const savedSearchClicked = (async (searchType) => {
    } else {
       analytics.trigger('Navigation', 'SAVED_SEARCH_CLICKED')
    }
-   await results.resetSearch()
+   results.resetSearch()
 })
 
 const deleteSearchClicked = ( (savedSearch) => {
@@ -192,12 +185,12 @@ const urlToText = ((url) => {
 const copyURL = ((token) => {
    let URL = window.location.protocol + "//" + window.location.host + searchURL(token)
    copy(URL)
-   infoToast("Search Copied", "Public search URL copied to clipboard.")
+   system.setToast("Search Copied", "Public search URL copied to clipboard.")
 })
 
 const copyRSS = ((token) => {
    copy( rssURL(token) )
-   infoToast("RSS URL Copied", "RSS URL copied to clipboard.")
+   system.setToast("RSS URL Copied", "RSS URL copied to clipboard.")
    closeRSSDialog()
 })
 

@@ -29,12 +29,10 @@ import { useSystemStore } from "@/stores/system"
 import { useItemStore } from "@/stores/item"
 import { useCollectionStore } from "@/stores/collection"
 import { useClipboard } from '@vueuse/core'
-import { useToast } from "primevue/usetoast"
 import { ref, computed } from 'vue'
 import ProgressBar from 'primevue/progressbar'
 
 const { copy } = useClipboard()
-const toast = useToast()
 const system = useSystemStore()
 const item = useItemStore()
 const collection = useCollectionStore()
@@ -54,7 +52,7 @@ const downloadRISClicked = (() => {
 const permalinkClicked = ( () => {
    analytics.trigger('Results', 'SHARE_ITEM_CLICKED', item.details.identifier)
    copy( window.location.href )
-   toast.add({severity:'success', summary:  "Copied", detail:  "Item URL copied to clipboard.", life: 5000})
+   system.setToast("Copied", "Item URL copied to clipboard.")
 })
 
 const pdfProgress = (()  => {

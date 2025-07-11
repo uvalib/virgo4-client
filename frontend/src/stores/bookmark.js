@@ -232,11 +232,24 @@ export const useBookmarkStore = defineStore('bookmark', {
          }
       },
       refreshBookmarksFolder(v4UID, folderID) {
+         const system = useSystemStore()
          this.updating = true
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}/refresh`
          axios.post(url).then((response) => {
             this.updateFolder(response.data.folder)
-            console.log(response.data.count+" records. "+response.data.updated+" updated")
+            if ( response.data.updated == 0) {
+               if ( response.data.missing > 0) {
+                  system.setToast("Boomarks Refresh",`${response.data.missing} items are no longer in Virgo.`)
+               } else {
+                  system.setToast("Boomarks Refresh", "No updates were necessary.")
+               }
+            } else {
+               let msg = `${response.data.updated} bookmarks updated. `
+               if ( response.data.missing > 0) {
+                  msg +=  `${response.data.missing} items are no longer in Virgo.`
+               }
+               system.setToast("Boomarks Refresh", msg, 10000)
+            }
             this.updating = false
          }).catch((error) => {
             useSystemStore().setError(error)

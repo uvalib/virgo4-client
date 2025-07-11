@@ -3,7 +3,7 @@
    <MessageBox />
    <SessionExpired />
    <AddBookmark />
-   <Toast position="top-center" />
+   <Toast position="center" @close="systemStore.clearToast" @life-end="systemStore.clearToast"/>
    <ConfirmDialog position="top" :closable="false">
       <template #message="slotProps">
          <i :class="slotProps.message.icon" style="font-size: 2rem; display: inline-block; margin-right: 20px;"></i>
@@ -70,20 +70,23 @@ import SessionExpired from "@/components/layout/SessionExpired.vue"
 import ConfirmDialog from 'primevue/confirmdialog'
 import AddBookmark from "@/components/modals/AddBookmark.vue"
 import Toast from 'primevue/toast'
+import { useToast } from "primevue/usetoast"
 import { useAlertStore } from "@/stores/alert"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { useCollectionStore } from "@/stores/collection"
-import { ref, onUpdated, onBeforeMount } from 'vue'
+import { ref, onUpdated, onBeforeMount, watch } from 'vue'
 import axios from 'axios'
 import analytics from '@/analytics'
 import { useRoute } from 'vue-router'
 import { usePinnable } from '@/composables/pin'
+import { storeToRefs } from "pinia"
 
 usePinnable("v4-navbar", "alerts", "v4main", "v4footer")
 
+const toast = useToast()
 const route = useRoute()
 const alertStore = useAlertStore()
 const userStore = useUserStore()
@@ -92,6 +95,13 @@ const poolStore = usePoolStore()
 const filterStore = useFilterStore()
 const collectionStore = useCollectionStore()
 const configuring = ref(true)
+
+const { showToast } = storeToRefs(systemStore)
+watch( showToast, (newValue) => {
+   if ( newValue ) {
+       toast.add({severity:'success', summary: systemStore.toast.title, detail: systemStore.toast.message, life: systemStore.toast.life})
+   }
+})
 
 function dismissAlert( uuid ) {
    let a = document.getElementById(uuid)

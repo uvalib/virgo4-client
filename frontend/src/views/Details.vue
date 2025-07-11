@@ -19,14 +19,14 @@ import { useItemStore } from "@/stores/item"
 import { useCollectionStore } from "@/stores/collection"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
+import { useSystemStore } from "@/stores/system"
 import analytics from '@/analytics'
-import { useToast } from "primevue/usetoast"
 
-const toast = useToast()
 const collection = useCollectionStore()
 const item = useItemStore()
 const restore = useRestoreStore()
 const bookmarks = useBookmarkStore()
+const system = useSystemStore()
 const route = useRoute()
 const loadingDetails = ref(true)
 
@@ -59,7 +59,7 @@ const getDetails = ( async (src, id, initialPage) => {
             let triggerBtn = document.querySelector(".icon-wrap .bookmark")
             bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn)
          } else {
-            toast.add({severity:'info', summary:  "Bookmark Info", detail:  `"${newBM.title}" has already been bookmarked.`, life: 10000})
+            system.setToast("Bookmark Info", `"${newBM.title}" has already been bookmarked.`)
          }
          restore.clear()
       }
