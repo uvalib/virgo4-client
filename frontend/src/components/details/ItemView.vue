@@ -170,13 +170,15 @@ const shouldDisplay =((field) => {
    return true
 })
 
-const accessURLField = computed(()=>{
-   return details.value.fields.find(f => f.name=="access_url")
-})
-
 const extDetailURL = computed(()=>{
    let extLink = details.value.fields.find( f=> f.name=="sirsi_url")
-   if (extLink) return extLink.value
+   if (extLink) {
+      let link =  extLink.value
+      if ( user.isAdmin || user.isStaff ) {
+         link += "-SC"
+      }
+      return link
+   }
 
    extLink = details.value.fields.find( f=> f.name=="worldcat_url")
    if (extLink) return extLink.value

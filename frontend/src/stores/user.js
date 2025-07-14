@@ -70,10 +70,14 @@ export const useUserStore = defineStore('user', {
       },
       isGuest: (state) => {
          return (state.role == 'guest' || state.role == '')
-       },
-       isUVA: (state) => {
-          return state.claims.isUVA
-       },
+      },
+      isUVA: (state) => {
+         return state.claims.isUVA
+      },
+      isStaff: (state) => {
+         // users that are members of lib-virgo4-staff or lb-scpres-joint
+         return (state.role == 'staff')
+      },
       isAdmin: (state) => {
         return (state.role == 'admin')
       },
