@@ -6,9 +6,6 @@
       <template v-if="expiredToken">
          <p class="error" v-html="error"></p>
          <p class="error">Please request a new password reset email.</p>
-         <div class="form-controls">
-            <VirgoButton severity="secondary" @click="closeExpiredChange" label="OK"/>
-         </div>
       </template>
       <template v-else>
          <p>New passwords must: </p>
@@ -38,8 +35,11 @@
          </FormKit>
       </template>
       <template #footer>
-         <VirgoButton severity="secondary" @click="closeChangeDialog" label="Cancel"/>
-         <VirgoButton @click="pwform.node.submit()" label="Submit" :disabled="okDisabled" />
+         <VirgoButton  v-if="expiredToken" severity="secondary" @click="closeExpiredChange" label="OK"/>
+         <template v-else>
+            <VirgoButton severity="secondary" @click="closeChangeDialog" label="Cancel"/>
+            <VirgoButton @click="pwform.node.submit()" label="Submit" :disabled="okDisabled" />
+         </template>
       </template>
    </Dialog>
 </template>
@@ -108,12 +108,12 @@ const closeExpiredChange = (() => {
 
 const submitPasswordChange = (() => {
    okDisabled.value = true
+   let success = false
    if (hasPasswordToken.value) {
       let data = {reset_password_token: passwordToken.value, new_password: newPassword.value}
       userStore.changePasswordWithToken(data).then(() => {
          showDialog.value = false
-         let msg = "Your password has been changed."
-         system.setToast("Success", msg)
+         success = true
       }).catch((e) => {
          expiredToken.value = true
          if(e.response.data.message){
@@ -128,8 +128,7 @@ const submitPasswordChange = (() => {
       let data  = {currPassword: currPassword.value, newPassword: newPassword.value}
       userStore.changePassword(data).then(() => {
          showDialog.value = false
-         let msg = "Your password has been changed."
-         system.setToast("Success", msg)
+         success = true
       }).catch((e) => {
          error.value = "Password change failed.</br>"
          if ( e.response.data.message ) {
@@ -142,6 +141,10 @@ const submitPasswordChange = (() => {
          okDisabled.value = false
       })
    }
+
+   setTimeout( ()=>{
+      system.setToast("Success", "Your password has been changed.")
+   }, 500)
 })
 </script>
 
