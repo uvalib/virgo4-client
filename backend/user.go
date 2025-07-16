@@ -176,33 +176,8 @@ func (svc *ServiceContext) ChangePassword(c *gin.Context) {
 	c.String(http.StatusOK, "pin changed")
 }
 
-// ChangePasswordWithToken takes a resetPinToken and newPin as params in the json POST payload.
-// It changes the pin to new_pin.
-func (svc *ServiceContext) ChangePasswordWithToken(c *gin.Context) {
-	var qp struct {
-		Token   string `json:"reset_password_token"`
-		NewPass string `json:"new_password"`
-	}
-
-	qpErr := c.ShouldBindJSON(&qp)
-	if qpErr != nil {
-		log.Printf("ERROR: invalid change_password_token payload: %v", qpErr)
-		c.String(http.StatusBadRequest, "Invalid request")
-		return
-	}
-	log.Printf("Attempting to change pin with token")
-	pinURL := fmt.Sprintf("%s/users/change_password_with_token", svc.ILSAPI)
-	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
-	if ilsErr != nil {
-		log.Printf("User pin change with token failed")
-		c.String(ilsErr.StatusCode, ilsErr.Message)
-		return
-	}
-	c.String(http.StatusOK, "Password changed")
-}
-
-// ForgotPassword sends a password reset email via ILS Connector and Sirsi
-func (svc *ServiceContext) ForgotPassword(c *gin.Context) {
+// Forgot password step 1: request a reset email which contains a reset token
+func (svc *ServiceContext) requestPasswordReset(c *gin.Context) {
 	var qp struct {
 		UserBarcode string `json:"userBarcode"`
 	}
@@ -223,6 +198,56 @@ func (svc *ServiceContext) ForgotPassword(c *gin.Context) {
 	}
 
 	c.String(http.StatusOK, "Password reset")
+}
+
+// Forgot password step 2: use the reset token to start a new sirsi session for reset attempts
+// If a reset fails for complexity reasons, the session can be reused
+func (svc *ServiceContext) startResetPasswordSession(c *gin.Context) {
+	var qp struct {
+		ResetToken string `json:"resetPasswordToken"`
+	}
+	qpErr := c.ShouldBindJSON(&qp)
+	if qpErr != nil {
+		log.Printf("ERROR: invalid payload for start reset session: %v", qpErr)
+		c.String(http.StatusBadRequest, "invalid request")
+		return
+	}
+
+	log.Printf("INFO: start reset session with token %s", qp.ResetToken)
+	pinURL := fmt.Sprintf("%s/users/start_reset_password_session", svc.ILSAPI)
+	resp, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
+	if ilsErr != nil {
+		log.Printf("ERROR: unable to start reset session with token %s: %s", qp.ResetToken, ilsErr.Message)
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+
+	log.Printf("INFO: reset passward session started: %s", resp)
+	c.String(http.StatusOK, string(resp))
+}
+
+// Forgot password step 3: reset the password using the session started in step 2
+func (svc *ServiceContext) resetPassword(c *gin.Context) {
+	var qp struct {
+		Session string `json:"session"`
+		NewPass string `json:"newPassword"`
+	}
+
+	qpErr := c.ShouldBindJSON(&qp)
+	if qpErr != nil {
+		log.Printf("ERROR: invalid reset_password payload: %v", qpErr)
+		c.String(http.StatusBadRequest, "invalid request")
+		return
+	}
+	log.Printf("INFO: use established session to reset password")
+	pinURL := fmt.Sprintf("%s/users/reset_password", svc.ILSAPI)
+	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
+	if ilsErr != nil {
+		log.Printf("ERROR: reset password failed: %s", ilsErr.Message)
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+	c.String(http.StatusOK, "Password changed")
 }
 
 // GetUserBills uses ILS Connector user billing details

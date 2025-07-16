@@ -23,7 +23,6 @@ function parseJwt(token) {
 
 export const useUserStore = defineStore('user', {
 	state: () => ({
-      showForgotPW: false,
       authToken: "",
       authorizing: false,
       signedInUser: "",
@@ -648,16 +647,6 @@ export const useUserStore = defineStore('user', {
          window.location.href = "/authenticate/netbadge"
       },
 
-      changePassword(data) {
-         data['barcode'] = this.accountInfo['barcode']
-         return axios.post("/api/change_password", data)
-      },
-      changePasswordWithToken(data) {
-         return axios.post("/api/change_password_token", data, {_retry: true}) // don't retry
-      },
-      forgotPassword(barcode) {
-         return axios.post("/api/forgot_password", {userBarcode: barcode} )
-      },
       async submitNewAccountRequest() {
          this.lookingUp = true
          await axios.post("/api/requests/account", this.accountRequest ).then( _resp => {

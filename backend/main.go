@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "2.10.0"
+const version = "2.11.0"
 
 /**
  * MAIN
@@ -72,6 +72,11 @@ func main() {
 	router.POST("/authorize", svc.Authorize)
 	router.POST("/signout", svc.SignOut)
 
+	// No version headers for RSS
+	apiWithoutVersion := router.Group("/api")
+	apiWithoutVersion.GET("/searches/:token/rss", svc.GetRSSFeed)
+
+	// all other api routes ensure virgo versions are correct
 	api := router.Group("/api")
 	api.Use(svc.versionMiddleware)
 
@@ -79,13 +84,16 @@ func main() {
 
 	api.GET("/bookmarks/:token", svc.GetPublicBookmarks)
 	api.GET("/codes", svc.AuthMiddleware, svc.GetCodes)
-	api.POST("/change_password", svc.AuthMiddleware, svc.ChangePassword)
-	api.POST("/change_password_token", svc.ChangePasswordWithToken)
-	api.POST("/forgot_password", svc.ForgotPassword)
-	api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
-	apiWithoutVersion := router.Group("/api") // No version headers for RSS
-	apiWithoutVersion.GET("/searches/:token/rss", svc.GetRSSFeed)
 
+	// signed in user changes their passeord
+	api.POST("/change_password", svc.AuthMiddleware, svc.ChangePassword)
+
+	// signed out user forgot password sequance
+	api.POST("/forgot_password", svc.requestPasswordReset)                   // first step, reqest reset email
+	api.POST("/start_reset_password_session", svc.startResetPasswordSession) // begin a session using the reset token
+	api.POST("/reset_password", svc.resetPassword)                           // use the session to resest the password, failures reuse this session
+
+	api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
 	api.GET("/availability/:id", svc.AuthMiddleware, svc.getItemAvailability)
 
 	api.POST("/coursereserves", svc.AuthMiddleware, svc.createCourseReserves)
