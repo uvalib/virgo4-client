@@ -1,6 +1,6 @@
 <template>
-   <VirgoButton  @click="showDialog = true" v-if="passwords.isPasswordReset == false" :disabled="showDialog" ref="trigger" label="Change password"/>
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Change Password"
+   <VirgoButton  @click="passwords.showChangePass = true" v-if="passwords.isPasswordReset == false" :disabled="passwords.showChangePass" ref="trigger" label="Change password"/>
+   <Dialog v-model:visible="passwords.showChangePass" :modal="true" position="top" header="Change Password"
       @hide="closeChangeDialog" @show="opened" :draggable="false"
    >
       <p>New passwords must: </p>
@@ -28,6 +28,7 @@
          />
          <FormKit type="password" name="password_confirm" label="Confirm password" validation="required|confirm" v-model="confirmPassword" />
       </FormKit>
+      <div v-if="passwords.error" class="error" v-html="passwords.error"></div>
       <template #footer>
          <VirgoButton severity="secondary" @click="closeChangeDialog" label="Cancel"/>
          <VirgoButton @click="pwform.node.submit()" label="Submit" :loading="passwords.working"/>
@@ -40,7 +41,6 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from "@/stores/user"
 import { usePasswordStore } from "@/stores/password"
-import { setErrors } from '@formkit/core'
 import Dialog from 'primevue/dialog'
 
 const route = useRoute()
@@ -48,7 +48,6 @@ const router = useRouter()
 const userStore = useUserStore()
 const passwords = usePasswordStore()
 
-const showDialog = ref(false)
 const currPassword = ref("")
 const newPassword = ref("")
 const confirmPassword = ref("")
@@ -59,7 +58,6 @@ onMounted(()=> {
    passwords.resetForgotSession()
    if ( route.query.token && route.query.token.length > 0 ) {
       passwords.initForgotSession( route.query.token )
-      showDialog.value = true
    }
 })
 
@@ -70,7 +68,7 @@ const opened = (() => {
 })
 
 const closeChangeDialog = (() => {
-   showDialog.value = false
+   passwords.showChangePass = false
    if(trigger.value) {
       trigger.value.$el.focus()
    }
@@ -81,16 +79,11 @@ const closeChangeDialog = (() => {
    }
 })
 
-const submitPasswordChange = (async () => {
+const submitPasswordChange = (() => {
    if ( passwords.isPasswordReset ) {
-      await passwords.resetPassword( newPassword.value )
+      passwords.resetPassword( newPassword.value )
    } else {
-      await passwords.changePassword( userStore.accountInfo['barcode'], currPassword.value, newPassword.value )
-   }
-   if ( passwords.error != "") {
-      setErrors('change-password', passwords.error)
-   } else {
-      showDialog.value = false
+      passwords.changePassword( userStore.accountInfo['barcode'], currPassword.value, newPassword.value )
    }
 })
 </script>
@@ -106,5 +99,8 @@ label {
    display: block;
    margin: 10px 0 2px 0;
    font-weight: bold;
+}
+.error {
+   color: $uva-red-A;
 }
 </style>
