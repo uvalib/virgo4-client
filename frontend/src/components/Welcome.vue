@@ -4,7 +4,10 @@
          Virgo is the Library catalog, where you can find books, articles, and more.
       </h2>
       <p>
-         You can use Virgo to make requests, find and create course reserves, organize and share bookmarks, and set personal preferences for your own use of the system.
+         You can use Virgo to <router-link to="/requests">make requests</router-link>,
+          <router-link to="/coursereserves">find</router-link> and create course reserves,
+         <router-link to="/bookmarks">organize and share bookmarks</router-link>,
+         and set <router-link to="/preferences">personal preferences</router-link> for your own use of the system.
       </p>
       <p  v-if="systemStore.isKiosk == false">
          Or, find
