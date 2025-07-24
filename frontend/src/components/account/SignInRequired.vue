@@ -1,9 +1,7 @@
 <template>
    <div class="signout-content" v-if="userStore.isSignedIn == false">
-      <h3>You must be signed in to access {{props.targetPage}}.</h3>
-      <p>
-         <VirgoButton text label="Sign in now" @click="signInClicked" :aria-label="`Sign in to view ${props.targetPage}`" />
-      </p>
+      <div class="message">You must be signed in to access {{props.targetPage}}.</div>
+      <VirgoButton label="Sign in now" @click="signInClicked" :aria-label="`Sign in to view ${props.targetPage}`" />
    </div>
 </template>
 
@@ -29,14 +27,18 @@ function signInClicked() {
 <style lang="scss" scoped>
 
 .signout-content {
-   width: 60%;
    margin: 0 auto;
+   min-height: 400px;
    position: relative;
    text-align: center;
+   .message {
+      margin-bottom: 30px;
+      font-size: 1.25rem;
+   }
 }
 @media only screen and (min-width: 768px) {
    div.signout-content  {
-       width: 60%;
+       width: 70%;
    }
 }
 @media only screen and (max-width: 768px) {

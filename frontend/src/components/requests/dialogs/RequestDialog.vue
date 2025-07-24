@@ -1,5 +1,5 @@
 <template>
-   <div>
+   <div class="trigger">
       <VirgoButton @click="showDialog=true" :label="props.trigger" :disabled="props.disabled" />
       <slot name="info"></slot>
    </div>
@@ -77,4 +77,19 @@ const hideRequestDialog = (() => {
 </script>
 
 <style lang="scss" scoped>
+.trigger {
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+}
+@media only screen and (min-width: 768px) {
+   .trigger {
+      width: auto;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .trigger {
+      width: 100%;
+   }
+}
 </style>
