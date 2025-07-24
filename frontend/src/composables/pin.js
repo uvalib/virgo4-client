@@ -1,5 +1,7 @@
 import { onMounted, ref, watch, nextTick } from 'vue'
-import { useWindowScroll, useElementBounding, useResizeObserver } from '@vueuse/core'
+import { useWindowScroll, useElementBounding, useResizeObserver, useWindowSize } from '@vueuse/core'
+
+const { height } = useWindowSize()
 
 export function usePinnable( pinID, alertsID, scrollID, footerID ) {
    const { y } = useWindowScroll()
@@ -18,15 +20,21 @@ export function usePinnable( pinID, alertsID, scrollID, footerID ) {
    })
 
    watch(y, (newY) => {
-      if ( pinnedY.value < 0) {
-         if ( toolbarBounds.value.top <= 0 ) {
-            pinnedY.value = y.value+toolbarBounds.value.top
-            pin()
+      if (height.value < 580) {
+         if ( pinnedY.value > -1) {
+            unpin()
          }
       } else {
-         if ( newY <=  pinnedY.value) {
-            pinnedY.value = -1
-            unpin()
+         if ( pinnedY.value < 0) {
+            if ( toolbarBounds.value.top <= 0 ) {
+               pinnedY.value = y.value+toolbarBounds.value.top
+               pin()
+            }
+         } else {
+            if ( newY <=  pinnedY.value) {
+               pinnedY.value = -1
+               unpin()
+            }
          }
       }
    })
