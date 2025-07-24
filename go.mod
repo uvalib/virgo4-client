@@ -13,15 +13,15 @@ require (
 	github.com/rs/xid v1.6.0
 	github.com/uvalib/virgo4-api v1.0.0
 	github.com/uvalib/virgo4-jwt v1.2.3
-	github.com/zsais/go-gin-prometheus v1.0.0
+	github.com/zsais/go-gin-prometheus v1.0.1
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.6.0
-	gorm.io/gorm v1.30.0
+	gorm.io/gorm v1.30.1
 )
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bytedance/sonic v1.13.3 // indirect
+	github.com/bytedance/sonic v1.14.0 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect

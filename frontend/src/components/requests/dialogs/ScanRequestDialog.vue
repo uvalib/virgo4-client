@@ -3,44 +3,46 @@
       :show="request.activeRequest=='scan'" :showSubmit="submitted == false && user.isSignedIn"
       :disabled="request.working" :submit-disabled="user.illiadBlocked" @opened="dialogOpened" @closed="dialogClosed" @submit="scanForm.node.submit()">
       <SignIn v-if="!user.isSignedIn" />
-      <p v-if="!user.hasIlliad">
-         No ILLiad account found.<br />
-         To register <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
-         please complete this form. <i class='fal fa-external-link-alt'></i></a>
-      </p>
-      <p v-else-if="user.illiadBlocked">
-         Your ILLiad account is blocked.<br />
-         Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
-      </p>
-      <FormKit v-else-if="submitted == false" type="form" ref="scanForm" :actions="false" @submit="submit">
-         <FormKit v-if="request.items.length > 1" type="select" label="Select the item you want" v-model="selectedItem"
-            id="scan-item-sel" placeholder="Select an item"
-            :validation-messages="{required: 'Item selection is required.'}" :options="request.items"
-            validation="required" @change="itemSelected($event)" />
-         <FormKit type="select" label="Scan purpose" id="scan-use" v-model="scan.type"
-            :options="{'Article': 'Research', 'Collab': 'Instruction'}" />
-         <div class="scan-use-note" v-if="scan.type == 'Article'">
-            Use this form to request a scan for your coursework or personal academic research.
-         </div>
-         <div v-else class="scan-use-note">
-            <div><b>For instructors only: </b></div>
-            <div>Use this form to request a scan for distribution to your students through<br />a course management
-               system (Collab, Canvas, etc).</div>
-         </div>
-         <FormKit label="Book or Journal Title" type="text" v-model="scan.title" validation="required" />
-         <FormKit label="Chapter or Article Title" type="text" v-model="scan.chapter" validation="required" />
-         <FormKit label="Chapter or Article Author" type="text" v-model="scan.author" validation="required" />
-         <FormKit label="Year" type="text" v-model="scan.year" placeholder="yyyy"
-            validation="required|date_format:YYYY" />
-         <FormKit label="Volume" type="text" v-model="scan.volume" />
-         <FormKit label="Issue" type="text" v-model="scan.issue" />
-         <FormKit label="Pages" type="text" v-model="scan.pages" validation="required|length:1,25" help="(ex: 1-15)" />
-         <FormKit v-if="scan.type=='Article'" label="Notes" type="textarea" v-model="scan.notes" :rows="2" />
-         <FormKit v-else label="Course Information" type="textarea" v-model="scan.notes" :rows="2"
-            validation="required" />
-         <ILLCopyrightNotice :type="scan.type === 'Article' ? 'research' : 'instruction'" />
-      </FormKit>
-      <ConfirmationPanel v-else />
+      <template v-else>
+         <p v-if="!user.hasIlliad">
+            No ILLiad account found.<br />
+            To register <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
+            please complete this form. <i class='fal fa-external-link-alt'></i></a>
+         </p>
+         <p v-else-if="user.illiadBlocked">
+            Your ILLiad account is blocked.<br />
+            Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
+         </p>
+         <FormKit v-else-if="submitted == false" type="form" ref="scanForm" :actions="false" @submit="submit">
+            <FormKit v-if="request.items.length > 1" type="select" label="Select the item you want" v-model="selectedItem"
+               id="scan-item-sel" placeholder="Select an item"
+               :validation-messages="{required: 'Item selection is required.'}" :options="request.items"
+               validation="required" @change="itemSelected($event)" />
+            <FormKit type="select" label="Scan purpose" id="scan-use" v-model="scan.type"
+               :options="{'Article': 'Research', 'Collab': 'Instruction'}" />
+            <div class="scan-use-note" v-if="scan.type == 'Article'">
+               Use this form to request a scan for your coursework or personal academic research.
+            </div>
+            <div v-else class="scan-use-note">
+               <div><b>For instructors only: </b></div>
+               <div>Use this form to request a scan for distribution to your students through<br />a course management
+                  system (Collab, Canvas, etc).</div>
+            </div>
+            <FormKit label="Book or Journal Title" type="text" v-model="scan.title" validation="required" />
+            <FormKit label="Chapter or Article Title" type="text" v-model="scan.chapter" validation="required" />
+            <FormKit label="Chapter or Article Author" type="text" v-model="scan.author" validation="required" />
+            <FormKit label="Year" type="text" v-model="scan.year" placeholder="yyyy"
+               validation="required|date_format:YYYY" />
+            <FormKit label="Volume" type="text" v-model="scan.volume" />
+            <FormKit label="Issue" type="text" v-model="scan.issue" />
+            <FormKit label="Pages" type="text" v-model="scan.pages" validation="required|length:1,25" help="(ex: 1-15)" />
+            <FormKit v-if="scan.type=='Article'" label="Notes" type="textarea" v-model="scan.notes" :rows="2" />
+            <FormKit v-else label="Course Information" type="textarea" v-model="scan.notes" :rows="2"
+               validation="required" />
+            <ILLCopyrightNotice :type="scan.type === 'Article' ? 'research' : 'instruction'" />
+         </FormKit>
+         <ConfirmationPanel v-else />
+      </template>
    </RequestDialog>
 </template>
 
