@@ -18,10 +18,10 @@
    </div>
    <div v-else-if="userStore.canRequestAccount == false && userStore.accountRequested == false" class="signup-form no-signup">
       <p class="left">Hello!</p>
-      <p class="left">There is an issue with your library account’s setup or you need to be registered.</p>
+      <p class="left">There is an issue with your library account's setup or you need to be registered.</p>
       <p class="light left">
          Please contact us to have this resolved.<br/>
-         You may call us at 434-924-3021, email us <a target="_blank" href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>,
+         You may call us at 434-924-3021, email us <a target="_blank" href="mailto:lib-circ@virginia.edu" aria-describedby="new-window">lib-circ@virginia.edu</a>,
          or visit us at Shannon Library.
       </p>
       <p class="light left">

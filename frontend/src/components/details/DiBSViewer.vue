@@ -24,7 +24,7 @@
                   </template>
                   <template v-else>
                      <a href="tel:4342435180" target="_blank">434-243-5180</a> or <a href="mailto:sdacAT@virginia.edu"
-                        target="_blank">sdacAT@virginia.edu</a>.
+                        target="_blank" aria-describedby="new-window">sdacAT@virginia.edu</a>.
                   </template>
                   This item may have a time limit, or a limited number of concurrent users.
                </div>

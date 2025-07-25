@@ -29,7 +29,7 @@
             </Column>
             <Column field="url" header="URL">
                <template #body="slotProps">
-                  <a  v-if="slotProps.data.url" :href="slotProps.data.ur" target="_blank">{{ slotProps.data.url }}</a>
+                  <a  v-if="slotProps.data.url" :href="slotProps.data.ur" target="_blank" aria-describedby="new-window">{{ slotProps.data.url }}</a>
                   <span v-else class="none">None</span>
                </template>
                <template #editor="{ data, field }">

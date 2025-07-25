@@ -5,8 +5,7 @@
          <div class="content">
             <h4>
                <template v-if="libraryURL && system.isKiosk == false">
-                  <a :href="libraryURL" target="_blank" :aria-describedby="`${props.library.id}-link`">{{ props.library.name }}<i aria-hidden="true" class="fal fa-external-link-alt"></i></a>
-                  <span :id="`${props.library.id}-link`" class="screen-reader-text">(opens in a new window)</span>
+                  <a :href="libraryURL" target="_blank" aria-describedby="new-window">{{ props.library.name }}<i aria-hidden="true" class="fal fa-external-link-alt"></i></a>
                </template>
                <span v-else>{{props.library.name}}</span>
             </h4>

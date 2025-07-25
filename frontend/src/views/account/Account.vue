@@ -114,7 +114,7 @@
                                     <em>Fines will continuing accruing until the item is returned</em>.
                                  </p>
                                  <p>
-                                    <a href="https://www.library.virginia.edu/policies/circulation/" target="_blank">
+                                    <a href="https://www.library.virginia.edu/policies/circulation/" target="_blank" aria-describedby="new-window">
                                     Learn more about Library circulation and fines.
                                     </a>
                                  </p>
@@ -151,7 +151,7 @@
                         <div v-else>
                            <div>
                               <p>
-                                 <a href="https://pci.foc.virginia.edu/UVA_Library_Circulation" target="_blank">The Library offers an online payment option</a>.
+                                 <a href="https://pci.foc.virginia.edu/UVA_Library_Circulation" target="_blank" aria-describedby="new-window">The Library offers an online payment option</a>.
                                  You will need to enter the total amount billed to pay.
                               </p>
                               <p>
@@ -178,7 +178,7 @@
             <h3>ILLiad</h3>
             <p class="sc" v-if="!userStore.hasIlliad">
                No ILLiad account found.<br/>
-               To register <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
+               To register <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
                please complete this form. <i class='fal fa-external-link-alt'></i></a>
             </p>
             <p v-else-if="userStore.illiadBlocked" class="standing-info">
@@ -191,7 +191,7 @@
                   {{userStore.leoLocation}}
                </dd>
                <p>
-                  <a target="_blank" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad account">Visit ILLiad</a> to change your LEO delivery location.
+                  <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad account">Visit ILLiad</a> to change your LEO delivery location.
                </p>
             </dl>
          </div>
@@ -199,7 +199,7 @@
          <div class="account-group">
             <h3>Special Collections</h3>
             <p class="sc">
-               <a target="_blank" href="https://virginia.aeon.atlas-sys.com/logon" aria-label="Special Collections Account" >
+               <a target="_blank" aria-describedby="new-window" href="https://virginia.aeon.atlas-sys.com/logon" aria-label="Special Collections Account" >
                   Make Small Special Collections requests
                </a>
                using your online researcher account.

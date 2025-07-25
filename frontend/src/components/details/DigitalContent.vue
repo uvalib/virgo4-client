@@ -18,9 +18,8 @@
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
             <div class="img-toolbar">
                <VirgoButton as="a" label="View full size" severity="info" size="small"
-                  :aria-describedby="`${item.details.identifier}-fullsize-link`" :href="imageURL('max')" target="_blank" rel="noopener"
+                  aria-describedby="new-window" :href="imageURL('max')" target="_blank" rel="noopener"
                />
-               <span :id="`${item.details.identifier}-fullsize-link`" class="screen-reader-text">(opens in a new window)</span>
             </div>
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large" :alt="item.details.header.title">
          </div>

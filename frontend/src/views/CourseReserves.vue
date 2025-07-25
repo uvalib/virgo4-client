@@ -19,12 +19,12 @@
                   <VirgoButton @click="searchClicked('course_id')" label="Search Course ID"/>
                </div>
                <div class="links">
-                  <a href="https://collab.its.virginia.edu/portal" target="_blank">
+                  <a href="https://collab.its.virginia.edu/portal" target="_blank" aria-describedby="new-window">
                      UVA Collab<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                   </a>
                </div>
                <div class="links">
-                  <a href="http://www.library.virginia.edu/services/course-reserves/" target="_blank">
+                  <a href="http://www.library.virginia.edu/services/course-reserves/" target="_blank" aria-describedby="new-window">
                      Place a Reserve (Instructors only)<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                   </a>
                </div>

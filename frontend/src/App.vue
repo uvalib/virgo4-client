@@ -46,6 +46,7 @@
             </div>
          </div>
          <router-view />
+         <span id="new-window" class="screen-reader-text">(opens in a new window)</span>
       </template>
       <div v-else  class="configure">
          <V4Spinner message="Configuring system..."/>

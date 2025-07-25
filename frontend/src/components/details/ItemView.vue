@@ -41,9 +41,10 @@
                   <span class="copyright" v-else-if="field.type=='copyright'">
                      <img :aria-label="`${field.item} icon`" :src="copyrightIconSrc(field)">
                      <template v-if="system.isKiosk == false">
-                        <a :href="field.value" target="_blank">{{field.item}}</a>
+                        <a :href="field.value" target="_blank" aria-describedby="new-window">{{field.item}}</a>
                         <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
                            href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
+                           aria-describedby="new-window"
                         >
                            More about Rights and Permissions<i style="margin-left:5px;" aria-hidden="true" class="fal fa-external-link-alt"></i>
                         </a>
@@ -60,7 +61,7 @@
             <template v-if="system.isKiosk == false && extDetailURL && (detailExpanded || preferences.expandDetails || showFieldsToggle == false)">
                <dt class="label">Full metadata</dt>
                <dd class="value">
-                  <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
+                  <a :href="extDetailURL" target="_blank" aria-describedby="new-window" @click="extDetailClicked">
                      <span class="full-metadata">{{ extDetailLabel }}</span>
                      <i style="margin-left:5px;" aria-hidden="true" class="fal fa-external-link-alt"></i>
                   </a>

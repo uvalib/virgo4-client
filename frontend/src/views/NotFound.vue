@@ -10,10 +10,10 @@
             <li>To access <router-link to="/account">account information</router-link>, click "Sign in" above. If you are already signed in, it will read "Signed in as..."" with your ID.</li>
             <li>
                Use the "Library Services" link above or visit the
-               <a href="http://library.virginia.edu/" target="_blank">Library home page</a>
+               <a href="http://library.virginia.edu/" target="_blank" aria-describedby="new-window">Library home page</a>
                to see more options for Library services.
             </li>
-            <li>You’re always welcome to <a href="http://www.library.virginia.edu/askalibrarian/" target="_blank">Ask a Librarian</a> for help!</li>
+            <li>You're always welcome to <a href="http://www.library.virginia.edu/askalibrarian/" target="_blank" aria-describedby="new-window">Ask a Librarian</a> for help!</li>
          </ul>
       </div>
    </div>

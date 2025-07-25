@@ -6,7 +6,7 @@
       <div class="forgot">
          <p>
             An email will be sent to the address on file with a link to reset your password.<br/>If you need assistance, please
-            <a target="_blank" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.
+            <a target="_blank" aria-describedby="new-window" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.
          </p>
          <label for="forgot-id">Library ID* <span class="required">(required)</span></label>
          <input type="text" v-model="userId" id="forgot-id" @keyup.enter="searchClicked"/>

@@ -6,7 +6,7 @@
       <template v-else>
          <p v-if="!user.hasIlliad">
             No ILLiad account found.<br />
-            To register <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
+            To register <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
             please complete this form. <i class='fal fa-external-link-alt'></i></a>
          </p>
          <p v-else-if="user.illiadBlocked">

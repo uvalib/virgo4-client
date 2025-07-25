@@ -3,7 +3,7 @@
       <div class="message">
          <h3>Virgo is experiencing technical difficulties. Please check back later.</h3>
          <h4>{{systemStore.fatal}}</h4>
-         <p>If this problem persists, <a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a></p>
+         <p>If this problem persists, <a href='https://v4.lib.virginia.edu/feedback' target='_blank' aria-describedby="new-window">please contact us.</a></p>
       </div>
    </div>
 </template>

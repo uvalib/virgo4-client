@@ -58,7 +58,7 @@ export const usePasswordStore = defineStore('password', {
             this.working = false
             this.showForgotPass = false
          }).catch((e) => {
-            let msg = "There's a problem with your account. <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for help.<br/>"
+            let msg = "There's a problem with your account. <a href='https://www.library.virginia.edu/askalibrarian' target='_blank' aria-describedby='new-window'>Ask a Librarian</a> for help.<br/>"
             msg += e.response.data
             this.error =  msg
             this.working = false

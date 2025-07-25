@@ -48,13 +48,13 @@
         </ul>
         <p>
           If you wish to go outside of these guidelines and you believe your use is fair, please consult our page about
-          <a href="https://copyright.library.virginia.edu/user-rights-and-responsibilities/classroom-scanning/" target="_blank">copyright and instructional scanning</a>
+          <a href="https://copyright.library.virginia.edu/user-rights-and-responsibilities/classroom-scanning/" target="_blank" aria-describedby="new-window">copyright and instructional scanning</a>
           and contact our Director of Information Policy to learn more about how to apply fair use to your request. If your request exceeds
           our rules and is not otherwise fair use, you must obtain copyright permission from the publisher of the journal or book.
           Many academic publishers use the
-          <a href="https://marketplace.copyright.com/rs-ui-web/mp" target="_blank">Copyright Clearance Center</a> (CCC) to manage permissions requests.
+          <a href="https://marketplace.copyright.com/rs-ui-web/mp" target="_blank" aria-describedby="new-window">Copyright Clearance Center</a> (CCC) to manage permissions requests.
           The University's policy on Adherence to Copyright Protections is available
-          <a href="https://uvapolicy.virginia.edu/policy/GOV-005" target="_blank">here</a>.
+          <a href="https://uvapolicy.virginia.edu/policy/GOV-005" target="_blank" aria-describedby="new-window">here</a>.
           This institution reserves the right to refuse to accept a copying order if,
           in its judgment, fulfillment of the order would involve violation of copyright law.
         </p>

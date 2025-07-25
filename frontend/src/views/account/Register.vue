@@ -7,7 +7,7 @@
       <li>A community borrower account does not grant access to online material.</li>
       <li><b>To keep your account, you must verify your identity within the first 30 days:</b></li>
       <ul>
-        <li>Please bring a photo ID to a <a href="https://library.virginia.edu/hours" target="_blank">UVA Library location</a>. Accepted forms of ID include:
+        <li>Please bring a photo ID to a <a href="https://library.virginia.edu/hours" target="_blank" aria-describedby="new-window">UVA Library location</a>. Accepted forms of ID include:
           <ul>
             <li>Driver's license</li>
             <li>Passport</li>
@@ -19,10 +19,10 @@
       <li>If not verified, accounts will be deleted after 30 days.</li>
       <li>More information:
         <ul>
-          <li><a target="_blank" href="https://www.library.virginia.edu/policies/circulation">
+          <li><a target="_blank" aria-describedby="new-window" href="https://www.library.virginia.edu/policies/circulation">
               Circulation Policies
             </a></li>
-          <li><a target="_blank" href="https://www.library.virginia.edu/services/community-patrons">
+          <li><a target="_blank" aria-describedby="new-window" href="https://www.library.virginia.edu/services/community-patrons">
               Community Patron Services
             </a>
           </li>

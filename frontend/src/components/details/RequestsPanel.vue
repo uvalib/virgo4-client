@@ -10,7 +10,7 @@
             <div  v-else>
                This item is now on order. Learn more about
                <a href="https://library.virginia.edu/about-available-to-order-items" aria-label="Available to Order"
-                  style="text-decoration: underline;" target="_blank" title="Available to Order (Opens in a new window.)"
+                  style="text-decoration: underline;" target="_blank" title="Available to Order" aria-describedby="new-window"
                   class="piwik_link">Available to Order</a> items.
             </div>
          </template>

@@ -5,7 +5,7 @@
          <div class="line">
             <b>
                The Library
-               <a href="https://www.library.virginia.edu/policies/privacy-policy/" target="_blank">values your privacy</a>.
+               <a href="https://www.library.virginia.edu/policies/privacy-policy/" target="_blank" aria-describedby="new-window">values your privacy</a>.
             </b>
          </div>
          <div class="line">

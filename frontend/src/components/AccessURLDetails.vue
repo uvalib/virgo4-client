@@ -12,7 +12,7 @@
          <template v-else>
             <div v-if="hasProviderInfo(p.provider)" class="header">
                <template v-if="providerHomepage(p.provider)">
-                  <a class="provider-link" :aria-label="`${providerLabel(p.provider)} home page`" :href="providerHomepage(p.provider)" target="_blank">
+                  <a class="provider-link" :aria-label="`${providerLabel(p.provider)} home page`" :href="providerHomepage(p.provider)" target="_blank" aria-describedby="new-window">
                      {{ providerLabel(p.provider) }}
                   </a>
                </template>
@@ -22,7 +22,7 @@
             </div>
             <div class="links" :class="{indent: hasProviderInfo}">
                <div v-for="(l,idx) in providerLinks(p)" :key="`${l.url}-${idx}`">
-                  <VirgoButton as="a" :label="linkLabel(l)" :href="l.url" target="_blank" size="small"
+                  <VirgoButton as="a" :label="linkLabel(l)" :href="l.url" target="_blank" aria-describedby="new-window" size="small"
                      :aria-label="`access ${props.title} ${l.label} with ${providerLabel(p.provider)}`"/>
                </div>
                <template v-if="props.mode=='brief' && remainingLinks(p)">

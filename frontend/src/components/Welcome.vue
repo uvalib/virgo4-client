@@ -11,9 +11,9 @@
       </p>
       <p  v-if="systemStore.isKiosk == false">
          Or, find
-            <a href="https://guides.lib.virginia.edu/az.php" _targtet="_blank">databases</a>,
-            <a href="https://guides.lib.virginia.edu/" _targtet="_blank">subject guides</a>, and
-            <a href="https://guides.lib.virginia.edu/journalfinder" _targtet="_blank">journals</a>.
+         <a href="https://guides.lib.virginia.edu/az.php" _targtet="_blank" aria-describedby="new-window">databases</a>,
+         <a href="https://guides.lib.virginia.edu/" _targtet="_blank" aria-describedby="new-window">subject guides</a>, and
+         <a href="https://guides.lib.virginia.edu/journalfinder" _targtet="_blank" aria-describedby="new-window">journals</a>.
       </p>
    </div>
 </template>

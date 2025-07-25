@@ -51,7 +51,7 @@
       </div>
       <div class="community">
          Members of our community are welcome to use many UVA Library resources.
-         <a href="https://www.library.virginia.edu/policies/circulation/" target="_blank">Learn about creating an account and accessing materials.</a>
+         <a href="https://www.library.virginia.edu/policies/circulation/" target="_blank" aria-describedby="new-window">Learn about creating an account and accessing materials.</a>
       </div>
    </div>
 </template>

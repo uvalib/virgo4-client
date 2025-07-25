@@ -26,7 +26,8 @@
       />
       <div v-if="openurl.pickup == 'LEO' && (userStore.hasIlliad==false || userStore.leoLocation=='')" class="illiad-prompt ra-box ra-fiy">
          It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
-         <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
+         <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank" aria-describedby="new-window">here</a>
+         and let us know where you would like your item to be delivered.
       </div>
 
       <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-openurl-book"

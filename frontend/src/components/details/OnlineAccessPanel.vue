@@ -11,7 +11,7 @@
                      <a v-if="providerHomepage(s.provider)" class="provider-link"
                         :aria-label="`${providerLabel(s.provider)} home page`"
                         :href="providerHomepage(s.provider)" target="_blank"
-                        aria-describedby="external-link"
+                        aria-describedby="new-window"
                      >
                         {{ providerLabel(s.provider) }}
                      </a>
@@ -21,7 +21,7 @@
                   </div>
                   <div class="links">
                      <template  v-for="l in s.links">
-                        <VirgoButton as="a" :label="linkLabel(l, s.provider)" :href="l.url" size="small" target="_blank" aria-describedby="external-link"/>
+                        <VirgoButton as="a" :label="linkLabel(l, s.provider)" :href="l.url" size="small" target="_blank" aria-describedby="new-window"/>
                      </template>
                   </div>
                </div>

@@ -9,7 +9,7 @@
 
          <p>
             If you cannot pick your item up at the location(s) shown below, please
-            <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a>
+            <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a>
             to request your item.
          </p>
 

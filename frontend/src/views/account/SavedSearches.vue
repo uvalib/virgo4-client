@@ -30,7 +30,7 @@
                   </span>
                </div>
                <div v-if="saved.public" class="public-controls">
-                  <a  class="view" :href="searchURL(saved.token)" target="_blank">
+                  <a  class="view" :href="searchURL(saved.token)" target="_blank" aria-describedby="new-window">
                      <span>View published search</span>
                      <i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                   </a>

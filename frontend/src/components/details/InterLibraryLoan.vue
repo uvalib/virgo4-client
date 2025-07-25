@@ -8,7 +8,7 @@
             <template v-if="requestStore.activeRequest == 'none'">
                <div class="message">
                   This item is available with an Interlibrary Loan.
-                  <a v-if="!system.isKiosk" href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a>
+                  <a v-if="!system.isKiosk" href="https://www.library.virginia.edu/services/ils/ill" target="_blank" aria-describedby="new-window">Learn more about Interlibrary Loans.</a>
                </div>
                <VirgoButton @click="requestClicked" label="Request Interlibrary Loan" id="ill-request-btn"/>
             </template>

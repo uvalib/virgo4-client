@@ -19,7 +19,7 @@
             <p>This pickup location is where you will go to retrieve items you've requested.</p>
             <p>
                If you cannot pick your item up at the location(s) shown above, please
-               <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a>
+               <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a>
                to request your item.
             </p>
          </div>
@@ -29,7 +29,7 @@
          >
             <template v-if="!user.hasIlliad">
                No ILLiad account found.<br/>
-               To register <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
+               To register <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
                please complete this form. <i class='fal fa-external-link-alt'></i></a>
             </template>
             <template v-else-if="user.illiadBlocked">
@@ -38,7 +38,7 @@
             </template>
             <template v-else-if="user.leoLocation==''">
                It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
-               <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
+               <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank" aria-describedby="new-window">here</a> and let us know where you would like your item to be delivered.
             </template>
          </div>
             <div class="medium-rare-message" v-if="pickupLibrary == 'SPEC-COLL' ">

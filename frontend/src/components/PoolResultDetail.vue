@@ -4,7 +4,7 @@
          <div class="desc" v-html="selectedResults.pool.description">
          </div>
          <div v-if="hasLogo" class="source-logo">
-            <a v-if="hasURL" :href="poolStore.externalURL(selectedResults.pool.id)" target="_blank">
+            <a v-if="hasURL" :href="poolStore.externalURL(selectedResults.pool.id)" target="_blank" aria-describedby="new-window">
                <img class ="logo" :src="poolStore.logo(selectedResults.pool.id)">
             </a>
              <img v-else class ="logo" :src="poolStore.log(selectedResults.pool.id)">
@@ -21,7 +21,7 @@
                <span>Search timed out</span>
                <p class="note">
                   Sorry, the source providing this data took too long to respond.  You may wish to try your search again, or try a different search.
-                  If the problem persists, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> may be able to help.
+                  If the problem persists, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank' aria-describedby="new-window">Ask a Librarian</a> may be able to help.
                </p>
                <VirgoButton @click="retrySearch">Retry Search</VirgoButton>
             </div>

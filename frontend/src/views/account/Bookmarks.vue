@@ -33,7 +33,7 @@
                            <label :for="`folder${folderInfo.id}`" class="cb-label">Public</label>
                         </span>
                         <span v-if="folderInfo.public" class="public-url">
-                           <a :href="getPublicURL(folderInfo)" target="_blank">
+                           <a :href="getPublicURL(folderInfo)" target="_blank" aria-describedby="new-window">
                               <span>View</span><i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                            </a>
                         </span>
