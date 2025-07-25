@@ -18,7 +18,7 @@
       </div>
 
       <div class="viewer">
-         <iframe :src="curioURL" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
+         <iframe :src="curioURL" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0" :title="`viewer for ${item.details.header.title}`"/>
       </div>
       <h2>Digital Collection</h2>
       <CollectionPanel />

@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton @click="showDialog=true" aria-label="view collection calendar" ref="trigger"
+   <VirgoButton @click="showDialog=true" aria-label="calendar" ref="trigger"
       icon="fal fa-calendar-alt" text rounded size="large"/>
 
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog" @show="opened" :draggable="false">
