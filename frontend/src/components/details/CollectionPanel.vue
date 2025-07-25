@@ -6,7 +6,7 @@
          </div>
          <div class="collection-right-panel">
             <div class="content">
-               <div class="title-row">{{collection.title}}</div>
+               <h3 class="title-row">{{collection.title}}</h3>
                <div class="desc-row" v-html="collection.description"></div>
             </div>
             <div class="collection-search" v-if="collection.canSearch">
@@ -89,6 +89,7 @@ const searchClicked = (() => {
             .title-row  {
                font-weight: bold;
                font-size: 1.25em;
+               margin:0;
             }
 
             .desc-row {
