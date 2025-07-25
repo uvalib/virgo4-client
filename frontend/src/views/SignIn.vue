@@ -21,7 +21,7 @@
          <div class="section">
             <FormKit type="form" id="signin" :actions="false" @submit="signinClicked">
                <FormKit label="Library ID" type="text" v-model="user" validation="required" help="Library ID, eg: C001005101 or TEMP001166" />
-               <FormKit label="Password" type="password" v-model="pin" />
+               <FormKit label="Password" type="password" v-model="pin" validation="required"  />
                <V4FormActions :hasCancel="false" submitLabel="Sign in" submitID="submit-signin" buttonAlign="center" />
             </FormKit>
             <transition name="message-transition"
