@@ -18,9 +18,9 @@
             </div>
          </div>
          <div class="controls">
-            <VirgoButton link @click="toggle" class="toggle" :label="expandText"
-               :aria-expanded="showFull" aria-controls="`${props.id}-cut`"
-            />
+            <a href="#" @click="toggle" class="toggle" :aria-expanded="showFull" aria-controls="`${props.id}-cut`">
+               {{ expandText }}
+            </a>
          </div>
       </div>
    </div>
@@ -83,7 +83,9 @@ const expand = ((event) => {
    }
 })
 
-const toggle = (() => {
+const toggle = ((event) => {
+   event.preventDefault()
+   event.stopPropagation()
    showFull.value = !showFull.value
    if ( showFull.value == false ) {
       setFocusID(props.id+"-cut", true)

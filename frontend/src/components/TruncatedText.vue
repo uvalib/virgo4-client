@@ -13,9 +13,9 @@
             <div v-else class="full" :id="`${props.id}-full`" aria-live="polite" >
                <span class="text" v-html="props.text"></span>
             </div>
-            <VirgoButton link @click="toggle" class="trigger" :label="linkLabel"
-               :aria-expanded="showFull.toString()" aria-controls="`truncated-${props.id}`"
-            />
+            <a href="#" @click="toggle" class="trigger" :aria-expanded="showFull.toString()" aria-controls="`truncated-${props.id}`">
+               {{linkLabel}}
+            </a>
          </div>
       </template>
    </div>
@@ -72,7 +72,9 @@ const hide =(() => {
    })
 })
 
-const toggle = (() => {
+const toggle = (( event ) => {
+   event.preventDefault()
+   event.stopPropagation()
    showFull.value = !showFull.value
    let tgtID = `${props.id}-full`
    if ( showFull.value == false) {

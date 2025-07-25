@@ -57,7 +57,7 @@ const backToTop = (()=> {
       background-color: $uva-grey-A;
    }
    &:focus {
-      outline: 2px dotted white;
+      outline: 2px dotted $uva-brand-orange;
       outline-offset: 3px;
    }
 }
