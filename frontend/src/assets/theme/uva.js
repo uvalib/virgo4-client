@@ -90,7 +90,7 @@ const UVA = definePreset(Aura, {
          root: {
             paddingY: '.5em',
             paddingX: '1em',
-            gap: '1rem',
+            gap: '0.5rem',
             borderRadius: '.3rem',
             sm: {
                fontSize: '0.875rem',

@@ -18,9 +18,6 @@
                :pt="{
                   pcPaginator: {
                      pcRowPerPageDropdown: {
-                        root: {
-                           'aria-label': 'rows per page'
-                        },
                         label: {
                            'aria-controls': null
                         }
