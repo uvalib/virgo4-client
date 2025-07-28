@@ -7,7 +7,7 @@
             <span v-if="props.inline && idx < truncatedLinks.length-1" class="sep">;</span>
          </div>
       </div>
-      <div v-else tabindex="0"  class="truncated-content" :id="`${props.id}-cut`"
+      <div v-else class="truncated-content" :id="`${props.id}-cut`"
             @keydown.enter="expand" @keydown.space="expand" @keyup.stop.esc="hide"
       >
          <div :id="`${props.id}-list`" aria-live="polite" class="truncated-links" :class="{inline: props.inline}">
