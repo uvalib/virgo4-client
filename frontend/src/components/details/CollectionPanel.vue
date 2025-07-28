@@ -10,11 +10,11 @@
                <div class="desc-row" v-html="collection.description"></div>
             </div>
             <div class="collection-search" v-if="collection.canSearch">
+               <label for="search">Search collection:</label>
                <div class="search-box">
                   <input autocomplete="off" type="text" id="search"
                      @keyup.enter="searchClicked"
                      v-model="queryStore.basic"
-                     placeholder="Search this collection"
                   >
                   <VirgoButton label="Search" @click="searchClicked"  />
                </div>
