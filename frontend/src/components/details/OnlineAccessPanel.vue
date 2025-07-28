@@ -9,7 +9,6 @@
                <div class='source' v-for="s in props.sources">
                   <div class="name">
                      <a v-if="providerHomepage(s.provider)" class="provider-link"
-                        :aria-label="`${providerLabel(s.provider)} home page`"
                         :href="providerHomepage(s.provider)" target="_blank"
                         aria-describedby="new-window"
                      >
