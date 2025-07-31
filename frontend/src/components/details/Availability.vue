@@ -3,7 +3,7 @@
       <div class="working" v-if="item.availability.searching" >
          <V4Spinner message="Loading Availability..."/>
       </div>
-      <div class="availability-content" v-else>
+      <div class="availability-content" v-else-if="hasOnlineContent || hasItems">
          <h2>Availability</h2>
          <div class="online" v-if="hasOnlineContent">
             <OnlineAccessPanel v-if="item.onlineAccessSources.length > 0 && !system.isKiosk"
