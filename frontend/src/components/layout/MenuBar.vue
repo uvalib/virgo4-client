@@ -1,12 +1,6 @@
 <template>
    <nav v-if="!systemStore.$datafatal" class="menu" aria-label="Virgo Menu">
-      <Menubar :model="v4Menu"
-         :pt="{
-            item: {
-               'aria-level': null
-            }
-         }"
-      >
+      <Menubar :model="v4Menu">
          <template #end>
             <span v-if="userStore.isSignedIn && userStore.itemsOnNotice.length > 0">
                <router-link to="/checkouts?overdue=1">
@@ -16,10 +10,14 @@
                </router-link>
             </span>
             <span v-if="systemStore.isKiosk == false" class="alert-wrap">
-               <VirgoButton icon="alert-bell icon fal fa-bell" text rounded aria-label="virgo alerts"
-                  size="large" :class="{dim: alertStore.seenCount==0}"
+               <OverlayBadge v-if="alertStore.seenCount" :value="alertStore.seenCount" severity="warn" @click="alertClicked" aria-live="polite" >
+                  <VirgoButton icon="alert-bell icon fal fa-bell" text rounded :ariaLabel="`${alertStore.seenCount} virgo alerts`"
+                     size="large" :class="{dim: alertStore.seenCount==0}" severity="contrast"
+                     :disabled="alertStore.seenCount==0"  @click="alertClicked" />
+               </OverlayBadge>
+               <VirgoButton v-else icon="alert-bell icon fal fa-bell" text rounded aria-label="virgo alerts"
+                  size="large" :class="{dim: alertStore.seenCount==0}" severity="contrast"
                   :disabled="alertStore.seenCount==0"  @click="alertClicked" />
-               <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
             </span>
          </template>
       </Menubar>
@@ -35,6 +33,7 @@ import { useAlertStore } from "@/stores/alert"
 import { computed } from 'vue'
 import analytics from '@/analytics'
 import { useRouter } from "vue-router"
+import OverlayBadge from 'primevue/overlaybadge'
 
 const alertStore = useAlertStore()
 const systemStore = useSystemStore()
@@ -112,51 +111,17 @@ const signOut = (() => {
 </script>
 
 <style lang="scss" scoped>
-.menu-item.notice {
-   color: $uva-yellow;
-   margin: 0 0 0 10px;
-   font-weight: normal;
-   .cnt {
-      font-size: 0.8em;
-      font-weight: bold;
-      font-family: sans-serif;
-      display: inline-block;
-      position: relative;
-      top: -6px;
-      left: -2px;
-   }
-}
-:deep(.alert-bell.icon) {
-   color: white;
-}
-#alertmenu {
-   display: inline-block;
-   border-radius: 10px;
-}
 .alert-wrap {
-   position: relative;
-   display: block;
    button {
       color: white;
+      width: 20px !important;
+      height: 34px !important;
    }
    button.dim {
       opacity: 0.2;
    }
-   .alert-count {
-      font-size: 1em;
-      font-weight: bold;
-      background: $uva-brand-orange;
-      color: white;
-      font-family: sans-serif;
-      display: inline-block;
-      text-align: center;
-      border-radius: 40px;
-      padding: 4px 8px;
-      position: absolute;
-      right: -11px;
-      top: -7px;
-      cursor: default;
-   }
+   display: inline-block;
+   margin: 1px 2px 0 0;
 }
 
 </style>

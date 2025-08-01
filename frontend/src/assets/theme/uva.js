@@ -86,6 +86,20 @@ const UVA = definePreset(Aura, {
             padding: '1.125rem 1.125rem 1.125rem 1.125rem'
         }
       },
+       badge: {
+         root: {
+            fontWeight: 'normal',
+            fontSize: '1em'
+         },
+         colorScheme: {
+            light: {
+               warn: {
+                  background: colors.brandOrange,
+                  borderColor: colors.brandOrange,
+               }
+            }
+         }
+      },
       button: {
          root: {
             paddingY: '.5em',

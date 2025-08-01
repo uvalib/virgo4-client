@@ -236,10 +236,10 @@ onUpdated(() => {
             margin-top: 0px;
          }
          a {
-            color: $uva-blue-alt-A;
+            color: black;
             text-decoration: underline;
             &:hover {
-               color: $uva-blue-alt;
+               color: black;
             }
          }
       }
