@@ -179,10 +179,15 @@ const router = createRouter({
    },
 })
 
-router.afterEach((to) => {
+router.afterEach((to, from) => {
    const systemStore  = useSystemStore()
-   systemStore.clearMessage()
-   useToast().removeAllGroups()
+
+   // only clear messages if a different page or item is navigated.
+   // searches just change query params, and sometimes generate errors which need to be preserved
+   if (to.path != from.path ) {
+      systemStore.clearMessage()
+      useToast().removeAllGroups()
+   }
 
    // Page header is now in the main app template and driven by the pageTitle
    // model variable. Ensure it is set correctly for each new page
