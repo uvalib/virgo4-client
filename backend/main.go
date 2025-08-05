@@ -89,9 +89,8 @@ func main() {
 	api.POST("/change_password", svc.AuthMiddleware, svc.ChangePassword)
 
 	// signed out user forgot password sequance
-	api.POST("/forgot_password", svc.requestPasswordReset)                   // first step, reqest reset email
-	api.POST("/start_reset_password_session", svc.startResetPasswordSession) // begin a session using the reset token
-	api.POST("/reset_password", svc.resetPassword)                           // use the session to resest the password, failures reuse this session
+	api.POST("/forgot_password", svc.requestPasswordReset)
+	api.POST("/reset_password", svc.resetPassword)
 
 	api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
 	api.GET("/availability/:id", svc.AuthMiddleware, svc.getItemAvailability)

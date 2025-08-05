@@ -200,36 +200,11 @@ func (svc *ServiceContext) requestPasswordReset(c *gin.Context) {
 	c.String(http.StatusOK, "Password reset")
 }
 
-// Forgot password step 2: use the reset token to start a new sirsi session for reset attempts
-// If a reset fails for complexity reasons, the session can be reused
-func (svc *ServiceContext) startResetPasswordSession(c *gin.Context) {
-	var qp struct {
-		ResetToken string `json:"resetPasswordToken"`
-	}
-	qpErr := c.ShouldBindJSON(&qp)
-	if qpErr != nil {
-		log.Printf("ERROR: invalid payload for start reset session: %v", qpErr)
-		c.String(http.StatusBadRequest, "invalid request")
-		return
-	}
-
-	log.Printf("INFO: start reset session with token %s", qp.ResetToken)
-	pinURL := fmt.Sprintf("%s/users/start_reset_password_session", svc.ILSAPI)
-	resp, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
-	if ilsErr != nil {
-		log.Printf("ERROR: unable to start reset session with token %s: %s", qp.ResetToken, ilsErr.Message)
-		c.String(ilsErr.StatusCode, ilsErr.Message)
-		return
-	}
-
-	log.Printf("INFO: reset passward session started: %s", resp)
-	c.String(http.StatusOK, string(resp))
-}
-
-// Forgot password step 3: reset the password using the session started in step 2
+// On the first attempt, this call will have Token set. Subsequent requests will have Session set
 func (svc *ServiceContext) resetPassword(c *gin.Context) {
 	var qp struct {
-		Session string `json:"session"`
+		Token   string `json:"token"`   // the initial passwrd reset token from the email
+		Session string `json:"session"` // session returned from failed reset attempts
 		NewPass string `json:"newPassword"`
 	}
 
@@ -243,8 +218,18 @@ func (svc *ServiceContext) resetPassword(c *gin.Context) {
 	pinURL := fmt.Sprintf("%s/users/reset_password", svc.ILSAPI)
 	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
-		log.Printf("ERROR: reset password failed: %s", ilsErr.Message)
-		c.String(ilsErr.StatusCode, ilsErr.Message)
+		var resetFailResp struct {
+			SessionToken string `json:"sessionToken"`
+			ErrorMessage string `json:"errorMessage"`
+		}
+		parseErr := json.Unmarshal([]byte(ilsErr.Message), &resetFailResp)
+		if parseErr != nil {
+			log.Printf("ERROR: reset password failed with %s, but parse failed: %s", ilsErr.Message, parseErr.Error())
+			c.String(http.StatusInternalServerError, parseErr.Error())
+		} else {
+			log.Printf("ERROR: reset password failed with [%s] and a new session token [%s]", resetFailResp.ErrorMessage, resetFailResp.SessionToken)
+			c.JSON(http.StatusBadRequest, resetFailResp)
+		}
 		return
 	}
 	c.String(http.StatusOK, "Password changed")

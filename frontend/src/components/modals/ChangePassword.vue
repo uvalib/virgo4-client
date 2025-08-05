@@ -101,6 +101,7 @@ label {
    font-weight: bold;
 }
 .error {
+   margin-top: 10px;
    color: $uva-red-A;
 }
 </style>

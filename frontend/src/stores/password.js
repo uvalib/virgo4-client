@@ -7,14 +7,14 @@ export const usePasswordStore = defineStore('password', {
       working: false,
       error: "",
       resetToken: "",
-      forgotPasswordSession: "",
+      resetSession: "",
       showForgotPass: false,
       showChangePass: false
    }),
 
    getters: {
       isPasswordReset: state => {
-         return state.resetToken != ""
+         return state.resetToken != "" || state.resetSession != ""
       }
    },
 
@@ -26,7 +26,7 @@ export const usePasswordStore = defineStore('password', {
 
       resetForgotSession() {
          this.resetToken = ""
-         this.forgotPasswordSession = ""
+         this.resetSession = ""
          this.error = ""
       },
 
@@ -66,24 +66,18 @@ export const usePasswordStore = defineStore('password', {
       },
 
       initForgotSession(resetToken) {
+         // On the first attempt, there is a reset token but no session.
+         // If that request fails, a session will be part of the reponse. When that happens
+         // the token will be blanked out (it is no longer valid) and session set
          this.resetToken = resetToken
-         this.forgotPasswordSession = ""
-         this.showChangePass = true
-         this.working = true
-         let data = {resetPasswordToken: resetToken}
-         axios.post("/api/start_reset_password_session", data ).then((response) => {
-            this.forgotPasswordSession = response.data
-            this.working = false
-         }).catch((e) => {
-            let msg = "Unable to initialize forgot password request: "+e.response.data
-            this.error =  msg
-            this.working = false
-         })
+         this.resetSession = ""
+         this.showChangePass = true // automatically open the change password modal
       },
 
       resetPassword( newPassword ) {
          this.initRequest()
-         let data = { session: this.forgotPasswordSession, newPassword: newPassword}
+         // Per above notes, only session or token should be set. If both are present, session is preferred.
+         let data = { token: this.resetToken, session: this.resetSession, newPassword: newPassword}
          axios.post("/api/reset_password", data ).then(() => {
             this.working = false
             this.showChangePass = false
@@ -91,7 +85,15 @@ export const usePasswordStore = defineStore('password', {
                useSystemStore().setToast("Success", "Your password has been changed.")
             }, 250)
          }).catch((e) => {
-            this.error =  e.response.data
+            console.log("PASSWORD RESET FAILED:")
+            console.log(e.response)
+            if ( e.response.data.sessionToken ) {
+               this.resetToken = ""
+               this.resetSession = e.response.data.sessionToken
+               this.error =  e.response.data.errorMessage
+            } else {
+               this.error =  e.response.data
+            }
             this.working = false
          })
       },
