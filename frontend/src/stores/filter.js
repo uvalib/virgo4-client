@@ -347,7 +347,18 @@ export const useFilterStore = defineStore('filter', {
                if ( poolFacetObj.dirty === true ) {
                   console.log("pool "+poolFacetObj.pool+" facets marked dirty by a new search; refreshing")
                } else {
-                  if ( !(poolFacetObj.placeholder === true || poolFacetObj.facets.length == 0) ) {
+                  // if there are no facets present, they must be requested
+                  let requestFacets = (poolFacetObj.facets.length == 0)
+                  if ( requestFacets == false ) {
+                     // some facets are present, see if any are placeholders. If so a request is needed
+                     poolFacetObj.facets.forEach( pf => {
+                        if ( pf.placeholder === true ) {
+                           requestFacets = true
+                        }
+                     })
+                  }
+
+                  if ( requestFacets === false ) {
                      console.log("pool "+poolFacetObj.pool+" facets are current, do not refresh")
                      return
                   }
