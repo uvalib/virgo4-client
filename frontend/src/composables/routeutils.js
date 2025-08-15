@@ -15,12 +15,9 @@ export function useRouteUtils( router,route ) {
       const sortStore = useSortStore()
 
       let query = route.query
-      if (!query.q || query.reset) {
-         // only reset the search when there is NO query present, or reset param exists,
+      if (!query.q ) {
+         // only reset the search when there is NO query present
          // otherwise the search is re-excuted each time a tab changes
-
-         // if reset param exists, it will trigger a re-run of the search, but will be
-         // removed from the query beforehand so that it doesn't keep resetting
          resultStore.resetSearch()
       }
 
@@ -37,24 +34,30 @@ export function useRouteUtils( router,route ) {
          queryStore.setTargetPool(targetPool)
       }
 
-      // get sort from URL (but preserve current sort)...
+      // get existing search
       let oldSortObj = sortStore.poolSort(targetPool)
       let oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
-      if (query.sort) {
-         sortStore.setPoolSort(targetPool, query.sort)
-         sortStore.setActivePool(targetPool)
-      } else {
-         sortStore.setPoolSort(targetPool, oldSort)
-         sortStore.setActivePool(targetPool)
+
+      // do not process any sort params if a pool was not specified
+      if ( targetPool != "presearch" ) {
+         if (query.sort) {
+            sortStore.setPoolSort(targetPool, query.sort)
+            sortStore.setActivePool(targetPool)
+         } else {
+            sortStore.setPoolSort(targetPool, oldSort)
+            sortStore.setActivePool(targetPool)
+         }
       }
 
-      // get pool filters from URL (but preserve current, unless explicitly resetting)
+      // get pool filters from URL
       let oldFilterParam = filters.asQueryParam(targetPool)
       if (query.filter) {
-         if (query.reset) {
+         // In the collection search link from item details, no pool is specified. Target pool will be presearch.
+         // Always allow this to happen so the logic that detects when to run a search is tripped (filters willl be different from original)
+         filters.restoreFromURL(query.filter, targetPool)
+         if ( !query.pool ) {
+            // if filters are specified but no pool, apply the filter to all pools
             filters.setAllFromURL(query.filter)
-         } else {
-            filters.restoreFromURL(query.filter, targetPool)
          }
       } else {
          filters.resetPoolFilters(targetPool)
@@ -66,9 +69,14 @@ export function useRouteUtils( router,route ) {
          queryStore.restoreFromURL(query.q)
       }
 
+      // console.log(`Q: ${queryStore.string} vs ${oldQ}`)
+      // console.log(`F: ${filters.asQueryParam(targetPool)} vs ${oldFilterParam}`)
+      // console.log(`S: ${sortStore.activeSort} vs ${oldSort}`)
+      // console.log(`user search: ${queryStore.userSearched}`)
+
       // only re-run search when query, sort or filtering has changed - or a user has initiated a search with a UI element, or explicitly resetting
       if ( queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam ||
-           sortStore.activeSort != oldSort || queryStore.userSearched == true || query.reset) {
+           sortStore.activeSort != oldSort || queryStore.userSearched == true) {
          resultStore.resetSearchResults()
          let refreshFacets = queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam || queryStore.userSearched == true
          queryStore.userSearched = false

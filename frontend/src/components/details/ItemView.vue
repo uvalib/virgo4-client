@@ -260,7 +260,7 @@ const getFilterLinks = ( ( filter, values ) => {
    values.forEach( v => {
       let qp = `keyword:{}`
       let fp = `{"${filter}":["${encodeURIComponent(v)}"]}`
-      let link = {label: v, url: `/search?reset=y&mode=advanced&q=${qp}&filter=${fp}`}
+      let link = {label: v, url: `/search?mode=advanced&q=${qp}&filter=${fp}`}
       out.push(link)
    })
    return out
