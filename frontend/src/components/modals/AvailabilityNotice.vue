@@ -63,7 +63,7 @@ const messageParts = (() => {
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .icon {
    color: $uva-brand-orange;
    font-size: 1.25em;

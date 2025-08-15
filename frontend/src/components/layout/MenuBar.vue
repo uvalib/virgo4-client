@@ -116,9 +116,6 @@ const signOut = (() => {
       color: white;
       width: 20px !important;
       height: 34px !important;
-      .icon {
-         color: white;
-      }
    }
    button.dim {
       opacity: 0.2;
