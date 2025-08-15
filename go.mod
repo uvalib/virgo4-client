@@ -11,7 +11,7 @@ require (
 	github.com/gorilla/feeds v1.2.0
 	github.com/lib/pq v1.10.9
 	github.com/rs/xid v1.6.0
-	github.com/uvalib/virgo4-api v1.0.0
+	github.com/uvalib/virgo4-api v1.0.1
 	github.com/uvalib/virgo4-jwt v1.2.3
 	github.com/zsais/go-gin-prometheus v1.0.1
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df

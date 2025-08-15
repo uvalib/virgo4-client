@@ -283,6 +283,15 @@ export const useFilterStore = defineStore('filter', {
          }
       },
 
+      setAllFromURL( filterStr ) {
+         const pools = usePoolStore()
+         pools.list.forEach( pool => {
+            this.resetPoolFilters(pool.id)
+            this.restoreFromURL(filterStr, pool.id)
+         })
+         this.setDirty()
+      },
+
       promotePreSearchFilters() {
          const pools = usePoolStore()
          let psf = this.facets.find( pf => pf.pool == "presearch")

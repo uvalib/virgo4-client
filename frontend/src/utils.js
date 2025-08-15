@@ -130,7 +130,7 @@ export const preProcessHitFields = ((poolURL, hits) => {
             }
          } else {
             // for ease of use later, these fields are always an array
-            let arrayFields = ["subject", "oclc", "isbn", "lccn"]
+            let arrayFields = ["subject", "oclc", "isbn", "lccn", "digital_collection"]
             if (arrayFields.includes(field.name) ) {
                field.value = [field.value]
             }

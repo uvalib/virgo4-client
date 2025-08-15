@@ -33,6 +33,9 @@
                   <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`" label="subjects"
                      :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value)"
                   />
+                  <V4LinksList v-if="field.name == 'digital_collection' && field.filter" :id="`${field.name}-links`" :inline="true" label="collections"
+                     :expand="preferences.expandDetails" :links="getFilterLinks(field.filter, field.value)"
+                  />
                   <span class="related" v-else-if="field.type=='related-url'">
                      <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
                         <VirgoButton as="a" :href="v.url" target="_blank" :label="v.label" size="small"/>
@@ -247,6 +250,17 @@ const getBrowseLinks = ( ( name, values ) => {
    values.forEach( v => {
       let qp = `${name}: {"${encodeURIComponent(v)}"}`
       let link = {label: v, url: `/search?mode=advanced&q=${qp}`}
+      out.push(link)
+   })
+   return out
+})
+
+const getFilterLinks = ( ( filter, values ) => {
+   let out = []
+   values.forEach( v => {
+      let qp = `keyword:{}`
+      let fp = `{"${filter}":["${encodeURIComponent(v)}"]}`
+      let link = {label: v, url: `/search?reset=y&mode=advanced&q=${qp}&filter=${fp}`}
       out.push(link)
    })
    return out

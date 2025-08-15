@@ -15,9 +15,12 @@ export function useRouteUtils( router,route ) {
       const sortStore = useSortStore()
 
       let query = route.query
-      if (!query.q) {
-         // only reset the search when there is NO query present,
+      if (!query.q || query.reset) {
+         // only reset the search when there is NO query present, or reset param exists,
          // otherwise the search is re-excuted each time a tab changes
+
+         // if reset param exists, it will trigger a re-run of the search, but will be
+         // removed from the query beforehand so that it doesn't keep resetting
          resultStore.resetSearch()
       }
 
@@ -45,10 +48,14 @@ export function useRouteUtils( router,route ) {
          sortStore.setActivePool(targetPool)
       }
 
-      // get pool filters from URL (but preserve current)...
+      // get pool filters from URL (but preserve current, unless explicitly resetting)
       let oldFilterParam = filters.asQueryParam(targetPool)
       if (query.filter) {
-         filters.restoreFromURL(query.filter, targetPool)
+         if (query.reset) {
+            filters.setAllFromURL(query.filter)
+         } else {
+            filters.restoreFromURL(query.filter, targetPool)
+         }
       } else {
          filters.resetPoolFilters(targetPool)
       }
@@ -59,9 +66,9 @@ export function useRouteUtils( router,route ) {
          queryStore.restoreFromURL(query.q)
       }
 
-      // only re-run search when query, sort or filtering has changed - or a user has initiated a search with a UI element
+      // only re-run search when query, sort or filtering has changed - or a user has initiated a search with a UI element, or explicitly resetting
       if ( queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam ||
-           sortStore.activeSort != oldSort || queryStore.userSearched == true) {
+           sortStore.activeSort != oldSort || queryStore.userSearched == true || query.reset) {
          resultStore.resetSearchResults()
          let refreshFacets = queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam || queryStore.userSearched == true
          queryStore.userSearched = false
@@ -73,6 +80,8 @@ export function useRouteUtils( router,route ) {
             let newQ = Object.assign({}, query)
             newQ.pool = resultStore.selectedResults.pool.id
             newQ.sort = sortStore.activeSort
+            // remove any existing reset parameter from new search
+            delete newQ.reset
             router.replace({path: "/search", query: newQ})
          } else {
             // only request facets if the URL isn't replaced above since the URL replacement
