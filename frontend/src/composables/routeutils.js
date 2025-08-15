@@ -34,7 +34,7 @@ export function useRouteUtils( router,route ) {
          queryStore.setTargetPool(targetPool)
       }
 
-      // get existing search
+      // get existing sort
       let oldSortObj = sortStore.poolSort(targetPool)
       let oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
 
@@ -42,9 +42,6 @@ export function useRouteUtils( router,route ) {
       if ( targetPool != "presearch" ) {
          if (query.sort) {
             sortStore.setPoolSort(targetPool, query.sort)
-            sortStore.setActivePool(targetPool)
-         } else {
-            sortStore.setPoolSort(targetPool, oldSort)
             sortStore.setActivePool(targetPool)
          }
       }
