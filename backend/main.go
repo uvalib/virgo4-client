@@ -90,7 +90,10 @@ func main() {
 
 	// signed out user forgot password sequance
 	api.POST("/forgot_password", svc.requestPasswordReset)
-	api.POST("/reset_password", svc.resetPassword)
+	api.POST("/change_password_token", svc.ChangePasswordWithToken)
+
+	// this is the new reset passwsord logic
+	// api.POST("/reset_password", svc.resetPassword)
 
 	api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
 	api.GET("/availability/:id", svc.AuthMiddleware, svc.getItemAvailability)

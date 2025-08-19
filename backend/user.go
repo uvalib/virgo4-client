@@ -200,40 +200,66 @@ func (svc *ServiceContext) requestPasswordReset(c *gin.Context) {
 	c.String(http.StatusOK, "Password reset")
 }
 
-// On the first attempt, this call will have Token set. Subsequent requests will have Session set
-func (svc *ServiceContext) resetPassword(c *gin.Context) {
+// ChangePasswordWithToken takes a resetPinToken and newPin as params in the json POST payload.
+// It changes the pin to new_pin.
+func (svc *ServiceContext) ChangePasswordWithToken(c *gin.Context) {
 	var qp struct {
-		Token   string `json:"token"`   // the initial passwrd reset token from the email
-		Session string `json:"session"` // session returned from failed reset attempts
-		NewPass string `json:"newPassword"`
+		Token   string `json:"reset_password_token"`
+		NewPass string `json:"new_password"`
 	}
 
 	qpErr := c.ShouldBindJSON(&qp)
 	if qpErr != nil {
-		log.Printf("ERROR: invalid reset_password payload: %v", qpErr)
-		c.String(http.StatusBadRequest, "invalid request")
+		log.Printf("ERROR: invalid change_password_token payload: %v", qpErr)
+		c.String(http.StatusBadRequest, "Invalid request")
 		return
 	}
-	log.Printf("INFO: use established session to reset password")
-	pinURL := fmt.Sprintf("%s/users/reset_password", svc.ILSAPI)
+	log.Printf("Attempting to change pin with token")
+	pinURL := fmt.Sprintf("%s/users/change_password_with_token", svc.ILSAPI)
 	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
-		var resetFailResp struct {
-			SessionToken string `json:"sessionToken"`
-			ErrorMessage string `json:"errorMessage"`
-		}
-		parseErr := json.Unmarshal([]byte(ilsErr.Message), &resetFailResp)
-		if parseErr != nil {
-			log.Printf("ERROR: reset password failed with %s, but parse failed: %s", ilsErr.Message, parseErr.Error())
-			c.String(http.StatusInternalServerError, parseErr.Error())
-		} else {
-			log.Printf("ERROR: reset password failed with [%s] and a new session token [%s]", resetFailResp.ErrorMessage, resetFailResp.SessionToken)
-			c.JSON(http.StatusBadRequest, resetFailResp)
-		}
+		log.Printf("User pin change with token failed")
+		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
 	}
 	c.String(http.StatusOK, "Password changed")
 }
+
+// THIS IS THE NEW RESET PASSWORD LOGIC
+// // On the first attempt, this call will have Token set. Subsequent requests will have Session set
+// func (svc *ServiceContext) resetPassword(c *gin.Context) {
+// 	var qp struct {
+// 		Token   string `json:"token"`   // the initial passwrd reset token from the email
+// 		Session string `json:"session"` // session returned from failed reset attempts
+// 		NewPass string `json:"newPassword"`
+// 	}
+
+// 	qpErr := c.ShouldBindJSON(&qp)
+// 	if qpErr != nil {
+// 		log.Printf("ERROR: invalid reset_password payload: %v", qpErr)
+// 		c.String(http.StatusBadRequest, "invalid request")
+// 		return
+// 	}
+// 	log.Printf("INFO: use established session to reset password")
+// 	pinURL := fmt.Sprintf("%s/users/reset_password", svc.ILSAPI)
+// 	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
+// 	if ilsErr != nil {
+// 		var resetFailResp struct {
+// 			SessionToken string `json:"sessionToken"`
+// 			ErrorMessage string `json:"errorMessage"`
+// 		}
+// 		parseErr := json.Unmarshal([]byte(ilsErr.Message), &resetFailResp)
+// 		if parseErr != nil {
+// 			log.Printf("ERROR: reset password failed with %s, but parse failed: %s", ilsErr.Message, parseErr.Error())
+// 			c.String(http.StatusInternalServerError, parseErr.Error())
+// 		} else {
+// 			log.Printf("ERROR: reset password failed with [%s] and a new session token [%s]", resetFailResp.ErrorMessage, resetFailResp.SessionToken)
+// 			c.JSON(http.StatusBadRequest, resetFailResp)
+// 		}
+// 		return
+// 	}
+// 	c.String(http.StatusOK, "Password changed")
+// }
 
 // GetUserBills uses ILS Connector user billing details
 func (svc *ServiceContext) GetUserBills(c *gin.Context) {
