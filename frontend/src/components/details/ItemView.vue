@@ -33,7 +33,7 @@
                   <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`" label="subjects"
                      :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value)"
                   />
-                  <V4LinksList v-if="field.name == 'digital_collection' && field.filter" :id="`${field.name}-links`" :inline="true" label="collections"
+                  <V4LinksList v-else-if="field.name == 'digital_collection' && field.filter" :id="`${field.name}-links`" :inline="true" label="collections"
                      :expand="preferences.expandDetails" :links="getFilterLinks(field.filter, field.value)"
                   />
                   <span class="related" v-else-if="field.type=='related-url'">
