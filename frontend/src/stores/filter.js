@@ -376,7 +376,6 @@ export const useFilterStore = defineStore('filter', {
          }
 
          // this lets a SINGLE collection context show up at the top of the search results
-         collectionStore.clearCollectionDetails()
          let done = false
          collectionStore.collections.some( c => {
             let filter = filterObj.facets.find( f=>f.facet_id == c.filter_name && f.value == c.title)
