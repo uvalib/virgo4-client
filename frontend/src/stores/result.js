@@ -372,6 +372,7 @@ export const useResultStore = defineStore('result', {
             system.reportError(err)
          }
 
+         useCollectionStore().clearCollectionDetails()
          this.setSearching(true)
          this.lastSearchScrollPosition = 0
          this.lastSearchURL = ""
@@ -417,6 +418,7 @@ export const useResultStore = defineStore('result', {
          const poolStore = usePoolStore()
          const sortStore = useSortStore()
 
+         useCollectionStore().clearCollectionDetails()
          this.setSearching(true)
          let filters = filterStore.poolFilter(params.pool.id)
          let sort = sortStore.poolSort(params.pool.id)
