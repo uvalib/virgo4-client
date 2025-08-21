@@ -3,7 +3,7 @@
       <div class="options">
          <PlaceHoldDialog v-if="request.hasOption('hold')" :settings="request.option('hold')" />
          <ScanRequestDialog v-if="request.hasOption('scan')"  :settings="request.option('scan')" />
-         <VideoReserveDialog v-if="request.hasOption('videoReserve')"  :settings="request.option('videoReserve')" />
+         <VideoReserveDialog v-if="user.canMakeReserves && request.hasOption('videoReserve')"  :settings="request.option('videoReserve')" />
          <AeonRequestDialog v-if="request.hasOption('aeon')"  :settings="request.option('aeon')" />
          <template v-if="request.hasOption('pda')">
             <PDADialog :settings="request.option('pda')" v-if="request.option('pda').create_url" />
@@ -31,8 +31,10 @@ import ScanRequestDialog from "@/components/requests/dialogs/ScanRequestDialog.v
 import VideoReserveDialog from "@/components/requests/dialogs/VideoReserveDialog.vue"
 import PDADialog from "@/components/requests/dialogs/PDADialog.vue"
 import { useRequestStore } from "@/stores/request"
+import { useUserStore } from "@/stores/user"
 
 const request = useRequestStore()
+const user = useUserStore()
 
 const directLinkClicked = ( (url) => {
    let tab = window.open(url, '_blank')
