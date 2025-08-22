@@ -345,7 +345,7 @@ func (svc *ServiceContext) GetCodes(c *gin.Context) {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
 	}
-	var codes interface{}
+	var codes any
 	if err := json.Unmarshal(bodyBytes, &codes); err != nil {
 		log.Printf("ERROR: unable to parse codes response: %s", err.Error())
 		c.String(http.StatusInternalServerError, err.Error())
@@ -355,7 +355,7 @@ func (svc *ServiceContext) GetCodes(c *gin.Context) {
 }
 
 // ILLiadRequest sends a GET/PUT/POST request to ILLiad and returns results
-func (svc *ServiceContext) ILLiadRequest(verb string, url string, data interface{}) ([]byte, *RequestError) {
+func (svc *ServiceContext) ILLiadRequest(verb string, url string, data any) ([]byte, *RequestError) {
 	log.Printf("ILLiad  %s request: %s, %+v", verb, url, data)
 	illiadURL := fmt.Sprintf("%s/%s", svc.Illiad.URL, url)
 

@@ -131,6 +131,26 @@ export const useRequestStore = defineStore('request', {
             this.working = false
          )
       },
+       async submitPDFRemediationRequest(req, file) {
+         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pdfRemediation")
+         this.working = true
+         this.failed = false
+
+         let formData = new FormData()
+         formData.append('file', file)
+         formData.append('course', req.course)
+         formData.append('work', req.work)
+         formData.append('title', req.title)
+         await axios.post('/api/requests/standalone/remediate', formData, {
+            headers: {
+               'Content-Type': 'multipart/form-data',
+            }
+         }).catch(e =>
+            useSystemStore().setError(e)
+         ).finally(()=>
+            this.working = false
+         )
+      },
       async submitScan( scan ) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "scan")
          this.working = true
