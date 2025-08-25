@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (svc *ServiceContext) searchCourseReserves(c *gin.Context) {
-	url := fmt.Sprintf("%s/course_reserves/search?type=%s&query=%s", svc.ILSAPI, c.Query("type"), c.Query("query"))
+	encodedQ := url.QueryEscape(c.Query("query"))
+	url := fmt.Sprintf("%s/course_reserves/search?type=%s&query=%s", svc.ILSAPI, c.Query("type"), encodedQ)
 	resp, ilsErr := svc.ILSConnectorGet(url, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		log.Printf("ERROR: course reserves search failed: %s", ilsErr.Message)
