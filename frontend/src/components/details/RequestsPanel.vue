@@ -18,9 +18,6 @@
             @click="directLinkClicked(request.option('directLink').create_url)"
          />
       </div>
-      <div class="help">
-         Other request types and requests for different materials can be made from  <router-link to="/requests">"Requests"</router-link> under <router-link to="/account">"My Account"</router-link>.
-      </div>
    </section>
 </template>
 
