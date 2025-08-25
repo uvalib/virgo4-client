@@ -344,6 +344,7 @@ onMounted(() =>{
    margin: 0 auto;
    position: relative;
    text-align: left;
+   padding-bottom: 75px;
 
    h3 {
       margin: 10px 0 5px 0;
