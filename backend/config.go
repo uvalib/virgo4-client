@@ -32,11 +32,12 @@ type DBConfig struct {
 	Name string
 }
 
-// IlliadConfig contains the configuration necessary to communicate with the Illiad API
+// IlliadConfig contains the configuration necessary to communicate with the Illiad API and upload files
 type IlliadConfig struct {
 	URL          string
 	APIKey       string
 	HealthSciURL string
+	UploadURL    string
 }
 
 // DevConfig specifies configuration params specific to development mode
@@ -92,6 +93,7 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.Illiad.URL, "illiad", "", "Illiad API URL")
 	flag.StringVar(&cfg.Illiad.APIKey, "illiadkey", "", "Illiad API Key")
 	flag.StringVar(&cfg.Illiad.HealthSciURL, "hsilliad", "", "HS Illiad API URL")
+	flag.StringVar(&cfg.Illiad.UploadURL, "illiadupload", "", "URL for the ILLiad file upload service")
 
 	// DB connection params
 	flag.StringVar(&cfg.DB.Host, "dbhost", "localhost", "Database host")

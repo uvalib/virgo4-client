@@ -4,14 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"path"
 	"text/template"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Baese request structure for ILLiad POST /transaction
+// Base request structure for ILLiad POST /transaction
 type illiadRequest struct {
 	Username          string
 	RequestType       string
@@ -179,27 +183,13 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 		borrowReq.illiadRequest = &illiadReq
 	}
 
-	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", borrowReq)
+	transactionNum, illErr := svc.createILLiadTransaction(borrowReq, req.Notes)
 	if illErr != nil {
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
 		c.String(illErr.StatusCode, IlliadErrorMessage)
 		return
 	}
-
-	// parse transaction number from response
-	var illadResp struct {
-		TransactionNumber int
-	}
-	json.Unmarshal([]byte(rawResp), &illadResp)
-	if req.Notes != "" {
-		noteReq := illiadNote{Note: req.Notes, NoteType: "Staff"}
-		_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
-		if illErr != nil {
-			log.Printf("WARN: unable to add note to borrow request %d: %s", illadResp.TransactionNumber, illErr.Message)
-		}
-	}
-
-	c.JSON(http.StatusOK, illadResp)
+	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
 }
 
 // CreateOpenURLRequest will send an openURL request to ILLiad
@@ -262,28 +252,108 @@ func (svc *ServiceContext) CreateOpenURLRequest(c *gin.Context) {
 		openURLReq = scanReq
 	}
 
-	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", openURLReq)
+	transactionNum, illErr := svc.createILLiadTransaction(openURLReq, req.Notes)
+	if illErr != nil {
+		log.Printf("WARN: Illiad Error: %s", illErr.Message)
+		c.String(illErr.StatusCode, IlliadErrorMessage)
+		return
+	}
+	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
+}
+
+// PDFRemediationRequest generates am illiad request for pdf remediation and uploads the target PDF
+func (svc *ServiceContext) PDFRemediationRequest(c *gin.Context) {
+	formData, err := c.MultipartForm()
+	if err != nil {
+		log.Printf("ERROR: unable to get pdf remediation form data: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// this has already been thru auth middleware so JWT/claims will exist
+	v4Claims, _ := getJWTClaims(c)
+	jwtIface, _ := c.Get("jwt")
+	jwt, _ := jwtIface.(string)
+
+	// pull required data from form fields
+	work := formData.Value["work"][0]
+	title := formData.Value["title"][0]
+	course := formData.Value["course"][0]
+	formFile := formData.File["file"][0]
+
+	log.Printf("INFO: process pdf remediation request from %s for course %s, work '%s', title '%s", v4Claims.UserID, course, work, title)
+	baseReq := illiadRequest{
+		Username:          v4Claims.UserID,
+		RequestType:       "Article",
+		TransactionStatus: "Remediation Request",
+		ProcessType:       "DocDel",
+		DocumentType:      "Instructional",
+	}
+	remediateReq := struct {
+		*illiadRequest
+		PhotoJournalTitle string
+		PhotoArticleTitle string
+	}{
+		illiadRequest:     &baseReq,
+		PhotoJournalTitle: work,
+		PhotoArticleTitle: title,
+	}
+
+	transactionNum, illErr := svc.createILLiadTransaction(remediateReq, course)
 	if illErr != nil {
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
 		c.String(illErr.StatusCode, IlliadErrorMessage)
 		return
 	}
 
-	// parse transaction number from response
-	var illadResp struct {
-		TransactionNumber int
-	}
-	json.Unmarshal([]byte(rawResp), &illadResp)
-
-	if req.Notes != "" {
-		noteReq := illiadNote{Note: req.Notes, NoteType: "Staff"}
-		_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
-		if illErr != nil {
-			log.Printf("WARN: unable to add note to OpenURL request %d: %s", illadResp.TransactionNumber, illErr.Message)
-		}
+	log.Printf("INFO: pull file %s from request to temporary file", formFile.Filename)
+	destFile := path.Join("/tmp", formFile.Filename)
+	err = c.SaveUploadedFile(formFile, destFile)
+	if err != nil {
+		log.Printf("ERROR: unable to save %s: %s", formFile.Filename, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
 	}
 
-	c.JSON(http.StatusOK, illadResp)
+	log.Printf("INFO: create new multipart-form with the received file")
+	dlFile, oErr := os.Open(destFile)
+	if oErr != nil {
+		log.Printf("ERROR: unable to open %s so it can be added to a new multipart form: %s", destFile, oErr.Error())
+		c.String(http.StatusInternalServerError, oErr.Error())
+		return
+	}
+	defer dlFile.Close()
+
+	formBuff := &bytes.Buffer{}
+	formWriter := multipart.NewWriter(formBuff)
+	// append the transaction number to the filename sent to the uploader
+	fileW, cErr := formWriter.CreateFormFile("file", fmt.Sprintf("%d_%s", transactionNum, formFile.Filename))
+	if cErr != nil {
+		log.Printf("ERROR: unable to create form file: %s", cErr.Error())
+		c.String(http.StatusInternalServerError, cErr.Error())
+		return
+	}
+
+	_, cpErr := io.Copy(fileW, dlFile)
+	if cpErr != nil {
+		log.Printf("ERROR: unable to add %s to upload form: %s", formFile.Filename, cpErr.Error())
+		c.String(http.StatusInternalServerError, cpErr.Error())
+		return
+	}
+
+	formWriter.Close() // gotta do this to to get multipart form terminating boundary
+
+	log.Printf("INFO: send form with file to illiad upload service")
+	req, _ := http.NewRequest("POST", svc.Illiad.UploadURL, formBuff)
+	req.Header.Set("Content-Type", formWriter.FormDataContentType())
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwt))
+	_, reqErr := svc.SlowHTTPClient.Do(req) // 30 sec timeout. Hopefully big enough
+	if reqErr != nil {
+		log.Printf("ERROR: upload failed: %s", reqErr.Error())
+		return
+	}
+
+	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
 }
 
 // CreateStandaloneScan send a request for a standalone scan to ILLiad
@@ -342,7 +412,7 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	note := ""
 	if req.ScanType == "INSTRUCTIONAL" {
 		illiadReq.ProcessType = "DocDel"
-		illiadReq.DocumentType = "Collab"
+		illiadReq.DocumentType = "Instructional"
 		scanReq.PhotoJournalTitle = req.Work
 		scanReq.PhotoArticleTitle = req.Title
 		note = req.Course
@@ -360,11 +430,20 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		note = req.Notes
 	}
 
-	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", scanReq)
+	transactionNum, illErr := svc.createILLiadTransaction(scanReq, note)
 	if illErr != nil {
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
 		c.String(illErr.StatusCode, IlliadErrorMessage)
 		return
+	}
+	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
+}
+
+func (svc *ServiceContext) createILLiadTransaction(payload any, note string) (int, *RequestError) {
+	log.Printf("INFO: create illiad transaction for %+v", payload)
+	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", payload)
+	if illErr != nil {
+		return 0, illErr
 	}
 
 	// parse transaction number from response
@@ -372,17 +451,17 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		TransactionNumber int
 	}
 	json.Unmarshal([]byte(rawResp), &illadResp)
+	log.Printf("INFO: transaction %d created", illadResp.TransactionNumber)
 
 	if note != "" {
-		// use transaction number to add a note to the request containing course info or scanning notes
+		log.Printf("INFO: add note [%s] to illiad transaction %d", note, illadResp.TransactionNumber)
 		noteReq := illiadNote{Note: note, NoteType: "Staff"}
 		_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
 		if illErr != nil {
 			log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, illErr.Message)
 		}
 	}
-
-	c.JSON(http.StatusOK, illadResp)
+	return illadResp.TransactionNumber, nil
 }
 
 // CreateScan first sends the request to Illiad, then ils-connector
@@ -426,7 +505,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		RequestType:       "Article",
 		ProcessType:       "DocDel",
 		TransactionStatus: "No Hold Scan Request",
-		DocumentType:      scanReq.IlliadType,
+		DocumentType:      "Instructional",
 	}
 	illiadScanReq := illiadScanRequest{
 		illiadRequest:              &illiadReq,
@@ -444,26 +523,11 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		Location: scanReq.Library,
 	}
 
-	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illiadScanReq)
+	transactionNum, illErr := svc.createILLiadTransaction(illiadScanReq, scanReq.Notes)
 	if illErr != nil {
-		// if the first ILLiad request fails, notify user and exit
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
 		c.String(illErr.StatusCode, IlliadErrorMessage)
 		return
-	}
-
-	// parse transaction number from response
-	var illiadResp struct {
-		TransactionNumber int
-	}
-	json.Unmarshal([]byte(rawResp), &illiadResp)
-
-	if scanReq.Notes != "" {
-		noteReq := illiadNote{Note: scanReq.Notes, NoteType: "Staff"}
-		_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illiadResp.TransactionNumber), noteReq)
-		if illErr != nil {
-			log.Printf("WARN: unable to add note to scan %d: %s", illiadResp.TransactionNumber, illErr.Message)
-		}
 	}
 
 	// Only make a hold for certain libraries
@@ -503,7 +567,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	ilsScan := ilsScanRequest{
 		ItemBarcode:   scanReq.ItemBarcode,
 		PickupLibrary: PickupLibrary,
-		IlliadTN:      fmt.Sprintf("%d", illiadResp.TransactionNumber),
+		IlliadTN:      fmt.Sprintf("%d", transactionNum),
 	}
 
 	createHoldURL := fmt.Sprintf("%s/requests/scan", svc.ILSAPI)
@@ -513,9 +577,9 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		// then fail the response
 		type illiadMove struct{ Status string }
 		moveReq := illiadMove{Status: "Virgo Hold Error"}
-		_, qErr := svc.ILLiadRequest("PUT", fmt.Sprintf("/transaction/%d/route", illiadResp.TransactionNumber), moveReq)
+		_, qErr := svc.ILLiadRequest("PUT", fmt.Sprintf("/transaction/%d/route", transactionNum), moveReq)
 		if qErr != nil {
-			log.Printf("WARN: unable to update scan status %d: %s", illiadResp.TransactionNumber, qErr.Message)
+			log.Printf("WARN: unable to update scan status %d: %s", transactionNum, qErr.Message)
 		}
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -524,9 +588,9 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	// Update Illiad status after successful hold
 	type illiadMove struct{ Status string }
 	moveReq := illiadMove{Status: "Scan Request - Hold Placed"}
-	_, qErr := svc.ILLiadRequest("PUT", fmt.Sprintf("/transaction/%d/route", illiadResp.TransactionNumber), moveReq)
+	_, qErr := svc.ILLiadRequest("PUT", fmt.Sprintf("/transaction/%d/route", transactionNum), moveReq)
 	if qErr != nil {
-		log.Printf("WARN: unable to update scan status %d: %s", illiadResp.TransactionNumber, qErr.Message)
+		log.Printf("WARN: unable to update scan status %d: %s", transactionNum, qErr.Message)
 	}
 
 	//TODO: update illiad with the actual hold barcode if necessary
