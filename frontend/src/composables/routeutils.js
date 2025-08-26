@@ -128,20 +128,49 @@ export function useRouteUtils( router,route ) {
    const scopeChanged = ( () => {
       const queryStore = useQueryStore()
       const resultStore = useResultStore()
+      const filters = useFilterStore()
+      const sortStore = useSortStore()
 
+      // If a single pool was the prior scope, results would be length 1.
+      // Any more than that means scope was everything
+      const wasEverythingSearched = (resultStore.results.length > 1)
+
+      // NOTES: The scope radio buttons directly update queryStore.searchSources. This means that
+      // in the logic below, queryStore will have the newly selected scope and newQ/route.query will have the original
       let newQ = Object.assign({}, route.query)
       delete newQ.page
-      if (queryStore.searchSources == newQ.pool && queryStore.searchSources != "all") {
+      delete newQ.filter
+      delete newQ.sort
+      delete newQ.pool
+
+      // If the previous scope was everything, the only way this logic can be called is if
+      // a single pool was selected for the scope
+      if ( wasEverythingSearched ) {
+         // scope narrowed to a single pool; drop all other results. No need to trigger a new search with userSearched=true
+         console.log("NARROW SCOPE ALL TO "+queryStore.searchSources)
          resultStore.dropOtherResults(queryStore.searchSources)
       } else {
-         newQ.q = queryStore.string
-         delete newQ.pool
-         if ( queryStore.searchSources != "all") {
-            newQ.pool = queryStore.searchSources
-         }
+         // Two causes to be here:
+         //    1. single pool scope changed to a different pool
+         //    2. single pool scope widened to everything
+         // In either case, any previous results have been lost and a re-search needs to be triggerred
+         console.log(`SCOPE CHANGED FROM: ${route.query.pool} TO ${queryStore.searchSources}`)
          queryStore.userSearched = true
-         router.push({path: "/search", query: newQ })
       }
+
+      if ( queryStore.searchSources != "all") {
+         newQ.pool = queryStore.searchSources
+
+         // restore any previously defined sort and filter for the new scope
+         const selectedSortObj = sortStore.poolSort( queryStore.searchSources )
+         newQ.sort = `${selectedSortObj.sort_id}_${selectedSortObj.order}`
+         const selectedFilter = filters.asQueryParam( queryStore.searchSources )
+         if (selectedFilter != '{}') {
+            newQ.filter = selectedFilter
+         }
+      }
+
+      router.push({path: "/search", query: newQ })
    })
 
    const sortChanged = (() => {
