@@ -32,7 +32,7 @@
                <ILLBorrowItem v-if="request == 'ILLBorrowItem'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
                <ILLScanArticle v-if="request == 'ILLScanArticle'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
                <InstructionalScan v-if="request == 'InstructionalScan'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
-               <PDFRemediation v-if="request == 'PDFRemediation'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+               <!-- <PDFRemediation v-if="request == 'PDFRemediation'" @canceled="cancelRequest" @submitted="requestSubmitted"/> -->
             </template>
             <h3 class="gap">Outstanding Requests</h3>
          </template>
@@ -208,7 +208,7 @@ import ILLBorrowAV from "@/components/requests/standalone/ILLBorrowAV.vue"
 import ILLBorrowItem from "@/components/requests/standalone/ILLBorrowItem.vue"
 import ILLScanArticle from "@/components/requests/standalone/ILLScanArticle.vue"
 import InstructionalScan from "@/components/requests/standalone/InstructionalScan.vue"
-import PDFRemediation from "@/components/requests/standalone/PDFRemediation.vue"
+// import PDFRemediation from "@/components/requests/standalone/PDFRemediation.vue"
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
 import { useRequestStore } from "@/stores/request"
