@@ -78,7 +78,7 @@ const canMakeRequests = computed(()=>{
 })
 
 const reset = (() => {
-   requestStore.reset()
+   requestStore.resetData()
    setFocusID("ill-request-btn")
 })
 

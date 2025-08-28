@@ -91,7 +91,10 @@ export const useRequestStore = defineStore('request', {
             this.openurl.processType = "Borrowing"
          }
       },
-      reset() {
+      clearAll() {
+         this.$reset()
+      },
+      resetData() {
          // preserve the request options and restore them after the reset
          let saved = this.requestOptions.slice(0)
          this.$reset()

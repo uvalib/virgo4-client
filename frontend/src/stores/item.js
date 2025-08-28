@@ -143,9 +143,11 @@ export const useItemStore = defineStore('item', {
       },
       clearDetails() {
          this.$reset()
+         useRequestStore().clearAll()
       },
       clearAvailability() {
         this.availability = {searching: true, titleId: '', libraries: [], bound_with: [], error: ""}
+         useRequestStore().clearAll()
       },
       setCatalogKeyDetails(data) {
          let found = false
@@ -328,8 +330,6 @@ export const useItemStore = defineStore('item', {
       },
 
       async getAvailability() {
-         const requestStore = useRequestStore()
-
          this.clearAvailability()
          let url = `/api/availability/${this.details.identifier}`
          return axios.get(url).then((response) => {
@@ -352,7 +352,7 @@ export const useItemStore = defineStore('item', {
                //       response.data.request_options[0].item_options[last].label += " (Ivy limited circulation)"
                //    }
                // }
-               requestStore.requestOptions = response.data.request_options
+               useRequestStore().requestOptions = response.data.request_options
             }
             this.availability.searching = false
          }).catch((error) => {
