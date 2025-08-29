@@ -38,8 +38,8 @@
                <LibraryItemsPanel v-for="lib in item.availability.libraries" :library="lib"/>
             </div>
          </div>
-         <div class="online-requests" v-else-if="request.hasOptions">
-            <RequestsPanel v-if="canMakeRequests"/>
+         <div class="online-requests" v-else-if="canMakeRequests">
+            <RequestsPanel />
          </div>
       </div>
    </div>
