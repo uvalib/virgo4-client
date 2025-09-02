@@ -6,10 +6,10 @@
    >
       <SignIn v-if="!user.isSignedIn" />
       <FormKit v-else-if="submitted == false" type="form" ref="holdForm" :actions="false" @submit="placeHold">
-         <FormKit v-if="request.items.length > 1" type="select" label="Select the item you want"
+         <FormKit v-if="request.options.hold.barcodes.length > 1" type="select" label="Select the item you want"
             v-model="selectedItem" id="item-sel" placeholder="Select an item"
             :validation-messages="{required: 'Item selection is required.'}"
-            :options="request.items" validation="required"
+            :options="request.optionItems" validation="required"
          />
          <FormKit type="select" label="Preferred pickup location" v-model="pickupLibrary"
             placeholder="Select a location" @input="pickupLibraryChanged" id="pickup-sel"
@@ -71,13 +71,6 @@ import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
 import { setFocusID } from '@/utils'
 
-const props = defineProps({
-   settings: {
-      type: Object,
-      required: true
-   },
-})
-
 const user = useUserStore()
 const restore = useRestoreStore()
 const request = useRequestStore()
@@ -104,7 +97,6 @@ const pickupLibraries = computed(()=>{
 const dialogOpened = (() => {
    selectedItem.value = null
    submitted.value = false
-   request.$reset
    request.activeRequest = "hold"
    restore.setActiveRequest( request.activeRequest )
    restore.setURL(route.fullPath)
@@ -114,8 +106,8 @@ const dialogOpened = (() => {
    }
    if (user.isSignedIn) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
-      if ( request.items.length == 1) {
-         selectedItem.value = request.items[0].value
+      if ( request.options.hold.barcodes.length == 1) {
+         selectedItem.value = request.optionItems[0].value
          setFocusID("pickup-sel")
       } else {
          setFocusID("item-sel")

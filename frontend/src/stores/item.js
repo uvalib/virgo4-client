@@ -352,7 +352,7 @@ export const useItemStore = defineStore('item', {
                //       response.data.request_options[0].item_options[last].label += " (Ivy limited circulation)"
                //    }
                // }
-               useRequestStore().requestOptions = response.data.request_options
+               useRequestStore().setOptions( response.data.request_options )
             }
             this.availability.searching = false
          }).catch((error) => {

@@ -1,12 +1,12 @@
 <template>
    <section class="requests" aria-live="polite">
       <div class="options">
-         <PlaceHoldDialog v-if="request.hasOption('hold')" :settings="request.option('hold')" />
-         <ScanRequestDialog v-if="request.hasOption('scan')"  :settings="request.option('scan')" />
-         <VideoReserveDialog v-if="user.canMakeReserves && request.hasOption('videoReserve')"  :settings="request.option('videoReserve')" />
-         <AeonRequestDialog v-if="request.hasOption('aeon')"  :settings="request.option('aeon')" />
-         <template v-if="request.hasOption('pda')">
-            <PDADialog :settings="request.option('pda')" v-if="request.option('pda').create_url" />
+         <PlaceHoldDialog v-if="request.options.hold" />
+         <ScanRequestDialog v-if="request.options.scan" />
+         <VideoReserveDialog v-if="user.canMakeReserves && request.options.videoReserve" />
+         <AeonRequestDialog v-if="request.options.aeon"  />
+         <template v-if="request.options.pda">
+            <PDADialog v-if="request.options.pda.create_url" />
             <div  v-else>
                This item is now on order. Learn more about
                <a href="https://library.virginia.edu/about-available-to-order-items" aria-label="Available to Order"
@@ -14,8 +14,8 @@
                   class="piwik_link">Available to Order</a> items.
             </div>
          </template>
-         <VirgoButton v-if="request.hasOption('directLink')"  label="Request a scan"
-            @click="directLinkClicked(request.option('directLink').create_url)"
+         <VirgoButton v-if="request.options.directLink"  label="Request a scan"
+            @click="directLinkClicked(request.options.directLink.create_url)"
          />
       </div>
    </section>

@@ -6,9 +6,10 @@ import { useUserStore } from "@/stores/user"
 
 export const useRequestStore = defineStore('request', {
 	state: () => ({
-      // option types:
-      // hold, aeon, scan, videoReserve, pda, directLink
-      requestOptions: [],
+      // option types: hold, aeon, scan, videoReserve, pda, directLink
+      items: [],        // shared list items that are candidates for requests
+      options: null,    // available options as an object. Each request type is a member
+
       errors: {},
       working: false,
       failed: false,
@@ -49,32 +50,39 @@ export const useRequestStore = defineStore('request', {
 
    getters: {
       hasOptions: (store) => {
-         return Array.isArray(store.requestOptions) && store.requestOptions.length > 0
+         return store.options != null
       },
-      hasOption: (store) => {
-         return (reqType) => {
-            let optIdx  = store.requestOptions.findIndex( ro => ro.type == reqType)
-            return optIdx > -1
-         }
-      },
-      option: (store) => {
-         return (reqType) => {
-            return store.requestOptions.find( ro => ro.type == reqType)
-         }
-      },
-      items: (store) => {
-         var opts = store.requestOptions.find( ro => ro.type == store.activeRequest)
-         if (opts) {
-            let out = []
-            opts.item_options.forEach( i => {
-               out.push( {label: i.call_number, value: i} )
+      optionItems: (store) => {
+         let out = []
+         if ( store.activeRequest != 'none' ) {
+            store.options[store.activeRequest].barcodes.forEach( bc => {
+               const detail = store.items.find( item => item.barcode == bc )
+               out.push( {label: detail.call_number, value: detail} )
             })
-            return out
          }
-         return []
+         return out
       }
    },
    actions: {
+      clearAll() {
+         this.$reset()
+      },
+
+      resetData() {
+         // preserve the request options and restore them after the reset
+         let saved = this.requestOptions.slice(0)
+         this.$reset()
+         this.requestOptions = saved
+      },
+
+      setOptions( data ) {
+         this.$reset()
+         if ( data ) {
+            this.items = data.items
+            this.options = data.options
+         }
+      },
+
       setOpenURLRequestGenre(genre) {
          // genre determines what type of form, and also a bunch of request values
          if (genre == "article" || genre == "preprint") {
@@ -90,15 +98,6 @@ export const useRequestStore = defineStore('request', {
             this.openurl.documentType = "Book"
             this.openurl.processType = "Borrowing"
          }
-      },
-      clearAll() {
-         this.$reset()
-      },
-      resetData() {
-         // preserve the request options and restore them after the reset
-         let saved = this.requestOptions.slice(0)
-         this.$reset()
-         this.requestOptions = saved
       },
 
       async submitOpenURLRequest() {
@@ -221,7 +220,7 @@ export const useRequestStore = defineStore('request', {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pda")
          this.working = true
          this.failed = false
-         await axios.post(this.option("pda").create_url)
+         await axios.post(this.options.pda.create_url)
             .catch(e => {
                let message = e.response.data.error || "There was a problem sending this order. Please try again later."
                useSystemStore().setError(message)
@@ -239,7 +238,7 @@ export const useRequestStore = defineStore('request', {
          this.requestInfo.callNumber = item.call_number
          this.requestInfo.notes = specialInstructions
 
-         var url = new URL(this.option("aeon").create_url)
+         var url = new URL(this.options.aeon.create_url)
          let params = new URLSearchParams(url.search)
          params.set("CallNumber", item.call_number)
          params.set("ItemVolume", item.call_number)   // TODO is this a mistake? Volume is set by the availability service

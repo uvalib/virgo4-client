@@ -33,13 +33,6 @@ import { useRoute } from "vue-router"
 import { useUserStore } from "@/stores/user"
 import analytics from '@/analytics'
 
-const props = defineProps({
-   settings: {
-      type: Object,
-      required: true
-   },
-})
-
 const route = useRoute()
 const request = useRequestStore()
 const restore = useRestoreStore()
