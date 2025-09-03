@@ -5,7 +5,7 @@
       @opened="dialogOpened" @closed="dialogClosed" @submit="aeonForm.node.submit()"
    >
       <FormKit v-if="submitted == false" type="form" ref="aeonForm" :actions="false" @submit="submitAeon">
-         <FormKit v-if="request.options.aeon.barcodes.length > 1" type="select" label="Select the item you want"
+         <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
             v-model="selectedItem" id="aeon-item-sel" placeholder="Select an item"
             :validation-messages="{required: 'Item selection is required.'}"
             :options="request.optionItems" validation="required"
@@ -48,7 +48,7 @@ const dialogOpened = (() => {
    selectedItem.value = null
    specialRequest.value = ""
    request.activeRequest = "aeon"
-   if (request.options.aeon.barcodes.length == 1) {
+   if (request.optionItems.length == 1) {
       selectedItem.value = request.optionItems[0].value
       setFocusID("aeon-item-notes")
    } else {

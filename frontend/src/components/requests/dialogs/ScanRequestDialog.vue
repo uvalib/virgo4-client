@@ -14,7 +14,7 @@
             Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
          </p>
          <FormKit v-else-if="submitted == false" type="form" ref="scanForm" :actions="false" @submit="submit">
-            <FormKit v-if="request.options.scan.barcodes.length > 1" type="select" label="Select the item you want"
+            <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
                v-model="selectedItem" id="scan-item-sel" placeholder="Select an item"
                :validation-messages="{required: 'Item selection is required.'}" :options="request.optionItems"
                validation="required" @change="itemSelected()" />
@@ -111,7 +111,7 @@ const dialogOpened = (() => {
    restore.save()
    if (user.isSignedIn) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
-      if ( request.options.scan.barcodes.length == 1) {
+      if ( request.optionItems.length == 1) {
          selectedItem.value = request.optionItems[0].value
          itemSelected()
          setFocusID("scan-pickup-sel")
@@ -144,8 +144,8 @@ const itemSelected = (() => {
    if ( selectedItem.value ) {
       scan.value.barcode = selectedItem.value.barcode
       scan.value.library = selectedItem.value.library
-      scan.value.location = selectedItem.value.location_id
-      scan.value.callNumber = selectedItem.value.call_number
+      scan.value.location = selectedItem.value.location
+      scan.value.callNumber = selectedItem.value.callNumber
    }
 })
 

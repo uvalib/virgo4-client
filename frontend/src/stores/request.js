@@ -6,9 +6,9 @@ import { useUserStore } from "@/stores/user"
 
 export const useRequestStore = defineStore('request', {
 	state: () => ({
-      // option types: hold, aeon, scan, videoReserve, pda, directLink
-      items: [],        // shared list items that are candidates for requests
-      options: null,    // available options as an object. Each request type is a member
+      options: [],
+      directLink: null,
+      pdaLink: null,
 
       errors: {},
       working: false,
@@ -50,17 +50,44 @@ export const useRequestStore = defineStore('request', {
 
    getters: {
       hasOptions: (store) => {
-         return store.options != null
+         return store.options.length > 0
+      },
+      hasOption: (store) => {
+         return (reqType) => {
+            if (reqType == "directLink") {
+               return (store.directLink != null)
+            }
+            if (reqType == "pda") {
+               return (store.pdaLink != null)
+            }
+            let found = false
+            store.options.some( (opt) => {
+               found = opt.requests.includes(reqType)
+               return found
+            })
+            return found
+         }
       },
       optionItems: (store) => {
          let out = []
          if ( store.activeRequest != 'none' ) {
-            store.options[store.activeRequest].barcodes.forEach( bc => {
-               const detail = store.items.find( item => item.barcode == bc )
-               out.push( {label: detail.call_number, value: detail} )
+            store.options.map( opt => {
+               if (opt.requests.includes(store.activeRequest)) {
+                  out.push( {label: opt.callNumber, value: opt} )
+               }
             })
          }
          return out
+      },
+      isStreamingReserve: (store) => {
+         let found = false
+         if ( store.activeRequest == 'videoReserve' ) {
+            store.options.some( opt => {
+               found = opt.streamingReserve
+               return found
+            })
+         }
+         return found
       }
    },
    actions: {
@@ -78,8 +105,17 @@ export const useRequestStore = defineStore('request', {
       setOptions( data ) {
          this.$reset()
          if ( data ) {
-            this.items = data.items
-            this.options = data.options
+            this.options = data.items
+            if ( data.streamingVideoReserve ) {
+               let requests = ["videoReserve"]
+               this.options.push({ requests: requests, streamingReserve:  true} )
+            }
+            if ( data.hsaScanURL ) {
+               this.directLink = data.hsaScanURL
+            }
+            if ( data.pdaURL ) {
+               this.pdaLink = data.pdaURL
+            }
          }
       },
 
@@ -180,7 +216,7 @@ export const useRequestStore = defineStore('request', {
 
          // track this request so it can be displayed on confirmation panel
          this.requestInfo.pickupLibrary = pickupLibrary
-         this.requestInfo.callNumber = item.call_number
+         this.requestInfo.callNumber = item.callNumber
          this.requestInfo.notes = ""
 
          let req = {itemBarcode: item.barcode, pickupLibrary: pickupLibrary}
@@ -220,7 +256,7 @@ export const useRequestStore = defineStore('request', {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pda")
          this.working = true
          this.failed = false
-         await axios.post(this.options.pda.create_url)
+         await axios.post(this.pdaLink)
             .catch(e => {
                let message = e.response.data.error || "There was a problem sending this order. Please try again later."
                useSystemStore().setError(message)
@@ -235,20 +271,12 @@ export const useRequestStore = defineStore('request', {
 
          // track this request so it can be displayed on confirmation panel
          this.requestInfo.pickupLibrary = ""
-         this.requestInfo.callNumber = item.call_number
+         this.requestInfo.callNumber = item.callNumber
          this.requestInfo.notes = specialInstructions
 
-         var url = new URL(this.options.aeon.create_url)
-         let params = new URLSearchParams(url.search)
-         params.set("CallNumber", item.call_number)
-         params.set("ItemVolume", item.call_number)   // TODO is this a mistake? Volume is set by the availability service
-         params.set("ItemNumber", item.barcode)
-         params.set("Notes", item.sc_notes)
-         params.set("Location", item.location)
-         params.set("SpecialRequest", specialInstructions)
-
-         let aeonUrl = url.origin+url.pathname+"?"+params.toString()
-         window.open(aeonUrl, "_blank")
+         var url = item.aeonURL
+         url += `&SpecialRequest=${encodeURIComponent(specialInstructions)}`
+         window.open(url, "_blank")
 
          this.working = false
       },
