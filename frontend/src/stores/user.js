@@ -332,7 +332,7 @@ export const useUserStore = defineStore('user', {
          localStorage.setItem("v4_jwt", jwtStr)
 
          // Use the new JWT token in auth headers for all a requests and handle reauth if it expires
-         if ( this.requestInterceptor ) {
+         if ( this.requestInterceptor != null ) {
             console.log("remove existing request intercptor")
             axios.interceptors.request.eject( this.requestInterceptor)
          }
@@ -353,7 +353,7 @@ export const useUserStore = defineStore('user', {
             return Promise.reject(error)
          })
 
-         if ( this.responseInterceptor ) {
+         if ( this.responseInterceptor != null ) {
             console.log("remove existing response intercptor")
             axios.interceptors.response.eject(this.responseInterceptor )
          }

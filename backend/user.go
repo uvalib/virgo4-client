@@ -44,8 +44,8 @@ type ILSUserInfo struct {
 	HomeLibrary   string `json:"homeLibrary"`
 	PrivateLDAP   string `json:"private"`
 	// pass through sirsiProfile objects
-	SirsiProfile     map[string]interface{} `json:"sirsiProfile"`
-	SirsiUnavailable bool                   `json:"sirsiUnavailable"`
+	SirsiProfile     map[string]any `json:"sirsiProfile"`
+	SirsiUnavailable bool           `json:"sirsiUnavailable"`
 }
 
 // AccountRequest contains data required to request a Sirsi Account

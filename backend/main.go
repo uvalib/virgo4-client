@@ -138,7 +138,8 @@ func main() {
 	api.POST("/requests/scan", svc.AuthMiddleware, svc.CreateScan)
 	api.POST("/requests/standalone/scan", svc.AuthMiddleware, svc.CreateStandaloneScan)
 	api.POST("/requests/standalone/borrow", svc.AuthMiddleware, svc.CreateBorrowRequest)
-	api.POST("/requests/standalone/remediate", svc.AuthMiddleware, svc.PDFRemediationRequest)
+	api.POST("/requests/standalone/remediate", svc.AuthMiddleware, svc.pdfRemediationRequest)
+	api.GET("/requests/standalone/outstanding", svc.AuthMiddleware, svc.getOutstandingStandaloneRequests)
 	api.POST("/requests/openurl", svc.AuthMiddleware, svc.CreateOpenURLRequest)
 	api.POST("/requests/account", svc.AuthMiddleware, svc.CreateAccountRequest)
 

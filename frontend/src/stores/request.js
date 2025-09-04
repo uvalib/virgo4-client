@@ -21,6 +21,15 @@ export const useRequestStore = defineStore('request', {
          notes: ""
       },
 
+      requestStats: {
+         remediationRequests: 0,
+         remediationLimit: 0,
+         remediationDisabled: false,
+         otherRequests: 0,
+         otherRequestsLimit: 0,
+         otherRequestsDisabled: false
+      },
+
       openurl: {
          requestType: "Loan",
          documentType: "Book",
@@ -48,6 +57,12 @@ export const useRequestStore = defineStore('request', {
    }),
 
    getters: {
+      isRemediateDisabled: (store) => {
+         return store.requestStats.remediationDisabled
+      },
+      otherRequestsDisabled: (store) => {
+         return store.requestStats.otherRequestsDisabled
+      },
       hasOptions: (store) => {
          return Array.isArray(store.requestOptions) && store.requestOptions.length > 0
       },
@@ -99,6 +114,19 @@ export const useRequestStore = defineStore('request', {
          let saved = this.requestOptions.slice(0)
          this.$reset()
          this.requestOptions = saved
+      },
+
+      getStandaloneRequestUsage() {
+         this.working = true
+         this.failed = false
+         axios.get('/api/requests/standalone/outstanding').then( resp => {
+            this.requestStats = resp.data
+         }).catch(e => {
+            console.log("unable to check request limits")
+            console.error(e)
+         }).finally(()=>
+            this.working = false
+         )
       },
 
       async submitOpenURLRequest() {
