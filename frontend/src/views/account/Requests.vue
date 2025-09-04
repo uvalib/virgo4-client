@@ -16,14 +16,22 @@
                   Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
                </p>
             </div>
-            <div v-else class="subcontent buttons">
-               <VirgoButton @click="instructionalScanClick" label="Instructional Scanning"/>
-               <VirgoButton @click="illBorrowClick" label="ILL Borrow Item"/>
-               <VirgoButton @click="illBorrowAVClick" label="ILL Borrow A/V"/>
-               <VirgoButton @click="illScanClick" label="ILL Scan Chapter/Article"/>
-               <!-- <VirgoButton @click="pdfRemediationClick" label="PDF Remediation Request"/> -->
-            </div>
-            <div class="subcontent links">
+            <div v-else class="subcontent">
+               <div class="buttons">
+                  <VirgoButton @click="instructionalScanClick" label="Instructional Scanning" :disabled="requestStore.otherRequestsDisabled"/>
+                  <VirgoButton @click="illBorrowClick" label="ILL Borrow Item" :disabled="requestStore.otherRequestsDisabled"/>
+                  <VirgoButton @click="illBorrowAVClick" label="ILL Borrow A/V" :disabled="requestStore.otherRequestsDisabled"/>
+                  <VirgoButton @click="illScanClick" label="ILL Scan Chapter/Article" :disabled="requestStore.otherRequestsDisabled"/>
+               </div>
+               <div class="reason" v-if="requestStore.otherRequestsDisabled">
+                  You have reached the maximum of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
+               </div>
+               <div class="buttons">
+                  <VirgoButton @click="pdfRemediationClick" label="PDF Remediation Request" :disabled="requestStore.isRemediateDisabled"/>
+               </div>
+               <div class="reason" v-if="requestStore.isRemediateDisabled">
+                  You have reached the maximum of {{ requestStore.requestStats.remediationLimit }} active remediation requests.
+               </div>
                <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank" aria-describedby="new-window">Purchase Request<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i></a>
             </div>
 
@@ -121,8 +129,10 @@
                      <div class="request" v-for="(req,idx) in digitalRequests" :key="`digital-${idx}`">
                         <h3 class="title">{{req.photoJournalTitle}}</h3>
                         <dl>
-                           <dt>Author:</dt>
-                           <dd>{{req.photoArticleAuthor}}</dd>
+                           <template v-if="req.photoArticleAuthor">
+                              <dt>Author:</dt>
+                              <dd>{{req.photoArticleAuthor}}</dd>
+                              </template>
                            <template v-if="req.photoArticleTitle">
                               <dt>Article Title:</dt>
                               <dd>{{req.photoArticleTitle}}</dd>
@@ -330,6 +340,7 @@ onMounted(() =>{
    if ( userStore.isSignedIn) {
       analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")
       userStore.getRequests()
+      requestStore.getStandaloneRequestUsage()
    }
 })
 </script>
@@ -357,18 +368,18 @@ onMounted(() =>{
    .subcontent {
       margin-bottom: 0px;
       padding: 10px;
-   }
-   .subcontent.links {
-      padding-top: 10px;
-   }
-
-   .subcontent.buttons {
       display: flex;
-      flex-flow: row wrap;
-      justify-content: center;
-      align-content: center;
+      flex-direction: column;
       gap: 10px;
-      padding: 10px 0;
+      .buttons {
+         display: flex;
+         flex-flow: row wrap;
+         justify-content: flex-start;
+         gap: 10px;
+      }
+      a {
+         margin-top: 20px;
+      }
    }
 
    .ils-error {
@@ -413,36 +424,30 @@ onMounted(() =>{
    div.requests {
       width: 60%;
    }
-   .subcontent.buttons {
-      button {
-         width: 49%;
-      }
-   }
 }
 @media only screen and (max-width: 768px) {
    div.requests {
       width: 95%;
    }
-   .subcontent.buttons {
-      button {
-         width: 99%;
+   .subcontent {
+      .buttons button {
+         flex-grow: 1;
       }
    }
 }
 
-.cancel-panel {
-   dl {
-      margin: 0 0 0 10px;
-      display: inline-grid;
-      grid-template-columns: max-content 2fr;
-      grid-column-gap: 15px;
-   }
-   dt {
-      font-weight: bold;
-      text-align: right;
-   }
-   dd {
-      margin: 0 0 10px 0;
-   }
+dl {
+   margin: 10px 0 0 10px;
+   display: inline-grid;
+   grid-template-columns: max-content 2fr;
+   grid-column-gap: 15px;
 }
+dt {
+   font-weight: bold;
+   text-align: right;
+}
+dd {
+   margin: 0 0 10px 0;
+}
+
 </style>

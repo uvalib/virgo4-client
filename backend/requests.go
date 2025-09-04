@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"text/template"
 
 	"github.com/gin-gonic/gin"
@@ -262,7 +263,7 @@ func (svc *ServiceContext) CreateOpenURLRequest(c *gin.Context) {
 }
 
 // PDFRemediationRequest generates am illiad request for pdf remediation and uploads the target PDF
-func (svc *ServiceContext) PDFRemediationRequest(c *gin.Context) {
+func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 	formData, err := c.MultipartForm()
 	if err != nil {
 		log.Printf("ERROR: unable to get pdf remediation form data: %s", err.Error())
@@ -354,6 +355,86 @@ func (svc *ServiceContext) PDFRemediationRequest(c *gin.Context) {
 	}
 
 	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
+}
+
+func (svc *ServiceContext) getOutstandingStandaloneRequests(c *gin.Context) {
+	v4Claims, _ := getJWTClaims(c)
+	resp := struct {
+		RemediationRequests   int  `json:"remediationRequests"`
+		RemediationLimit      int  `json:"remediationLimit"`
+		RemediationDisabled   bool `json:"remediationDisabled"`
+		OtherRequests         int  `json:"otherRequests"`
+		OtherRequestsLimit    int  `json:"otherRequestsLimit"`
+		OtherRequestsDisabled bool `json:"otherRequestsDisabled"`
+	}{}
+
+	log.Printf("INFO: get standalone request counts for %s", v4Claims.UserID)
+	remediateCnt, err := svc.getOutstandingRemediationRequestCount(v4Claims.UserID)
+	if err != nil {
+		log.Printf("ERROR: unable to get remediation request count: %s", err.Message)
+		c.String(http.StatusInternalServerError, err.Message)
+		return
+	}
+
+	log.Printf("INFO: user %s has %d outstanding remediation requests", v4Claims.UserID, remediateCnt)
+	resp.RemediationRequests = remediateCnt
+	resp.RemediationLimit = 5
+	resp.RemediationDisabled = (resp.RemediationRequests >= resp.RemediationLimit)
+
+	otherCnt, err := svc.getOutstandingOtherRequestsCount(v4Claims.UserID)
+	if err != nil {
+		log.Printf("ERROR: unable to get other requests count: %s", err.Message)
+		c.String(http.StatusInternalServerError, err.Message)
+		return
+	}
+
+	// The active request limit by user status should: FACULTY: 50, GRADUATE: 25, EMPLOYEE: 25, UNDERGRAD: 25.
+	reqLimit := 25
+	if strings.EqualFold(v4Claims.Profile, "FACULTY") {
+		reqLimit = 50
+	}
+	log.Printf("INFO: user %s has %d outstanding non-remediation requests", v4Claims.UserID, otherCnt)
+	resp.OtherRequests = otherCnt
+	resp.OtherRequestsLimit = reqLimit
+	resp.OtherRequestsDisabled = (resp.OtherRequests >= resp.OtherRequestsLimit)
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (svc *ServiceContext) getOutstandingRemediationRequestCount(userID string) (int, *RequestError) {
+	log.Printf("INFO: get pdf remediation count for %s", userID)
+
+	// Users are only allowed a maximum of 5 active PDF remediation requests.
+	// Active requests are identified by TransactionStatus matching the list below
+	activeStatuses := []string{"Remediation Request",
+		"Remediation - A (Low)", "Remediation - B (Medium)", "Remediation - C (High)",
+		"Remediation - In Process", "Remediation - Is Completed", "SDAC - Whole Book Requests"}
+
+	// build a transaction query with a filter for these statuses
+	filter := make([]string, 0)
+	for _, s := range activeStatuses {
+		filter = append(filter, fmt.Sprintf("TransactionStatus eq '%s'", s))
+	}
+	filterStr := fmt.Sprintf("$filter=(%s)", strings.Join(filter, " or "))
+	filterStr = strings.ReplaceAll(filterStr, " ", "+")
+	queryURI := fmt.Sprintf("/Transaction/UserRequests/%s?%s", userID, filterStr)
+	resp, respErr := svc.ILLiadRequest("GET", queryURI, nil)
+	if respErr != nil {
+		return 0, respErr
+	}
+
+	var parsed []any
+	parseErr := json.Unmarshal(resp, &parsed)
+	if parseErr != nil {
+		return 0, &RequestError{StatusCode: http.StatusInternalServerError, Message: parseErr.Error()}
+	}
+
+	return len(parsed), nil
+}
+
+func (svc *ServiceContext) getOutstandingOtherRequestsCount(userID string) (int, *RequestError) {
+	log.Printf("INFO: get other standalone requests counts for %s", userID)
+	return 0, nil
 }
 
 // CreateStandaloneScan send a request for a standalone scan to ILLiad
