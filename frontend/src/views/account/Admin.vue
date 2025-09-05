@@ -7,9 +7,9 @@
       </div>
       <div v-else class="sections">
          <template v-if="userStore.isSignedIn">
-            <PickupLibraries class="section" v-if="userStore.isAdmin"/>
-            <JWTAdmin class="section" v-if="userStore.isAdmin"/>
-            <PDADashboard class="section"  v-if="userStore.isAdmin || userStore.isPDAAdmin"/>
+            <PickupLibraries class="section" />
+            <JWTAdmin class="section" />
+            <PDADashboard class="section" />
          </template>
       </div>
    </div>
@@ -32,7 +32,7 @@ const poolStore = usePoolStore()
 const router = useRouter()
 
 onMounted(() => {
-   if ( !userStore.isAdmin &&  !userStore.isPDAAdmin ) {
+   if ( !userStore.isAdmin ) {
       router.replace("/forbidden")
    } else {
       if ( userStore.isSignedIn) {

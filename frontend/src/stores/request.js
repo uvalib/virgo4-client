@@ -8,7 +8,6 @@ export const useRequestStore = defineStore('request', {
 	state: () => ({
       options: [],
       directLink: null,
-      pdaLink: null,
 
       errors: {},
       working: false,
@@ -72,9 +71,6 @@ export const useRequestStore = defineStore('request', {
             if (reqType == "directLink") {
                return (store.directLink != null)
             }
-            if (reqType == "pda") {
-               return (store.pdaLink != null)
-            }
             let found = false
             store.options.some( (opt) => {
                found = opt.requests.includes(reqType)
@@ -127,9 +123,6 @@ export const useRequestStore = defineStore('request', {
             }
             if ( data.hsaScanURL ) {
                this.directLink = data.hsaScanURL
-            }
-            if ( data.pdaURL ) {
-               this.pdaLink = data.pdaURL
             }
          }
       },
@@ -280,19 +273,6 @@ export const useRequestStore = defineStore('request', {
            .finally(() => (this.working = false))
       },
 
-      async submitPDARequest() {
-         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pda")
-         this.working = true
-         this.failed = false
-         await axios.post(this.pdaLink)
-            .catch(e => {
-               let message = e.response.data.error || "There was a problem sending this order. Please try again later."
-               useSystemStore().setError(message)
-               this.failed = true
-            }).finally(()=>{
-               this.working = false
-            })
-      },
       submitAeon( item, specialInstructions) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "aeon")
          this.working = true

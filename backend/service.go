@@ -180,19 +180,6 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 			hcMap["ils_connector"] = hcResp{Healthy: true}
 		}
 	}
-	if svc.PDAAPI != "" {
-		apiURL := fmt.Sprintf("%s/version", svc.PDAAPI)
-		resp, err := svc.FastHTTPClient.Get(apiURL)
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-		if err != nil {
-			log.Printf("ERROR: Failed response from PDA Service PING: %s - %s", err.Error(), svc.PDAAPI)
-			hcMap["pda"] = hcResp{Healthy: false, Message: err.Error()}
-		} else {
-			hcMap["pda"] = hcResp{Healthy: true}
-		}
-	}
 
 	var schema struct {
 		Version int  `db:"version"`
@@ -436,34 +423,6 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values any, jwt string, 
 			url, err.StatusCode, err.Message, elapsedMS)
 	} else {
 		log.Printf("Successful response from ILS POST %s. Elapsed Time: %d (ms)", url, elapsedMS)
-	}
-	return resp, err
-}
-
-// PDAGet sends a GET request to the PDA API and returns the response
-func (svc *ServiceContext) PDAGet(path string, jwt string) ([]byte, *RequestError) {
-	url := fmt.Sprintf("%s%s", svc.PDAAPI, path)
-	logURL := sanitizeURL(url)
-	log.Printf("PDA GET request: %s, timeout  %.0f sec", logURL, svc.HTTPClient.Timeout.Seconds())
-	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
-
-	startTime := time.Now()
-	rawResp, rawErr := svc.HTTPClient.Do(req)
-	resp, err := handleAPIResponse(logURL, rawResp, rawErr)
-	elapsedNanoSec := time.Since(startTime)
-	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
-
-	if err != nil {
-		if shouldLogAsError(err.StatusCode) {
-			log.Printf("ERROR: Failed response from PDA GET %s - %d:%s. Elapsed Time: %d (ms)",
-				logURL, err.StatusCode, err.Message, elapsedMS)
-		} else {
-			log.Printf("INFO: Response from PDA GET %s - %d:%s. Elapsed Time: %d (ms)",
-				logURL, err.StatusCode, err.Message, elapsedMS)
-		}
-	} else {
-		log.Printf("Successful response from PDA GET %s. Elapsed Time: %d (ms)", logURL, elapsedMS)
 	}
 	return resp, err
 }
