@@ -260,7 +260,7 @@ const digitalRequests = computed(()=>{
       // console.log(`PT=${r.processType} RT=${r.requestType} DT=${r.documentType}`)
       if ((r.processType=="Borrowing" && r.requestType=="Article") ||
             ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article") ||
-            ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article" && r.documentType=="Collab")) {
+            ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article" && r.documentType=="Instructional")) {
          out.push(r)
          // console.log("ADD DIGITAL")
       }
