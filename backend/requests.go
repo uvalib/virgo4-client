@@ -586,7 +586,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		RequestType:       "Article",
 		ProcessType:       "DocDel",
 		TransactionStatus: "No Hold Scan Request",
-		DocumentType:      "Instructional",
+		DocumentType:      scanReq.IlliadType,
 	}
 	illiadScanReq := illiadScanRequest{
 		illiadRequest:              &illiadReq,
