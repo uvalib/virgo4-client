@@ -19,7 +19,7 @@
                :validation-messages="{required: 'Item selection is required.'}" :options="request.items"
                validation="required" @change="itemSelected($event)" />
             <FormKit type="select" label="Scan purpose" id="scan-use" v-model="scan.type"
-               :options="{'Article': 'Research', 'Collab': 'Instruction'}" />
+               :options="{'Article': 'Research', 'Instructional': 'Instruction'}" />
             <div class="scan-use-note" v-if="scan.type == 'Article'">
                Use this form to request a scan for your coursework or personal academic research.
             </div>
