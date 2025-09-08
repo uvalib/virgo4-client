@@ -3,44 +3,35 @@
    <Dialog v-model:visible="passwords.showChangePass" :modal="true" position="top" header="Change Password"
       @hide="closeChangeDialog" @show="opened" :draggable="false"
    >
-      <template v-if="passwords.expiredToken">
-         <p class="error" v-html="passwords.error"></p>
-         <p class="error">Please request a new password reset email.</p>
-      </template>
-      <template v-else>
-         <p>New passwords must: </p>
-         <ul>
-            <li>
-               Contain between 6 and 25 characters
-            </li>
-            <li>
-               Optional special characters allowed: ! , @ # $ % & * + ( ) _ - ?
-            </li>
-         </ul>
-         <FormKit type="form" id="change-password" :actions="false" @submit="submitPasswordChange" ref="pwform">
-            <FormKit v-if="!passwords.isPasswordReset" label="Current Password" type="password" v-model="currPassword" validation="required" />
-            <FormKit type="password" name="password" label="New Password" id="new-password"
-               :validation="[
-                  ['required'],
-                  ['length',6,25],
-                  ['matches', /^[A-Za-z0-9-!,@#$%&*+()_? ]*$/]
-               ]"
-               validation-visibility="blur"
-               :validation-messages="{
-                  matches: 'Password does not match requirements listed above.',
-               }"
-               v-model="newPassword"
-            />
-            <FormKit type="password" name="password_confirm" label="Confirm password" validation="required|confirm" v-model="confirmPassword" />
-         </FormKit>
-      </template>
+      <p>New passwords must: </p>
+      <ul>
+         <li>
+            Contain between 6 and 25 characters
+         </li>
+         <li>
+            Optional special characters allowed: ! , @ # $ % & * + ( ) _ - ?
+         </li>
+      </ul>
+      <FormKit type="form" id="change-password" :actions="false" @submit="submitPasswordChange" ref="pwform">
+         <FormKit v-if="!passwords.isPasswordReset" label="Current Password" type="password" v-model="currPassword" validation="required" />
+         <FormKit type="password" name="password" label="New Password" id="new-password"
+            :validation="[
+               ['required'],
+               ['length',6,25],
+               ['matches', /^[A-Za-z0-9-!,@#$%&*+()_? ]*$/]
+            ]"
+            validation-visibility="blur"
+            :validation-messages="{
+               matches: 'Password does not match requirements listed above.',
+            }"
+            v-model="newPassword"
+         />
+         <FormKit type="password" name="password_confirm" label="Confirm password" validation="required|confirm" v-model="confirmPassword" />
+      </FormKit>
       <div v-if="passwords.error" class="error" v-html="passwords.error"></div>
       <template #footer>
-         <VirgoButton  v-if="passwords.expiredToken" severity="secondary" @click="closeExpiredChange" label="OK"/>
-         <template v-else>
-            <VirgoButton severity="secondary" @click="closeChangeDialog" label="Cancel"/>
-            <VirgoButton @click="pwform.node.submit()" label="Submit" :loading="passwords.working" />
-         </template>
+         <VirgoButton severity="secondary" @click="closeChangeDialog" label="Cancel"/>
+         <VirgoButton @click="pwform.node.submit()" label="Submit" :loading="passwords.working"/>
       </template>
    </Dialog>
 </template>
@@ -88,14 +79,6 @@ const closeChangeDialog = (() => {
    }
 })
 
-const closeExpiredChange = (() => {
-   passwords.showChangePass = false
-   passwords.showForgotPass = true
-   let query = Object.assign({}, route.query)
-   delete query.token
-   router.replace({ query })
-})
-
 const submitPasswordChange = (() => {
    if ( passwords.isPasswordReset ) {
       passwords.resetPassword( newPassword.value )
@@ -120,6 +103,5 @@ label {
 .error {
    margin-top: 10px;
    color: $uva-red-A;
-   text-align: center;
 }
 </style>

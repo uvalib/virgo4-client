@@ -9,8 +9,7 @@ export const usePasswordStore = defineStore('password', {
       resetToken: "",
       resetSession: "",
       showForgotPass: false,
-      showChangePass: false,
-      expiredToken: false
+      showChangePass: false
    }),
 
    getters: {
@@ -29,7 +28,6 @@ export const usePasswordStore = defineStore('password', {
          this.resetToken = ""
          this.resetSession = ""
          this.error = ""
-         this.expiredToken = false
       },
 
       changePassword(barcode, currPassword, newPassword) {
@@ -73,14 +71,14 @@ export const usePasswordStore = defineStore('password', {
          // the token will be blanked out (it is no longer valid) and session set
          this.resetToken = resetToken
          this.resetSession = ""
-         this.expiredToken = false
          this.showChangePass = true // automatically open the change password modal
       },
 
       resetPassword( newPassword ) {
          this.initRequest()
-         let data = {reset_password_token: this.resetToken, new_password: newPassword}
-         axios.post("/api/change_password_token", data, {_retry: true}).then(() => { // don't retry
+         // Per above notes, only session or token should be set. If both are present, session is preferred.
+         let data = { token: this.resetToken, session: this.resetSession, newPassword: newPassword}
+         axios.post("/api/reset_password", data ).then(() => {
             this.working = false
             this.showChangePass = false
             setTimeout(()=>{
@@ -89,13 +87,13 @@ export const usePasswordStore = defineStore('password', {
          }).catch((e) => {
             console.log("PASSWORD RESET FAILED:")
             console.log(e.response)
-            this.expiredToken = true
-            if(e.response.data.message){
-               this.error = e.response.data.message
+            if ( e.response.data.sessionToken ) {
+               this.resetToken = ""
+               this.resetSession = e.response.data.sessionToken
+               this.error =  e.response.data.errorMessage
             } else {
-               this.error = "Password change failed."
+               this.error =  e.response.data
             }
-         }).finally(()=>{
             this.working = false
          })
       },
