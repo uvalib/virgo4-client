@@ -544,7 +544,7 @@ func (svc *ServiceContext) CreateTempAccount(c *gin.Context) {
 // ActivateTempAccount accepts a user account request and creates a temporary account in Sirsi via ils-connector
 func (svc *ServiceContext) ActivateTempAccount(c *gin.Context) {
 
-	token := c.Query("token")
+	token := c.Param("token")
 	if token == "" {
 		log.Printf("WARN: missing activation token")
 		c.Redirect(http.StatusFound, "/signin?activated=false")
