@@ -378,7 +378,7 @@ func (svc *ServiceContext) getOutstandingStandaloneRequests(c *gin.Context) {
 
 	log.Printf("INFO: user %s has %d outstanding remediation requests", v4Claims.UserID, remediateCnt)
 	resp.RemediationRequests = remediateCnt
-	resp.RemediationLimit = 5
+	resp.RemediationLimit = 10
 	resp.RemediationDisabled = (resp.RemediationRequests >= resp.RemediationLimit)
 
 	otherCnt, err := svc.getOutstandingOtherRequestsCount(v4Claims.UserID)
