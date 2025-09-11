@@ -26,12 +26,12 @@
                <div class="reason" v-if="requestStore.otherRequestsDisabled">
                   You have reached the maximum of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
                </div>
-               <!-- <div class="buttons">
+               <div class="buttons">
                   <VirgoButton @click="pdfRemediationClick" label="PDF Remediation Request" :disabled="requestStore.isRemediateDisabled"/>
                </div>
                <div class="reason" v-if="requestStore.isRemediateDisabled">
                   You have reached the maximum of {{ requestStore.requestStats.remediationLimit }} active remediation requests.
-               </div> -->
+               </div>
                <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank" aria-describedby="new-window">Purchase Request<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i></a>
             </div>
 
@@ -342,7 +342,7 @@ onMounted(() =>{
       userStore.getRequests()
 
       // This data is used to disable the request buttons based upon active requests per user
-      // requestStore.getStandaloneRequestUsage()
+      requestStore.getStandaloneRequestUsage()
    }
 })
 </script>
