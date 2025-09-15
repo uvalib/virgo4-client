@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import axios from 'axios'
-import VueCookies from 'vue-cookies'
+import { useCookies } from "vue3-cookies"
 
 export const usePreferencesStore = defineStore('preferences', {
 	state: () => ({
@@ -30,13 +30,14 @@ export const usePreferencesStore = defineStore('preferences', {
             this.expandDetails = prefsObj.expandDetails
          }
          if ( prefsObj.trackingOptOut) {
+            const { cookies } = useCookies()
             this.trackingOptOut  = prefsObj.trackingOptOut
-            let optOutCookie = VueCookies.get('v4_optout')
+            let optOutCookie = cookies.get('v4_optout')
             if ( this.trackingOptOut && !optOutCookie) {
                let data = {v4_opt_out: true}
-               VueCookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
+               cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
             } else {
-               VueCookies.remove("v4_optout")
+               cookies.remove("v4_optout")
             }
          }
          if (prefsObj.pickupLibrary ) {
@@ -62,12 +63,13 @@ export const usePreferencesStore = defineStore('preferences', {
          this.savePreferences()
       },
       async toggleOptOut() {
+         const { cookies } = useCookies()
          this.trackingOptOut = !this.trackingOptOut
          if ( this.trackingOptOut ) {
             let data = {v4_opt_out: true}
-            VueCookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
+            cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
          } else {
-            VueCookies.remove("v4_optout")
+            cookies.remove("v4_optout")
          }
          await this.savePreferences()
          window.location.reload()
