@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import analytics from '../analytics'
-import VueCookies from 'vue-cookies'
+import { useCookies } from "vue3-cookies"
 import { useSystemStore } from "@/stores/system"
 import { useAlertStore } from "@/stores/alert"
 import { usePreferencesStore } from "@/stores/preferences"
@@ -437,10 +437,11 @@ export const useUserStore = defineStore('user', {
 
       async overrideClaims() {
          if (this.isAdmin){
+            const { cookies } = useCookies()
             this.authorizing = true
             let claims = this.parsedJWT
             return axios.post("/api/admin/claims", claims ).then((_response) => {
-               let jwtStr = VueCookies.get("v4_jwt")
+               let jwtStr = cookies.get("v4_jwt")
                this.setUserJWT(jwtStr)
                this.authorizing = false
              }).catch((error) => {
@@ -611,8 +612,9 @@ export const useUserStore = defineStore('user', {
          this.authorizing = true
          axios.post("/authenticate/public", data).then( async (_response) => {
             const restore = useRestoreStore()
+            const { cookies } = useCookies()
 
-            let jwtStr = VueCookies.get("v4_jwt")
+            let jwtStr = cookies.get("v4_jwt")
             this.setUserJWT(jwtStr )
             restore.load()
             await this.getAccountInfo()   // needed for search preferences

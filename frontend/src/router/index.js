@@ -8,7 +8,7 @@ import { useRestoreStore } from "@/stores/restore"
 import { useUserStore } from "@/stores/user"
 import { setFocusID } from '@/utils'
 import { useToast } from "primevue/usetoast"
-import VueCookies from 'vue-cookies'
+import { useCookies } from 'vue3-cookies'
 
 const router = createRouter({
    history: createWebHistory( import.meta.env.BASE_URL ),
@@ -237,6 +237,7 @@ router.afterEach((to, from) => {
 router.beforeEach( async (to, _from) => {
    const restore = useRestoreStore()
    const userStore = useUserStore()
+   const { cookies } = useCookies()
 
    // URLs like /items/PID are legacy format. Redirect to /sources with a legacy source name
    // when the details page loads, source = legacy will trigger a lookup of the correct source / item and redirect again
@@ -247,7 +248,7 @@ router.beforeEach( async (to, _from) => {
 
    // signedin page is a temporary redirect after netbadge.
    if ( to.path == "/signedin") {
-      let jwtStr = VueCookies.get("v4_jwt")
+      let jwtStr = cookies.get("v4_jwt")
       userStore.setUserJWT(jwtStr)
       restore.load()
       let tgtURL = "/"
