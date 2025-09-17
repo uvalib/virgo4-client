@@ -123,13 +123,16 @@ async function initVirgo() {
    }
 
    // First time app is being created, request all common config
-   // the flag shows a config spinner until ready
-   await systemStore.getConfig()
-   await poolStore.getPools()
-   await collectionStore.getCollections()
-
-   // Make sure the session is is kept alive
-   await userStore.refreshAuth()
+   // the configuring flag shows a config spinner until the block bllow is done.
+   // NOTE: everything in the block below needs to be loaded before app starts. The config
+   // must be loaded first (the other calls depend on main cfg being present),
+   // then all the others can happen in parallel. Using Promise.all allows this. The execution will contine when all requests are done.
+   await Promise.all([
+      await systemStore.getConfig(),
+      poolStore.getPools(),
+      collectionStore.getCollections(),
+      userStore.refreshAuth()
+   ])
 
    if ( userStore.isSignedIn ) {
       await userStore.getAccountInfo()

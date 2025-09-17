@@ -416,6 +416,7 @@ export const useUserStore = defineStore('user', {
             console.log("Get GUEST authorization token")
             await axios.post("/authorize", null).then( response => {
                this.setUserJWT(response.data)
+               console.log("GUEST authorization successful")
             })
          } else {
             console.log("Refreshing sign-in session")
