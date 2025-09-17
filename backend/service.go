@@ -440,34 +440,6 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values any, jwt string, 
 	return resp, err
 }
 
-// PDAGet sends a GET request to the PDA API and returns the response
-func (svc *ServiceContext) PDAGet(path string, jwt string) ([]byte, *RequestError) {
-	url := fmt.Sprintf("%s%s", svc.PDAAPI, path)
-	logURL := sanitizeURL(url)
-	log.Printf("PDA GET request: %s, timeout  %.0f sec", logURL, svc.HTTPClient.Timeout.Seconds())
-	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
-
-	startTime := time.Now()
-	rawResp, rawErr := svc.HTTPClient.Do(req)
-	resp, err := handleAPIResponse(logURL, rawResp, rawErr)
-	elapsedNanoSec := time.Since(startTime)
-	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
-
-	if err != nil {
-		if shouldLogAsError(err.StatusCode) {
-			log.Printf("ERROR: Failed response from PDA GET %s - %d:%s. Elapsed Time: %d (ms)",
-				logURL, err.StatusCode, err.Message, elapsedMS)
-		} else {
-			log.Printf("INFO: Response from PDA GET %s - %d:%s. Elapsed Time: %d (ms)",
-				logURL, err.StatusCode, err.Message, elapsedMS)
-		}
-	} else {
-		log.Printf("Successful response from PDA GET %s. Elapsed Time: %d (ms)", logURL, elapsedMS)
-	}
-	return resp, err
-}
-
 // PoolPost sends a POST to the specified pool
 // Only used during RSS feed generation
 func (svc *ServiceContext) PoolPost(url string, body any, jwt string) ([]byte, *RequestError) {
