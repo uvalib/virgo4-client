@@ -366,10 +366,11 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 	v4Claims.HasIlliad = false
 	respBytes, illErr := svc.ILLiadRequest("GET", fmt.Sprintf("Users/%s", v4Claims.UserID), nil)
 	if illErr != nil && illErr.StatusCode == 404 {
-		log.Printf("WARN: unable to get ILLiad user: %s", illErr.Message)
+		log.Printf("WARN: ILLiad user not found for %s: %s", v4Claims.UserID, illErr.Message)
 	} else if illErr != nil {
-		log.Printf("ERROR: unable to get ILLiad user: %s", illErr.Message)
+		log.Printf("ERROR: unable to get ILLiad user %s: %s", v4Claims.UserID, illErr.Message)
 	} else {
+		log.Printf("INFO: illiad user response: %s", respBytes)
 		v4Claims.HasIlliad = true
 		type illiadResponse struct {
 			Department   string `json:"Department"`
