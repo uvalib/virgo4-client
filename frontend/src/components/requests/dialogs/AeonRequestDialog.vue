@@ -5,10 +5,10 @@
       @opened="dialogOpened" @closed="dialogClosed" @submit="aeonForm.node.submit()"
    >
       <FormKit v-if="submitted == false" type="form" ref="aeonForm" :actions="false" @submit="submitAeon">
-         <FormKit v-if="request.items.length > 1" type="select" label="Select the item you want"
+         <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
             v-model="selectedItem" id="aeon-item-sel" placeholder="Select an item"
             :validation-messages="{required: 'Item selection is required.'}"
-            :options="request.items" validation="required"
+            :options="request.optionItems" validation="required"
          />
          <FormKit label="Add additional instructions if necessary" type="textarea"
             v-model="specialRequest" :rows="5" id="aeon-item-notes"
@@ -37,13 +37,6 @@ import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
 import { setFocusID } from '@/utils'
 
-const props = defineProps({
-   settings: {
-      type: Object,
-      required: true
-   },
-})
-
 const request = useRequestStore()
 const selectedItem = ref(null)
 const specialRequest = ref("")
@@ -55,8 +48,8 @@ const dialogOpened = (() => {
    selectedItem.value = null
    specialRequest.value = ""
    request.activeRequest = "aeon"
-   if (request.items.length == 1) {
-      selectedItem.value = request.items[0].value
+   if (request.optionItems.length == 1) {
+      selectedItem.value = request.optionItems[0].value
       setFocusID("aeon-item-notes")
    } else {
       setFocusID("aeon-item-sel")

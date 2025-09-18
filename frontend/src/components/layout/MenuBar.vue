@@ -73,7 +73,7 @@ const v4Menu = computed( () => {
          {label: "Searches", command: ()=>userLinkClicked("/searches")},
          {label: "Preferences", command: ()=>userLinkClicked("/preferences")}
       ]
-      if (userStore.isAdmin || userStore.isPDAAdmin) {
+      if (userStore.isAdmin) {
          items.push({label: "Admin", command: ()=>userLinkClicked("/admin")})
       }
       items.push({label: "Sign out",  command: ()=>signOut()})

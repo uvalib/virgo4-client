@@ -3,12 +3,9 @@
       <SignInRequired v-if="userStore.isSignedIn == false" targetPage="request information"/>
       <AccountActivities  v-if="userStore.isSignedIn"/>
       <div class="details" v-if="userStore.isSignedIn">
-         <template v-if="!userStore.noILSAccount && !userStore.isBarred">
+         <template v-if="userStore.isUVA && !userStore.noILSAccount && !userStore.isBarred">
             <h3>Make a New Request</h3>
-            <div v-if="!userStore.isUVA">
-               <!-- No ILL requests for community borrowers  -->
-            </div>
-            <div v-else-if="userStore.isHSLUser" class="subcontent">
+            <div v-if="userStore.isHSLUser" class="subcontent">
                <a :href="systemStore.hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i></a>
             </div>
             <div v-else-if="userStore.illiadBlocked" class="subcontent">

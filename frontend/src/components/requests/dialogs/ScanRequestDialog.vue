@@ -14,10 +14,10 @@
             Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
          </p>
          <FormKit v-else-if="submitted == false" type="form" ref="scanForm" :actions="false" @submit="submit">
-            <FormKit v-if="request.items.length > 1" type="select" label="Select the item you want" v-model="selectedItem"
-               id="scan-item-sel" placeholder="Select an item"
-               :validation-messages="{required: 'Item selection is required.'}" :options="request.items"
-               validation="required" @change="itemSelected($event)" />
+            <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
+               v-model="selectedItem" id="scan-item-sel" placeholder="Select an item"
+               :validation-messages="{required: 'Item selection is required.'}" :options="request.optionItems"
+               validation="required" @change="itemSelected()" />
             <FormKit type="select" label="Scan purpose" id="scan-use" v-model="scan.type"
                :options="{'Article': 'Research', 'Instructional': 'Instruction'}" />
             <div class="scan-use-note" v-if="scan.type == 'Article'">
@@ -59,13 +59,6 @@ import { useItemStore } from "@/stores/item"
 import { useRoute } from "vue-router"
 import analytics from '@/analytics'
 import { setFocusID } from '@/utils'
-
-const props = defineProps({
-   settings: {
-      type: Object,
-      required: true
-   },
-})
 
 const user = useUserStore()
 const restore = useRestoreStore()
@@ -118,8 +111,8 @@ const dialogOpened = (() => {
    restore.save()
    if (user.isSignedIn) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
-      if ( request.items.length == 1) {
-         selectedItem.value = request.items[0].value
+      if ( request.optionItems.length == 1) {
+         selectedItem.value = request.optionItems[0].value
          itemSelected()
          setFocusID("scan-pickup-sel")
       } else {
@@ -151,8 +144,8 @@ const itemSelected = (() => {
    if ( selectedItem.value ) {
       scan.value.barcode = selectedItem.value.barcode
       scan.value.library = selectedItem.value.library
-      scan.value.location = selectedItem.value.location_id
-      scan.value.callNumber = selectedItem.value.call_number
+      scan.value.location = selectedItem.value.location
+      scan.value.callNumber = selectedItem.value.callNumber
    }
 })
 

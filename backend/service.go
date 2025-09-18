@@ -180,19 +180,6 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 			hcMap["ils_connector"] = hcResp{Healthy: true}
 		}
 	}
-	if svc.PDAAPI != "" {
-		apiURL := fmt.Sprintf("%s/version", svc.PDAAPI)
-		resp, err := svc.FastHTTPClient.Get(apiURL)
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-		if err != nil {
-			log.Printf("ERROR: Failed response from PDA Service PING: %s - %s", err.Error(), svc.PDAAPI)
-			hcMap["pda"] = hcResp{Healthy: false, Message: err.Error()}
-		} else {
-			hcMap["pda"] = hcResp{Healthy: true}
-		}
-	}
 
 	var schema struct {
 		Version int  `db:"version"`

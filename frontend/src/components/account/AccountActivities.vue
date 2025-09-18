@@ -14,7 +14,7 @@
       <span class="sep">|</span>
       <router-link id="preferences-submenu" to="/preferences">Preferences</router-link>
       <span class="sep">|</span>
-      <template v-if="userStore.isAdmin || userStore.isPDAAdmin">
+      <template v-if="userStore.isAdmin">
          <router-link id="preferences-submenu" to="/admin">Admin</router-link>
          <span class="sep">|</span>
       </template>

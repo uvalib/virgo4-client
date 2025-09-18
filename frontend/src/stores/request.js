@@ -6,9 +6,9 @@ import { useUserStore } from "@/stores/user"
 
 export const useRequestStore = defineStore('request', {
 	state: () => ({
-      // option types:
-      // hold, aeon, scan, videoReserve, pda, directLink
-      requestOptions: [],
+      options: [],
+      directLink: null,
+
       errors: {},
       working: false,
       failed: false,
@@ -64,32 +64,69 @@ export const useRequestStore = defineStore('request', {
          return store.requestStats.otherRequestsDisabled
       },
       hasOptions: (store) => {
-         return Array.isArray(store.requestOptions) && store.requestOptions.length > 0
+         return store.options.length > 0
       },
       hasOption: (store) => {
          return (reqType) => {
-            let optIdx  = store.requestOptions.findIndex( ro => ro.type == reqType)
-            return optIdx > -1
-         }
-      },
-      option: (store) => {
-         return (reqType) => {
-            return store.requestOptions.find( ro => ro.type == reqType)
-         }
-      },
-      items: (store) => {
-         var opts = store.requestOptions.find( ro => ro.type == store.activeRequest)
-         if (opts) {
-            let out = []
-            opts.item_options.forEach( i => {
-               out.push( {label: i.call_number, value: i} )
+            if (reqType == "directLink") {
+               return (store.directLink != null)
+            }
+            let found = false
+            store.options.some( (opt) => {
+               found = opt.requests.includes(reqType)
+               return found
             })
-            return out
+            return found
          }
-         return []
+      },
+      optionItems: (store) => {
+         let out = []
+         if ( store.activeRequest != 'none' ) {
+            store.options.map( opt => {
+               if (opt.requests.includes(store.activeRequest)) {
+                  out.push( {label: opt.callNumber, value: opt} )
+               }
+            })
+         }
+         return out
+      },
+      isStreamingReserve: (store) => {
+         let found = false
+         if ( store.activeRequest == 'videoReserve' ) {
+            store.options.some( opt => {
+               found = opt.streamingReserve
+               return found
+            })
+         }
+         return found
       }
    },
    actions: {
+      clearAll() {
+         this.$reset()
+      },
+
+      resetData() {
+         // preserve the request options and restore them after the reset
+         let saved = this.requestOptions.slice(0)
+         this.$reset()
+         this.requestOptions = saved
+      },
+
+      setOptions( data ) {
+         this.$reset()
+         if ( data ) {
+            this.options = data.items
+            if ( data.streamingVideoReserve ) {
+               let requests = ["videoReserve"]
+               this.options.push({ requests: requests, streamingReserve:  true} )
+            }
+            if ( data.hsaScanURL ) {
+               this.directLink = data.hsaScanURL
+            }
+         }
+      },
+
       setOpenURLRequestGenre(genre) {
          // genre determines what type of form, and also a bunch of request values
          if (genre == "article" || genre == "preprint") {
@@ -105,15 +142,6 @@ export const useRequestStore = defineStore('request', {
             this.openurl.documentType = "Book"
             this.openurl.processType = "Borrowing"
          }
-      },
-      clearAll() {
-         this.$reset()
-      },
-      resetData() {
-         // preserve the request options and restore them after the reset
-         let saved = this.requestOptions.slice(0)
-         this.$reset()
-         this.requestOptions = saved
       },
 
       getStandaloneRequestUsage() {
@@ -209,7 +237,7 @@ export const useRequestStore = defineStore('request', {
 
          // track this request so it can be displayed on confirmation panel
          this.requestInfo.pickupLibrary = pickupLibrary
-         this.requestInfo.callNumber = item.call_number
+         this.requestInfo.callNumber = item.callNumber
          this.requestInfo.notes = ""
 
          let req = {itemBarcode: item.barcode, pickupLibrary: pickupLibrary}
@@ -245,39 +273,18 @@ export const useRequestStore = defineStore('request', {
            .finally(() => (this.working = false))
       },
 
-      async submitPDARequest() {
-         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pda")
-         this.working = true
-         this.failed = false
-         await axios.post(this.option("pda").create_url)
-            .catch(e => {
-               let message = e.response.data.error || "There was a problem sending this order. Please try again later."
-               useSystemStore().setError(message)
-               this.failed = true
-            }).finally(()=>{
-               this.working = false
-            })
-      },
       submitAeon( item, specialInstructions) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "aeon")
          this.working = true
 
          // track this request so it can be displayed on confirmation panel
          this.requestInfo.pickupLibrary = ""
-         this.requestInfo.callNumber = item.call_number
+         this.requestInfo.callNumber = item.callNumber
          this.requestInfo.notes = specialInstructions
 
-         var url = new URL(this.option("aeon").create_url)
-         let params = new URLSearchParams(url.search)
-         params.set("CallNumber", item.call_number)
-         params.set("ItemVolume", item.call_number)   // TODO is this a mistake? Volume is set by the availability service
-         params.set("ItemNumber", item.barcode)
-         params.set("Notes", item.sc_notes)
-         params.set("Location", item.location)
-         params.set("SpecialRequest", specialInstructions)
-
-         let aeonUrl = url.origin+url.pathname+"?"+params.toString()
-         window.open(aeonUrl, "_blank")
+         var url = item.aeonURL
+         url += `&SpecialRequest=${encodeURIComponent(specialInstructions)}`
+         window.open(url, "_blank")
 
          this.working = false
       },

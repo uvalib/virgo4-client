@@ -6,10 +6,10 @@
    >
       <SignIn v-if="!user.isSignedIn" />
       <FormKit v-else-if="submitted == false" type="form" ref="holdForm" :actions="false" @submit="placeHold">
-         <FormKit v-if="request.items.length > 1" type="select" label="Select the item you want"
+         <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
             v-model="selectedItem" id="item-sel" placeholder="Select an item"
             :validation-messages="{required: 'Item selection is required.'}"
-            :options="request.items" validation="required"
+            :options="request.optionItems" validation="required"
          />
          <FormKit type="select" label="Preferred pickup location" v-model="pickupLibrary"
             placeholder="Select a location" @input="pickupLibraryChanged" id="pickup-sel"
@@ -24,9 +24,7 @@
             </p>
          </div>
 
-         <div v-if="pickupLibrary == 'LEO'"
-            class="illiad-prompt ra-box ra-fiy"
-         >
+         <div v-if="pickupLibrary == 'LEO'" class="illiad-prompt ra-box ra-fiy">
             <template v-if="!user.hasIlliad">
                No ILLiad account found.<br/>
                To register <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
@@ -52,7 +50,6 @@
 
          <p class="error" v-if="request.errors.item_barcode">{{request.errors.item_barcode.join(', ')}}</p>
          <p class="error" v-if="request.errors.sirsi">{{request.errors.sirsi.join(', ')}}</p>
-
       </FormKit>
       <ConfirmationPanel v-else />
    </RequestDialog>
@@ -71,13 +68,6 @@ import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
 import { setFocusID } from '@/utils'
 
-const props = defineProps({
-   settings: {
-      type: Object,
-      required: true
-   },
-})
-
 const user = useUserStore()
 const restore = useRestoreStore()
 const request = useRequestStore()
@@ -90,7 +80,7 @@ const pickupLibrary = ref()
 const submitted = ref(false)
 
 const pickupLibraries = computed(()=>{
-   if ( selectedItem.value && selectedItem.value.call_number.includes("Ivy limited circulation") ) {
+   if ( selectedItem.value && selectedItem.value.callNumber.includes("Ivy limited circulation") ) {
       pickupLibrary.value = "SPEC-COLL"
       return [{value: "SPEC-COLL", label: "Small Special Collections Reading Room"}]
    }
@@ -104,7 +94,6 @@ const pickupLibraries = computed(()=>{
 const dialogOpened = (() => {
    selectedItem.value = null
    submitted.value = false
-   request.$reset
    request.activeRequest = "hold"
    restore.setActiveRequest( request.activeRequest )
    restore.setURL(route.fullPath)
@@ -114,8 +103,8 @@ const dialogOpened = (() => {
    }
    if (user.isSignedIn) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
-      if ( request.items.length == 1) {
-         selectedItem.value = request.items[0].value
+      if ( request.optionItems.length == 1) {
+         selectedItem.value = request.optionItems[0].value
          setFocusID("pickup-sel")
       } else {
          setFocusID("item-sel")

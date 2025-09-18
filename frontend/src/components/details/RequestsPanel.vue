@@ -1,21 +1,12 @@
 <template>
    <section class="requests" aria-live="polite">
       <div class="options">
-         <PlaceHoldDialog v-if="request.hasOption('hold')" :settings="request.option('hold')" />
-         <ScanRequestDialog v-if="request.hasOption('scan')"  :settings="request.option('scan')" />
-         <VideoReserveDialog v-if="user.canMakeReserves && request.hasOption('videoReserve')"  :settings="request.option('videoReserve')" />
-         <AeonRequestDialog v-if="request.hasOption('aeon')"  :settings="request.option('aeon')" />
-         <template v-if="request.hasOption('pda')">
-            <PDADialog :settings="request.option('pda')" v-if="request.option('pda').create_url" />
-            <div  v-else>
-               This item is now on order. Learn more about
-               <a href="https://library.virginia.edu/about-available-to-order-items" aria-label="Available to Order"
-                  style="text-decoration: underline;" target="_blank" title="Available to Order" aria-describedby="new-window"
-                  class="piwik_link">Available to Order</a> items.
-            </div>
-         </template>
-         <VirgoButton v-if="request.hasOption('directLink')"  label="Request a scan"
-            @click="directLinkClicked(request.option('directLink').create_url)"
+         <PlaceHoldDialog v-if="request.hasOption('hold')" />
+         <ScanRequestDialog v-if="request.hasOption('scan')" />
+         <VideoReserveDialog v-if="user.canMakeReserves && request.hasOption('videoReserve')" />
+         <AeonRequestDialog v-if="request.hasOption('aeon')" />
+         <VirgoButton v-if="request.hasOption('directLink')" label="Request a scan"
+            @click="directLinkClicked(request.directLink)"
          />
       </div>
       <div class="help">
@@ -31,7 +22,6 @@ import PlaceHoldDialog from "@/components/requests/dialogs/PlaceHoldDialog.vue"
 import AeonRequestDialog from "@/components/requests/dialogs/AeonRequestDialog.vue"
 import ScanRequestDialog from "@/components/requests/dialogs/ScanRequestDialog.vue"
 import VideoReserveDialog from "@/components/requests/dialogs/VideoReserveDialog.vue"
-import PDADialog from "@/components/requests/dialogs/PDADialog.vue"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
 import analytics from '@/analytics'

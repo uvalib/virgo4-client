@@ -75,14 +75,11 @@ export const useUserStore = defineStore('user', {
       },
       isStaff: (state) => {
          // users that are members of lib-virgo4-staff or lb-scpres-joint
-         return (state.role == 'staff')
+         return (state.role == 'staff' || state.role == 'pdaadmin')  // fix me: until JWT is updated treat pdaadmin as staff
       },
       isAdmin: (state) => {
         return (state.role == 'admin')
       },
-      isPDAAdmin: (state) => {
-         return (state.role == 'pdaadmin')
-       },
       isGraduate: (state) => {
          if ( state.role == 'guest' || state.role == '') return false
          if ( Object.keys(state.accountInfo).length == 0) return false
@@ -419,6 +416,7 @@ export const useUserStore = defineStore('user', {
             console.log("Get GUEST authorization token")
             await axios.post("/authorize", null).then( response => {
                this.setUserJWT(response.data)
+               console.log("GUEST authorization successful")
             })
          } else {
             console.log("Refreshing sign-in session")

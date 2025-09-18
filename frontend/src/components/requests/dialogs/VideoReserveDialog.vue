@@ -32,12 +32,12 @@
             If you have questions about video reserves, please email
             <a href="mailto:lib-reserves@virginia.edu">lib-reserves@virginia.edu</a>.
          </div>
-         <FormKit v-if="request.items.length > 1" type="select" label="Select the item you want"
+         <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
             v-model="selectedVideo" id="video-sel" placeholder="Select an item"
             :validation-messages="{required: 'Item selection is required.'}"
-            :options="request.items" validation="required"
+            :options="request.optionItems" validation="required"
          />
-         <template v-if="!streamingReserve">
+         <template v-if="!request.isStreamingReserve">
             <FormKit label="Preferred audio language" type="text" v-model="audioLanguage" />
             <FormKit type="select" label="Include subtitles?" v-model="subtitles" :options="{ no: 'No', yes: 'Yes' }" />
             <FormKit v-if="subtitles == 'yes'" label="Subtitles language" type="text" v-model="subtitleLanguage"
@@ -63,13 +63,6 @@ import { useItemStore } from "@/stores/item"
 import { useUserStore } from "@/stores/user"
 import { setFocusID } from '@/utils'
 
-const props = defineProps({
-   settings: {
-      type: Object,
-      required: true
-   },
-})
-
 const request = useRequestStore()
 const reserve = useReserveStore()
 const item = useItemStore()
@@ -86,10 +79,6 @@ const notes = ref("")
 const submitted = ref(false)
 const videoForm = ref()
 
-const streamingReserve = computed(() => {
-   return request.option('videoReserve').streaming_reserve
-})
-
 const dialogOpened = (() => {
    submitted.value = false
    request.activeRequest = "videoReserve"
@@ -99,10 +88,10 @@ const dialogOpened = (() => {
    if (user.isSignedIn) {
       reserve.clearRequestList()
       reserve.setRequestingUser(user.accountInfo)
-      if (request.items.length == 0){
+      if ( request.optionItems.length == 0){
          selectedVideo.value = {}
-      } else if (request.items.length == 1){
-         selectedVideo.value = request.items[0].value
+      } else if ( request.optionItems.length == 1){
+         selectedVideo.value = request.optionItems[0].value
       }
       reserve.request.lms = "A&S Canvas"
       setFocusID("behalf_of")
