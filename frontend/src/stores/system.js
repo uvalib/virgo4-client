@@ -30,6 +30,7 @@ export const useSystemStore = defineStore('system', {
       citationsURL: "",
       collectionsURL: "",
       shelfBrowseURL: "",
+      illiadCfg: {},
       dibsURL: "",
       searchAPI: "",
       sessionExpired: false,
@@ -56,6 +57,15 @@ export const useSystemStore = defineStore('system', {
       },
       hasError: state => {
          return state.message.type == "error" || state.message.type == "ilsError"
+      },
+      departments: state => {
+         return state.illiadCfg.departments.map( d => d.name)
+      },
+      schools: state => {
+         return state.illiadCfg.schools
+      },
+      buildings: state => {
+         return state.illiadCfg.buildings
       },
       pickupLibraries: state => {
          return state.allPickupLibraries.filter( p => p.enabled == true)
@@ -181,6 +191,7 @@ export const useSystemStore = defineStore('system', {
          this.shelfBrowseURL = cfg.shelfBrowseURL
          this.dibsURL = cfg.dibsURL
          this.allPickupLibraries = cfg.pickupLibraries
+         this.illiadCfg = cfg.illiad
       },
       async getConfig() {
          if (this.searchAPI != "") {

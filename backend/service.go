@@ -266,6 +266,15 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		Pool   string `json:"pool"`
 		Filter string `json:"filter"`
 	}
+	type illiadDepartment struct {
+		Name      string `json:"name"`
+		Buildings string `json:"building"`
+	}
+	type illiadCfg struct {
+		Departments []illiadDepartment `json:"departments"`
+		Buildings   []string           `json:"buildings"`
+		Schools     []string           `json:"schools"`
+	}
 	type config struct {
 		SearchAPI       string          `json:"searchAPI"`
 		CitationsURL    string          `json:"citationsURL"`
@@ -273,6 +282,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		ShelfBrowseURL  string          `json:"shelfBrowseURL"`
 		HealthSciURL    string          `json:"hsILLiadURL"`
 		DibsURL         string          `json:"dibsURL"`
+		ILLiad          illiadCfg       `json:"illiad"`
 		KioskMode       bool            `json:"kiosk"`
 		DevServer       bool            `json:"devServer"`
 		Firebase        *FirebaseConfig `json:"firebase,omitempty"`
@@ -303,6 +313,25 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	if dbResp.Error != nil {
 		log.Printf("ERROR: unable to get pickup libraries: %s", dbResp.Error.Error())
 	}
+
+	log.Printf("INFO: load illiad departments")
+	bytes, err := os.ReadFile("./data/departments.json")
+	if err != nil {
+		log.Printf("ERROR: unable to load illiad departments: %s", err.Error())
+	} else {
+		err = json.Unmarshal(bytes, &cfg.ILLiad.Departments)
+		if err != nil {
+			log.Printf("ERROR: unable to parse illiad departments: %s", err.Error())
+		}
+	}
+
+	log.Printf("INFO: load illiad buildings")
+	bytes, err = os.ReadFile("./data/buildings.txt")
+	cfg.ILLiad.Buildings = strings.Split(string(bytes), "\n")
+
+	log.Printf("INFO: load illiad schools")
+	bytes, err = os.ReadFile("./data/schools.txt")
+	cfg.ILLiad.Schools = strings.Split(string(bytes), "\n")
 
 	c.JSON(http.StatusOK, cfg)
 }

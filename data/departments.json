@@ -1,0 +1,290 @@
+[
+    {
+        "name": "Accounting Services, Financial Aid",
+        "building": "Carruthers Hall"
+    },
+    {
+        "name": "African American and African Studies",
+        "building": "Minor Hall"
+    },
+    {
+        "name": "African-American Affairs",
+        "building": "Luther P. Jackson House #4 Dawson's Row"
+    },
+    {
+        "name": "Alumni Hall",
+        "building": "Alumni Hall"
+    },
+    {
+        "name": "American Studies",
+        "building": "Wilson Hall"
+    },
+    {
+        "name": "Anthropology",
+        "building": "Brooks Hall"
+    },
+    {
+        "name": "Applied Mathematics",
+        "building": "Albert Small Building"
+    },
+    {
+        "name": "Aquatic & Fitness Center",
+        "building": "AFC Building"
+    },
+    {
+        "name": "Architecture",
+        "building": "Campbell Hall"
+    },
+    {
+        "name": "Art History",
+        "building": "Fayerweather Hall"
+    },
+    {
+        "name": "Astronomy",
+        "building": "Astronomy Building"
+    },
+    {
+        "name": "Biology",
+        "building": "Gilmer Hall"
+    },
+    {
+        "name": "Center for Politics",
+        "building": "Montesano House"
+    },
+    {
+        "name": "Center for Teaching Excellence",
+        "building": "Hotel D"
+    },
+    {
+        "name": "Chemical Engineering",
+        "building": "Chemical Engineering Building"
+    },
+    {
+        "name": "Chemistry",
+        "building": "Chemistry Building"
+    },
+    {
+        "name": "Civil & Environmental Engineering",
+        "building": "Olsson Hall"
+    },
+    {
+        "name": "Classics",
+        "building": "Cocke Hall"
+    },
+    {
+        "name": "College of Arts and Sciences",
+        "building": "Monroe Hall"
+    },
+    {
+        "name": "Commerce",
+        "building": "Robertson/Rouss Hall"
+    },
+    {
+        "name": "Computer Science",
+        "building": "Rice Hall"
+    },
+    {
+        "name": "Data Science",
+        "building": "Data Science Building"
+    },
+    {
+        "name": "Drama",
+        "building": "Culbreth Building"
+    },
+    {
+        "name": "Economics",
+        "building": "Monroe Hall"
+    },
+    {
+        "name": "Education",
+        "building": "Bavaro Hall"
+    },
+    {
+        "name": "Electrical and Computer Engineering",
+        "building": "Thornton Hall"
+    },
+    {
+        "name": "English",
+        "building": "Bryan Hall"
+    },
+    {
+        "name": "Environmental Science",
+        "building": "Clark Hall"
+    },
+    {
+        "name": "Facilities",
+        "building": "Leake Building"
+    },
+    {
+        "name": "Fralin Museum of Art",
+        "building": "Bayly Building"
+    },
+    {
+        "name": "Frank Batten School of Leadership and Public Policy",
+        "building": "Garrett Hall"
+    },
+    {
+        "name": "French",
+        "building": "New Cabell Hall"
+    },
+    {
+        "name": "German & Slavic Languages and Literatures",
+        "building": "New Cabell Hall"
+    },
+    {
+        "name": "Global Grounds / Global Studies",
+        "building": "Hotel A"
+    },
+    {
+        "name": "History",
+        "building": "Nau Hall"
+    },
+    {
+        "name": "Institute for Advanced Studies in Culture",
+        "building": "Watson Manor"
+    },
+    {
+        "name": "International Students and Scholars Program",
+        "building": "Minor Hall"
+    },
+    {
+        "name": "Jefferson Scholars Foundation",
+        "building": "Jefferson Scholars Foundation"
+    },
+    {
+        "name": "Materials Science and Engineering",
+        "building": "Wilsdorf Hall"
+    },
+    {
+        "name": "Mathematics",
+        "building": "Kerchof Hall"
+    },
+    {
+        "name": "Mechanical and Aerospace Engineering",
+        "building": "Mechanical & Aerospace Engineering Building"
+    },
+    {
+        "name": "Media Studies",
+        "building": "Wilson Hall"
+    },
+    {
+        "name": "Middle Eastern and South Asian Languages and Cultures",
+        "building": "New Cabell Hall"
+    },
+    {
+        "name": "Miller Center of Public Affairs",
+        "building": "Faulkner House"
+    },
+    {
+        "name": "Office of Admissions",
+        "building": "Peabody Hall"
+    },
+    {
+        "name": "Office of the Dean of Students",
+        "building": "Peabody Hall"
+    },
+    {
+        "name": "Philosophy",
+        "building": "Cocke Hall"
+    },
+    {
+        "name": "Physics",
+        "building": "Physics Building"
+    },
+    {
+        "name": "Politics",
+        "building": "Gibson Hall"
+    },
+    {
+        "name": "President's Office",
+        "building": "Madison Hall"
+    },
+    {
+        "name": "Provost's Office",
+        "building": "Booker House"
+    },
+    {
+        "name": "Psychology",
+        "building": "Gilmer Hall"
+    },
+    {
+        "name": "Religion",
+        "building": "Gibson Hall"
+    },
+    {
+        "name": "School of Continuing and Professional Studies",
+        "building": "Zehmer Hall"
+    },
+    {
+        "name": "Science Technology & Society",
+        "building": "Thornton Hall"
+    },
+    {
+        "name": "Sociology",
+        "building": "Randall Hall"
+    },
+    {
+        "name": "Spanish, Italian & Portuguese",
+        "building": "New Cabell Hall"
+    },
+    {
+        "name": "Statistics",
+        "building": "Halsey Hall"
+    },
+    {
+        "name": "Student Affairs",
+        "building": "Rotunda"
+    },
+    {
+        "name": "Student Health - Elson Building",
+        "building": "Elson Building"
+    },
+    {
+        "name": "Student Health and Wellness",
+        "building": "Student Health and Wellness Center Building"
+    },
+    {
+        "name": "Studio Art",
+        "building": "Ruffin Hall"
+    },
+    {
+        "name": "Systems and Information Engineering",
+        "building": "Olsson Hall"
+    },
+    {
+        "name": "University Administration",
+        "building": "Newcomb Hall"
+    },
+    {
+        "name": "University Career Services",
+        "building": "Bryant Hall"
+    },
+    {
+        "name": "University Press",
+        "building": "Bemiss House"
+    },
+    {
+        "name": "Virginia Humanities",
+        "building": "946 Grady Ave. Ste. 100"
+    },
+    {
+        "name": "Virginia Quarterly Review",
+        "building": "5 Boars Head Lane"
+    },
+    {
+        "name": "Virginia Transportation Research Council",
+        "building": "Shelbourne Hall"
+    },
+    {
+        "name": "Weldon Cooper Center for Public Service",
+        "building": "2400 Old Ivy Rd"
+    },
+    {
+        "name": "Women, Gender and Sexuality",
+        "building": "Hotel F - Leavering"
+    },
+    {
+        "name": "Women's Center",
+        "building": "Corner Building"
+    }
+]

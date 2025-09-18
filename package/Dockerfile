@@ -14,6 +14,7 @@ COPY go.mod go.sum Makefile ./
 COPY backend ./backend
 COPY frontend ./frontend
 COPY templates ./templates
+COPY data ./data
 RUN make linux-full
 
 #
@@ -56,10 +57,11 @@ COPY backend/db/migrations/*.sql $APP_HOME/db/
 COPY --from=builder /build/bin/v4srv.linux $APP_HOME/bin/v4srv
 COPY --from=builder /build/bin/public $APP_HOME/bin/public
 COPY --from=builder /build/bin/templates $APP_HOME/bin/templates
+COPY --from=builder /build/bin/data $APP_HOME/bin/data
 
 # Ensure permissions are correct
 RUN chown webservice:webservice /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/scripts/migrate.sh $APP_HOME/bin/v4srv $APP_HOME/bin/migrate && chmod 755 /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/scripts/migrate.sh $APP_HOME/bin/v4srv $APP_HOME/bin/migrate
-RUN chown -R webservice:webservice $APP_HOME/bin/public $APP_HOME/bin/templates $APP_HOME/db && chmod -R 755 $APP_HOME/bin/templates $APP_HOME/bin/public $APP_HOME/db
+RUN chown -R webservice:webservice $APP_HOME/bin/public $APP_HOME/bin/templates $APP_HOME/bin/data $APP_HOME/db && chmod -R 755 $APP_HOME/bin/templates $APP_HOME/bin/data $APP_HOME/bin/public $APP_HOME/db
 
 # Add the build tag
 ARG BUILD_TAG
