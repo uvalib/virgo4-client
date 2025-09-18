@@ -20,6 +20,9 @@ deploy-templates:
 	rm -rf bin/templates
 	mkdir -p bin/templates
 	cp ./templates/* bin/templates
+	rm -rf bin/data
+	mkdir -p bin/data
+	cp ./data/* bin/data
 
 darwin:
 	GOOS=darwin GOARCH=amd64 $(GOBUILD) -a -o bin/v4srv.darwin backend/*.go
