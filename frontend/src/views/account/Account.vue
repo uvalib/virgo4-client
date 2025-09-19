@@ -176,24 +176,25 @@
 
          <div class="account-group" v-if="userStore.canUseLEO">
             <h3>ILLiad</h3>
-            <p class="sc" v-if="!userStore.hasIlliad">
-               No ILLiad account found.<br/>
-               To register <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
-               please complete this form. <i class='fal fa-external-link-alt'></i></a>
-            </p>
-            <p v-else-if="userStore.illiadBlocked" class="standing-info">
-               Your ILLiad account is blocked.<br/>
-               Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
-            </p>
-            <dl v-if="userStore.leoLocation">
-               <dt>LEO Delivery Location:</dt>
-               <dd>
-                  {{userStore.leoLocation}}
-               </dd>
-               <p>
-                  <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad account">Visit ILLiad</a> to change your LEO delivery location.
+            <div class="no-illiad" v-if="userStore.hasIlliad"> <!-- FIX ME THIS IS FOR TEST. SHOULD BE !userStore.hasIlliad -->
+               <div>No ILLiad account found.</div>
+               <ILLiadRegistration />
+            </div>
+            <template v-else>
+               <p v-if="userStore.illiadBlocked" class="standing-info">
+                  Your ILLiad account is blocked.<br/>
+                  Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
                </p>
-            </dl>
+               <dl v-if="userStore.leoLocation">
+                  <dt>LEO Delivery Location:</dt>
+                  <dd>
+                     {{userStore.leoLocation}}
+                  </dd>
+                  <p>
+                     <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad account">Visit ILLiad</a> to change your LEO delivery location.
+                  </p>
+               </dl>
+            </template>
          </div>
 
          <div class="account-group">
@@ -217,6 +218,7 @@ import AccountActivities from "@/components/account/AccountActivities.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
 import ChangePassword from "@/components/modals/ChangePassword.vue"
 import UpdateContactInfo from "@/components/modals/UpdateContactInfo.vue"
+import ILLiadRegistration from "@/components/modals/ILLiadRegistration.vue"
 import { ref, computed, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
@@ -308,6 +310,14 @@ onMounted(() =>{
    .fines-content label {
       font-weight: bold;
       margin-right: 5px;
+   }
+   .no-illiad {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin:20px;
    }
    p.sc {
       margin:20px;

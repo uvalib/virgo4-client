@@ -67,6 +67,15 @@ export const useSystemStore = defineStore('system', {
       buildings: state => {
          return state.illiadCfg.buildings
       },
+      departmentBuilding: store => {
+         return (dept) => {
+            let d = store.illiadCfg.departments.find( d => d.name == dept)
+            if (d) {
+               return d.building
+            }
+            return ""
+         }
+      },
       pickupLibraries: state => {
          return state.allPickupLibraries.filter( p => p.enabled == true)
       },
