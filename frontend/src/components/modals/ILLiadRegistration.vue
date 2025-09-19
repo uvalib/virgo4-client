@@ -43,40 +43,47 @@
                :options="{Dept: 'LEO to Department', Library: 'LEO to Library', Address: 'Send to address'}"
             />
             <div v-if="registration.deliveryMethod == 'Dept'">
-               <p>
-                  Choose a building from the drop-down menu below and provide a room number
-                  (this may be your own office, a mail room or a central department office).
-                  If your building is not in the drop-down menu, contact us.
-               </p>
-               <FormKit type="select" label="Building Name" v-model="registration.buildingName"
-                  placeholder="Select a building" id="building" :options="system.buildings" validation="required"
-               />
-               <FormKit type="text" label="Room Number" v-model="registration.roomNumber" id="room"/>
+               <div class="delivery-info">
+                 <div>
+                     Choose a building from the drop-down menu below and provide a room number
+                     (this may be your own office, a mail room or a central department office).
+                     If your building is not in the drop-down menu, contact us.
+                  </div>
+                  <FormKit type="select" label="Building Name" v-model="registration.buildingName"
+                     placeholder="Select a building" id="building" :options="system.buildings" validation="required"
+                  />
+                  <FormKit type="text" label="Room Number" v-model="registration.roomNumber" id="room"/>
+               </div>
             </div>
             <div v-else-if="registration.deliveryMethod == 'Library'">
-               <p>
-                  Please choose the library where you would like to pick up your materials.
-               </p>
-               <FormKit type="select" label="Pickup Location" v-model="registration.pickupLocation"
-                  placeholder="Select a location" id="pickup-sel" :options="pickupLibraries" validation="required"
-               />
+               <div class="delivery-info">
+                  <div>Please choose the library where you would like to pick up your materials.</div>
+                  <FormKit type="select" label="Pickup Location" v-model="registration.pickupLocation"
+                     placeholder="Select a location" id="pickup-sel" :options="pickupLibraries" validation="required"
+                  />
+               </div>
             </div>
             <div v-else-if="registration.deliveryMethod == 'Address'">
-               <p>
-                  Items will be delivered to the address you entered above. Please ensure it is correct.<br/>
+               <div class="delivery-info">
+                  <div>Items will be delivered to the address you entered above. Please ensure it is correct.</div>
                   <address>
                      <div>{{ registration.firstName }} {{ registration.lastName }}</div>
                      <div>{{ registration.address1 }}</div>
                      <div v-if="registration.address2">{{ registration.address2 }}</div>
                      <div>{{ registration.city }}, {{ registration.state }} {{ registration.zip }}</div>
                   </address>
-               </p>
+               </div>
             </div>
          </div>
       </FormKit>
       <template #footer>
-         <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
-         <VirgoButton @click="illiadform.node.submit()" label="Register" :disabled="okDisabled"/>
+         <div class="footer-wrap">
+            <p v-if="error" class="error">{{ error }}</p>
+            <div class="buttons">
+               <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
+               <VirgoButton @click="illiadform.node.submit()" label="Register" :loading="working"/>
+            </div>
+         </div>
       </template>
    </Dialog>
 </template>
@@ -88,13 +95,15 @@ import { useSystemStore } from "@/stores/system"
 import Dialog from 'primevue/dialog'
 import { setFocusID } from '@/utils'
 import { useWindowSize } from '@vueuse/core'
+import axios from 'axios'
 
 const userStore = useUserStore()
 const system = useSystemStore()
 const { height } = useWindowSize()
 
 const showUpdateDialog = ref(false)
-const okDisabled = ref(false)
+const working = ref(false)
+const error = ref("")
 const trigger = ref(null)
 const illiadform = ref(null)
 
@@ -139,7 +148,8 @@ const pickupLibraries = computed(()=>{
 })
 
 const opened = (() => {
-   okDisabled.value = false
+   error.value = ""
+   working.value = false
    registration.value.computeID = userStore.accountInfo.id
    registration.value.firstName = userStore.accountInfo.sirsiProfile.firstName
    registration.value.lastName = userStore.accountInfo.sirsiProfile.lastName
@@ -190,7 +200,15 @@ const deliveryMethodChanged = ( (newMethod) => {
 })
 
 const submitRegistration = (() => {
-
+   working.value = true
+   error.value = ""
+   axios.post("/api/illiad/register", registration.value).then( () => {
+      working.value = false
+    }).catch ( err => {
+      console.log(err)
+      error.value = err
+      working.value = false
+   })
 })
 
 </script>
@@ -208,7 +226,29 @@ form.formkit-form {
       font-size: 0.95em;
    }
    address {
-      margin:15px;
+      margin-left:20px;
+   }
+   .delivery-info {
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+   }
+}
+.footer-wrap {
+   display: flex;
+   flex-direction: column;
+   gap: 5px;
+   flex-grow: 1;
+   .error {
+      text-align: center;
+      color: $uva-red-A;
+   }
+   .buttons {
+      display: flex;
+      flex-flow: row wrap;
+      gap: 1rem;
+      justify-content: flex-end;
    }
 }
 .columns {

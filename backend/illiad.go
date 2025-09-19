@@ -9,6 +9,39 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (svc *ServiceContext) illiadRegistrationRequest(c *gin.Context) {
+	log.Printf("INFO: received illiad registration request")
+	var req struct {
+		ComputeID      string `json:"computeID"`
+		FirstName      string `json:"firstName"`
+		LastName       string `json:"lastName"`
+		Email          string `json:"email"`
+		Phone          string `json:"phone"`
+		Address1       string `json:"address1"`
+		Address2       string `json:"address2"`
+		City           string `json:"city"`
+		State          string `json:"state"`
+		Zip            string `json:"zip"`
+		Status         string `json:"status"`
+		Department     string `json:"department"`
+		School         string `json:"school"`
+		DeliveryMethod string `json:"deliveryMethod"`
+		Building       string `json:"buildingName"`
+		Room           string `json:"roomNumber"`
+		PickupLocation string `json:"pickupLocation"`
+	}
+	err := c.ShouldBindBodyWithJSON(&req)
+	if err != nil {
+		log.Printf("ERROR: invalid illiad register payload: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	log.Printf("%+v", req)
+
+	c.String(http.StatusNotImplemented, "nope")
+}
+
 // GetILLiadRequests gets all active ILLiad requests for a user
 func (svc *ServiceContext) GetILLiadRequests(c *gin.Context) {
 	v4UserID := c.Param("uid")
