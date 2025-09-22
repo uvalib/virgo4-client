@@ -14,19 +14,44 @@
                </p>
             </div>
             <div v-else class="subcontent">
+               <div class="instructions">
+                  <h4>UVA Materials Scanning Request</h4>
+                  <div>
+                     Submit a scanning request using one of the forms below.
+                     <ul>
+                        <li>To place an article or book chapter request for personal research, submit the Research Scanning form.</li>
+                        <li>Materials requested via the Instructional Scanning form will be delivered in a format the meets the new accessibility for classroom use.</li>
+                        <li>To request remediation of a PDF that is intended for classroom instructional use, submit the PDF Remediation form, which will allow you to upload your PDF.</li>
+                     </ul>
+                  </div>
+               </div>
                <div class="buttons">
+                  <VirgoButton @click="researchScanClick" label="Research Scanning" :disabled="requestStore.otherRequestsDisabled"/>
                   <VirgoButton @click="instructionalScanClick" label="Instructional Scanning" :disabled="requestStore.otherRequestsDisabled"/>
+                  <VirgoButton @click="pdfRemediationClick" label="PDF Remediation Request" :disabled="requestStore.isRemediateDisabled"/>
+               </div>
+               <div class="instructions">
+                  <h4>LEO - UVA Materials Delivery Request</h4>
+                  <div>
+                     Faculty, staff and graduate students: To request physical delivery of Library materials to your campus
+                     department mail room, search for an item in Virgo and use the "Request Item" button.
+                  </div>
+                  <h4>InterLibrary Loan Request</h4>
+                  <div>
+                     Submit an ILL request for an item not owned by the UVA Library using one of the forms below. Items
+                     supplied via ILL are intended for personal research use only and are not eligible for the Library's
+                     accessibility remediation service or for further dissemation as course materials.
+                  </div>
+               </div>
+               <div class="buttons">
                   <VirgoButton @click="illBorrowClick" label="ILL Borrow Item" :disabled="requestStore.otherRequestsDisabled"/>
                   <VirgoButton @click="illBorrowAVClick" label="ILL Borrow A/V" :disabled="requestStore.otherRequestsDisabled"/>
                   <VirgoButton @click="illScanClick" label="ILL Scan Chapter/Article" :disabled="requestStore.otherRequestsDisabled"/>
                </div>
-               <div class="reason" v-if="requestStore.otherRequestsDisabled">
+               <div class="reason ils-error" v-if="requestStore.otherRequestsDisabled">
                   You have reached the maximum of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
                </div>
-               <div class="buttons">
-                  <VirgoButton @click="pdfRemediationClick" label="PDF Remediation Request" :disabled="requestStore.isRemediateDisabled"/>
-               </div>
-               <div class="reason" v-if="requestStore.isRemediateDisabled">
+               <div class="reason ils-error" v-if="requestStore.isRemediateDisabled">
                   You have reached the maximum of {{ requestStore.requestStats.remediationLimit }} active remediation requests.
                </div>
                <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank" aria-describedby="new-window">Purchase Request<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i></a>
@@ -37,6 +62,7 @@
                <ILLBorrowItem v-if="request == 'ILLBorrowItem'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
                <ILLScanArticle v-if="request == 'ILLScanArticle'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
                <InstructionalScan v-if="request == 'InstructionalScan'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+               <ResearchScan v-if="request == 'ResearchScan'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
                <PDFRemediation v-if="request == 'PDFRemediation'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
             </template>
             <h3 class="gap">Outstanding Requests</h3>
@@ -215,6 +241,7 @@ import ILLBorrowAV from "@/components/requests/standalone/ILLBorrowAV.vue"
 import ILLBorrowItem from "@/components/requests/standalone/ILLBorrowItem.vue"
 import ILLScanArticle from "@/components/requests/standalone/ILLScanArticle.vue"
 import InstructionalScan from "@/components/requests/standalone/InstructionalScan.vue"
+import ResearchScan from "@/components/requests/standalone/ResearchScan.vue"
 import PDFRemediation from "@/components/requests/standalone/PDFRemediation.vue"
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
@@ -263,6 +290,10 @@ const digitalRequests = computed(()=>{
       }
    })
    return out
+})
+
+const researchScanClick = (() => {
+   request.value = "ResearchScan"
 })
 
 const instructionalScanClick = (() => {
@@ -370,6 +401,14 @@ onMounted(() =>{
       display: flex;
       flex-direction: column;
       gap: 10px;
+      .instructions {
+         h4 {
+            margin-bottom: 10px;
+         }
+         ul {
+            margin: 10px 0;
+         }
+      }
       .buttons {
          display: flex;
          flex-flow: row wrap;
@@ -390,6 +429,9 @@ onMounted(() =>{
       border-radius: 0.3rem;
       color: $uva-text-color-dark;
       background-color: $uva-red-100;
+   }
+   .reason.ils-error {
+      margin: 0;
    }
 
    .working {
