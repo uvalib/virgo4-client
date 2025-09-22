@@ -44,7 +44,6 @@ cd bin; ./v4srv \
    -fbdb ${V4_FB_DB} \
    -fbproject ${V4_FB_PROJECT} \
    -fbapp ${V4_FB_APP} \
-   -pda ${PDA_URL} \
    -dibsurl ${DIBS_URL} \
    ${SMTP_USER_OPT} \
    ${SMTP_PASS_OPT}

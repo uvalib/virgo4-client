@@ -33,7 +33,6 @@ type ServiceContext struct {
 	SearchAPI       string
 	FeedbackEmail   string
 	ILSAPI          string
-	PDAAPI          string
 	CatalogPoolURL  string
 	JWTKey          string
 	Dev             DevConfig
@@ -66,7 +65,6 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		JWTKey:         cfg.JWTKey,
 		FeedbackEmail:  cfg.FeedbackEmail,
 		ILSAPI:         cfg.ILSAPI,
-		PDAAPI:         cfg.PDAAPI,
 		CatalogPoolURL: cfg.CatalogPoolURL,
 		SMTP:           cfg.SMTP,
 		Illiad:         cfg.Illiad,

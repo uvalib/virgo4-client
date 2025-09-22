@@ -58,7 +58,6 @@ type ServiceConfig struct {
 	SearchAPI      string
 	FeedbackEmail  string
 	ILSAPI         string
-	PDAAPI         string
 	CatalogPoolURL string
 	JWTKey         string
 	Dev            DevConfig
@@ -102,9 +101,6 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.DB.User, "dbuser", "v4user", "Database user")
 	flag.StringVar(&cfg.DB.Pass, "dbpass", "pass", "Database password")
 
-	// PDA API connection params
-	flag.StringVar(&cfg.PDAAPI, "pda", "https://pda-ws-dev.internal.lib.virginia.edu", "Patron Driven Acquisition API URL")
-
 	// SMTP settings
 	flag.StringVar(&cfg.SMTP.Host, "smtphost", "", "SMTP Host")
 	flag.IntVar(&cfg.SMTP.Port, "smtpport", 25, "SMTP Port")
@@ -133,11 +129,6 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("ils param is required")
 	} else {
 		log.Printf("ILS Connector API endpoint: %s", cfg.ILSAPI)
-	}
-	if cfg.PDAAPI == "" {
-		log.Fatal("pda param is required")
-	} else {
-		log.Printf("PDA API endpoint: %s", cfg.PDAAPI)
 	}
 	if cfg.CatalogPoolURL == "" {
 		log.Fatal("catalog pool param is required")

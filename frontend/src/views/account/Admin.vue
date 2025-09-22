@@ -9,7 +9,6 @@
          <template v-if="userStore.isSignedIn">
             <PickupLibraries class="section" />
             <JWTAdmin class="section" />
-            <PDADashboard class="section" />
          </template>
       </div>
    </div>
@@ -20,7 +19,6 @@ import SignInRequired from "@/components/account/SignInRequired.vue"
 import JWTAdmin from "@/components/admin/JWTAdmin.vue"
 import PickupLibraries from "@/components/admin/PickupLibraries.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
-import PDADashboard from "@/components/admin/PDADashboard.vue"
 import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { onMounted } from 'vue'
