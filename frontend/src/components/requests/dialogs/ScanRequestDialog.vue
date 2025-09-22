@@ -1,7 +1,9 @@
 <template>
-   <RequestDialog trigger="Request a scan" title="Scan Request" request="Submit Request"
-      :show="request.activeRequest=='scan'" :showSubmit="submitted == false && user.isSignedIn"
-      :disabled="request.working" :submit-disabled="user.illiadBlocked" @opened="dialogOpened" @closed="dialogClosed" @submit="scanForm.node.submit()">
+   <div class="trigger">
+      <VirgoButton @click="showClicked('instruction')" label="Request a scan for instruction" />
+      <VirgoButton @click="showClicked('research')" label="Request a scan for personal research" />
+   </div>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" :draggable="false" header="Scan Request" @show="dialogOpened" @hide="dialogClosed">
       <SignIn v-if="!user.isSignedIn" />
       <template v-else>
          <p v-if="!user.hasIlliad">
@@ -14,12 +16,6 @@
             Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
          </p>
          <FormKit v-else-if="submitted == false" type="form" ref="scanForm" :actions="false" @submit="submit">
-            <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
-               v-model="selectedItem" id="scan-item-sel" placeholder="Select an item"
-               :validation-messages="{required: 'Item selection is required.'}" :options="request.optionItems"
-               validation="required" @change="itemSelected()" />
-            <FormKit type="select" label="Scan purpose" id="scan-use" v-model="scan.type"
-               :options="{'Article': 'Research', 'Instructional': 'Instruction'}" />
             <div class="scan-use-note" v-if="scan.type == 'Article'">
                Use this form to request a scan for your coursework or personal academic research.
             </div>
@@ -28,6 +24,10 @@
                <div>Use this form to request a scan for distribution to your students through<br />a course management
                   system (Collab, Canvas, etc).</div>
             </div>
+            <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
+               v-model="selectedItem" id="scan-item-sel" placeholder="Select an item"
+               :validation-messages="{required: 'Item selection is required.'}" :options="request.optionItems"
+               validation="required" @change="itemSelected()" />
             <FormKit label="Book or Journal Title" type="text" v-model="scan.title" validation="required" />
             <FormKit label="Chapter or Article Title" type="text" v-model="scan.chapter" validation="required" />
             <FormKit label="Chapter or Article Author" type="text" v-model="scan.author" validation="required" />
@@ -43,12 +43,19 @@
          </FormKit>
          <ConfirmationPanel v-else />
       </template>
-   </RequestDialog>
+      <template #footer>
+         <template v-if="submitted == false && user.isSignedIn">
+            <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
+            <VirgoButton label="Submit Request" @click="submit" />
+         </template>
+         <VirgoButton v-else severity="secondary" id="request-done" @click="showDialog=false" label="Close"/>
+      </template>
+   </Dialog>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import RequestDialog from '@/components/requests/dialogs/RequestDialog.vue'
+import { ref,onMounted } from 'vue'
+import Dialog from 'primevue/dialog'
 import SignIn from "@/views/SignIn.vue"
 import ILLCopyrightNotice from '@/components/requests/panels/ILLCopyrightNotice.vue'
 import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
@@ -83,32 +90,55 @@ const scan = ref({
    location: '',
    callNumber: '',
 })
+
 const submitted = ref(false)
 const scanForm = ref()
+const showDialog = ref(false)
 
-const dialogOpened = (() => {
-   selectedItem.value = null
-   scan.value = {
-      barcode: '',
-      issn: '',
-      type: 'Article',
-      title: '',
-      chapter: '',
-      author: '',
-      volume: '',
-      issue: '',
-      year: '',
-      pages: '',
-      notes: '',
-      library: '',
-      location: '',
-      callNumber: '',
+onMounted(()  => {
+   // this is called when a page containing this control is loaded. Use it
+   // to auto-open a request that was in progress for a signed out user
+   if (request.activeRequest == "scanInstruct") {
+      scan.value.type = "Instructional"
+      showDialog.value = true
+   } else if (request.activeRequest == "scanArticle") {
+      scan.value.type = "Article"
+      showDialog.value = true
    }
-   submitted.value = false
-   request.activeRequest = "scan"
+})
+
+const showClicked = ((clickedMode) => {
+   if (clickedMode == "instruction") {
+      scan.value.type = "Instructional"
+      request.activeRequest = "scanInstruct"
+   } else {
+      scan.value.type = "Article"
+      request.activeRequest = "scanArticle"
+   }
+
    restore.setActiveRequest( request.activeRequest )
    restore.setURL(route.fullPath)
    restore.save()
+
+   showDialog.value = true
+})
+
+const dialogOpened = (() => {
+   selectedItem.value = null
+   scan.value.barcode = ''
+   scan.value.issn = ''
+   scan.value.title = ''
+   scan.value.chapter = ''
+   scan.value.author = ''
+   scan.value.volume = ''
+   scan.value.issue = ''
+   scan.value.year = ''
+   scan.value.pages = ''
+   scan.value.notes = ''
+   scan.value.library = ''
+   scan.value.location = ''
+   scan.value.callNumber = ''
+   submitted.value = false
    if (user.isSignedIn) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
       if ( request.optionItems.length == 1) {
@@ -165,6 +195,22 @@ const dialogClosed = (() =>{
 </script>
 
 <style lang="scss" scoped>
+@media only screen and (min-width: 768px) {
+   .trigger {
+      display: flex;
+      flex-flow: row wrap;
+      gap: 1rem;
+      width: auton;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .trigger {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+   }
+}
 .scan-use-note {
    padding:5px 0 10px 0;
    font-size: 0.85em;
