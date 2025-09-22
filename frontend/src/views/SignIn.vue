@@ -20,8 +20,8 @@
          <p>(All other researchers, including UVA alumni or retirees)</p>
          <div class="section">
             <FormKit type="form" id="signin" :actions="false" @submit="signinClicked">
-               <FormKit label="Library ID" type="text" v-model="user" validation="required" help="Library ID, eg: C001005101 or TEMP001166" autocomplete="username" />
-               <FormKit label="Password" type="password" v-model="pin" validation="required" autocomplete="current-password" />
+               <FormKit label="Library ID" type="text" v-model="user" validation="required" help="Library ID, eg: C001005101 or TEMP001166" autocomplete="username" validation-visibility="submit"/>
+               <FormKit label="Password" type="password" v-model="pin" validation="required" autocomplete="current-password" validation-visibility="submit" />
                <V4FormActions :hasCancel="false" submitLabel="Sign in" submitID="submit-signin" buttonAlign="center" />
             </FormKit>
             <transition name="message-transition"
@@ -63,7 +63,6 @@ import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { storeToRefs } from "pinia"
 
 const props = defineProps({
    embedded: {
@@ -80,14 +79,6 @@ const pin = ref('')
 
 const hasPasswordToken = computed( ()=> {
    return route.query.token && route.query.token.length > 0
-})
-
-// pull a ref to authTriesLeft from the user store so it can be watched directly
-const { authTriesLeft } = storeToRefs(userStore)
-watch(authTriesLeft, (newValue, oldValue) => {
-   if (newValue < oldValue ) {
-      pin.value = ""
-   }
 })
 
 const signinClicked = (() => {
