@@ -25,6 +25,9 @@ app.directive('focus', {
 
 const dc = defaultConfig({
    plugins: [addErrorAlertIconPlugin, addRequiredNotePlugin],
+   props: {
+      validationVisibility: "submit"
+   },
    config: {
       classes: {
          input: '$reset v4-form-input',
@@ -34,6 +37,8 @@ const dc = defaultConfig({
       },
    }
 })
+console.log("E")
+console.log(dc)
 app.use(plugin, dc)
 
 // announcer

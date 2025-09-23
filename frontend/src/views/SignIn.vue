@@ -20,8 +20,8 @@
          <p>(All other researchers, including UVA alumni or retirees)</p>
          <div class="section">
             <FormKit type="form" id="signin" :actions="false" @submit="signinClicked">
-               <FormKit label="Library ID" type="text" v-model="user" validation="required" help="Library ID, eg: C001005101 or TEMP001166" autocomplete="username" validation-visibility="submit"/>
-               <FormKit label="Password" type="password" v-model="pin" validation="required" autocomplete="current-password" validation-visibility="submit" />
+               <FormKit label="Library ID" type="text" v-model="user" validation="required" help="Library ID, eg: C001005101 or TEMP001166" autocomplete="username"/>
+               <FormKit label="Password" type="password" v-model="pin" validation="required" autocomplete="current-password"/>
                <V4FormActions :hasCancel="false" submitLabel="Sign in" submitID="submit-signin" buttonAlign="center" />
             </FormKit>
             <transition name="message-transition"
