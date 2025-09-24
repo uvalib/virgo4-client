@@ -103,7 +103,9 @@ export const useRequestStore = defineStore('request', {
    },
    actions: {
       clearAll() {
+         let oldAR = this.activeRequest
          this.$reset()
+         this.activeRequest = oldAR
       },
 
       resetData() {
@@ -114,7 +116,6 @@ export const useRequestStore = defineStore('request', {
       },
 
       setOptions( data ) {
-         this.$reset()
          if ( data ) {
             this.options = data.items
             if ( data.streamingVideoReserve ) {
@@ -124,6 +125,8 @@ export const useRequestStore = defineStore('request', {
             if ( data.hsaScanURL ) {
                this.directLink = data.hsaScanURL
             }
+         } else {
+            this.$reset()
          }
       },
 

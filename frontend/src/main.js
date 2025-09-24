@@ -37,8 +37,6 @@ const dc = defaultConfig({
       },
    }
 })
-console.log("E")
-console.log(dc)
 app.use(plugin, dc)
 
 // announcer

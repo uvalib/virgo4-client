@@ -115,8 +115,6 @@ const dialogOpened = (() => {
 const dialogClosed = (() =>{
    request.activeRequest = "none"
    request.errors = {}
-   restore.setActiveRequest( request.activeRequest )
-   restore.save()
 })
 
 const pickupLibraryChanged = ((value) => {

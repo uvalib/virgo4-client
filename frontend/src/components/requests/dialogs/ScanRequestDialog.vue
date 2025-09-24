@@ -186,8 +186,7 @@ const submit = (async () => {
 
 const dialogClosed = (() =>{
    request.activeRequest = "none"
-   restore.setActiveRequest( request.activeRequest )
-   restore.save()
+   request.errors = {}
 })
 
 </script>
