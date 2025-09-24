@@ -26,9 +26,8 @@
 
          <div v-if="pickupLibrary == 'LEO'" class="illiad-prompt ra-box ra-fiy">
             <template v-if="!user.hasIlliad">
-               No ILLiad account found.<br/>
-               To register <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=80" aria-label="Illiad registration">
-               please complete this form. <i class='fal fa-external-link-alt'></i></a>
+               <div>No ILLiad account found.</div>
+               <ILLiadRegistration />
             </template>
             <template v-else-if="user.illiadBlocked">
                Your ILLiad account is blocked.<br/>
@@ -67,6 +66,7 @@ import { usePreferencesStore } from "@/stores/preferences"
 import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
 import { setFocusID } from '@/utils'
+import ILLiadRegistration from '@/components/modals/ILLiadRegistration.vue'
 
 const user = useUserStore()
 const restore = useRestoreStore()

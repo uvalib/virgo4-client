@@ -395,12 +395,51 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 		v4User = User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
 	}
 
-	// Combine local V4 database user info with ILS user info and return results to client
+	// get illiad info
+	type illiadInfo struct {
+		HasAccount  bool   `json:"hasAccount"`
+		Cleared     string `json:"cleared"`
+		LEOLocation string `json:"leoLocation"`
+	}
+
+	illiad := illiadInfo{}
+	respBytes, illErr := svc.ILLiadRequest("GET", fmt.Sprintf("Users/%s", userID), nil)
+	if illErr != nil && illErr.StatusCode == 404 {
+		log.Printf("WARN: ILLiad user not found for %s: %s", userID, illErr.Message)
+	} else if illErr != nil {
+		log.Printf("ERROR: unable to get ILLiad user %s: %s", userID, illErr.Message)
+	} else {
+		var illResp struct {
+			Department   string `json:"Department"`
+			Organization string `json:"Organization"`
+			Country      string `json:"Country"`
+			Cleared      string `json:"Cleared"`
+		}
+		if err := json.Unmarshal(respBytes, &illResp); err != nil {
+			log.Printf("ERROR: unable to parse ILLiad user response: %s\n%s", err.Error(), respBytes)
+		} else {
+			var locationParts []string
+			if illResp.Department != "" {
+				locationParts = append(locationParts, illResp.Department)
+			}
+			if illResp.Organization != "" {
+				locationParts = append(locationParts, illResp.Organization)
+			}
+			if illResp.Country != "" {
+				locationParts = append(locationParts, illResp.Country)
+			}
+			illiad.HasAccount = true
+			illiad.Cleared = illResp.Cleared
+			illiad.LEOLocation = strings.Join(locationParts, ", ")
+		}
+	}
+
 	type fullUser struct {
 		*User
-		UserInfo *ILSUserInfo `json:"user"`
+		UserInfo ILSUserInfo `json:"user"`
+		Illiad   illiadInfo  `json:"illiad"`
 	}
-	user := fullUser{User: &v4User, UserInfo: &ilsUser}
+	user := fullUser{User: &v4User, UserInfo: ilsUser, Illiad: illiad}
 	c.JSON(http.StatusOK, user)
 }
 

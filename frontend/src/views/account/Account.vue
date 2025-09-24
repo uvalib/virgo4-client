@@ -174,7 +174,7 @@
             </div>
          </div>
 
-         <div class="account-group" v-if="userStore.canUseLEO">
+         <div class="account-group" v-if="userStore.canUseILLiad">
             <h3>ILLiad</h3>
             <div class="no-illiad" v-if="userStore.hasIlliad"> <!-- FIX ME THIS IS FOR TEST. SHOULD BE !userStore.hasIlliad -->
                <div>No ILLiad account found.</div>

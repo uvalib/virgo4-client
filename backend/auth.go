@@ -341,15 +341,9 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 	}
 
 	log.Printf("Adding %s claims based on ILS response", v4User.Virgo4ID)
-
 	v4Claims.IsUVA = !ilsUser.CommunityUser
 	if ilsUser.NoAccount {
 		log.Printf("WARN: User %s has no Sirsi account", v4User.Virgo4ID)
-		v4Claims.CanLEO = false
-		v4Claims.CanLEOPlus = false
-		v4Claims.CanPurchase = false
-		v4Claims.CanPlaceReserve = false
-		v4Claims.UseSIS = false
 		v4Claims.Role = v4jwt.Guest
 	} else {
 		v4Claims.Barcode = ilsUser.Barcode
@@ -359,43 +353,8 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 		v4Claims.CanLEOPlus = false // TODO update with rules once they have been decided
 		v4Claims.CanPurchase = ilsUser.CanPurchase()
 		v4Claims.CanPlaceReserve = ilsUser.CanPlaceReserve()
+		v4Claims.CanUseILLiad = (authMethod == v4jwt.Netbadge && ilsUser.HomeLibrary != "HEALTHSCI")
 		v4Claims.UseSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
-	}
-
-	// ILLiad Claims
-	v4Claims.HasIlliad = false
-	respBytes, illErr := svc.ILLiadRequest("GET", fmt.Sprintf("Users/%s", v4Claims.UserID), nil)
-	if illErr != nil && illErr.StatusCode == 404 {
-		log.Printf("WARN: ILLiad user not found for %s: %s", v4Claims.UserID, illErr.Message)
-	} else if illErr != nil {
-		log.Printf("ERROR: unable to get ILLiad user %s: %s", v4Claims.UserID, illErr.Message)
-	} else {
-		log.Printf("INFO: illiad user response: %s", respBytes)
-		v4Claims.HasIlliad = true
-		type illiadResponse struct {
-			Department   string `json:"Department"`
-			Organization string `json:"Organization"`
-			Country      string `json:"Country"`
-			Cleared      string `json:"Cleared"`
-		}
-		var illResp illiadResponse
-		var locationParts []string
-		if err := json.Unmarshal(respBytes, &illResp); err != nil {
-			log.Printf("ERROR: unable to parse ILLiad user response: %s\n%s", err.Error(), respBytes)
-		} else {
-			if illResp.Department != "" {
-				locationParts = append(locationParts, illResp.Department)
-			}
-			if illResp.Organization != "" {
-				locationParts = append(locationParts, illResp.Organization)
-			}
-			if illResp.Country != "" {
-				locationParts = append(locationParts, illResp.Country)
-			}
-
-			v4Claims.LEOLocation = strings.Join(locationParts, ", ")
-			v4Claims.IlliadCleared = illResp.Cleared
-		}
 	}
 
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)

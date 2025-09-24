@@ -29,6 +29,7 @@ export const useUserStore = defineStore('user', {
       role: "guest",
       sessionType: "",
       accountInfo: {},
+      illiad: {hasAccount: false, cleared: "", leoLocation: ""},
       claims: {},
       checkouts: [],
       showRenewSummary: false,
@@ -75,7 +76,7 @@ export const useUserStore = defineStore('user', {
       },
       isStaff: (state) => {
          // users that are members of lib-virgo4-staff or lb-scpres-joint
-         return (state.role == 'staff' || state.role == 'pdaadmin')  // fix me: until JWT is updated treat pdaadmin as staff
+         return state.role == 'staff'
       },
       isAdmin: (state) => {
         return (state.role == 'admin')
@@ -95,42 +96,38 @@ export const useUserStore = defineStore('user', {
          return false
       },
       canPurchase: (state) => {
-         if ( state.claims.canPurchase ) return state.claims.canPurchase
-         return false
+         return state.claims.canPurchase
       },
       canUseLEO: (state) => {
-         if ( state.claims.canLEO ) return state.claims.canLEO
-         return false
+         return state.claims.canLEO
       },
       canUseLEOPlus: (state) => {
-         if ( state.claims.canLEOPlus ) return state.claims.canLEOPlus
-         return false
+         return state.claims.canLEOPlus
       },
       useSIS: (state) => {
-         if ( state.claims.useSIS ) return state.claims.useSIS
-         return false
+         return state.claims.useSIS
       },
       canMakeReserves: (state) => {
-         if ( state.claims.canPlaceReserve ) return state.claims.canPlaceReserve
-         return false
+         return state.claims.canPlaceReserve
+      },
+      canUseILLiad: (state) => {
+         return state.claims.canUseILLiad
       },
       isBarred: state => {
          return state.accountInfo.standing == "BARRED" ||  state.accountInfo.standing == "BARR-SUPERVISOR"
       },
       hasIlliad: state => {
-         if ( state.claims.hasIlliad ) return state.claims.hasIlliad
-         return false
+         return state.illiad.hasAccount
       },
       illiadBlocked: (state) => {
-         if(state.claims.illiadCleared == "Yes"){
+         if(state.illiad.cleared == "Yes"){
             return false
          }
-         console.log("INFO: Blocking ILLiad. Cleared: %s ", state.claims.illiadCleared)
+         console.log("Blocking ILLiad. Cleared: "+state.illiad.cleared)
          return true
       },
       leoLocation: (state) => {
-         if ( state.claims.leoLocation ) return state.claims.leoLocation
-         return false
+         return state.illiad.leoLocation
       },
       isHSLUser: state => {
          return state.claims.homeLibrary == "HEALTHSCI"
@@ -293,9 +290,7 @@ export const useUserStore = defineStore('user', {
             homeLibrary: parsed.homeLibrary,
             canLEO: parsed.canLEO,
             canLEOPlus: parsed.canLEOPlus,
-            leoLocation: parsed.leoLocation,
-            illiadCleared: parsed.illiadCleared,
-            hasIlliad: parsed.hasIlliad,
+            canUseILLiad: parsed.canUseILLiad,
             canPlaceReserve: parsed.canPlaceReserve,
             useSIS: parsed.useSIS,
             isUVA: parsed.isUva,
@@ -401,6 +396,7 @@ export const useUserStore = defineStore('user', {
             this.accountRequest.zip = ""
          }
          delete  this.accountInfo.noAccount
+         this.illiad = data.illiad
       },
       clear() {
          this.$reset()

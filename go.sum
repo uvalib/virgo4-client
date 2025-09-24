@@ -117,8 +117,8 @@ github.com/ugorji/go/codec v1.3.0 h1:Qd2W2sQawAfG8XSvzwhBeoGq71zXOC/Q1E9y/wUcsUA
 github.com/ugorji/go/codec v1.3.0/go.mod h1:pRBVtBSKl77K30Bv8R2P+cLSGaTtex6fsA2Wjqmfxj4=
 github.com/uvalib/virgo4-api v1.0.1 h1:nf/Ps6GaSoZt1poUOzSAIZB5lQZVGL8n1IanVzowYFA=
 github.com/uvalib/virgo4-api v1.0.1/go.mod h1:p+LmQBQahBom6DErthL8iGZU6NgRJ9aN2wM7EE6VBSE=
-github.com/uvalib/virgo4-jwt v1.2.3 h1:tk/1VvzALvPYRSs1e2htwCE3l6Pg8UfdXFXIeSjPb3g=
-github.com/uvalib/virgo4-jwt v1.2.3/go.mod h1:3pcQ+XdN3q29AExajOiWzASmTGOXsfeEDOKh5VxEKXU=
+github.com/uvalib/virgo4-jwt v1.3.0 h1:PHG8G0GrcCXjPR3nPvVfVerWSPWyaht0oOy+7+blw64=
+github.com/uvalib/virgo4-jwt v1.3.0/go.mod h1:3pcQ+XdN3q29AExajOiWzASmTGOXsfeEDOKh5VxEKXU=
 github.com/zsais/go-gin-prometheus v1.0.2 h1:3asLqrFltMdItpgr/OS4hYc8pLq3HzMa5T1gYuXBIZ0=
 github.com/zsais/go-gin-prometheus v1.0.2/go.mod h1:iKBYSOHzvGfe2FyGSOC8JSwUA0MITdnYzI6v+aAbw1Q=
 go.uber.org/goleak v1.3.0 h1:2K3zAYmnTNqV73imy9J1T3WC+gmCePx2hEGkimedGto=
