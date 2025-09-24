@@ -119,6 +119,9 @@ export const useUserStore = defineStore('user', {
       hasIlliad: state => {
          return state.illiad.hasAccount
       },
+      illiadCleared: (state) => {
+         return state.illiad.cleared.toLowerCase()
+      },
       illiadBlocked: (state) => {
          if(state.illiad.cleared == "Yes"){
             return false

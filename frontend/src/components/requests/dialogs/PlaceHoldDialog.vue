@@ -1,49 +1,48 @@
 <template>
    <RequestDialog trigger="Request an item" title="Request Item" request="Place Hold"
       :show="request.activeRequest=='hold'" :showSubmit="submitted == false && user.isSignedIn"
-      :disabled="request.working" :submit-disabled="pickupLibrary == 'LEO' && user.illiadBlocked"
-      @opened="dialogOpened" @closed="dialogClosed" @submit="holdForm.node.submit()"
-   >
+      :disabled="request.working" :submit-disabled="pickupLibrary == 'LEO' && user.illiadBlocked" @opened="dialogOpened"
+      @closed="dialogClosed" @submit="holdForm.node.submit()">
       <SignIn v-if="!user.isSignedIn" />
       <FormKit v-else-if="submitted == false" type="form" ref="holdForm" :actions="false" @submit="placeHold">
          <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
             v-model="selectedItem" id="item-sel" placeholder="Select an item"
-            :validation-messages="{required: 'Item selection is required.'}"
-            :options="request.optionItems" validation="required"
-         />
+            :validation-messages="{required: 'Item selection is required.'}" :options="request.optionItems"
+            validation="required" />
          <FormKit type="select" label="Preferred pickup location" v-model="pickupLibrary"
-            placeholder="Select a location" @input="pickupLibraryChanged" id="pickup-sel"
-            :options="pickupLibraries" validation="required"
-         />
+            placeholder="Select a location" @input="pickupLibraryChanged" id="pickup-sel" :options="pickupLibraries"
+            validation="required" />
          <div class="help">
             <p>This pickup location is where you will go to retrieve items you've requested.</p>
             <p>
                If you cannot pick your item up at the location(s) shown above, please
-               <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a>
+               <a target="_blank" aria-describedby="new-window"
+                  href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a>
                to request your item.
             </p>
          </div>
 
-         <div v-if="pickupLibrary == 'LEO'" class="illiad-prompt ra-box ra-fiy">
-            <template v-if="!user.hasIlliad">
+         <div v-if="pickupLibrary == 'LEO'">
+            <div v-if="!user.hasIlliad" class="no-illiad">
                <div>No ILLiad account found.</div>
                <ILLiadRegistration />
-            </template>
-            <template v-else-if="user.illiadBlocked">
-               Your ILLiad account is blocked.<br/>
-               Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
-            </template>
-            <template v-else-if="user.leoLocation==''">
-               It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
-               <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank" aria-describedby="new-window">here</a> and let us know where you would like your item to be delivered.
-            </template>
+            </div>
+            <ILLiadMessages v-else-if="user.illiadBlocked" />
+            <div v-else-if="user.leoLocation == ''" class="illiad-prompt ra-box ra-fiy">
+               It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could
+               you please go
+               <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank"
+                  aria-describedby="new-window">here</a> and let us know where you would like your item to be delivered.
+            </div>
          </div>
-            <div class="medium-rare-message" v-if="pickupLibrary == 'SPEC-COLL' ">
+         <div class="medium-rare-message" v-if="pickupLibrary == 'SPEC-COLL'">
             <p>
-               This item does not circulate.<br/>When you request this item from Ivy, it will be delivered to the Small Special Collections Library for you to use in the reading room only.
+               This item does not circulate.<br />When you request this item from Ivy, it will be delivered to the Small
+               Special Collections Library for you to use in the reading room only.
             </p>
             <p>
-               <a target="_blank" href="https://library.virginia.edu/hours#special-collections-hours">Small Special Collections Reading Room Hours</a>
+               <a target="_blank" href="https://library.virginia.edu/hours#special-collections-hours">Small Special
+                  Collections Reading Room Hours</a>
             </p>
          </div>
 
@@ -67,6 +66,7 @@ import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
 import { setFocusID } from '@/utils'
 import ILLiadRegistration from '@/components/modals/ILLiadRegistration.vue'
+import ILLiadMessages from '@/components/ILLiadMessages.vue'
 
 const user = useUserStore()
 const restore = useRestoreStore()
@@ -140,6 +140,14 @@ const placeHold = ( async () => {
 </script>
 
 <style lang="scss" scoped>
+.no-illiad {
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
+   gap: 10px;
+   margin: 20px 0;
+}
+
 form {
    .error {
       color: $uva-red-A;

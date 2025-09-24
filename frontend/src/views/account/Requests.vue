@@ -9,9 +9,7 @@
                <a :href="systemStore.hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i></a>
             </div>
             <div v-else-if="userStore.illiadBlocked" class="subcontent">
-               <p class="ils-error">Your Illiad account is blocked.<br/>
-                  Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
-               </p>
+               <ILLiadMessages />
             </div>
             <div v-else class="subcontent">
                <div class="instructions">
@@ -251,6 +249,7 @@ import analytics from '@/analytics'
 import AccordionContent from "@/components/AccordionContent.vue"
 import Dialog from 'primevue/dialog'
 import { setFocusID } from '@/utils'
+import ILLiadMessages from "@/components/ILLiadMessages.vue"
 
 const systemStore = useSystemStore()
 const userStore = useUserStore()

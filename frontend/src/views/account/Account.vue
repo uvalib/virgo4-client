@@ -181,10 +181,9 @@
                <ILLiadRegistration />
             </div>
             <template v-else>
-               <p v-if="userStore.illiadBlocked" class="standing-info">
-                  Your ILLiad account is blocked.<br/>
-                  Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
-               </p>
+               <div v-if="userStore.illiadBlocked" class="illiad-info">
+                  <ILLiadMessages />
+               </div>
                <dl v-if="userStore.leoLocation">
                   <dt>LEO Delivery Location:</dt>
                   <dd>
@@ -223,6 +222,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import analytics from '@/analytics'
+import ILLiadMessages from "@/components/ILLiadMessages.vue"
 
 const userStore = useUserStore()
 const systemStore = useSystemStore()
@@ -397,6 +397,9 @@ div.notes p {
 .addr {
    padding: 5px 15px;
    margin-top: 10px;
+}
+.illiad-info {
+   margin:15px 20px;
 }
 .standing-info {
     font-size: 1em;

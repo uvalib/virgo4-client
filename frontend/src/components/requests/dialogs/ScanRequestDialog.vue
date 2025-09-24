@@ -6,14 +6,11 @@
    <Dialog v-model:visible="showDialog" :modal="true" position="top" :draggable="false" header="Scan Request" @show="dialogOpened" @hide="dialogClosed">
       <SignIn v-if="!user.isSignedIn" />
       <template v-else>
-         <p v-if="!user.hasIlliad">
+         <div v-if="!user.hasIlliad" class="no-illiad">
             <div>No ILLiad account found.</div>
             <ILLiadRegistration />
-         </p>
-         <p v-else-if="user.illiadBlocked">
-            Your ILLiad account is blocked.<br />
-            Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
-         </p>
+         </div>
+         <ILLiadMessages v-else-if="user.illiadBlocked"/>
          <FormKit v-else-if="submitted == false" type="form" ref="scanForm" :actions="false" @submit="submit">
             <div class="scan-use-note" v-if="scan.type == 'Article'">
                Use this form to request a scan for your coursework or personal academic research.
@@ -45,7 +42,7 @@
       <template #footer>
          <template v-if="submitted == false && user.isSignedIn">
             <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
-            <VirgoButton label="Submit Request" @click="submit" />
+            <VirgoButton label="Submit Request" @click="submit" :disabled="user.illiadBlocked || !user.hasIlliad"/>
          </template>
          <VirgoButton v-else severity="secondary" id="request-done" @click="showDialog=false" label="Close"/>
       </template>
@@ -66,6 +63,7 @@ import { useRoute } from "vue-router"
 import analytics from '@/analytics'
 import { setFocusID } from '@/utils'
 import ILLiadRegistration from '@/components/modals/ILLiadRegistration.vue'
+import ILLiadMessages from '@/components/ILLiadMessages.vue'
 
 const user = useUserStore()
 const restore = useRestoreStore()
@@ -210,6 +208,13 @@ const dialogClosed = (() =>{
       gap: 1rem;
       width: 100%;
    }
+}
+.no-illiad {
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
+   gap: 10px;
+   margin: 20px 0;
 }
 .scan-use-note {
    padding:5px 0 10px 0;
