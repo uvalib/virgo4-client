@@ -30,8 +30,7 @@
             It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
             <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank" aria-describedby="new-window">here</a> and let us know where you would like your item to be delivered.
          </div>
-         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-borrow-item"
-            :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
+         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-borrow-item" @canceled="emit('canceled')"/>
       </FormKit>
    </div>
 </template>

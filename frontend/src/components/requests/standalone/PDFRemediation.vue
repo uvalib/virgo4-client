@@ -18,8 +18,7 @@
                accept="application/pdf"
             />
          </label>
-         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-pdf-remediation"
-            :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
+         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-pdf-remediation" @canceled="emit('canceled')"/>
       </FormKit>
    </div>
 </template>

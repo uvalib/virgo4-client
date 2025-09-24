@@ -20,8 +20,7 @@
             help="(ex: missing from shelf, color copies)"
          />
          <ILLCopyrightNotice type="research" :wide="true"/>
-         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-borrow-av"
-            :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
+         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-scan-article"  @canceled="emit('canceled')"/>
       </FormKit>
    </div>
 </template>

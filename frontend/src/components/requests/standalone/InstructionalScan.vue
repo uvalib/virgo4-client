@@ -37,8 +37,7 @@
          />
 
          <ILLCopyrightNotice type="instruction" :wide="true"/>
-         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-borrow-av"
-            :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
+         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-scan-instruct" @canceled="emit('canceled')"/>
       </FormKit>
    </div>
 </template>

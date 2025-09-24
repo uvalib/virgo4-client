@@ -18,8 +18,7 @@
             help="(ex: color copies)"
       />
 
-      <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-openurl-book"
-         :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
+      <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-openurl-article" @canceled="emit('canceled')"/>
    </FormKit>
 </template>
 

@@ -30,8 +30,7 @@
          and let us know where you would like your item to be delivered.
       </div>
 
-      <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-openurl-book"
-         :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
+      <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-openurl-book" @canceled="emit('canceled')"/>
    </FormKit>
 </template>
 

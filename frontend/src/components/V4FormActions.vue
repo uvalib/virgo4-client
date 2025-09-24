@@ -19,10 +19,6 @@ const props = defineProps({
       type: String,
       default: "Cancel"
    },
-   disabled: {
-      type: Boolean,
-      default: false
-   },
    buttonAlign: {
       type: String,
       default: "right"

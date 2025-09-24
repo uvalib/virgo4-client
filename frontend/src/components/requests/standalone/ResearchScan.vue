@@ -23,8 +23,7 @@
          <FormKit label="ISBN/ISSN" type="text" v-model="request.issn"/>
          <FormKit label="OCLC Number" type="text" v-model="request.oclc"/>
          <ILLCopyrightNotice type="research" :wide="true"/>
-         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-research-scan"
-            :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
+         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-research-scan" @canceled="emit('canceled')"/>
       </FormKit>
    </div>
 </template>
