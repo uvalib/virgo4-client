@@ -30,6 +30,7 @@ export const useSystemStore = defineStore('system', {
       citationsURL: "",
       collectionsURL: "",
       shelfBrowseURL: "",
+      hsILLiadURL: "",
       illiadCfg: {},
       dibsURL: "",
       searchAPI: "",
