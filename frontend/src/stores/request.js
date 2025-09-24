@@ -172,8 +172,11 @@ export const useRequestStore = defineStore('request', {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "illiadBorrow")
          this.working = true
          this.failed = false
-         await axios.post('/api/requests/standalone/borrow', req
-         ).catch(e =>
+         await axios.post('/api/requests/standalone/borrow', req).then( ()=>{
+            console.log("increment standalone request count")
+            this.requestStats.otherRequests++
+            this.requestStats.otherRequestsDisabled = ( this.requestStats.otherRequests >= this.requestStats.otherRequestsLimit )
+         }).catch(e =>
             useSystemStore().setError(e)
          ).finally(()=>
             this.working = false
@@ -183,8 +186,11 @@ export const useRequestStore = defineStore('request', {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "illiadScan")
          this.working = true
          this.failed = false
-         await axios.post('/api/requests/standalone/scan', req
-         ).catch(e =>
+         await axios.post('/api/requests/standalone/scan', req).then( ()=>{
+            console.log("increment standalone request count")
+            this.requestStats.otherRequests++
+            this.requestStats.otherRequestsDisabled = ( this.requestStats.otherRequests >= this.requestStats.otherRequestsLimit )
+         }).catch(e =>
             useSystemStore().setError(e)
          ).finally(()=>
             this.working = false
@@ -204,6 +210,10 @@ export const useRequestStore = defineStore('request', {
             headers: {
                'Content-Type': 'multipart/form-data',
             }
+         }).then( ()=>{
+            console.log("increment remediation request count")
+            this.requestStats.remediationRequests++
+            this.requestStats.remediationDisabled = ( this.requestStats.remediationRequests >= this.requestStats.remediationLimit )
          }).catch(e =>
             useSystemStore().setError(e)
          ).finally(()=>

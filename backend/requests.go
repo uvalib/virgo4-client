@@ -309,9 +309,23 @@ func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 
 	log.Printf("INFO: pull file %s from request to temporary file", formFile.Filename)
 	destFile := path.Join("/tmp", formFile.Filename)
-	err = c.SaveUploadedFile(formFile, destFile)
+	frmFile, err := formFile.Open()
 	if err != nil {
-		log.Printf("ERROR: unable to save %s: %s", formFile.Filename, err.Error())
+		log.Printf("ERROR: unable to open uploaded file %s: %s", formFile.Filename, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	defer frmFile.Close()
+	out, err := os.Create(destFile)
+	if err != nil {
+		log.Printf("ERROR: unable to create temp file %s: %s", destFile, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	defer out.Close()
+	_, err = io.Copy(out, frmFile)
+	if err != nil {
+		log.Printf("ERROR: unable to write temp file %s: %s", destFile, err.Error())
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
