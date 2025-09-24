@@ -2,9 +2,6 @@
    <div class="request-panel">
       <h3>Research Scanning Request</h3>
       <FormKit type="form" id="scan-article" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
-         <FormKit label="Will you be providing a copy of this material for the Library to scan?" type="radio"
-            v-model="request.personalCopy" :options="{true: 'Yes', false: 'No'}"
-         />
          <div class="instruct" v-if="request.personalCopy=='true'">
             <p>Personal copies can be dropped off at a Library Circulation Desk, deposited in a Book Drop, or sent via campus mail to:</p>
             <p class="addy">
@@ -25,9 +22,6 @@
          <FormKit label="Pages" type="text" v-model="request.pages" validation="required|length:1,25" help="(ex: 1-15)"/>
          <FormKit label="ISBN/ISSN" type="text" v-model="request.issn"/>
          <FormKit label="OCLC Number" type="text" v-model="request.oclc"/>
-         <FormKit label="Will you accept the item in a language other than English?" type="radio"
-            v-model="request.anyLanguage" :options="{'true': 'Yes', 'false': 'No'}"
-         />
          <ILLCopyrightNotice type="research" :wide="true"/>
          <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-research-scan"
             :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
@@ -59,7 +53,7 @@ const request = ref({
    pages: "",
    issn: "",
    oclc: "",
-   anyLanguage: "true"
+   anyLanguage: "false"
 })
 
 async function submitClicked() {
