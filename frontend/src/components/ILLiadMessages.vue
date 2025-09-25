@@ -1,18 +1,19 @@
 <template>
    <div v-if="user.illiadCleared == 'no'" class="illiad-message">
-      Library staff must review your account before you can submit ILL or Scan requests.
+      Your ILLiad account is currently awaiting clearance by ILS staff. You will be notified once your account is active.
    </div>
    <div v-else-if="user.illiadCleared == 'new'" class="illiad-message">
-      You must complete your account registration and wait for Library staff to review your account before you can submit ILL or Scan requests.
+      Your ILLiad account registration is incomplete. Please contact ILS staff at <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
    </div>
    <div v-else-if="user.illiadCleared == 'dis'" class="illiad-message">
-      You are not allowed to submit ILL or Scan requests.
+      Your ILLiad account has been disavowed. This may be due to a change in your UVA status or your affiliation with the UVA Medical Center.
+      Please contact ILS staff at <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
    </div>
    <div v-else-if="user.illiadCleared == 'b'" class="illiad-message">
-      Your ILL and Scan request account is currently blocked. Please contact Access Services staff at <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a>.
+      Your ILLiad account is currently blocked. Please contact ILS staff at <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
    </div>
    <div v-else-if="user.illiadCleared == 'bo'" class="illiad-message">
-      Your ILL and Scan request account is currently blocked due to an overdue ILL item. Please contact Access Services staff at <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a>.
+      Your ILLiad account is currently blocked due to overdue items on your ILL or circulation account. Please contact ILS staff at <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
    </div>
    <div v-else class="illiad-message">
          There is a problem with your ILLiad account. Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
