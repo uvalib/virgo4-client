@@ -175,8 +175,12 @@
          </div>
 
          <div class="account-group" v-if="userStore.canUseILLiad">
-            <h3>ILLiad</h3>
-            <div class="no-illiad" v-if="userStore.hasIlliad"> <!-- FIX ME THIS IS FOR TEST. SHOULD BE !userStore.hasIlliad -->
+            <!-- FIX ME THIS IS FOR TEST. BOTH SHOULD BE !userStore.hasIlliad -->
+            <h3>
+               <span>ILLiad</span>
+                <i v-if="userStore.hasIlliad" class="alert fas fa-exclamation-triangle"></i>
+            </h3>
+            <div class="no-illiad" v-if="userStore.hasIlliad">
                <div>No ILLiad account found.</div>
                <ILLiadRegistration />
             </div>
@@ -278,6 +282,13 @@ onMounted(() =>{
       margin: 0;
       background: $uva-grey-200;
       border-bottom: 1px solid $uva-grey-100;
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: space-between;
+      .alert {
+         color: $uva-red-B;
+         font-size: 1.2em;
+      }
    }
    dl {
       margin: 25px;

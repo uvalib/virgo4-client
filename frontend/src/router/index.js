@@ -251,17 +251,13 @@ router.beforeEach( async (to, _from) => {
       let jwtStr = cookies.get("v4_jwt")
       userStore.setUserJWT(jwtStr)
       restore.load()
-      let tgtURL = "/"
-      if ( userStore.noILSAccount &&  userStore.signedInUser != "") {
-         console.log("NetBadge success, but NO ILS ACCOUNT")
-         tgtURL = "/account"
-      } else {
-         tgtURL = restore.url
-         console.log("redirect to "+tgtURL)
-         if (!tgtURL || tgtURL == "") {
-            tgtURL = "/"
-         }
+
+      let tgtURL = restore.url
+      console.log("redirect to "+tgtURL)
+      if (!tgtURL || tgtURL == "") {
+         tgtURL = "/"
       }
+
       return tgtURL
    }
 

@@ -493,7 +493,7 @@ export const useUserStore = defineStore('user', {
             if ( preferences.searchTemplate ) {
                queryStore.setTemplate(preferences.searchTemplate)
             }
-            if (response.data.user.noILSAccount && this.router.currentRoute.value.path != "/account") {
+            if ( (this.noILSAccount || this.hasIlliad == false) && this.router.currentRoute.value.path != "/account") {
                this.router.push( "/account" )
             }
             this.lookingUp = false
