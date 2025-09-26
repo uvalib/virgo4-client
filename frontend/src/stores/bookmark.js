@@ -10,7 +10,6 @@ export const useBookmarkStore = defineStore('bookmark', {
       // Note: only pool, identifier and groupParent are used. Title/Author are for temp display only
       // and will be looked up when bookmark is made
       newBookmark: {pool: "", identifier: null, groupParent: "", title: "", author: ""},
-      addBoomkarkTrigger: null,
       searching: false,
       public: [],
       bookmarks: [],
@@ -69,7 +68,7 @@ export const useBookmarkStore = defineStore('bookmark', {
          this.$reset()
       },
 
-      showAddBookmark( pool, details, trigger ) {
+      showAddBookmark( pool, details ) {
          this.newBookmark = {pool: pool, identifier: details.identifier }
 
           // normalize the various data sources into a simplified newBookmark struct
@@ -100,7 +99,6 @@ export const useBookmarkStore = defineStore('bookmark', {
          }
 
          this.showAddDialog = true
-         this.addBoomkarkTrigger = trigger
       },
 
       async addBookmark( folder  ) {
@@ -124,10 +122,6 @@ export const useBookmarkStore = defineStore('bookmark', {
       clearAddBookmark() {
          this.newBookmark = {}
          this.showAddDialog = false
-         if ( this.addBoomkarkTrigger ) {
-            this.addBoomkarkTrigger.focus()
-            this.addBoomkarkTrigger = null
-         }
       },
 
       setPublicBookmarks(data) {

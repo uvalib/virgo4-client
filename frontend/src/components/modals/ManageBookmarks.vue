@@ -1,8 +1,6 @@
 <template>
-   <VirgoButton @click="openClicked" ref="trigger" aria-label="manage selected bookmark storage" label="Move/Copy" :disabled="props.bookmarks.length == 0"/>
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Manage Bookmark Storage"
-      @hide="closeDialog" @show="opened" :draggable="false"
-   >
+   <VirgoButton @click="showDialog = true" aria-label="manage selected bookmark storage" label="Move/Copy" :disabled="props.bookmarks.length == 0"/>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Manage Bookmark Storage" @show="opened" :draggable="false">
       <div class="panels">
          <div class="panel">
             <p>Selected bookmark(s):</p>
@@ -28,7 +26,7 @@
          <p v-if="errorMessage" class="error">{{errorMessage}}</p>
       </div>
       <template #footer>
-         <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
+         <VirgoButton severity="secondary" @click="showDialog = true" label="Cancel"/>
          <VirgoButton @click="okClicked" :disabled="okDisabled" label="OK"/>
       </template>
    </Dialog>
@@ -53,25 +51,14 @@ const props = defineProps({
    }
 })
 
-const trigger = ref()
 const showDialog = ref(false)
 const selectedFolderIDs = ref([])
 const errorMessage = ref("")
 const okDisabled = ref(false)
 
-const openClicked = (() => {
-   showDialog.value = true
-})
-
 const opened = (() => {
    errorMessage.value = ""
    selectedFolderIDs.value = [ props.srcFolder ]
-})
-
-const closeDialog = (() => {
-   showDialog.value = false
-   // If the act was a move and there are now no bookmarks in the source folder, the trigger button will be gone
-   if ( trigger.value ) trigger.value.$el.focus()
 })
 
 const okClicked = ( async () => {
@@ -81,7 +68,7 @@ const okClicked = ( async () => {
        return
    }
    await bookmarkStore.manageSelectedBookmarks(props.srcFolder, props.bookmarks, selectedFolderIDs.value)
-   closeDialog()
+   showDialog.value = false
 })
 </script>
 

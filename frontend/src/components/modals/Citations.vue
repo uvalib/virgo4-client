@@ -1,8 +1,6 @@
 <template>
-   <VirgoButton text rounded label="Cite" icon="fas fa-quote-right fa-lg" @click="showDialog = true" ref="trigger"/>
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Citations"
-      @hide="closeDialog" @show="opened" :draggable="false"
-   >
+   <VirgoButton text rounded label="Cite" icon="fas fa-quote-right fa-lg" @click="showDialog = true" />
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Citations" @show="opened" :draggable="false">
       <div class="citations-content">
          <div class="working" v-if="loading" >
             <V4Spinner message="Gathering citations..."/>
@@ -28,7 +26,7 @@
 
       </div>
       <template #footer>
-         <VirgoButton @click="closeDialog" label="Cancel" severity="secondary"/>
+         <VirgoButton @click="showDialog = false" label="Cancel" severity="secondary"/>
          <VirgoButton @click="copyCitation" label="Copy citation" v-focus/>
       </template>
    </Dialog>
@@ -56,7 +54,6 @@ const failed = ref(false)
 const citations = ref(null)
 const selectedIdx = ref(0)
 const showDialog = ref(false)
-const trigger = ref(null)
 const message = ref("")
 const copied = ref(false)
 
@@ -78,11 +75,6 @@ const opened = (() => {
       failed.value = true
       citations.value = error
    })
-})
-
-const closeDialog = (() => {
-   showDialog.value = false
-   trigger.value.$el.focus()
 })
 
 const copyCitation = (() => {

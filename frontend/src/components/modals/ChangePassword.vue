@@ -1,7 +1,7 @@
 <template>
-   <VirgoButton  @click="passwords.showChangePass = true" v-if="passwords.isPasswordReset == false" :disabled="passwords.showChangePass" ref="trigger" label="Change password"/>
-   <Dialog v-model:visible="passwords.showChangePass" :modal="true" position="top" header="Change Password"
-      @hide="closeChangeDialog" @show="opened" :draggable="false"
+   <VirgoButton  @click="passwords.showChangePass = true" v-if="passwords.isPasswordReset == false" label="Change password"/>
+   <Dialog v-model:visible="passwords.showChangePass" :modal="true" position="top"
+      header="Change Password" @show="opened" :draggable="false"
    >
       <p>New passwords must: </p>
       <ul>
@@ -20,7 +20,6 @@
                ['length',6,25],
                ['matches', /^[A-Za-z0-9-!,@#$%&*+()_? ]*$/]
             ]"
-            validation-visibility="blur"
             :validation-messages="{
                matches: 'Password does not match requirements listed above.',
             }"
@@ -51,7 +50,6 @@ const passwords = usePasswordStore()
 const currPassword = ref("")
 const newPassword = ref("")
 const confirmPassword = ref("")
-const trigger = ref(null)
 const pwform = ref()
 
 onMounted(()=> {
@@ -69,9 +67,6 @@ const opened = (() => {
 
 const closeChangeDialog = (() => {
    passwords.showChangePass = false
-   if(trigger.value) {
-      trigger.value.$el.focus()
-   }
    let query = Object.assign({}, route.query)
    if ( query.token )  {
       delete query.token

@@ -1,12 +1,12 @@
 <template>
    <VirgoButton v-if="system.isKiosk==false && !props.labeled" size="large"
       text rounded role="switch" @click="bookmarkClicked" :icon="bookmarkIcon"
-      :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
+      :aria-checked="bookmarkCount > 0"
       aria-label="toggle item bookmark"
       :class="{checked: bookmarkCount > 0}" />
    <VirgoButton v-if="system.isKiosk==false && props.labeled" label="Bookmark"
       text rounded role="switch" @click="bookmarkClicked" :icon="bookmarkIcon"
-      :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
+      :aria-checked="bookmarkCount > 0"
       :class="{checked: bookmarkCount > 0}" />
 </template>
 
@@ -37,7 +37,6 @@ const props = defineProps({
 const system = useSystemStore()
 const bookmarkStore = useBookmarkStore()
 const confirm = useConfirm()
-const bookmarkbtn = ref()
 
 const bookmarkIcon = computed(() => {
    let sz = ""
@@ -57,7 +56,7 @@ const bookmarkCount = computed(()=>{
 const bookmarkClicked = (() => {
    emit("clicked")
    if ( bookmarkCount.value == 0) {
-      bookmarkStore.showAddBookmark( props.pool, props.data, bookmarkbtn.value.$el )
+      bookmarkStore.showAddBookmark( props.pool, props.data )
       return
    }
 
@@ -79,9 +78,6 @@ const bookmarkClicked = (() => {
       },
       accept: () => {
          removeBookmark()
-      },
-      reject: () => {
-         bookmarkbtn.value.$el.focus()
       }
    })
 })
@@ -95,7 +91,6 @@ const removeBookmark = ( () => {
       })
    })
    analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', props.data.identifier)
-   bookmarkbtn.value.$el.focus()
 })
 </script>
 

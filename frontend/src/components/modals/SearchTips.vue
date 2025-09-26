@@ -1,7 +1,7 @@
 <template>
    <div id="search-tips">
-      <VirgoButton severity="secondary" variant="outlined"  ref="trigger" @click="showDialog = true" label="Help me search"/>
-      <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Help me search" :draggable="false">
+      <VirgoButton severity="secondary" variant="outlined" @click="showDialog = true" label="Help me search"/>
+      <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Help me search" :draggable="false" @show="tipsOpened">
          <div class="tips">
             <div class="section">How to search</div>
             <ul class="dots">
@@ -48,9 +48,8 @@ import analytics from '@/analytics'
 import { ref } from 'vue'
 
 const showDialog = ref(false)
-const trigger = ref(null)
 
-const showDisclosure = (() => {
+const tipsOpened = (() => {
    analytics.trigger('Help', 'SEARCH_TIPS')
 })
 </script>

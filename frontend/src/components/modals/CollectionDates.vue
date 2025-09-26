@@ -1,8 +1,6 @@
 <template>
-   <VirgoButton @click="showDialog=true" aria-label="calendar" ref="trigger"
-      icon="fal fa-calendar-alt" text rounded size="large"/>
-
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog" @show="opened" :draggable="false">
+   <VirgoButton @click="showDialog=true" aria-label="calendar" icon="fal fa-calendar-alt" text rounded size="large"/>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="showDialog=false" @show="opened" :draggable="false">
       <DatePicker v-model="picked"  inline dateFormat="yy-mm-dd" :disabledDates="collection.notPublishedDates"
          :minDate="minDate" :maxDate="maxDate" @year-change="yearChanged" @month-change="monthChanged" @update:model-value="datePicked"
          :pt="{
@@ -38,11 +36,11 @@ const props = defineProps({
 
 const collection = useCollectionStore()
 const showDialog = ref(false)
-const trigger = ref()
 const picked = ref()
 const error = ref("")
 
 const opened = (() => {
+   error.value = ""
    picked.value = new Date(`${props.date}T12:00:00Z`)
 })
 
@@ -74,19 +72,9 @@ const datePicked = (() => {
       error.value = `No ${collection.itemLabel.toLowerCase()} was found for ${picked.value}`
    }
 })
-
-const closeDialog = (() => {
-   error.value = ""
-   showDialog.value = false
-   trigger.value.$el.focus()
-})
 </script>
 
 <style lang="scss" scoped>
-:deep(.p-disabled) {
-   opacity: 0.2;
-}
-
 #collection-date-picker {
    width: 100%;
    max-width: 300px;

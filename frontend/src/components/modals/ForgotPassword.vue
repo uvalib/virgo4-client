@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton link @click="passwords.showForgotPass = true" :disabled="passwords.showForgotPass" ref="trigger" label="Forgot your password?"/>
+   <VirgoButton link @click="passwords.showForgotPass = true" label="Forgot your password?"/>
    <Dialog v-model:visible="passwords.showForgotPass" :modal="true" position="top" header="Forgot Password"
       @hide="closeDialog" @show="opened" :draggable="false"
    >
@@ -14,7 +14,7 @@
          <div v-if="passwords.error" class="error" v-html="passwords.error"></div>
       </div>
       <template #footer>
-         <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
+         <VirgoButton severity="secondary" @click="passwords.showForgotPass = false" label="Cancel"/>
          <VirgoButton label="OK" @click="okClicked" :loading="passwords.working" />
       </template>
    </Dialog>
@@ -24,24 +24,16 @@
 import { usePasswordStore } from "@/stores/password"
 import { ref } from 'vue'
 import Dialog from 'primevue/dialog'
-import { setFocusID } from '@/utils'
 
 const passwords = usePasswordStore()
 const userId = ref("")
-const trigger = ref(null)
 
 const opened = (() => {
    userId.value = ""
-   setFocusID("forgot-id")
-})
-
-const closeDialog = (() => {
-   passwords.showForgotPass = false
-   trigger.value.$el.focus()
 })
 
 const okClicked = ( async () => {
-   passwords.forgotPassword( userId.value)
+   passwords.forgotPassword( userId.value )
 })
 </script>
 

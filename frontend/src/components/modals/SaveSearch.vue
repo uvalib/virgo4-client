@@ -1,8 +1,6 @@
 <template>
-   <VirgoButton @click="openSaveClicked" ref="trigger">Save Search</VirgoButton>
-   <Dialog v-model:visible="searches.showSaveDialog" :modal="true" position="top" header="Save Search"
-      @hide="closeDialog" @show="opened" :draggable="false"
-   >
+   <VirgoButton @click="openSaveClicked">Save Search</VirgoButton>
+   <Dialog v-model:visible="searches.showSaveDialog" :modal="true" position="top" header="Save Search" @show="opened" :draggable="false">
       <div class="save-panel">
          <template v-if="showSignInMessage">
             <p>You must be signed in to save searches.</p>
@@ -32,9 +30,9 @@
          </template>
       </div>
       <template #footer>
-         <VirgoButton v-if="showSignInMessage || saved || searches.duplicate" severity="secondary" @click="closeDialog">Close</VirgoButton>
+         <VirgoButton v-if="showSignInMessage || saved || searches.duplicate" severity="secondary" @click="searches.showSaveDialog = false">Close</VirgoButton>
          <template v-else>
-            <VirgoButton severity="secondary" @click="closeDialog">Cancel</VirgoButton>
+            <VirgoButton severity="secondary" @click="searches.showSaveDialog = false">Cancel</VirgoButton>
             <VirgoButton @click="saveClicked" :disabled="searches.working">Save</VirgoButton>
          </template>
       </template>
@@ -57,7 +55,6 @@ const restore = useRestoreStore()
 const route = useRoute()
 const router = useRouter()
 
-const trigger = ref()
 const showSignInMessage = ref(false)
 const searchName = ref("")
 const error = ref("")
@@ -73,14 +70,10 @@ const openSaveClicked = (() => {
    searches.showSaveDialog = true
 })
 
-const closeDialog = (() => {
-   searches.showSaveDialog = false
-   trigger.value.$el.focus()
-})
 
 const signInClicked = (() => {
    restore.setRestoreSaveSearch()
-   closeDialog()
+   searches.showSaveDialog = false
    router.push("/signin")
 })
 

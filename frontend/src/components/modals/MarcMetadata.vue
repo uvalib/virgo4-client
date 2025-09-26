@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton @click="showDialog=true" ref="trigger" severity="secondary" size="small" label="MARC XML" icon="fal fa-code" iconPos="right"/>
+   <VirgoButton @click="showDialog=true" severity="secondary" size="small" label="MARC XML" icon="fal fa-code" iconPos="right"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="MARC XML" style="width:75%" :maximizable="true" :draggable="false">
       <pre class="xml">{{ beautifiedXML }}</pre>
    </Dialog>

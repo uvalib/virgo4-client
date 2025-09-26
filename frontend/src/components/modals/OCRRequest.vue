@@ -1,8 +1,6 @@
 <template>
-   <VirgoButton link @click="ocrClicked" ref="trigger" size="small" :tabindex="props.tabindex" label="Download full text"/>
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Extract Item Text"
-      @hide="closeDialog" @show="opened" :draggable="false"
-   >
+   <VirgoButton link @click="ocrClicked" size="small" :tabindex="props.tabindex" label="Download full text"/>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Extract Item Text" @show="opened" :draggable="false">
       <div v-if="mode=='init'" class="searching">
          <V4Spinner message="Searching for item text..." />
       </div>
@@ -27,7 +25,7 @@
       </div>
       <p class="error" v-if="error">{{error}}</p>
       <template #footer v-if="mode!='init'" >
-         <VirgoButton v-if="mode != 'submitted'" severity="secondary" @click="closeDialog" label="Cancel"/>
+         <VirgoButton v-if="mode != 'submitted'" severity="secondary" @click="showDialog = false" label="Cancel"/>
          <VirgoButton @click="okClicked" label="OK"/>
       </template>
    </Dialog>
@@ -55,7 +53,6 @@ const props = defineProps({
 const user = useUserStore()
 const item = useItemStore()
 
-const trigger = ref()
 const showDialog = ref(false)
 const email = ref("")
 const error = ref("")
@@ -85,17 +82,12 @@ const ocrClicked = ( async () => {
 const opened = (() => {
    email.value = user.singleEmail
    error.value = ""
-})
-
-const closeDialog = (() => {
-   showDialog.value = false
-   trigger.value.$el.focus()
    mode.value = "init"
 })
 
 const okClicked = (async () => {
    if ( mode.value == "submitted") {
-      closeDialog()
+      showDialog.value = false
       return
    }
    if ( mode.value == "request") {

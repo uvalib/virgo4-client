@@ -1,7 +1,7 @@
 <template>
-   <VirgoButton @click="showUpdateDialog = true" :disabled="showUpdateDialog" ref="trigger" label="Register for ILLiad account"/>
+   <VirgoButton @click="showUpdateDialog = true" label="Register for ILLiad account"/>
    <Dialog v-model:visible="showUpdateDialog" :modal="true" position="top" :style="dialogWidth"
-      :draggable="false" header="ILLiad Registration" @hide="closeDialog" @show="opened"
+      :draggable="false" header="ILLiad Registration" @show="opened"
    >
       <FormKit type="form" id="illiad-register" :actions="false" @submit="submitRegistration" ref="illiadform">
          <div class="help">If you have any questions about the completion of this form, please contact the ILS office at (434) 982-2617.</div>
@@ -80,7 +80,7 @@
          <div class="footer-wrap">
             <p v-if="error" class="error">{{ error }}</p>
             <div class="buttons">
-               <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
+               <VirgoButton severity="secondary" @click="showUpdateDialog = false" label="Cancel"/>
                <VirgoButton @click="illiadform.node.submit()" label="Register" :loading="working"/>
             </div>
          </div>
@@ -93,7 +93,6 @@ import { ref,computed,nextTick } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
 import Dialog from 'primevue/dialog'
-import { setFocusID } from '@/utils'
 import { useWindowSize } from '@vueuse/core'
 import axios from 'axios'
 
@@ -104,7 +103,6 @@ const { height } = useWindowSize()
 const showUpdateDialog = ref(false)
 const working = ref(false)
 const error = ref("")
-const trigger = ref(null)
 const illiadform = ref(null)
 
 const registration = ref({
@@ -167,12 +165,6 @@ const opened = (() => {
    registration.value.buildingName = ""
    registration.value.roomNumber = ""
    registration.value.pickupLocation = ""
-   setFocusID("firstname")
-})
-
-const closeDialog = (() => {
-   showUpdateDialog.value = false
-   trigger.value.$el.focus()
 })
 
 const deliveryMethodChanged = ( (newMethod) => {

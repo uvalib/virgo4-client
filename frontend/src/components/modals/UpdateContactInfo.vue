@@ -1,8 +1,8 @@
 <template>
-   <VirgoButton @click="showUpdateDialog = true" :disabled="showUpdateDialog" ref="trigger" label="Update my Virgo contact information"/>
+   <VirgoButton @click="showUpdateDialog = true" label="Update my Virgo contact information"/>
    <Dialog v-model:visible="showUpdateDialog" :modal="true" position="top"
       style="max-width: 600px" :draggable="false"
-      header="Update Contact Info" @hide="closeDialog" @show="opened"
+      header="Update Contact Info" @show="opened"
    >
       <FormKit type="form" id="update-contact" :actions="false" @submit="submitUpdate" ref="contactform">
          <div class="scroller">
@@ -31,7 +31,7 @@
          <p v-if="error" class="error" v-html="error"></p>
       </FormKit>
       <template #footer>
-         <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
+         <VirgoButton severity="secondary" @click="showUpdateDialog=false" label="Cancel"/>
          <VirgoButton @click="contactform.node.submit()" label="Update" :disabled="okDisabled"/>
       </template>
    </Dialog>
@@ -42,7 +42,6 @@ import { ref } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
 import Dialog from 'primevue/dialog'
-import { setFocusID } from '@/utils'
 
 const system = useSystemStore()
 const userStore = useUserStore()
@@ -59,7 +58,6 @@ const contact = ref({
 const originalContact = ref({})
 const error = ref("")
 const okDisabled = ref(false)
-const trigger = ref(null)
 const contactform = ref()
 
 const opened = (() => {
@@ -74,16 +72,6 @@ const opened = (() => {
    okDisabled.value = false
    // Shallow clone
    originalContact.value = {...contact.value}
-   if(userStore.isUVA){
-      setFocusID("email")
-   }else{
-      setFocusID("firstname")
-   }
-})
-
-const closeDialog = (() => {
-   showUpdateDialog.value = false
-   trigger.value.$el.focus()
 })
 
 const submitUpdate = (() => {
