@@ -1,8 +1,6 @@
 <template>
    <VirgoButton link @click="passwords.showForgotPass = true" label="Forgot your password?"/>
-   <Dialog v-model:visible="passwords.showForgotPass" :modal="true" position="top" header="Forgot Password"
-      @hide="closeDialog" @show="opened" :draggable="false"
-   >
+   <Dialog v-model:visible="passwords.showForgotPass" :modal="true" position="top" header="Forgot Password" @show="opened" :draggable="false">
       <div class="forgot">
          <p>
             An email will be sent to the address on file with a link to reset your password.<br/>If you need assistance, please

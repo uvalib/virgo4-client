@@ -1,8 +1,7 @@
 <template>
-   <RequestDialog trigger="Request in Special Collections" title="Special Collections Request"
-      request="Next step: Go to Special Collections request system"
-      :show="request.activeRequest=='aeon'" :showSubmit="submitted == false" :disabled="request.working"
-      @opened="dialogOpened" @closed="dialogClosed" @submit="aeonForm.node.submit()"
+   <VirgoButton @click="showDialog=true" class="trigger" label="Request in Special Collections" />
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" :draggable="false"
+      header="Special Collections Request" @show="dialogOpened" @hide="dialogClosed"
    >
       <FormKit v-if="submitted == false" type="form" ref="aeonForm" :actions="false" @submit="submitAeon">
          <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
@@ -26,22 +25,29 @@
          </div>
       </FormKit>
       <ConfirmationPanel v-else />
-   </RequestDialog>
+      <template #footer>
+         <template v-if="submitted == false">
+            <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
+            <VirgoButton label="Next step: Go to Special Collections request system" @click="aeonForm.node.submit()" />
+         </template>
+         <VirgoButton v-else severity="secondary" id="request-done" @click="showDialog=false" label="Close"/>
+      </template>
+   </Dialog>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import RequestDialog from '@/components/requests/dialogs/RequestDialog.vue'
+import Dialog from 'primevue/dialog'
 import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
 import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
-import { setFocusID } from '@/utils'
 
 const request = useRequestStore()
 const selectedItem = ref(null)
 const specialRequest = ref("")
 const submitted = ref(false)
 const aeonForm = ref()
+const showDialog = ref(false)
 
 const dialogOpened = (() => {
    submitted.value = false
@@ -50,9 +56,6 @@ const dialogOpened = (() => {
    request.activeRequest = "aeon"
    if (request.optionItems.length == 1) {
       selectedItem.value = request.optionItems[0].value
-      setFocusID("aeon-item-notes")
-   } else {
-      setFocusID("aeon-item-sel")
    }
    analytics.trigger('Requests', 'REQUEST_STARTED', "aeon")
 })
@@ -68,6 +71,16 @@ const submitAeon = (() => {
 </script>
 
 <style lang="scss" scoped>
+@media only screen and (min-width: 768px) {
+   .trigger {
+      width: auto;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .trigger {
+      width: 100%;
+   }
+}
 .request-footer {
    display: flex;
    flex-direction: column;

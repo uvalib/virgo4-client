@@ -135,15 +135,22 @@ h2 {
 }
 .signin.embedded {
    margin: 0 auto;
+   padding-bottom:0;
 }
 @media only screen and (min-width: 768px) {
    .signin {
       width: 35%;
    }
+   .signin.embedded {
+      width:400px;
+   }
 }
 @media only screen and (max-width: 768px) {
    .signin {
       width: 95%;
+   }
+   .signin.embedded {
+      width:95%;
    }
    div.section {
      margin-left: 0;

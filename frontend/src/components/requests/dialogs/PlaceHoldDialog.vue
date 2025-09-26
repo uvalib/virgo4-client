@@ -1,9 +1,9 @@
 <template>
-   <RequestDialog trigger="Request an item" title="Request Item" request="Place Hold"
-      :show="request.activeRequest=='hold'" :showSubmit="submitted == false && user.isSignedIn"
-      :disabled="request.working" :submit-disabled="pickupLibrary == 'LEO' && user.illiadBlocked" @opened="dialogOpened"
-      @closed="dialogClosed" @submit="holdForm.node.submit()">
-      <SignIn v-if="!user.isSignedIn" />
+   <VirgoButton class="trigger" @click="showDialog=true" label="Request an item" />
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" :draggable="false"
+      header="Request Item" @show="dialogOpened" @hide="dialogClosed"
+   >
+      <SignIn v-if="!user.isSignedIn" :embedded="true"/>
       <FormKit v-else-if="submitted == false" type="form" ref="holdForm" :actions="false" @submit="placeHold">
          <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
             v-model="selectedItem" id="item-sel" placeholder="Select an item"
@@ -50,12 +50,19 @@
          <p class="error" v-if="request.errors.sirsi">{{request.errors.sirsi.join(', ')}}</p>
       </FormKit>
       <ConfirmationPanel v-else />
-   </RequestDialog>
+      <template #footer>
+         <template v-if="submitted == false && user.isSignedIn">
+            <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
+            <VirgoButton label="Request an item" @click="holdForm.node.submit()" />
+         </template>
+         <VirgoButton v-else severity="secondary" id="request-done" @click="showDialog=false" label="Close"/>
+      </template>
+   </Dialog>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import RequestDialog from '@/components/requests/dialogs/RequestDialog.vue'
+import Dialog from 'primevue/dialog'
 import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
 import SignIn from "@/views/SignIn.vue"
 import { useRestoreStore } from "@/stores/restore"
@@ -64,7 +71,6 @@ import { useUserStore } from "@/stores/user"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
-import { setFocusID } from '@/utils'
 import ILLiadRegistration from '@/components/modals/ILLiadRegistration.vue'
 import ILLiadMessages from '@/components/ILLiadMessages.vue'
 
@@ -78,6 +84,7 @@ const holdForm = ref()
 const selectedItem = ref(null)
 const pickupLibrary = ref()
 const submitted = ref(false)
+const showDialog = ref(false)
 
 const pickupLibraries = computed(()=>{
    if ( selectedItem.value && selectedItem.value.callNumber.includes("Ivy limited circulation") ) {
@@ -105,9 +112,6 @@ const dialogOpened = (() => {
       analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
       if ( request.optionItems.length == 1) {
          selectedItem.value = request.optionItems[0].value
-         setFocusID("pickup-sel")
-      } else {
-         setFocusID("item-sel")
       }
    }
 })
@@ -145,7 +149,16 @@ const placeHold = ( async () => {
    gap: 10px;
    margin: 20px 0;
 }
-
+@media only screen and (min-width: 768px) {
+   .trigger {
+      width: auto;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .trigger {
+      width: 100%;
+   }
+}
 form {
    .error {
       color: $uva-red-A;

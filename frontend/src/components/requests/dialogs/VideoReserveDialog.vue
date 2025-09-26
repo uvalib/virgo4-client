@@ -1,7 +1,7 @@
 <template>
-   <RequestDialog trigger="Video reserve request" title="Video Reserve Request" request="Submit"
-      :show="request.activeRequest=='videoReserve'" :showSubmit="submitted == false" :disabled="request.working"
-      @opened="dialogOpened" @closed="dialogClosed" @submit="videoForm.node.submit()"
+   <VirgoButton class="trigger" @click="showDialog=true" label="Video reserve request" />
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" :draggable="false"
+      header="Video Reserve Request" @show="dialogOpened" @hide="dialogClosed"
    >
       <SignIn v-if="!user.isSignedIn" />
       <FormKit v-else-if="submitted == false" type="form" ref="videoForm" :actions="false" @submit="submit">
@@ -47,12 +47,19 @@
 
       </FormKit>
       <ReservedPanel v-else />
-   </RequestDialog>
+      <template #footer>
+         <template v-if="submitted == false && user.isSignedIn">
+            <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
+            <VirgoButton label="Video reserve request" @click="videoForm.node.submit()" />
+         </template>
+         <VirgoButton v-else severity="secondary" id="request-done" @click="showDialog=false" label="Close"/>
+      </template>
+   </Dialog>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import RequestDialog from '@/components/requests/dialogs/RequestDialog.vue'
+import { ref } from 'vue'
+import Dialog from 'primevue/dialog'
 import ReservedPanel from "@/components/requests/panels/ReservedPanel.vue"
 import SignIn from "@/views/SignIn.vue"
 import { useRestoreStore } from "@/stores/restore"
@@ -61,7 +68,6 @@ import { useRequestStore } from "@/stores/request"
 import { useReserveStore } from "@/stores/reserve"
 import { useItemStore } from "@/stores/item"
 import { useUserStore } from "@/stores/user"
-import { setFocusID } from '@/utils'
 
 const request = useRequestStore()
 const reserve = useReserveStore()
@@ -70,6 +76,7 @@ const route = useRoute()
 const user = useUserStore()
 const restore = useRestoreStore()
 
+const showDialog = ref(false)
 const selectedVideo = ref(null)
 const audioLanguage = ref("English")
 const subtitles = ref("no")
@@ -94,7 +101,6 @@ const dialogOpened = (() => {
          selectedVideo.value = request.optionItems[0].value
       }
       reserve.request.lms = "A&S Canvas"
-      setFocusID("behalf_of")
    }
 })
 
@@ -119,4 +125,14 @@ const submit = (async () => {
 </script>
 
 <style lang="scss" scoped>
+@media only screen and (min-width: 768px) {
+   .trigger {
+      width: auto;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .trigger {
+      width: 100%;
+   }
+}
 </style>
