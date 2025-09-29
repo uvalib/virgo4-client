@@ -9,11 +9,6 @@
             @click="directLinkClicked(request.directLink)"
          />
       </div>
-      <div class="help">
-         Other request types and requests for different materials can be made from
-         <router-link @click="helpClicked('requests')" to="/requests">"Requests"</router-link> under
-         <router-link @click="helpClicked('account')" to="/account">"My Account"</router-link>.
-      </div>
    </section>
 </template>
 
@@ -24,7 +19,6 @@ import ScanRequestDialog from "@/components/requests/dialogs/ScanRequestDialog.v
 import VideoReserveDialog from "@/components/requests/dialogs/VideoReserveDialog.vue"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
-import analytics from '@/analytics'
 
 const request = useRequestStore()
 const user = useUserStore()
@@ -32,10 +26,6 @@ const user = useUserStore()
 const directLinkClicked = ( (url) => {
    let tab = window.open(url, '_blank')
    tab.focus()
-})
-
-const helpClicked = ((tgt) => {
-   analytics.trigger('NavigationHelp', 'REQUEST_LINK_CLICKED', tgt)
 })
 
 </script>
