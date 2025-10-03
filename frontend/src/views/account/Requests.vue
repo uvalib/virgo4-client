@@ -13,38 +13,49 @@
             </div>
             <div v-else class="subcontent">
                <div class="instructions">
-                  <h4>UVA Materials Scanning Request</h4>
                   <div>
-                     Submit a scanning request using one of the forms below.
+                     To request an item for pickup, click the &quot;<strong>Request item</strong>&quot; button in the item's record and follow the prompts. This option will not be available for all items.
+                  </div>
+                  <h4>For course materials</h4>
+                  <div>
                      <ul>
-                        <li>To place an article or book chapter request for personal research, submit the Research Scanning form.</li>
-                        <li>Materials requested via the Instructional Scanning form will be delivered in a format the meets the new accessibility for classroom use.</li>
-                        <li>To request remediation of a PDF that is intended for classroom instructional use, submit the PDF Remediation form, which will allow you to upload your PDF.</li>
+                        <li>
+                           <VirgoButton @click="instructionalScanClick" variant="link" label="Make an instructional scanning request" :disabled="requestStore.otherRequestsDisabled"/>
+                           for course materials or for materials posted to Canvas. </li>
+                        <li>
+                           <VirgoButton @click="pdfRemediationClick" variant="link" label="Make a PDF remediation request" :disabled="requestStore.isRemediateDisabled"/>
+                           for updating or improving the accessibility of an older scan made from sources available in the UVA Library collection.
+                        </li>
                      </ul>
                   </div>
+                  <h4>For research materials</h4>
+                  <ul>
+                     <li>
+                        <VirgoButton @click="researchScanClick"  variant="link" label="Make a research scanning request" :disabled="requestStore.otherRequestsDisabled"/>
+                        for materials supporting your personal research.
+                     </li>
+                  </ul>
+                  <h4>For items UVA doesn't own</h4>
+                  <ul>
+                     <li>Submit an interlibrary loan (ILL) request to borrow an item from another institution. Please note that items supplied from ILL are for personal research only (<strong>not</strong> for course materials) and are not eligible for the Library's accessibility remediation service.
+                        <ul>
+                           <li><VirgoButton @click="illBorrowClick" variant="link" label="ILL Borrow Item" :disabled="requestStore.otherRequestsDisabled"/></li>
+                           <li><VirgoButton @click="illBorrowAVClick" variant="link" label="ILL Borrow A/V" :disabled="requestStore.otherRequestsDisabled"/></li>
+                           <li><VirgoButton @click="illScanClick" variant="link" label="ILL Scan Chapter/Article" :disabled="requestStore.otherRequestsDisabled"/></li>
+                        </ul>
+                     </li>
+                     <li>
+                        <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank" aria-describedby="new-window">
+                           Recommend a purchase<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
+                        </a>
+                     </li>
+                  </ul>
                </div>
-               <div class="buttons">
-                  <VirgoButton @click="researchScanClick" label="Research Scanning" :disabled="requestStore.otherRequestsDisabled"/>
-                  <VirgoButton @click="instructionalScanClick" label="Instructional Scanning" :disabled="requestStore.otherRequestsDisabled"/>
-                  <VirgoButton @click="pdfRemediationClick" label="PDF Remediation Request" :disabled="requestStore.isRemediateDisabled"/>
-               </div>
-               <div class="instructions">
-                  <h4>LEO - UVA Materials Delivery Request</h4>
-                  <div>
-                     Faculty, staff and graduate students: To request physical delivery of Library materials to your campus
-                     department mail room, search for an item in Virgo and use the "Request Item" button.
-                  </div>
-                  <h4>InterLibrary Loan Request</h4>
-                  <div>
-                     Submit an ILL request for an item not owned by the UVA Library using one of the forms below. Items
-                     supplied via ILL are intended for personal research use only and are not eligible for the Library's
-                     accessibility remediation service or for further dissemation as course materials.
-                  </div>
-               </div>
-               <div class="buttons">
-                  <VirgoButton @click="illBorrowClick" label="ILL Borrow Item" :disabled="requestStore.otherRequestsDisabled"/>
-                  <VirgoButton @click="illBorrowAVClick" label="ILL Borrow A/V" :disabled="requestStore.otherRequestsDisabled"/>
-                  <VirgoButton @click="illScanClick" label="ILL Scan Chapter/Article" :disabled="requestStore.otherRequestsDisabled"/>
+               <div class="helper">
+                  Many of these actions can also be made directly from an item page in Virgo.<br/>
+                  <a href="https://library.virginia.edu/services/request" target="_blank" aria-describedby="new-window">
+                     Learn more about how to make a request in Virgo.<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
+                  </a>
                </div>
                <div class="reason ils-error" v-if="requestStore.otherRequestsDisabled">
                   You have reached the maximum of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
@@ -52,7 +63,6 @@
                <div class="reason ils-error" v-if="requestStore.isRemediateDisabled">
                   You have reached the maximum of {{ requestStore.requestStats.remediationLimit }} active remediation requests.
                </div>
-               <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank" aria-describedby="new-window">Purchase Request<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i></a>
             </div>
 
             <template v-if="request">
@@ -386,6 +396,13 @@ onMounted(() =>{
    text-align: left;
    padding-bottom: 75px;
 
+   a {
+      font-weight: bold;
+      i.link-icon {
+         margin-left: 5px !important;
+      }
+   }
+
    h3 {
       margin: 10px 0 5px 0;
       font-size: 1.25em;
@@ -406,6 +423,16 @@ onMounted(() =>{
          }
          ul {
             margin: 10px 0;
+         }
+         .p-button.p-component.p-button-link {
+            padding: 0;
+            :deep(span.p-button-label) {
+               font-weight: bold;
+            }
+         }
+         .p-button.p-component.p-button-link:disabled {
+            opacity: 1;
+            color: $uva-grey-A;
          }
       }
       .buttons {
