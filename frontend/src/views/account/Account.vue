@@ -175,12 +175,11 @@
          </div>
 
          <div class="account-group" v-if="userStore.canUseILLiad">
-            <!-- FIX ME THIS IS FOR TEST. BOTH SHOULD BE !userStore.hasIlliad -->
             <h3>
                <span>ILLiad</span>
-                <i v-if="userStore.hasIlliad" class="alert fas fa-exclamation-triangle"></i>
+                <i v-if="userStore.hasIlliad == false" class="alert fas fa-exclamation-triangle"></i>
             </h3>
-            <div class="no-illiad" v-if="userStore.hasIlliad">
+            <div class="no-illiad" v-if="userStore.hasIlliad  == false">
                <div>No ILLiad account found.</div>
                <ILLiadRegistration />
             </div>
@@ -188,15 +187,18 @@
                <div v-if="userStore.illiadBlocked" class="illiad-info">
                   <ILLiadMessages />
                </div>
-               <dl v-if="userStore.leoLocation">
-                  <dt>LEO Delivery Location:</dt>
-                  <dd>
-                     {{userStore.leoLocation}}
-                  </dd>
-                  <p>
-                     <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad account">Visit ILLiad</a> to change your LEO delivery location.
-                  </p>
-               </dl>
+               <template v-else>
+                  <ILLiadRegistration /> <!-- HACK REMOVE ME -->
+                  <dl v-if="userStore.leoLocation">
+                     <dt>LEO Delivery Location:</dt>
+                     <dd>
+                        {{userStore.leoLocation}}
+                     </dd>
+                     <p>
+                        <a target="_blank" aria-describedby="new-window" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad account">Visit ILLiad</a> to change your LEO delivery location.
+                     </p>
+                  </dl>
+               </template>
             </template>
          </div>
 

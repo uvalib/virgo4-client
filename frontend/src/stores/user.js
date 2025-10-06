@@ -682,7 +682,10 @@ export const useUserStore = defineStore('user', {
             msg += "<a href='https://search.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
             system.setError(msg)
          })
-
+      },
+      illiadRegistrationSubmitted() {
+         this.illiad.hasAccount = true
+         this.illiad.cleared = "No"
       }
    }
 })

@@ -37,9 +37,66 @@ func (svc *ServiceContext) illiadRegistrationRequest(c *gin.Context) {
 		return
 	}
 
-	log.Printf("%+v", req)
+	type illRegRequest struct {
+		UserName           string `json:"UserName"`       // computeID
+		ExternalUserID     string `json:"ExternalUserId"` // computeID
+		LastName           string `json:"LastName"`
+		FirstName          string `json:"FirstName"`
+		Status             string `json:"Status"`
+		EMailAddress       string `json:"EMailAddress"`
+		Phone              string `json:"Phone"`
+		Department         string `json:"Department"`
+		Address            string `json:"Address"`
+		Address2           any    `json:"Address2"`
+		City               string `json:"City"`
+		State              string `json:"State"`
+		Zip                string `json:"Zip"`
+		Fax                string `json:"Fax"`                // preferred delivery method
+		Nvtgc              string `json:"NVTGC"`              // pickup library
+		Country            string `json:"Country"`            // delivery building for leo to department
+		Organization       string `json:"Organization"`       // delivery room number for leo to department
+		UserInfo1          string `json:"UserInfo1"`          // school
+		NotificationMethod string `json:"NotificationMethod"` // Electronic
+		DeliveryMethod     string `json:"DeliveryMethod"`     // Hold for Pickup
+		LoanDeliveryMethod string `json:"LoanDeliveryMethod"` // Hold for Pickup
+	}
+	illReq := illRegRequest{
+		UserName: req.ComputeID, ExternalUserID: req.ComputeID,
+		LastName: req.LastName, FirstName: req.FirstName,
+		Status: req.Status, EMailAddress: req.Email, Phone: req.Phone,
+		Department: req.Department, UserInfo1: req.School,
+		Address: req.Address1, Address2: req.Address2,
+		City: req.City, State: req.State, Zip: req.Zip,
+		NotificationMethod: "Electronic", DeliveryMethod: "Hold for Pickup", LoanDeliveryMethod: "Hold for Pickup",
+		Fax: req.DeliveryMethod,
+	}
 
-	c.String(http.StatusNotImplemented, "nope")
+	// delivery methods: {Dept: 'LEO to Department', Library: 'LEO to Library', Address: 'Send to address'}
+	switch req.DeliveryMethod {
+	case "Dept":
+		log.Printf("INFO: preferred pickup is leo to department")
+		illReq.Country = req.Building
+		illReq.Organization = req.Room
+	case "Library":
+		log.Printf("INFO: preferred pickup is leo to library")
+		illReq.Nvtgc = req.PickupLocation
+	case "Address":
+		log.Printf("INFO: preferred pickup is send to address")
+		// nothing more to do; deliver to address specified in user info
+	default:
+		log.Printf("ERROR: invalid delivery method %s", req.DeliveryMethod)
+		c.String(http.StatusBadRequest, fmt.Sprintf("invalid delivery method %s", req.DeliveryMethod))
+		return
+	}
+
+	_, illErr := svc.ILLiadRequest("POST", "/Users", illReq)
+	if illErr != nil {
+		log.Printf("ERROR: ILLiad registration request failed: %s", illErr.Message)
+		c.String(http.StatusInternalServerError, illErr.Message)
+		return
+	}
+
+	c.String(http.StatusOK, "ok")
 }
 
 // GetILLiadRequests gets all active ILLiad requests for a user
