@@ -12,18 +12,29 @@
                <ILLiadMessages />
             </div>
             <div v-else class="subcontent">
-               <div class="instructions">
+               <div class="instructions"> <!-- add  v-if="request == ''" to hide instructions when a form is selected -->
                   <div>
                      To request an item for pickup, click the &quot;<strong>Request item</strong>&quot; button in the item's record and follow the prompts. This option will not be available for all items.
                   </div>
+                  <div class="errors" v-if="requestStore.otherRequestsDisabled || requestStore.isRemediateDisabled">
+                  <div class="reason ils-error" v-if="requestStore.otherRequestsDisabled">
+                     You have reached the <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
+                        limit<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
+                     </a>
+                     of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
+                  </div>
+                  <div class="reason ils-error" v-if="requestStore.isRemediateDisabled">
+                     You have reached the limit of {{ requestStore.requestStats.remediationLimit }} active remediation requests.
+                  </div>
+               </div>
                   <h4>For course materials</h4>
                   <div>
                      <ul>
                         <li>
-                           <VirgoButton @click="instructionalScanClick" variant="link" label="Make an instructional scanning request" :disabled="requestStore.otherRequestsDisabled"/>
+                           <a href="#" @click="instructionalScanClick">Make an instructional scanning request</a>
                            for course materials or for materials posted to Canvas. </li>
                         <li>
-                           <VirgoButton @click="pdfRemediationClick" variant="link" label="Make a PDF remediation request" :disabled="requestStore.isRemediateDisabled"/>
+                           <a href="#" @click="pdfRemediationClick">Make a PDF remediation request</a>
                            for updating or improving the accessibility of an older scan made from sources available in the UVA Library collection.
                         </li>
                      </ul>
@@ -31,7 +42,7 @@
                   <h4>For research materials</h4>
                   <ul>
                      <li>
-                        <VirgoButton @click="researchScanClick"  variant="link" label="Make a research scanning request" :disabled="requestStore.otherRequestsDisabled"/>
+                        <a href="#" @click="researchScanClick">Make a research scanning request</a>
                         for materials supporting your personal research.
                      </li>
                   </ul>
@@ -39,9 +50,9 @@
                   <ul>
                      <li>Submit an interlibrary loan (ILL) request to borrow an item from another institution. Please note that items supplied from ILL are for personal research only (<strong>not</strong> for course materials) and are not eligible for the Library's accessibility remediation service.
                         <ul>
-                           <li><VirgoButton @click="illBorrowClick" variant="link" label="ILL Borrow Item" :disabled="requestStore.otherRequestsDisabled"/></li>
-                           <li><VirgoButton @click="illBorrowAVClick" variant="link" label="ILL Borrow A/V" :disabled="requestStore.otherRequestsDisabled"/></li>
-                           <li><VirgoButton @click="illScanClick" variant="link" label="ILL Scan Chapter/Article" :disabled="requestStore.otherRequestsDisabled"/></li>
+                           <li><a href="#" @click="illBorrowClick">ILL Borrow Item</a></li>
+                           <li><a href="#" @click="illBorrowAVClick">ILL Borrow A/V</a></li>
+                           <li><a href="#" @click="illScanClick">ILL Scan Chapter/Article</a></li>
                         </ul>
                      </li>
                      <li>
@@ -56,12 +67,6 @@
                   <a href="https://library.virginia.edu/services/request" target="_blank" aria-describedby="new-window">
                      Learn more about how to make a request in Virgo.<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                   </a>
-               </div>
-               <div class="reason ils-error" v-if="requestStore.otherRequestsDisabled">
-                  You have reached the maximum of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
-               </div>
-               <div class="reason ils-error" v-if="requestStore.isRemediateDisabled">
-                  You have reached the maximum of {{ requestStore.requestStats.remediationLimit }} active remediation requests.
                </div>
             </div>
 
@@ -290,38 +295,42 @@ const illLoans = computed(()=>{
 const digitalRequests = computed(()=>{
    let out = []
    illiadRequests.value.forEach( r => {
-      // console.log(`PT=${r.processType} RT=${r.requestType} DT=${r.documentType}`)
       if ((r.processType=="Borrowing" && r.requestType=="Article") ||
             ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article") ||
             ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article" && r.documentType=="Instructional")) {
          out.push(r)
-         // console.log("ADD DIGITAL")
       }
    })
    return out
 })
 
-const researchScanClick = (() => {
+const researchScanClick = ((event) => {
+   event.preventDefault()
    request.value = "ResearchScan"
 })
 
-const instructionalScanClick = (() => {
+const instructionalScanClick = ((event) => {
+   event.preventDefault()
    request.value = "InstructionalScan"
 })
 
-const illBorrowClick = (() => {
+const illBorrowClick = ((event) => {
+   event.preventDefault()
    request.value = "ILLBorrowItem"
 })
 
-const illBorrowAVClick = (() => {
+const illBorrowAVClick = ((event) => {
+   event.preventDefault()
    request.value = "ILLBorrowAV"
 })
 
-const illScanClick = (() => {
+const illScanClick = ((event) => {
+   event.preventDefault()
    request.value = "ILLScanArticle"
 })
 
-const pdfRemediationClick = (() => {
+const pdfRemediationClick = ((event) => {
+   event.preventDefault()
    request.value = "PDFRemediation"
 })
 
@@ -417,6 +426,12 @@ onMounted(() =>{
       display: flex;
       flex-direction: column;
       gap: 10px;
+      .errors {
+         display: flex;
+         flex-direction: column;
+         gap: 10px;
+         margin-top: 20px;
+      }
       .instructions {
          h4 {
             margin-bottom: 10px;
@@ -458,6 +473,12 @@ onMounted(() =>{
    }
    .reason.ils-error {
       margin: 0;
+      a {
+         text-decoration: underline;
+         &:hover {
+            text-decoration: none;
+         }
+      }
    }
 
    .working {

@@ -1,7 +1,13 @@
 <template>
    <div class="request-panel">
       <h3>Instructional Scanning Request</h3>
-       <FormKit type="form" id="instructional-scan" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
+      <div class="limit-reached" v-if="requestStore.otherRequestsDisabled">
+         <div class="message">
+            You have reached the limit of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
+         </div>
+         <VirgoButton severity="secondary" @click="emit('canceled')" label="Cancel"/>
+      </div>
+       <FormKit v-else type="form" id="instructional-scan" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
          <FormKit label="Course Information" type="textarea" :rows="2" v-model="request.course" id="course"
             validation="required" help="Please supply the Course Instructor, Course Name, Number, Section and Semester"
          />
@@ -83,6 +89,19 @@ onMounted(()=>{
 
 <style lang="scss" scoped>
 .request-panel {
+   .limit-reached {
+      text-align: right;
+      .message {
+         font-size: 1em;
+         font-weight: bold;
+         text-align: center;
+         padding: 10px;
+         border-radius: 0.3rem;
+         color: $uva-text-color-dark;
+         background-color: $uva-red-100;
+         margin: 0 0 10px 0;
+      }
+   }
    .instruct {
       margin: 10px 0;
       background: $uva-grey-200;

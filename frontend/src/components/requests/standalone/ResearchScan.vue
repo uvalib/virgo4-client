@@ -1,7 +1,13 @@
 <template>
    <div class="request-panel">
       <h3>Research Scanning Request</h3>
-      <FormKit type="form" id="scan-article" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
+      <div class="limit-reached" v-if="requestStore.otherRequestsDisabled">
+         <div class="message">
+            You have reached the limit of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
+         </div>
+         <VirgoButton severity="secondary" @click="emit('canceled')" label="Cancel"/>
+      </div>
+      <FormKit v-else type="form" id="scan-article" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
          <div class="instruct" v-if="request.personalCopy=='true'">
             <p>Personal copies can be dropped off at a Library Circulation Desk, deposited in a Book Drop, or sent via campus mail to:</p>
             <p class="addy">
@@ -68,6 +74,19 @@ onMounted(()=>{
 
 <style lang="scss" scoped>
 .request-panel {
+   .limit-reached {
+      text-align: right;
+      .message {
+         font-size: 1em;
+         font-weight: bold;
+         text-align: center;
+         padding: 10px;
+         border-radius: 0.3rem;
+         color: $uva-text-color-dark;
+         background-color: $uva-red-100;
+         margin: 0 0 10px 0;
+      }
+   }
    .notice {
       margin-top: 25px;
    }

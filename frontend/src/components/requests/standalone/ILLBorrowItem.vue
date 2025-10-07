@@ -1,7 +1,13 @@
 <template>
    <div class="request-panel">
       <h3 v-if="props.prefill==false">ILL Borrow Item Request</h3>
-      <FormKit type="form" id="borrow-item" :actions="false" incompleteMessage="Sorry, not all fields are filled out correctly." @submit="submitClicked">
+      <div class="limit-reached" v-if="requestStore.otherRequestsDisabled">
+         <div class="message">
+            You have reached the limit of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
+         </div>
+         <VirgoButton severity="secondary" @click="emit('canceled')" label="Cancel"/>
+      </div>
+      <FormKit v-else type="form" id="borrow-item" :actions="false" incompleteMessage="Sorry, not all fields are filled out correctly." @submit="submitClicked">
          <FormKit type="select" label="What would you like to borrow?" v-model="request.doctype" id="item-type" validation="required"
             placeholder="Select an item type"
             :options="['Book', 'Bound Journal Volume', 'Thesis or Dissertation', 'Newspapers', 'Microform', 'Government Document', 'Music Score']"
@@ -113,6 +119,19 @@ onMounted(()=>{
 
 <style lang="scss" scoped>
 .request-panel {
+   .limit-reached {
+      text-align: right;
+      .message {
+         font-size: 1em;
+         font-weight: bold;
+         text-align: center;
+         padding: 10px;
+         border-radius: 0.3rem;
+         color: $uva-text-color-dark;
+         background-color: $uva-red-100;
+         margin: 0 0 10px 0;
+      }
+   }
    .illiad-prompt {
       margin: 15px;
       a {
