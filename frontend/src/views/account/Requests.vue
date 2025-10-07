@@ -24,7 +24,10 @@
                      of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
                   </div>
                   <div class="reason ils-error" v-if="requestStore.isRemediateDisabled">
-                     You have reached the limit of {{ requestStore.requestStats.remediationLimit }} active remediation requests.
+                     You have reached the <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
+                        limit<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
+                     </a>
+                     of {{ requestStore.requestStats.remediationLimit }} active remediation requests.
                   </div>
                </div>
                   <h4>For course materials</h4>
