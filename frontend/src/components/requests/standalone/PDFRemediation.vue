@@ -3,7 +3,7 @@
       <h3>PDF Remediation Request</h3>
       <div class="limit-reached" v-if="requestStore.isRemediateDisabled">
          <div class="message">
-            You have reached the limit of {{ requestStore.requestStats.remediationLimit }} active remediation requests.
+            You've reached the active request limit of {{ requestStore.requestStats.remediationLimit }} PDF remediation requests at a time.
          </div>
          <VirgoButton severity="secondary" @click="emit('canceled')" label="Cancel"/>
       </div>

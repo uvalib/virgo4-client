@@ -3,7 +3,7 @@
       <h3>Instructional Scanning Request</h3>
       <div class="limit-reached" v-if="requestStore.otherRequestsDisabled">
          <div class="message">
-            You have reached the limit of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
+            You've reached the active request limit of {{ requestStore.requestStats.otherRequestsLimit }} ILL and/or scan requests at a time.
          </div>
          <VirgoButton severity="secondary" @click="emit('canceled')" label="Cancel"/>
       </div>

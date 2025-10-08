@@ -18,16 +18,16 @@
                   </div>
                   <div class="errors" v-if="requestStore.otherRequestsDisabled || requestStore.isRemediateDisabled">
                   <div class="reason ils-error" v-if="requestStore.otherRequestsDisabled">
-                     You have reached the <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
-                        limit<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
+                     <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
+                        You've reached the active request limit<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                      </a>
-                     of {{ requestStore.requestStats.otherRequestsLimit }} active borrow and/or scan requests.
+                     of {{ requestStore.requestStats.otherRequestsLimit }} ILL and/or scan requests at a time.
                   </div>
                   <div class="reason ils-error" v-if="requestStore.isRemediateDisabled">
-                     You have reached the <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
-                        limit<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
+                     <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
+                        You've reached the active request limit<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                      </a>
-                     of {{ requestStore.requestStats.remediationLimit }} active remediation requests.
+                     of {{ requestStore.requestStats.remediationLimit }} PDF remediation requests at a time.
                   </div>
                </div>
                   <h4>For course materials</h4>

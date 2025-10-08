@@ -327,6 +327,10 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
 	guestJWT, _ := v4jwt.Mint(guestClaim, 1*time.Minute, svc.JWTKey)
 
+	// NOTES: First a user is looked up n the uva user-ws. If this user is not found, they are flagged with CommunityUser = true.
+	// Next, sirsi is checked. If a community user is not found in sirsi, a 404 error is returned, resulting in the user being redirected
+	// to forbidden page. If a non-community user is not found in sirs, success is returned, but just the
+	// basics are included (id, title, dept, desctiption). The user is signed in and redirected the user to the account registration form.
 	log.Printf("Get ILS Connector data for user %s", v4User.Virgo4ID)
 	userURL := fmt.Sprintf("%s/users/%s", svc.ILSAPI, v4User.Virgo4ID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, guestJWT, svc.HTTPClient)
