@@ -10,77 +10,66 @@
       <FormKit v-else type="form" id="illiad-register" :actions="false" @submit="submitRegistration" ref="illiadform">
          <div class="help">If you have any questions about the completion of this form, please contact the ILS office at (434) 982-2617.</div>
          <FormKit type="text" label="Username" v-model="registration.computeID" id="username" validation="required"/>
-         <FormKit type="text" label="First name" v-model="registration.firstName" id="firstname" validation="required"/>
-         <FormKit type="text" label="Last name" v-model="registration.lastName" id="lastname" validation="required"/>
-         <FormKit type="tel" label="Daytime phone" v-model="registration.phone" id="phone"
-            placeholder="xxx-xxx-xxxx" validation="required|matches:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/"
-         />
-         <FormKit type="email" label="Email" v-model="registration.email" id="email" validation="required"/>
-
-         <div class="note">If your mailing address changes, please contact us at <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> to update your account.</div>
-         <FormKit type="text" label="Address" v-model="registration.address1" id="address1" validation="required"/>
-         <FormKit type="text" label="Address line 2" v-model="registration.address2" id="address2"/>
-         <FormKit type="text" label="City" v-model="registration.city" id="city" validation="required"/>
-         <div class="columns">
-            <FormKit type="select" label="State" v-model="registration.state" id="state"
-               placeholder="Select a state" :options="states" validation="required"
-            />
-            <FormKit type="text" label="Zip" v-model="registration.zip" id="zip" validation="required"/>
-         </div>
          <FormKit type="select" label="Status" id="status" v-model="registration.status" validation="required"
             placeholder="Select a status" @input="statusSelected"
             :options="['Graduate', 'Faculty', 'Faculty (retired)', 'Staff', 'Undergraduate']" />
+         <FormKit type="text" label="First name" v-model="registration.firstName" id="firstname" validation="required"/>
+         <FormKit type="text" label="Last name" v-model="registration.lastName" id="lastname" validation="required"/>
+         <FormKit type="email" label="Email" v-model="registration.email" id="email" validation="required"/>
+         <FormKit type="tel" label="Phone" v-model="registration.phone" id="phone"
+            placeholder="xxx-xxx-xxxx" validation="required|matches:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/"
+         />
          <FormKit type="select" label="Department" id="department" v-model="registration.department" validation="required"
             placeholder="Select a department" :options="system.departments"
          />
          <FormKit type="select" label="School" id="school" v-model="registration.school" validation="required"
             placeholder="Select a school" :options="system.schools"
          />
-         <div class="delivery">
-            <div>
-               Please choose how you would like to pick up your materials.<br/>
-               <ul>
-                  <li>Users who live inside the Charlottesville/Albemarle County area should pick either 'LEO to Department' or 'LEO to Library'.</li>
-                  <li>Users who live outside the Charlottesville/Albemarle County area should Send to Address.</li>
-               </ul>
-            </div>
-            <FormKit type="select" label="Preferred delivery method" id="delivery" v-model="registration.deliveryMethod" validation="required"
-               placeholder="Select a delivery method" @input="deliveryMethodChanged" :disabled="registration.status == 'Undergraduate'"
-               :options="{Dept: 'LEO to Department', Library: 'LEO to Library', Address: 'Send to address'}"
-            />
-            <div v-if="registration.deliveryMethod == 'Dept'">
-               <div class="delivery-info">
-                 <div>
-                     Choose a building from the drop-down menu below and provide a room number
-                     (this may be your own office, a mail room or a central department office).
-                     If your building is not in the drop-down menu, contact us.
+         <template v-if="registration.status != ''">
+            <template v-if="registration.status != 'Undergraduate'">
+               <FormKit type="select" label="Building Name" v-model="registration.buildingName"
+                  placeholder="Select a building" id="building" :options="system.buildings" validation="required"
+               />
+               <div class="delivery">
+                  <div>
+                     Please choose how you would like to pick up your materials.<br/>
+                     <ul>
+                        <li>Users who live inside the Charlottesville/Albemarle County area should pick either 'LEO to Department' or 'LEO to Library'.</li>
+                        <li>Users who live outside the Charlottesville/Albemarle County area should Send to Address.</li>
+                     </ul>
+                     <FormKit type="select" label="Preferred delivery method" id="delivery" v-model="registration.deliveryMethod" validation="required"
+                           placeholder="Select a delivery method" @input="deliveryMethodChanged" :disabled="registration.status == 'Undergraduate'"
+                           :options="{Dept: 'LEO to Department', Library: 'LEO to Library', Address: 'Send to Address'}"
+                     />
+                     <div v-if="registration.deliveryMethod == 'Dept'" class="delivery-info">
+                        <div>
+                           Please provide a room number in your building. This may be your own office, a mail room or a central department office.
+                        </div>
+                        <FormKit type="text" label="Room Number" v-model="registration.roomNumber" id="room"/>
+                     </div>
+                     <div v-else-if="registration.deliveryMethod == 'Library'" class="delivery-info">
+                        <FormKit type="select" label="Pickup Library" v-model="registration.pickupLocation"
+                           placeholder="Select a library" id="pickup-sel" :options="pickupLibraries" validation="required"
+                        />
+                     </div>
+                     <div v-else-if="registration.deliveryMethod == 'Address'" class="delivery-info">
+                        <FormKit type="text" label="Address" v-model="registration.address1" id="address1" validation="required"/>
+                        <FormKit type="text" label="Address line 2" v-model="registration.address2" id="address2"/>
+                        <FormKit type="text" label="City" v-model="registration.city" id="city" validation="required"/>
+                        <div class="columns">
+                           <FormKit type="select" label="State" v-model="registration.state" id="state"
+                              placeholder="Select a state" :options="states" validation="required"
+                           />
+                           <FormKit type="text" label="Zip" v-model="registration.zip" id="zip" validation="required"/>
+                        </div>
+                     </div>
                   </div>
-                  <FormKit type="select" label="Building Name" v-model="registration.buildingName"
-                     placeholder="Select a building" id="building" :options="system.buildings" validation="required"
-                  />
-                  <FormKit type="text" label="Room Number" v-model="registration.roomNumber" id="room"/>
                </div>
-            </div>
-            <div v-else-if="registration.deliveryMethod == 'Library'">
-               <div class="delivery-info">
-                  <div>Please choose the library where you would like to pick up your materials.</div>
-                  <FormKit type="select" label="Pickup Location" v-model="registration.pickupLocation"
-                     placeholder="Select a location" id="pickup-sel" :options="pickupLibraries" validation="required"
-                  />
-               </div>
-            </div>
-            <div v-else-if="registration.deliveryMethod == 'Address'">
-               <div class="delivery-info">
-                  <div>Items will be delivered to the address you entered above. Please ensure it is correct.</div>
-                  <address>
-                     <div>{{ registration.firstName }} {{ registration.lastName }}</div>
-                     <div>{{ registration.address1 }}</div>
-                     <div v-if="registration.address2">{{ registration.address2 }}</div>
-                     <div>{{ registration.city }}, {{ registration.state }} {{ registration.zip }}</div>
-                  </address>
-               </div>
-            </div>
-         </div>
+            </template>
+            <FormKit  v-else type="select" label="Pickup Library" v-model="registration.pickupLocation"
+               placeholder="Select a library" id="pickup-sel" :options="pickupLibraries" validation="required"
+            />
+         </template>
       </FormKit>
       <template #footer>
          <div class="footer-wrap">
