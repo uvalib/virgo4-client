@@ -88,7 +88,7 @@ import axios from 'axios'
 
 const userStore = useUserStore()
 const system = useSystemStore()
-const { height } = useWindowSize()
+const { width } = useWindowSize()
 
 const showForm = ref(false)
 const working = ref(false)
@@ -117,7 +117,7 @@ const registration = ref({
 })
 
 const dialogWidth = computed(() => {
-   if ( height.value <= 768) {
+   if ( width.value <= 768) {
       return "width: 95%"
    }
    return "width: 600px"

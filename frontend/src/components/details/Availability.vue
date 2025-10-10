@@ -83,12 +83,6 @@ const hasAvailMessage = computed( () => {
 const canMakeRequests = computed(()=>{
    if ( system.isKiosk) return false
    if ( user.isBarred ) return false
-   if ( user.noILSAccount) {
-      if (request.requestOptions.find( ro => ro.sign_in_required === false)) {
-         return true
-      }
-      return false
-   }
    return request.hasOptions
 })
 const availabilityStatement = computed(()=>{

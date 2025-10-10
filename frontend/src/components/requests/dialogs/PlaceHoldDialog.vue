@@ -4,6 +4,17 @@
       header="Request Item" @show="dialogOpened" @hide="dialogClosed"
    >
       <SignIn v-if="!user.isSignedIn" :embedded="true"/>
+      <div v-else-if="user.noILSAccount" class="no-ils-account">
+         <div v-if="user.accountRequested">
+            Your UVA Library account is processing and will be created within 1-2 business days.<br/>
+            You will be notified via email when the account has been created. Until that time, you cannot make item requests.
+         </div>
+         <template v-else >
+            <div>You do not currently have a UVA Library account and cannot make item requests.</div>
+            <VirgoButton @click="requestAccountClicked()" label="Request Account" />
+         </template>
+         <div>If you have any questions or problems, please contact <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.</div>
+      </div>
       <FormKit v-else-if="submitted == false" type="form" ref="holdForm" :actions="false" @submit="placeHold">
          <FormKit v-if="request.optionItems.length > 1" type="select" label="Select the item you want"
             v-model="selectedItem" id="item-sel" placeholder="Select an item"
@@ -51,7 +62,7 @@
       </FormKit>
       <ConfirmationPanel v-else />
       <template #footer>
-         <template v-if="submitted == false && user.isSignedIn">
+         <template v-if="submitted == false && user.isSignedIn && user.noILSAccount == false">
             <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
             <VirgoButton label="Request an item" @click="holdForm.node.submit()" />
          </template>
@@ -121,6 +132,11 @@ const dialogClosed = (() =>{
    request.errors = {}
 })
 
+const requestAccountClicked = (() => {
+   showDialog.value = false
+   user.showRequestDialog = true
+})
+
 const pickupLibraryChanged = ((value) => {
    if(value == "SPEC-COLL"){
       // Dont remember Medium Rare Location
@@ -148,6 +164,14 @@ const placeHold = ( async () => {
    align-items: flex-start;
    gap: 10px;
    margin: 20px 0;
+}
+.no-ils-account {
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+   button {
+      width: fit-content;
+   }
 }
 @media only screen and (min-width: 768px) {
    .trigger {

@@ -46,9 +46,8 @@ export const useUserStore = defineStore('user', {
       lockedOut: false,
       parsedJWT: {},
       noILSAccount: false,
-      accountRequest: {name: "", id: "", email: "", phone: "", department: "",
-         address1: "", address2: "", city: "", state: "", zip: ""},
       tempAccount: {},
+      showRequestDialog: false,
       accountRequested: false,
       sirsiUnavailable: false,
       requestInterceptor: null,
@@ -307,23 +306,6 @@ export const useUserStore = defineStore('user', {
          this.sessionType =  parsed.authMethod
          this.role = parsed.role
 
-         if (this.role == "guest" && this.sessionType == "netbadge" && this.signedInUser != "anonymous") {
-            this.noILSAccount = true
-            this.accountRequest.name = ""
-            this.accountRequest.id = parsed.userId
-            this.accountRequest.email = parsed.userId+"@virginia.edu"
-            this.accountRequest.phone = ""
-            this.accountRequest.department = ""
-            this.accountRequest.address1 = ""
-            this.accountRequest.address2 = ""
-            this.accountRequest.city = ""
-            this.accountRequest.state = ""
-            this.accountRequest.zip = ""
-            if (localStorage.getItem("v4_requested") ) {
-               this.accountRequested = true
-            }
-         }
-
          localStorage.setItem("v4_jwt", jwtStr)
 
          // Use the new JWT token in auth headers for all a requests and handle reauth if it expires
@@ -382,24 +364,22 @@ export const useUserStore = defineStore('user', {
       setAccountInfo(data) {
          this.accountInfo = data.user
          this.noILSAccount = data.user.noAccount
-         this.sirsiUnavailable = data.user.sirsiUnavailable
-         if (localStorage.getItem("v4_requested") ) {
-            this.accountRequested = true
-         }
-         if ( this.noILSAccount) {
-            this.accountRequest.name = data.user.displayName
-            this.accountRequest.id = data.user.id
-            this.accountRequest.email = data.user.email
-            this.accountRequest.phone = ""
-            this.accountRequest.department = data.user.department
-            this.accountRequest.address1 = ""
-            this.accountRequest.address2 = ""
-            this.accountRequest.city = ""
-            this.accountRequest.state = ""
-            this.accountRequest.zip = ""
-         }
          delete  this.accountInfo.noAccount
+         this.sirsiUnavailable = data.user.sirsiUnavailable
          this.illiad = data.illiad
+
+         if (this.role == "guest" && this.sessionType == "netbadge" && this.signedInUser != "anonymous") {
+            this.noILSAccount = true
+            this.accountRequested = false
+            if (localStorage.getItem("v4_requested") ) {
+               this.accountRequested = true
+            }
+            this.showRequestDialog = true
+         } else {
+            localStorage.removeItem("v4_requested")
+            this.accountRequested = false
+            this.noILSAccount = false
+         }
       },
       clear() {
          this.$reset()
@@ -492,9 +472,6 @@ export const useUserStore = defineStore('user', {
             bookmarks.setBookmarks(response.data.bookmarks)
             if ( preferences.searchTemplate ) {
                queryStore.setTemplate(preferences.searchTemplate)
-            }
-            if ( (this.noILSAccount || this.hasIlliad == false) && this.router.currentRoute.value.path != "/account") {
-               this.router.push( "/account" )
             }
             this.lookingUp = false
           }).catch((error) => {
@@ -644,25 +621,6 @@ export const useUserStore = defineStore('user', {
       netbadge() {
          this.authorizing = true
          window.location.href = "/authenticate/netbadge"
-      },
-
-      async submitNewAccountRequest() {
-         this.lookingUp = true
-         await axios.post("/api/requests/account", this.accountRequest ).then( _resp => {
-            this.lookingUp = false
-            this.flagAccountRequested()
-            window.scrollTo({
-               top: 0,
-               behavior: "auto"
-            })
-         }).catch ( error => {
-            const system = useSystemStore()
-            console.log("Unable to request new account: "+error)
-            let msg = "System error, we regret the inconvenience. If this problem persists, "
-            msg += "<a href='https://search.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-            system.setError(msg)
-            this.lookingUp = false
-         })
       },
       updateContactInfo(info) {
          return axios.post(`/api/users/${info.newContact.userID}/contact`, info )

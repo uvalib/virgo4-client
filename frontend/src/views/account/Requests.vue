@@ -12,7 +12,7 @@
                <ILLiadMessages />
             </div>
             <div v-else class="subcontent">
-               <div class="instructions"> <!-- add  v-if="request == ''" to hide instructions when a form is selected -->
+               <div class="instructions">
                   <div>
                      To request an item for pickup, click the &quot;<strong>Request item</strong>&quot; button in the item's record and follow the prompts. This option will not be available for all items.
                   </div>

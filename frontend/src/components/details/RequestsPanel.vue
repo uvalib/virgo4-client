@@ -1,6 +1,7 @@
 <template>
    <section class="requests" aria-live="polite">
       <div class="options">
+         <!-- sign in and ils account required for all but direct and aeon-->
          <PlaceHoldDialog v-if="request.hasOption('hold')" />
          <ScanRequestDialog v-if="request.hasOption('scan')" />
          <VideoReserveDialog v-if="user.canMakeReserves && request.hasOption('videoReserve')" />

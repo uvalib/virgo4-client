@@ -3,6 +3,7 @@
    <MessageBox />
    <SessionExpired />
    <AddBookmark />
+   <ILSRegistration />
    <Toast position="center" @close="systemStore.clearToast" @life-end="systemStore.clearToast"/>
    <ConfirmDialog position="top" :closable="false">
       <template #message="slotProps">
@@ -84,6 +85,7 @@ import analytics from '@/analytics'
 import { useRoute } from 'vue-router'
 import { usePinnable } from '@/composables/pin'
 import { storeToRefs } from "pinia"
+import ILSRegistration from "./components/modals/ILSRegistration.vue"
 
 usePinnable("v4-navbar", "alerts", "v4main", "v4footer")
 
