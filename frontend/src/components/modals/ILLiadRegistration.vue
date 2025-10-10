@@ -41,26 +41,18 @@
                            placeholder="Select a delivery method" @input="deliveryMethodChanged" :disabled="registration.status == 'Undergraduate'"
                            :options="{Dept: 'LEO to Department', Library: 'LEO to Library', Address: 'Send to Address'}"
                      />
-                     <div v-if="registration.deliveryMethod == 'Dept'" class="delivery-info">
-                        <div>
-                           Please provide a room number in your building. This may be your own office, a mail room or a central department office.
-                        </div>
-                        <FormKit type="text" label="Room Number" v-model="registration.roomNumber" id="room"/>
-                     </div>
-                     <div v-else-if="registration.deliveryMethod == 'Library'" class="delivery-info">
+                     <div v-if="registration.deliveryMethod == 'Library'" class="delivery-info">
                         <FormKit type="select" label="Pickup Library" v-model="registration.pickupLocation"
                            placeholder="Select a library" id="pickup-sel" :options="pickupLibraries" validation="required"
                         />
                      </div>
                      <div v-else-if="registration.deliveryMethod == 'Address'" class="delivery-info">
-                        <FormKit type="text" label="Address" v-model="registration.address1" id="address1" validation="required"/>
+                        <FormKit type="text" label="Address" v-model="registration.address1" id="address1"/>
                         <FormKit type="text" label="Address line 2" v-model="registration.address2" id="address2"/>
-                        <FormKit type="text" label="City" v-model="registration.city" id="city" validation="required"/>
+                        <FormKit type="text" label="City" v-model="registration.city" id="city" />
                         <div class="columns">
-                           <FormKit type="select" label="State" v-model="registration.state" id="state"
-                              placeholder="Select a state" :options="states" validation="required"
-                           />
-                           <FormKit type="text" label="Zip" v-model="registration.zip" id="zip" validation="required"/>
+                           <FormKit type="select" label="State" v-model="registration.state" id="state" placeholder="Select a state" :options="states"/>
+                           <FormKit type="text" label="Zip" v-model="registration.zip" id="zip"/>
                         </div>
                      </div>
                   </div>
