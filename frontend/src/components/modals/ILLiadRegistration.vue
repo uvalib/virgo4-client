@@ -8,7 +8,7 @@
          make ILLiad requests until it has been reviewed and cleared.
       </div>
       <FormKit v-else type="form" id="illiad-register" :actions="false" @submit="submitRegistration" ref="illiadform">
-         <div class="help">If you have any questions about the completion of this form, please contact the ILS office at (434) 982-2617.</div>
+         <div class="help">If you have any questions about the completion of this form, please contact <a href="mailto:4leo@virginia.edu">leo@virginia.edu</a>.</div>
          <FormKit type="text" label="Username" v-model="registration.computeID" id="username" validation="required"/>
          <FormKit type="select" label="Status" id="status" v-model="registration.status" validation="required"
             placeholder="Select a status" @input="statusSelected"
@@ -17,7 +17,7 @@
          <FormKit type="text" label="Last name" v-model="registration.lastName" id="lastname" validation="required"/>
          <FormKit type="email" label="Email" v-model="registration.email" id="email" validation="required"/>
          <FormKit type="tel" label="Phone" v-model="registration.phone" id="phone"
-            placeholder="xxx-xxx-xxxx" validation="required|matches:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/"
+            placeholder="xxx-xxx-xxxx" validation="matches:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/"
          />
          <FormKit type="select" label="Department" id="department" v-model="registration.department" validation="required"
             placeholder="Select a department" :options="system.departments"
@@ -30,12 +30,15 @@
                <FormKit type="select" label="Building Name" v-model="registration.buildingName"
                   placeholder="Select a building" id="building" :options="system.buildings" validation="required"
                />
+               <FormKit type="select" label="Pickup Library" v-model="registration.pickupLocation"
+                  placeholder="Select a library" id="pickup-sel" :options="pickupLibraries" validation="required"
+               />
                <div class="delivery">
                   <div>
                      Please choose how you would like to pick up your materials.<br/>
                      <ul>
-                        <li>Users who live inside the Charlottesville/Albemarle County area should pick either 'LEO to Department' or 'LEO to Library'.</li>
-                        <li>Users who live outside the Charlottesville/Albemarle County area should Send to Address.</li>
+                        <li>Users who live within 50 miles should choose "LEO to Department" or "LEO to Library"</li>
+                        <li>Users who live further than 50 miles can choose "Send to address" if they wish</li>
                      </ul>
                      <FormKit type="select" label="Preferred delivery method" id="delivery" v-model="registration.deliveryMethod" validation="required"
                            placeholder="Select a delivery method" @input="deliveryMethodChanged" :disabled="registration.status == 'Undergraduate'"
@@ -201,9 +204,7 @@ const deliveryMethodChanged = ( (newMethod) => {
    } else {
       // department delivery does not use pickupLocation
       registration.value.pickupLocation = ""
-
-      // default builing to the builting associated with the selected department
-      registration.value.buildingName = system.departmentBuilding(registration.value.department)
+      registration.value.buildingName = ""
    }
 
    nextTick( () => {
@@ -235,10 +236,6 @@ const hideRegistration = (() => {
 
 <style lang="scss" scoped>
 form.formkit-form {
-   .help {
-      font-weight: bold;
-   }
-
    .note {
       padding: 0;
       margin: 20px 0 -5px 0;
