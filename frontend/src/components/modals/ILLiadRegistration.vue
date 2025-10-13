@@ -203,7 +203,11 @@ const submitRegistration = (() => {
       submitted.value = true
     }).catch ( err => {
       console.log(err)
-      error.value = err
+      if ( err.response && err.response.data ) {
+         err.value = err.response.data
+      } else {
+         error.value = err
+      }
       working.value = false
    })
 })
