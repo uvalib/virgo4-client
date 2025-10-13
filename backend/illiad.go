@@ -27,7 +27,6 @@ func (svc *ServiceContext) illiadRegistrationRequest(c *gin.Context) {
 		School         string `json:"school"`
 		DeliveryMethod string `json:"deliveryMethod"`
 		Building       string `json:"buildingName"`
-		Room           string `json:"roomNumber"`
 		PickupLocation string `json:"pickupLocation"`
 	}
 	err := c.ShouldBindBodyWithJSON(&req)
@@ -54,38 +53,37 @@ func (svc *ServiceContext) illiadRegistrationRequest(c *gin.Context) {
 		Fax                string `json:"Fax"`                // preferred delivery method
 		Nvtgc              string `json:"NVTGC"`              // pickup library
 		Country            string `json:"Country"`            // delivery building for leo to department
-		Organization       string `json:"Organization"`       // delivery room number for leo to department
 		UserInfo1          string `json:"UserInfo1"`          // school
 		NotificationMethod string `json:"NotificationMethod"` // Electronic
 		DeliveryMethod     string `json:"DeliveryMethod"`     // Hold for Pickup
 		LoanDeliveryMethod string `json:"LoanDeliveryMethod"` // Hold for Pickup
 	}
 	illReq := illRegRequest{
-		UserName: req.ComputeID, ExternalUserID: req.ComputeID,
-		LastName: req.LastName, FirstName: req.FirstName,
-		Status: req.Status, EMailAddress: req.Email, Phone: req.Phone,
-		Department: req.Department, UserInfo1: req.School,
-		Address: req.Address1, Address2: req.Address2,
-		City: req.City, State: req.State, Zip: req.Zip,
+		UserName:           req.ComputeID,
+		ExternalUserID:     req.ComputeID,
+		LastName:           req.LastName,
+		FirstName:          req.FirstName,
+		Status:             req.Status,
+		EMailAddress:       req.Email,
+		Phone:              req.Phone,
+		Department:         req.Department,
+		Country:            req.Building,
+		UserInfo1:          req.School,
+		Nvtgc:              req.PickupLocation,
+		Fax:                req.DeliveryMethod,
+		Address:            req.Address1,
+		Address2:           req.Address2,
+		City:               req.City,
+		State:              req.State,
+		Zip:                req.Zip,
 		NotificationMethod: "Electronic", DeliveryMethod: "Hold for Pickup", LoanDeliveryMethod: "Hold for Pickup",
-		Fax: req.DeliveryMethod,
 	}
 
-	// delivery methods: {Dept: 'LEO to Department', Library: 'LEO to Library', Address: 'Send to address'}
-	switch req.DeliveryMethod {
-	case "Dept":
-		log.Printf("INFO: preferred pickup is leo to department")
-		illReq.Country = req.Building
-		illReq.Organization = req.Room
-	case "Library":
-		log.Printf("INFO: preferred pickup is leo to library")
-		illReq.Nvtgc = req.PickupLocation
-	case "Address":
-		log.Printf("INFO: preferred pickup is send to address")
-		// nothing more to do; deliver to address specified in user info
-	default:
-		log.Printf("ERROR: invalid delivery method %s", req.DeliveryMethod)
-		c.String(http.StatusBadRequest, fmt.Sprintf("invalid delivery method %s", req.DeliveryMethod))
+	jsonReq, err := json.Marshal(illReq)
+	log.Printf("INFO: illiad registration request details %s", jsonReq)
+	if err != nil {
+		log.Printf("ERROR: unable to generate json registration request string: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 

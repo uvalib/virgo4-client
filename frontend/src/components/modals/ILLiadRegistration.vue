@@ -44,12 +44,7 @@
                            placeholder="Select a delivery method" @input="deliveryMethodChanged" :disabled="registration.status == 'Undergraduate'"
                            :options="{Dept: 'LEO to Department', Library: 'LEO to Library', Address: 'Send to Address'}"
                      />
-                     <div v-if="registration.deliveryMethod == 'Library'" class="delivery-info">
-                        <FormKit type="select" label="Pickup Library" v-model="registration.pickupLocation"
-                           placeholder="Select a library" id="pickup-sel" :options="pickupLibraries" validation="required"
-                        />
-                     </div>
-                     <div v-else-if="registration.deliveryMethod == 'Address'" class="delivery-info">
+                     <div v-if="registration.deliveryMethod == 'Address'" class="delivery-info">
                         <FormKit type="text" label="Address" v-model="registration.address1" id="address1"/>
                         <FormKit type="text" label="Address line 2" v-model="registration.address2" id="address2"/>
                         <FormKit type="text" label="City" v-model="registration.city" id="city" />
@@ -115,7 +110,6 @@ const registration = ref({
    school: "",
    deliveryMethod: "",
    buildingName: "",
-   roomNumber: "",
    pickupLocation: ""
 })
 
@@ -177,36 +171,20 @@ const opened = (() => {
    registration.value.school = ""
    registration.value.deliveryMethod = ""
    registration.value.buildingName = ""
-   registration.value.roomNumber = ""
    registration.value.pickupLocation = ""
 })
 
 const statusSelected = ( (newStatus) => {
    registration.value.deliveryMethod = ""
    registration.value.buildingName = ""
-   registration.value.roomNumber = ""
    registration.value.pickupLocation = ""
    if ( newStatus == "Undergraduate") {
       registration.value.deliveryMethod = "Library"
    }
 })
 
-const deliveryMethodChanged = ( (newMethod) => {
-   if ( newMethod == "Address") {
-      // address delivery method must set pickup location to 'Distance Education', which is value SCHED
-      registration.value.pickupLocation = "SCED"
-      registration.value.roomNumber = ""
-      registration.value.buildingName = ""
-   } else if ( newMethod == "Library") {
-      // library delivery does not use building or room
-      registration.value.roomNumber = ""
-      registration.value.buildingName = ""
-   } else {
-      // department delivery does not use pickupLocation
-      registration.value.pickupLocation = ""
-      registration.value.buildingName = ""
-   }
-
+const deliveryMethodChanged = ( () => {
+   // make sure any new UI elements displayed by the change are scrolled into view
    nextTick( () => {
       let body = document.getElementsByClassName("p-dialog-content")[0]
       body.scrollTo(0, body.scrollHeight)
@@ -214,6 +192,10 @@ const deliveryMethodChanged = ( (newMethod) => {
 })
 
 const submitRegistration = (() => {
+   if ( registration.value.deliveryMethod == "Address") {
+      // address delivery method must set pickup location to 'Distance Education', which is value SCHED
+      registration.value.pickupLocation = "SCED"
+   }
    working.value = true
    error.value = ""
    axios.post("/api/illiad/register", registration.value).then( () => {
