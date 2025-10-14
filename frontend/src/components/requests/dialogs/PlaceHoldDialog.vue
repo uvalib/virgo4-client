@@ -35,7 +35,7 @@
 
          <div v-if="pickupLibrary == 'LEO'">
             <div v-if="!user.hasIlliad" class="no-illiad">
-               <div>No ILLiad account found.</div>
+               <div>An ILLiad account is required for LEO delivery. No ILLiad account found.</div>
                <ILLiadRegistration />
             </div>
             <ILLiadMessages v-else-if="user.illiadBlocked" />
@@ -64,7 +64,7 @@
       <template #footer>
          <template v-if="submitted == false && user.isSignedIn && user.noILSAccount == false">
             <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
-            <VirgoButton label="Request an item" @click="holdForm.node.submit()" />
+            <VirgoButton label="Request an item" @click="holdForm.node.submit()" :disabled="isRequestDisabled" />
          </template>
          <VirgoButton v-else severity="secondary" id="request-done" @click="showDialog=false" label="Close"/>
       </template>
@@ -107,6 +107,11 @@ const pickupLibraries = computed(()=>{
       libs.push({value: l.id, label: l.name})
    })
    return libs
+})
+
+const isRequestDisabled = computed( () => {
+   if ( pickupLibrary.value == "LEO" && (user.hasIlliad == false || user.illiadBlocked) ) return true
+   return false
 })
 
 const dialogOpened = (() => {
@@ -163,7 +168,7 @@ const placeHold = ( async () => {
    flex-direction: column;
    align-items: flex-start;
    gap: 10px;
-   margin: 20px 0;
+   margin: 0;
 }
 .no-ils-account {
    display: flex;

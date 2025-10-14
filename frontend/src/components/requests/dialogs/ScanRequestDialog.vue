@@ -7,7 +7,7 @@
       <SignIn v-if="!user.isSignedIn" />
       <template v-else>
          <div v-if="!user.hasIlliad" class="no-illiad">
-            <div>No ILLiad account found.</div>
+            <div>An ILLiad account is required for scan requests. No ILLiad account found.</div>
             <ILLiadRegistration />
          </div>
          <ILLiadMessages v-else-if="user.illiadBlocked"/>
@@ -213,7 +213,6 @@ const dialogClosed = (() =>{
    flex-direction: column;
    align-items: flex-start;
    gap: 10px;
-   margin: 20px 0;
 }
 .scan-use-note {
    padding:5px 0 10px 0;

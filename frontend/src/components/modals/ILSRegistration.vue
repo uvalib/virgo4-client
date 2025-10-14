@@ -13,6 +13,7 @@
    </div>
    <template v-else>
       <div>You do not currently have a UVA Library account. Please fill out the form below to request one.</div>
+      <p><b>Without an account you will be unable to request items from the library.</b></p>
       <FormKit type="form" ref="accountrequest" :actions="false" @submit="submitRequest">
          <FormKit label="ID" type="text" v-model="registration.id" validation="required"/>
          <FormKit label="Name" type="text" v-model="registration.name" validation="required"/>
