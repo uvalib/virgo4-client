@@ -10,16 +10,7 @@ import { useBookmarkStore } from "@/stores/bookmark"
 import { useSearchStore } from "@/stores/search"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
-
-function parseJwt(token) {
-   var base64Url = token.split('.')[1]
-   var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-   var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-   }).join(''))
-
-   return JSON.parse(jsonPayload);
-}
+import { useJwt } from '@vueuse/integrations/useJwt'
 
 export const useUserStore = defineStore('user', {
 	state: () => ({
@@ -282,7 +273,8 @@ export const useUserStore = defineStore('user', {
          this.authTriesLeft = 10
       },
       async setUserJWT(jwtStr) {
-         let parsed = parseJwt(jwtStr)
+         const { payload } = useJwt(jwtStr)
+         const parsed = payload.value
          if( parsed.role === "admin" ) {
             this.parsedJWT = JSON.stringify(parsed,undefined, 2);
          }

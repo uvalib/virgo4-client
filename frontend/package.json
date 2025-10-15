@@ -15,16 +15,17 @@
     "@vueuse/integrations": "^13.9.0",
     "axios": "^1.12.2",
     "firebase": "^12.4.0",
+    "jwt-decode": "^4.0.0",
     "pinia": "^3.0.3",
     "primevue": "^4.4.1",
     "vue": "^3.5.22",
-    "vue-router": "^4.5.1",
+    "vue-router": "^4.6.2",
     "vue3-cookies": "^1.0.6",
     "xml-beautifier": "^0.5.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
     "sass-embedded": "^1.93.2",
-    "vite": "^7.1.9"
+    "vite": "^7.1.10"
   }
 }
