@@ -9,7 +9,7 @@
       </div>
       <FormKit v-else type="form" id="illiad-register" :actions="false" @submit="submitRegistration" ref="illiadform">
          <div class="help">If you have any questions about the completion of this form, please contact <a href="mailto:4leo@virginia.edu">leo@virginia.edu</a>.</div>
-         <FormKit type="text" label="Username" v-model="registration.computeID" id="username" validation="required"/>
+         <FormKit type="text" label="Username" v-model="registration.computeID" id="username" disabled/>
          <FormKit type="select" label="Status" id="status" v-model="registration.status" validation="required"
             placeholder="Select a status" @input="statusSelected"
             :options="['Graduate', 'Faculty', 'Faculty (retired)', 'Staff', 'Undergraduate']" />
@@ -25,41 +25,61 @@
          <FormKit type="select" label="School" id="school" v-model="registration.school" validation="required"
             placeholder="Select a school" :options="system.schools"
          />
-         <template v-if="registration.status != ''">
-            <template v-if="registration.status != 'Undergraduate'">
-               <FormKit type="select" label="Building Name" v-model="registration.buildingName"
-                  placeholder="Select a building" id="building" :options="system.buildings" validation="required"
-               />
-               <FormKit type="select" label="Pickup Library" v-model="registration.pickupLocation"
-                  placeholder="Select a library" id="pickup-sel" :options="pickupLibraries" validation="required"
-               />
-               <div class="delivery">
-                  <div>
-                     Please choose how you would like to pick up your materials.<br/>
-                     <ul>
-                        <li>Users who live within 50 miles should choose "LEO to Department" or "LEO to Library"</li>
-                        <li>Users who live further than 50 miles can choose "Send to address" if they wish</li>
-                     </ul>
-                     <FormKit type="select" label="Preferred delivery method" id="delivery" v-model="registration.deliveryMethod" validation="required"
-                           placeholder="Select a delivery method" @input="deliveryMethodChanged" :disabled="registration.status == 'Undergraduate'"
-                           :options="{Dept: 'LEO to Department', Library: 'LEO to Library', Address: 'Send to Address'}"
-                     />
-                     <div v-if="registration.deliveryMethod == 'Address'" class="delivery-info">
-                        <FormKit type="text" label="Address" v-model="registration.address1" id="address1"/>
-                        <FormKit type="text" label="Address line 2" v-model="registration.address2" id="address2"/>
-                        <FormKit type="text" label="City" v-model="registration.city" id="city" />
-                        <div class="columns">
-                           <FormKit type="select" label="State" v-model="registration.state" id="state" placeholder="Select a state" :options="states"/>
-                           <FormKit type="text" label="Zip" v-model="registration.zip" id="zip"/>
-                        </div>
-                     </div>
-                  </div>
+         <FormKit type="select" label="Preferred library" v-model="registration.pickupLocation"
+            placeholder="Select a library" id="pickup-sel" :options="pickupLibraries" validation="required"
+         />
+
+         <template v-if="isSCPS">
+            <FormKit type="select" label="Do you live more than 50 miles from UVA?" id="distance" v-model="longDistance" validation="required"
+               placeholder="Select an answer" :options="['Yes', 'No']"  @input="distanceSelected"
+            />
+            <template v-if="longDistance=='Yes'">
+               <FormKit type="text" label="Address" v-model="registration.address1" id="address1"/>
+               <FormKit type="text" label="Address line 2" v-model="registration.address2" id="address2"/>
+               <FormKit type="text" label="City" v-model="registration.city" id="city" />
+               <div class="columns">
+                  <FormKit type="select" label="State" v-model="registration.state" id="state" placeholder="Select a state" :options="states"/>
+                  <FormKit type="text" label="Zip" v-model="registration.zip" id="zip"/>
                </div>
+               <FormKit v-if="registration.status == 'Undergraduate'" type="select" label="1 Preferred delivery method" id="delivery"
+                  v-model="registration.deliveryMethod" validation="required"
+                  placeholder="Select a delivery method" @input="showNewContent"
+                  :options="{Library: 'LEO to Library', Address: 'Send to Address'}"
+               />
+               <template v-else>
+                  <FormKit type="select" label="2 Preferred delivery method" id="delivery"
+                     v-model="registration.deliveryMethod" validation="required"
+                     placeholder="Select a delivery method" @input="showNewContent"
+                     :options="{Library: 'LEO to Library', Dept: 'LEO to Department', Address: 'Send to Address'}"
+                  />
+                  <FormKit v-if="registration.deliveryMethod == 'Dept'" type="select" label="Building name" v-model="registration.buildingName"
+                     placeholder="Select a building" id="building" :options="system.buildings" validation="required"
+                  />
+               </template>
             </template>
-            <FormKit  v-else type="select" label="Pickup Library" v-model="registration.pickupLocation"
-               placeholder="Select a library" id="pickup-sel" :options="pickupLibraries" validation="required"
+            <template v-else-if="longDistance=='No'">
+               <template v-if="registration.status != 'Undergraduate'">
+                  <FormKit type="select" label="3 Preferred delivery method" id="delivery"
+                        v-model="registration.deliveryMethod" validation="required"
+                        placeholder="Select a delivery method" @input="showNewContent"
+                        :options="{Library: 'LEO to Library', Dept: 'LEO to Department'}"
+                     />
+                     <FormKit v-if="registration.deliveryMethod == 'Dept'" type="select" label="Building name" v-model="registration.buildingName"
+                        placeholder="Select a building" id="building" :options="system.buildings" validation="required"
+                     />
+                  </template>
+            </template>
+         </template>
+         <template v-else-if="registration.status != 'Undergraduate'">
+            <FormKit type="select" label="4 Preferred delivery method" id="delivery" v-model="registration.deliveryMethod" validation="required"
+               placeholder="Select a delivery method" @input="showNewContent"
+               :options="{Dept: 'LEO to Department', Library: 'LEO to Library'}"
+            />
+            <FormKit v-if="registration.deliveryMethod == 'Dept'" type="select" label="Building name" v-model="registration.buildingName"
+               placeholder="Select a building" id="building" :options="system.buildings" validation="required"
             />
          </template>
+
       </FormKit>
       <template #footer>
          <div class="footer-wrap">
@@ -94,6 +114,7 @@ const submitted = ref(false)
 const error = ref("")
 const illiadform = ref(null)
 
+const longDistance = ref("")
 const registration = ref({
    computeID: "",
    firstName: "",
@@ -152,10 +173,16 @@ const pickupLibraries = computed(()=>{
    ]
 })
 
+const isSCPS = computed( () => {
+   return ( registration.value.department == "School of Continuing and Professional Studies" ||
+      registration.value.school == "School of Continuing & Professional Studies")
+})
+
 const opened = (() => {
    error.value = ""
    working.value = false
    submitted.value = false
+   longDistance.value = ""
    registration.value.computeID = userStore.accountInfo.id
    registration.value.firstName = userStore.accountInfo.sirsiProfile.firstName
    registration.value.lastName = userStore.accountInfo.sirsiProfile.lastName
@@ -174,16 +201,30 @@ const opened = (() => {
    registration.value.pickupLocation = ""
 })
 
-const statusSelected = ( (newStatus) => {
+const statusSelected = ( () => {
    registration.value.deliveryMethod = ""
    registration.value.buildingName = ""
-   registration.value.pickupLocation = ""
-   if ( newStatus == "Undergraduate") {
-      registration.value.deliveryMethod = "Library"
+   longDistance.value = ""
+   if ( registration.value.pickupLocation == "SCED") {
+      registration.value.pickupLocation = ""
    }
 })
 
-const deliveryMethodChanged = ( () => {
+const distanceSelected = (() => {
+   registration.value.address1 = ""
+   registration.value.address2 = ""
+   registration.value.city = ""
+   registration.value.state = "VA"
+   registration.value.zip = ""
+   registration.value.deliveryMethod = ""
+   registration.value.buildingName = ""
+   if ( registration.value.pickupLocation == "SCED") {
+      registration.value.pickupLocation = ""
+   }
+   showNewContent()
+})
+
+const showNewContent = ( () => {
    // make sure any new UI elements displayed by the change are scrolled into view
    nextTick( () => {
       let body = document.getElementsByClassName("p-dialog-content")[0]
@@ -196,6 +237,16 @@ const submitRegistration = (() => {
       // address delivery method must set pickup location to 'Distance Education', which is value SCHED
       registration.value.pickupLocation = "SCED"
    }
+   if ( isSCPS.value == false && registration.value.status == 'Undergraduate' ) {
+      registration.value.deliveryMethod = "Library"
+   }
+   if ( isSCPS.value == true && registration.value.status == 'Undergraduate' && longDistance.value == 'No' ) {
+      registration.value.deliveryMethod = "Library"
+   }
+   if ( registration.value.deliveryMethod != "Dept") {
+      registration.value.buildingName = ""
+   }
+
    working.value = true
    error.value = ""
    axios.post("/api/illiad/register", registration.value).then( () => {
