@@ -201,7 +201,6 @@
                   <ILLiadMessages />
                </div>
                <template v-else>
-                  <ILLiadRegistration /> <!-- HACK REMOVE ME -->
                   <dl v-if="userStore.leoLocation">
                      <dt>LEO Delivery Location:</dt>
                      <dd>
