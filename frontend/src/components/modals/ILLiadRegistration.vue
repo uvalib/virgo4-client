@@ -41,13 +41,13 @@
                   <FormKit type="select" label="State" v-model="registration.state" id="state" placeholder="Select a state" :options="states"/>
                   <FormKit type="text" label="Zip" v-model="registration.zip" id="zip"/>
                </div>
-               <FormKit v-if="registration.status == 'Undergraduate'" type="select" label="1 Preferred delivery method" id="delivery"
+               <FormKit v-if="registration.status == 'Undergraduate'" type="select" label="Preferred delivery method" id="delivery"
                   v-model="registration.deliveryMethod" validation="required"
                   placeholder="Select a delivery method" @input="showNewContent"
                   :options="{Library: 'LEO to Library', Address: 'Send to Address'}"
                />
                <template v-else>
-                  <FormKit type="select" label="2 Preferred delivery method" id="delivery"
+                  <FormKit type="select" label="Preferred delivery method" id="delivery"
                      v-model="registration.deliveryMethod" validation="required"
                      placeholder="Select a delivery method" @input="showNewContent"
                      :options="{Library: 'LEO to Library', Dept: 'LEO to Department', Address: 'Send to Address'}"
@@ -59,7 +59,7 @@
             </template>
             <template v-else-if="longDistance=='No'">
                <template v-if="registration.status != 'Undergraduate'">
-                  <FormKit type="select" label="3 Preferred delivery method" id="delivery"
+                  <FormKit type="select" label="Preferred delivery method" id="delivery"
                         v-model="registration.deliveryMethod" validation="required"
                         placeholder="Select a delivery method" @input="showNewContent"
                         :options="{Library: 'LEO to Library', Dept: 'LEO to Department'}"
@@ -71,7 +71,7 @@
             </template>
          </template>
          <template v-else-if="registration.status != 'Undergraduate'">
-            <FormKit type="select" label="4 Preferred delivery method" id="delivery" v-model="registration.deliveryMethod" validation="required"
+            <FormKit type="select" label="Preferred delivery method" id="delivery" v-model="registration.deliveryMethod" validation="required"
                placeholder="Select a delivery method" @input="showNewContent"
                :options="{Dept: 'LEO to Department', Library: 'LEO to Library'}"
             />
