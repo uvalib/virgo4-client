@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Dialog from 'primevue/dialog'
 import ReservedPanel from "@/components/requests/panels/ReservedPanel.vue"
 import SignIn from "@/views/SignIn.vue"
@@ -85,6 +85,12 @@ const notes = ref("")
 
 const submitted = ref(false)
 const videoForm = ref()
+
+onMounted( () => {
+   if ( request.activeRequest == "videoReserve") {
+      showDialog.value = true
+   }
+})
 
 const dialogOpened = (() => {
    submitted.value = false

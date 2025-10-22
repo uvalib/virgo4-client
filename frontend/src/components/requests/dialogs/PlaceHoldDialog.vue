@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Dialog from 'primevue/dialog'
 import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
 import SignIn from "@/views/SignIn.vue"
@@ -96,6 +96,13 @@ const selectedItem = ref(null)
 const pickupLibrary = ref()
 const submitted = ref(false)
 const showDialog = ref(false)
+
+
+onMounted( () => {
+   if ( request.activeRequest == "hold") {
+      showDialog.value = true
+   }
+})
 
 const pickupLibraries = computed(()=>{
    if ( selectedItem.value && selectedItem.value.callNumber.includes("Ivy limited circulation") ) {
