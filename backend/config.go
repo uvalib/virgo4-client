@@ -65,7 +65,6 @@ type ServiceConfig struct {
 	SMTP           SMTPConfig
 	Illiad         IlliadConfig
 	Firebase       FirebaseConfig
-	DibsURL        string
 }
 
 // LoadConfig will load the service configuration from env/cmdline
@@ -115,9 +114,6 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.Firebase.DatabaseURL, "fbdb", "", "Firebase database URL")
 	flag.StringVar(&cfg.Firebase.ProjectID, "fbproject", "", "Firebase projectID")
 
-	// DIBS electronic reserves base URL
-	flag.StringVar(&cfg.DibsURL, "dibsurl", "", "DIBS electronic reserves base URL")
-
 	flag.Parse()
 
 	if cfg.SearchAPI == "" {
@@ -157,11 +153,6 @@ func LoadConfig() *ServiceConfig {
 	}
 	if cfg.JWTKey == "" {
 		log.Fatal("jwtkey param is required")
-	}
-	if cfg.DibsURL == "" {
-		log.Fatal("dibsurl param is required")
-	} else {
-		log.Printf("DIBS URL: %s", cfg.DibsURL)
 	}
 
 	if cfg.Firebase.APIKey == "" {

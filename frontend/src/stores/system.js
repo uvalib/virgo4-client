@@ -32,7 +32,6 @@ export const useSystemStore = defineStore('system', {
       shelfBrowseURL: "",
       hsILLiadURL: "",
       illiadCfg: {},
-      dibsURL: "",
       searchAPI: "",
       sessionExpired: false,
       locationCodes: [],
@@ -199,7 +198,6 @@ export const useSystemStore = defineStore('system', {
          this.collectionsURL = cfg.collectionsURL
          this.hsILLiadURL = cfg.hsILLiadURL
          this.shelfBrowseURL = cfg.shelfBrowseURL
-         this.dibsURL = cfg.dibsURL
          this.allPickupLibraries = cfg.pickupLibraries
          this.illiadCfg = cfg.illiad
       },

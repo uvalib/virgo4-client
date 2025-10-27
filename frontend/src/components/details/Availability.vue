@@ -8,7 +8,6 @@
          <div class="online" v-if="hasOnlineContent">
             <OnlineAccessPanel v-if="item.onlineAccessSources.length > 0 && !system.isKiosk"
                :title="item.details.header.title" :pool="item.details.source" :sources="item.onlineAccessSources" />
-            <DiBSViewer :items="dibsItems" v-if="dibsItems.length > 0"></DiBSViewer>
          </div>
 
          <div class="avail-statement ra-box ra-fiy pad-top" v-if="availabilityStatement" v-html="availabilityStatement"></div>
@@ -48,7 +47,6 @@
 <script setup>
 import { computed } from "vue"
 import LibraryItemsPanel from "@/components/details/LibraryItemsPanel.vue"
-import DiBSViewer from "@/components/details/DiBSViewer.vue"
 import OnlineAccessPanel from "@/components/details/OnlineAccessPanel.vue"
 import RequestsPanel from "@/components/details/RequestsPanel.vue"
 import { useItemStore } from "@/stores/item"
@@ -63,7 +61,7 @@ const system = useSystemStore()
 
 const hasOnlineContent = computed( () => {
    if ( system.isKiosk ) return false
-   return (item.onlineAccessSources.length > 0 || dibsItems.value.length > 0 )
+   return (item.onlineAccessSources.length > 0 )
 })
 const hasItems = computed(()=>{
    return item.availability.libraries.length > 0
@@ -115,18 +113,6 @@ const libraryAvailabilityNotes = computed(()=>{
       return af.value
    }
    return []
-})
-
-const dibsItems = computed(()=>{
-   let items = []
-   item.availability.libraries.forEach( lib => {
-      lib.items.forEach( item => {
-         if ( item.dibs ) {
-            items.push(item)
-         }
-      })
-   })
-   return items
 })
 
 </script>
