@@ -31,7 +31,7 @@ export const useSystemStore = defineStore('system', {
       collectionsURL: "",
       shelfBrowseURL: "",
       hsILLiadURL: "",
-      illiadCfg: {},
+      illiadCfg: {departments: [], buildings: [], schools: []},
       searchAPI: "",
       sessionExpired: false,
       locationCodes: [],
@@ -59,7 +59,7 @@ export const useSystemStore = defineStore('system', {
          return state.message.type == "error" || state.message.type == "ilsError"
       },
       departments: state => {
-         return state.illiadCfg.departments.map( d => d.name)
+         return state.illiadCfg.departments
       },
       schools: state => {
          return state.illiadCfg.schools
