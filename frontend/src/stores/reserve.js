@@ -151,7 +151,11 @@ export const useReserveStore = defineStore('reserve', {
 
       },
 
-      createReserves() {
+      createVideoReserves() {
+         // NOTES: the requestList i spopulated from teh bookmark data structure
+         // which only has a string for callNumber. Prior logic to determine array or not
+         // is not necessary. ILSConnect has been updated to expect a string rather
+         // than an array for callNumer
          const userStore = useUserStore()
          this.working = true
          let v4UserID = userStore.signedInUser
@@ -159,7 +163,8 @@ export const useReserveStore = defineStore('reserve', {
          this.requestList.forEach( item=>{
             let notes = item.notes
             if (notes.length == 0) notes = "-"
-            let subItem = {catalogKey: item.identifier,
+            let subItem = {
+               catalogKey: item.identifier,
                pool: item.pool,
                title: item.details.title,
                author: item.details.author,
@@ -171,12 +176,8 @@ export const useReserveStore = defineStore('reserve', {
                isVideo: item.video,
                audioLanguage: item.audioLanguage,
                subtitles: item.subtitles,
-               subtitleLanguage: item.subtitleLanguage
-            }
-            if (Array.isArray(item.details.callNumber)) {
-               subItem.callNumber = item.details.callNumber
-            } else {
-               subItem.callNumber = [item.details.callNumber]
+               subtitleLanguage: item.subtitleLanguage,
+               callNumber: item.details.callNumber
             }
             data.items.push( subItem )
          })
@@ -192,8 +193,13 @@ export const useReserveStore = defineStore('reserve', {
          })
       },
 
-      async createVideoReserve(v4UserID, video){
+      async createVideoReserve(video) {
+         // NOTE: the video data here comes from the video reserve request dialog. It ensures
+         // there is only a single callNumber selected. As mentioned in the other video
+         // request action, ILSConnect has been update to accept a string callNum rather than array
          const system = useSystemStore()
+         const userStore = useUserStore()
+         let v4UserID = userStore.signedInUser
 
          let data = { userID: v4UserID, request: this.request, items: [video] }
          await axios.post(`/api/coursereserves`, data).then((_response) => {

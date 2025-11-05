@@ -70,7 +70,9 @@ func (svc *ServiceContext) createCourseReserves(c *gin.Context) {
 	var req any
 	c.ShouldBindJSON(&req)
 
-	log.Printf("INFO: %s requests course reserves %v", v4Claims.UserID, req)
+	jsonReq, _ := json.Marshal(req)
+
+	log.Printf("INFO: %s requests course reserves [ %s ]", v4Claims.UserID, jsonReq)
 	url := fmt.Sprintf("%s/course_reserves", svc.ILSAPI)
 	resp, ilsErr := svc.ILSConnectorPost(url, req, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {

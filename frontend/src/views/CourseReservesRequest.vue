@@ -97,7 +97,7 @@ function cancelRequest() {
    router.push("/bookmarks")
 }
 function submitRequest() {
-   reserveStore.createReserves()
+   reserveStore.createVideoReserves()
 }
 </script>
 

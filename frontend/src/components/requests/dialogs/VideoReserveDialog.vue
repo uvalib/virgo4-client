@@ -124,7 +124,7 @@ const submit = (async () => {
    selectedVideo.value.notes = notes.value
    selectedVideo.value.isVideo = true
    request.working = true
-   await reserve.createVideoReserve(user.signedInUser, selectedVideo.value)
+   await reserve.createVideoReserve(selectedVideo.value)
    request.working = false
    submitted.value = true
 })
