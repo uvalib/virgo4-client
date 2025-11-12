@@ -3,10 +3,14 @@
       <SignInRequired v-if="userStore.isSignedIn == false" targetPage="request information"/>
       <AccountActivities  v-if="userStore.isSignedIn"/>
       <div class="details" v-if="userStore.isSignedIn">
-         <template v-if="userStore.canUseILLiad && !userStore.noILSAccount && !userStore.isBarred">
+         <template v-if="userStore.canUseILLiad">
             <h3>Make a New Request</h3>
             <div v-if="userStore.isHSLUser" class="subcontent">
                <a :href="systemStore.hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i></a>
+            </div>
+            <div class="subcontent no-illiad" v-else-if="userStore.hasIlliad  == false">
+               <div>No ILLiad account found.</div>
+               <ILLiadRegistration />
             </div>
             <div v-else-if="userStore.illiadBlocked" class="subcontent">
                <ILLiadMessages />
@@ -92,7 +96,7 @@
             </template>
             <template v-if="userStore.lookingUp == false && !systemStore.ilsError && userStore.requests.holds.length > 0">
                <AccordionContent
-                     :expanded="$route.hash == '#ils-holds'"
+                     :expanded="true"
                      class="requests-accordion"
                      borderWidth="0 0 3px 0"
                      borderColor="#007BAC"
@@ -259,6 +263,7 @@ import ILLScanArticle from "@/components/requests/standalone/ILLScanArticle.vue"
 import InstructionalScan from "@/components/requests/standalone/InstructionalScan.vue"
 import ResearchScan from "@/components/requests/standalone/ResearchScan.vue"
 import PDFRemediation from "@/components/requests/standalone/PDFRemediation.vue"
+import ILLiadRegistration from "@/components/modals/ILLiadRegistration.vue"
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
 import { useRequestStore } from "@/stores/request"
@@ -422,6 +427,9 @@ onMounted(() =>{
    }
    h3.gap {
       margin: 25px 0 5px 0;
+   }
+   .subcontent.no-illiad {
+      align-items: flex-start;
    }
    .subcontent {
       margin-bottom: 0px;
