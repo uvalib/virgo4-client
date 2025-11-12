@@ -2,9 +2,6 @@
    <div v-if="user.illiadCleared == 'no'" class="illiad-message">
       Your ILLiad account is currently awaiting clearance by ILS staff. You will be notified once your account is active.
    </div>
-   <div v-else-if="user.illiadCleared == 'new'" class="illiad-message">
-      Your ILLiad account registration is incomplete. Please contact ILS staff at <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.
-   </div>
    <div v-else-if="user.illiadCleared == 'dis'" class="illiad-message">
       Your ILLiad account has been disavowed. This may be due to a change in your UVA status or your affiliation with the UVA Medical Center.
       Please contact ILS staff at <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> for assistance.

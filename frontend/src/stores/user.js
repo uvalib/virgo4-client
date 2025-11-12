@@ -107,7 +107,7 @@ export const useUserStore = defineStore('user', {
          return state.accountInfo.standing == "BARRED" ||  state.accountInfo.standing == "BARR-SUPERVISOR"
       },
       hasIlliad: state => {
-         return state.illiad.hasAccount
+         return state.illiad.hasAccount && state.illiad.cleared != "NEW"
       },
       illiadCleared: (state) => {
          return state.illiad.cleared.toLowerCase()
