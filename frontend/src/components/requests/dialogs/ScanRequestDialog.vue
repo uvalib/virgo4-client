@@ -42,7 +42,7 @@
       <template #footer>
          <template v-if="submitted == false && user.isSignedIn">
             <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
-            <VirgoButton label="Submit Request" @click="submit" :disabled="user.illiadBlocked || !user.hasIlliad"/>
+            <VirgoButton label="Submit Request" @click="scanForm.node.submit()" :disabled="user.illiadBlocked || !user.hasIlliad"/>
          </template>
          <VirgoButton v-else severity="secondary" id="request-done" @click="showDialog=false" label="Close"/>
       </template>
