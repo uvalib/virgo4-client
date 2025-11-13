@@ -4,11 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"mime/multipart"
 	"net/http"
-	"os"
 	"path"
 	"strings"
 	"text/template"
@@ -271,104 +268,112 @@ func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 		return
 	}
 
-	// this has already been thru auth middleware so JWT/claims will exist
-	v4Claims, _ := getJWTClaims(c)
-	jwtIface, _ := c.Get("jwt")
-	jwt, _ := jwtIface.(string)
+	// // this has already been thru auth middleware so JWT/claims will exist
+	// v4Claims, _ := getJWTClaims(c)
+	// jwtIface, _ := c.Get("jwt")
+	// jwt, _ := jwtIface.(string)
 
-	// pull required data from form fields
-	work := formData.Value["work"][0]
-	title := formData.Value["title"][0]
-	course := formData.Value["course"][0]
+	// // pull required data from form fields
+	// work := formData.Value["work"][0]
+	// title := formData.Value["title"][0]
+	// course := formData.Value["course"][0]
 	formFile := formData.File["file"][0]
 
-	log.Printf("INFO: process pdf remediation request from %s for course %s, work '%s', title '%s", v4Claims.UserID, course, work, title)
-	baseReq := illiadRequest{
-		Username:          v4Claims.UserID,
-		RequestType:       "Article",
-		TransactionStatus: "Remediation Request",
-		ProcessType:       "DocDel",
-		DocumentType:      "Instructional",
-	}
-	remediateReq := struct {
-		*illiadRequest
-		PhotoJournalTitle string
-		PhotoArticleTitle string
-	}{
-		illiadRequest:     &baseReq,
-		PhotoJournalTitle: work,
-		PhotoArticleTitle: title,
-	}
+	// log.Printf("INFO: process pdf remediation request from %s for course %s, work '%s', title '%s", v4Claims.UserID, course, work, title)
+	// baseReq := illiadRequest{
+	// 	Username:          v4Claims.UserID,
+	// 	RequestType:       "Article",
+	// 	TransactionStatus: "Remediation Request",
+	// 	ProcessType:       "DocDel",
+	// 	DocumentType:      "Instructional",
+	// }
+	// remediateReq := struct {
+	// 	*illiadRequest
+	// 	PhotoJournalTitle string
+	// 	PhotoArticleTitle string
+	// }{
+	// 	illiadRequest:     &baseReq,
+	// 	PhotoJournalTitle: work,
+	// 	PhotoArticleTitle: title,
+	// }
 
-	transactionNum, illErr := svc.createILLiadTransaction(remediateReq, course)
-	if illErr != nil {
-		log.Printf("WARN: Illiad Error: %s", illErr.Message)
-		c.String(illErr.StatusCode, IlliadErrorMessage)
-		return
-	}
+	// transactionNum, illErr := svc.createILLiadTransaction(remediateReq, course)
+	// if illErr != nil {
+	// 	log.Printf("WARN: Illiad Error: %s", illErr.Message)
+	// 	c.String(illErr.StatusCode, IlliadErrorMessage)
+	// 	return
+	// }
 
 	log.Printf("INFO: pull file %s from request to temporary file", formFile.Filename)
 	destFile := path.Join("/tmp", formFile.Filename)
-	frmFile, err := formFile.Open()
+	err = c.SaveUploadedFile(formFile, destFile)
 	if err != nil {
-		log.Printf("ERROR: unable to open uploaded file %s: %s", formFile.Filename, err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
-	defer frmFile.Close()
-	out, err := os.Create(destFile)
-	if err != nil {
-		log.Printf("ERROR: unable to create temp file %s: %s", destFile, err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
-	defer out.Close()
-	_, err = io.Copy(out, frmFile)
-	if err != nil {
-		log.Printf("ERROR: unable to write temp file %s: %s", destFile, err.Error())
+		log.Printf("ERROR: unable to save %s: %s", formFile.Filename, err.Error())
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	log.Printf("INFO: create new multipart-form with the received file")
-	dlFile, oErr := os.Open(destFile)
-	if oErr != nil {
-		log.Printf("ERROR: unable to open %s so it can be added to a new multipart form: %s", destFile, oErr.Error())
-		c.String(http.StatusInternalServerError, oErr.Error())
-		return
-	}
-	defer dlFile.Close()
+	c.String(http.StatusNotImplemented, "no op for testing ")
+	// frmFile, err := formFile.Open()
+	// if err != nil {
+	// 	log.Printf("ERROR: unable to open uploaded file %s: %s", formFile.Filename, err.Error())
+	// 	c.String(http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+	// defer frmFile.Close()
+	// out, err := os.Create(destFile)
+	// if err != nil {
+	// 	log.Printf("ERROR: unable to create temp file %s: %s", destFile, err.Error())
+	// 	c.String(http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+	// defer out.Close()
+	// _, err = io.Copy(out, frmFile)
+	// if err != nil {
+	// 	log.Printf("ERROR: unable to write temp file %s: %s", destFile, err.Error())
+	// 	c.String(http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
 
-	formBuff := &bytes.Buffer{}
-	formWriter := multipart.NewWriter(formBuff)
-	// append the transaction number to the filename sent to the uploader
-	fileW, cErr := formWriter.CreateFormFile("file", fmt.Sprintf("%d_%s", transactionNum, formFile.Filename))
-	if cErr != nil {
-		log.Printf("ERROR: unable to create form file: %s", cErr.Error())
-		c.String(http.StatusInternalServerError, cErr.Error())
-		return
-	}
+	// log.Printf("INFO: create new multipart-form with the received file")
+	// dlFile, oErr := os.Open(destFile)
+	// if oErr != nil {
+	// 	log.Printf("ERROR: unable to open %s so it can be added to a new multipart form: %s", destFile, oErr.Error())
+	// 	c.String(http.StatusInternalServerError, oErr.Error())
+	// 	return
+	// }
+	// defer dlFile.Close()
 
-	_, cpErr := io.Copy(fileW, dlFile)
-	if cpErr != nil {
-		log.Printf("ERROR: unable to add %s to upload form: %s", formFile.Filename, cpErr.Error())
-		c.String(http.StatusInternalServerError, cpErr.Error())
-		return
-	}
+	// formBuff := &bytes.Buffer{}
+	// formWriter := multipart.NewWriter(formBuff)
+	// // append the transaction number to the filename sent to the uploader
+	// fileW, cErr := formWriter.CreateFormFile("file", fmt.Sprintf("%d_%s", transactionNum, formFile.Filename))
+	// if cErr != nil {
+	// 	log.Printf("ERROR: unable to create form file: %s", cErr.Error())
+	// 	c.String(http.StatusInternalServerError, cErr.Error())
+	// 	return
+	// }
 
-	formWriter.Close() // gotta do this to to get multipart form terminating boundary
+	// _, cpErr := io.Copy(fileW, dlFile)
+	// if cpErr != nil {
+	// 	log.Printf("ERROR: unable to add %s to upload form: %s", formFile.Filename, cpErr.Error())
+	// 	c.String(http.StatusInternalServerError, cpErr.Error())
+	// 	return
+	// }
 
-	log.Printf("INFO: send form with file to illiad upload service")
-	req, _ := http.NewRequest("POST", svc.Illiad.UploadURL, formBuff)
-	req.Header.Set("Content-Type", formWriter.FormDataContentType())
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwt))
-	_, reqErr := svc.SlowHTTPClient.Do(req) // 30 sec timeout. Hopefully big enough
-	if reqErr != nil {
-		log.Printf("ERROR: upload failed: %s", reqErr.Error())
-		return
-	}
+	// formWriter.Close() // gotta do this to to get multipart form terminating boundary
 
-	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
+	// log.Printf("INFO: send form with file to illiad upload service")
+	// req, _ := http.NewRequest("POST", svc.Illiad.UploadURL, formBuff)
+	// req.Header.Set("Content-Type", formWriter.FormDataContentType())
+	// req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwt))
+	// _, reqErr := svc.SlowHTTPClient.Do(req) // 30 sec timeout. Hopefully big enough
+	// if reqErr != nil {
+	// 	log.Printf("ERROR: upload failed: %s", reqErr.Error())
+	// 	return
+	// }
+
+	// c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
 }
 
 func (svc *ServiceContext) getOutstandingStandaloneRequests(c *gin.Context) {
@@ -454,6 +459,7 @@ func (svc *ServiceContext) getOutstandingOtherRequestsCount(userID string) (int,
 // CreateStandaloneScan send a request for a standalone scan to ILLiad
 func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	var req struct {
+		// TODO might need to support RESEARCH too
 		ScanType     string `json:"scanType"` // ARTICLE or INSTRUCTIONAL
 		DocType      string `json:"doctype"`
 		Course       string `json:"course"`
