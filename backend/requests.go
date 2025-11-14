@@ -126,8 +126,8 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// CreateBorrowRequest sends a borrow request to ILLiad for A/V or non-A/V-items
-func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
+// CreateStandaloneBorrowRequest sends a borrow request to ILLiad for A/V or non-A/V-items
+func (svc *ServiceContext) CreateStandaloneBorrowRequest(c *gin.Context) {
 	var req struct {
 		BorrowType    string `json:"borrowType"`
 		DocumentType  string `json:"doctype"`
@@ -488,9 +488,8 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 
 	log.Printf("Process standalone %s scan request from %s for  '%s'", req.ScanType, v4Claims.UserID, req.Title)
 	illiadReq := illiadRequest{
-		Username:          v4Claims.UserID,
-		RequestType:       "Article",
-		TransactionStatus: "Standalone Form Scan Request",
+		Username:    v4Claims.UserID,
+		RequestType: "Article",
 	}
 	scanReq := illiadScanRequest{
 		illiadRequest:              &illiadReq,
@@ -508,13 +507,10 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	note := ""
 
 	switch req.ScanType {
-	case "RESEARCH":
-		illiadReq.ProcessType = "DocDel"
-		illiadReq.DocumentType = "Article"
-		scanReq.TransactionStatus = "No Hold Scan Request"
 	case "INSTRUCTIONAL":
-		illiadReq.ProcessType = "DocDel"
-		illiadReq.DocumentType = "Instructional"
+		scanReq.ProcessType = "DocDel"
+		scanReq.DocumentType = "Instructional"
+		scanReq.TransactionStatus = "No Hold Scan Request"
 		note = req.Course
 		if req.AnyLanguage == "true" {
 			scanReq.AcceptNonEnglish = true
@@ -522,9 +518,15 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		if req.PersonalCopy == "true" {
 			scanReq.Location = "Personal Copy"
 		}
+	case "RESEARCH":
+		scanReq.ProcessType = "DocDel"
+		scanReq.DocumentType = "Article"
+		scanReq.TransactionStatus = "No Hold Scan Request"
+
 	case "ARTICLE":
-		illiadReq.ProcessType = "Borrowing"
-		illiadReq.DocumentType = req.DocType
+		scanReq.ProcessType = "Borrowing"
+		scanReq.DocumentType = req.DocType
+		scanReq.TransactionStatus = "Awaiting Request Processing"
 		note = req.Notes
 	default:
 		log.Printf("ERROR: invalid scan type %s", req.ScanType)
