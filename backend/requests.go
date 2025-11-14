@@ -604,10 +604,14 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 
 	// Only make a hold for certain libraries
 	makeHold := false
-	for _, holdLoc := range []string{"BY-REQUEST", "STACKS", "OVERSIZE", "RESERVE", "REFERENCE", "CUR-PER", "JOURNALS"} {
+	transactionStatus := "No Hold Scan Request"
+	for _, holdLoc := range []string{
+		"BY-REQUEST", "STACKS", "STACKS-1", "STACKS-2", "STACKS-3", "STACKS-4", "STACKS-5",
+		"OVERSIZE", "RESERVE", "REFERENCE", "CUR-PER", "JOURNALS"} {
 		if scanReq.Location == holdLoc {
 			log.Printf("Making hold for %s\n%+v", scanReq.ItemBarcode, scanReq)
 			makeHold = true
+			transactionStatus = "Scan Request - Hold Placed"
 		}
 	}
 
@@ -617,7 +621,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		Username:          v4Claims.UserID,
 		RequestType:       "Article",
 		ProcessType:       "DocDel",
-		TransactionStatus: "No Hold Scan Request",
+		TransactionStatus: transactionStatus,
 		DocumentType:      scanReq.IlliadType,
 	}
 	illiadScanReq := illiadScanRequest{
@@ -633,10 +637,6 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		ItemNumber:                 scanReq.ItemBarcode,
 		CallNumber:                 scanReq.CallNumber,
 		Location:                   scanReq.Library, // Library needs to go in the illiad location field
-	}
-
-	if makeHold {
-		illiadScanReq.TransactionStatus = "Scan Request - Hold Placed"
 	}
 
 	transactionNum, illErr := svc.createILLiadTransaction(illiadScanReq, scanReq.Notes)
