@@ -602,6 +602,15 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		return
 	}
 
+	// Only make a hold for certain libraries
+	makeHold := false
+	for _, holdLoc := range []string{"BY-REQUEST", "STACKS", "OVERSIZE", "RESERVE", "REFERENCE", "CUR-PER", "JOURNALS"} {
+		if scanReq.Location == holdLoc {
+			log.Printf("Making hold for %s\n%+v", scanReq.ItemBarcode, scanReq)
+			makeHold = true
+		}
+	}
+
 	// First, attempt the ILLiad POST... convert into required structure
 	log.Printf("Process scan request from %s for barcode %s", v4Claims.UserID, scanReq.ItemBarcode)
 	illiadReq := illiadRequest{
@@ -623,8 +632,11 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		ISSN:                       scanReq.Issn,
 		ItemNumber:                 scanReq.ItemBarcode,
 		CallNumber:                 scanReq.CallNumber,
-		// Library needs to go in the illiad location field
-		Location: scanReq.Library,
+		Location:                   scanReq.Library, // Library needs to go in the illiad location field
+	}
+
+	if makeHold {
+		illiadScanReq.TransactionStatus = "Scan Request - Hold Placed"
 	}
 
 	transactionNum, illErr := svc.createILLiadTransaction(illiadScanReq, scanReq.Notes)
@@ -634,20 +646,13 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		return
 	}
 
-	// Only make a hold for certain libraries
-	makeHold := false
-	for _, holdLoc := range []string{"BY-REQUEST", "STACKS", "OVERSIZE", "RESERVE", "REFERENCE", "CUR-PER", "JOURNALS"} {
-		if scanReq.Location == holdLoc {
-			log.Printf("Making hold for %s\n%+v", scanReq.ItemBarcode, scanReq)
-			makeHold = true
-		}
-	}
 	if !makeHold {
-		log.Printf("No Hold for %s", scanReq.ItemBarcode)
+		log.Printf("INFO: no hold for scan request %s", scanReq.ItemBarcode)
 		c.JSON(http.StatusOK, nil)
 		return
 	}
 
+	log.Printf("INFO: place hold for scan request %s", scanReq.ItemBarcode)
 	type ilsScanRequest struct {
 		ItemBarcode   string `json:"itemBarcode"`
 		PickupLibrary string `json:"pickupLibrary"`
