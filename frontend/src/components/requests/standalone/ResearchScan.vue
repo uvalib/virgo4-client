@@ -8,16 +8,6 @@
          <VirgoButton severity="secondary" @click="emit('canceled')" label="Cancel"/>
       </div>
       <FormKit v-else type="form" id="scan-article" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
-         <div class="instruct" v-if="request.personalCopy=='true'">
-            <p>Personal copies can be dropped off at a Library Circulation Desk, deposited in a Book Drop, or sent via campus mail to:</p>
-            <p class="addy">
-               Instructional Scanning Services<br/>
-               PO BOX 400109
-            </p>
-            <p>
-               <b>** Please include a note with instructor name and course information in the item when dropping off a personal copy.</b>
-            </p>
-         </div>
          <FormKit label="Book or Journal Title" type="text" v-model="request.title" validation="required" id="scan-item-title"/>
          <FormKit label="Chapter or Article Title" type="text" v-model="request.article" validation="required" />
          <FormKit label="Chapter or Article Author" type="text" v-model="request.author" />
@@ -46,8 +36,10 @@ const emit = defineEmits( ['submitted', 'canceled'])
 const requestStore = useRequestStore()
 
 const request = ref({
-   scanType: "ARTICLE",
-   personalCopy: "false",
+   // NOTE: scan type does not actually go to ILLiad. It is an internal flag
+   // to differentiate the type of scan being submitted
+   scanType: "RESEARCH",
+   doctype: "Article",
    title: "",
    article: "",
    author: "",
@@ -58,7 +50,6 @@ const request = ref({
    pages: "",
    issn: "",
    oclc: "",
-   anyLanguage: "false"
 })
 
 async function submitClicked() {

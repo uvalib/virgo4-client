@@ -14,7 +14,7 @@
     "@vueuse/core": "^14.0.0",
     "@vueuse/integrations": "^14.0.0",
     "axios": "^1.13.2",
-    "firebase": "^12.5.0",
+    "firebase": "^12.6.0",
     "jwt-decode": "^4.0.0",
     "pinia": "^3.0.4",
     "primevue": "^4.4.1",

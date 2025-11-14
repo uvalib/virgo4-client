@@ -51,6 +51,8 @@ const requestStore = useRequestStore()
 const item = useItemStore()
 
 const request = ref({
+   // NOTE: scan type does not actually go to ILLiad. It is an internal flag
+   // to differentiate the type of scan being submitted
    scanType: "ARTICLE",
    doctype: "",
    title: "",

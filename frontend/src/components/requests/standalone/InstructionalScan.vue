@@ -24,11 +24,11 @@
                <b>** Please include a note with instructor name and course information in the item when dropping off a personal copy.</b>
             </p>
          </div>
-         <FormKit label="Article or Chapter Title" type="text" v-model="request.title" validation="required"
+         <FormKit label="Article or Chapter Title" type="text" v-model="request.article" validation="required"
             help="One article or chapter per request, please"
          />
          <FormKit label="Article or Chapter Author" type="text" v-model="request.author" validation="required"/>
-         <FormKit label="Title of Work" type="text" v-model="request.work" validation="required"
+         <FormKit label="Title of Work" type="text" v-model="request.title" validation="required"
             help="Journal, Book, Conference Proceedings or Newspaper"
          />
          <FormKit label="Volume" type="text" v-model="request.volume"/>
@@ -58,12 +58,15 @@ import { setFocusID } from '@/utils'
 const emit = defineEmits( ['submitted', 'canceled'] )
 
 const request = ref({
+   // NOTE: scan type does not actually go to ILLiad. It is an internal flag
+   // to differentiate the type of scan being submitted
    scanType: "INSTRUCTIONAL",
+   doctype: "Instructional",
    course: "",
    personalCopy: "false",
-   title: "",
+   article: "",
    author: "",
-   work: "",
+   title: "",
    volume: "",
    issue: "",
    month: "",
