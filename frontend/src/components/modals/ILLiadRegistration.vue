@@ -162,7 +162,7 @@ const states = computed(() => {
 
 const pickupLibraries = computed(()=>{
    return [
-      {value: "SHAN", label: "Shannon"},
+      {value: "SHANNON", label: "Shannon"},
       {value: "SEL", label: "Brown Science & Engineering"},
       {value: "CLEM", label: "Clemons"},
       {value: "DARDEN", label: "Darden"},
