@@ -187,7 +187,7 @@ export const useSystemStore = defineStore('system', {
          } else {
             this.message.content = error
          }
-         this.reportError(this.message)
+         this.reportError(error)
       },
 
       setConfig(cfg) {
