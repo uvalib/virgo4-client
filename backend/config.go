@@ -59,7 +59,9 @@ type ServiceConfig struct {
 	FeedbackEmail  string
 	ILSAPI         string
 	CatalogPoolURL string
+
 	JWTKey         string
+	GeminiKey      string
 	Dev            DevConfig
 	DB             DBConfig
 	SMTP           SMTPConfig
@@ -80,6 +82,7 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.FeedbackEmail, "feedbackemail", "", "Email recipient for feedback")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
 	flag.StringVar(&cfg.CatalogPoolURL, "catalogPoolURL", "https://pool-solr-ws-uva-library-dev.internal.lib.virginia.edu/api/search", "Catalog Pool API URL")
+	flag.StringVar(&cfg.GeminiKey, "geminikey", "", "Gemini API key")
 
 	// Dev mode settings
 	flag.StringVar(&cfg.Dev.AuthUser, "devuser", "", "Authorized computing id for dev")
@@ -154,6 +157,12 @@ func LoadConfig() *ServiceConfig {
 	if cfg.JWTKey == "" {
 		log.Fatal("jwtkey param is required")
 	}
+
+	if cfg.GeminiKey == "" {
+		log.Printf("WARN: geminikey not set, AI suggestions will be disabled")
+	}
+
+
 
 	if cfg.Firebase.APIKey == "" {
 		cfg.Firebase.AppID = ""

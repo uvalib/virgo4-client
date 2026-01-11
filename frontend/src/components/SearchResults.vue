@@ -1,7 +1,7 @@
 <template>
    <PrintedSearchResults  v-if="systemStore.printing"/>
    <div tabindex="-1" id="results-container" class="search-results" aria-describedby="search-summary">
-      <SearchSuggestions />
+      <AISuggestions />
       <div class="results-header" role="heading" aria-level="2">
          <div id="search-summary" class="summary">
             <div class="query">Showing {{$formatNum(resultStore.total)}} results for:</div>
@@ -41,7 +41,7 @@ import PoolResultDetail from "@/components/PoolResultDetail.vue"
 import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
 import FacetSidebar from "@/components/FacetSidebar.vue"
 import SaveSearch from "@/components/modals/SaveSearch.vue"
-import SearchSuggestions from "@/components/SearchSuggestions.vue"
+import AISuggestions from "@/components/AISuggestions.vue"
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
 import { computed, nextTick, onMounted } from 'vue'

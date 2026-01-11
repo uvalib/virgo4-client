@@ -82,6 +82,8 @@ func main() {
 
 	api.POST("/error", svc.LogClientError)
 
+	api.POST("/suggestions", svc.AuthMiddleware, svc.GetAISuggestions)
+
 	api.GET("/bookmarks/:token", svc.GetPublicBookmarks)
 	api.GET("/codes", svc.AuthMiddleware, svc.GetCodes)
 

@@ -24,3 +24,4 @@ to_dev_db.sh
 frontend/yarn_start.sh
 .vscode
 jwt.key
+gemini.key

@@ -35,6 +35,7 @@ type ServiceContext struct {
 	ILSAPI          string
 	CatalogPoolURL  string
 	JWTKey          string
+	GeminiKey       string
 	Dev             DevConfig
 	Firebase        FirebaseConfig
 	GDB             *gorm.DB
@@ -62,6 +63,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		CollectionsURL: cfg.CollectionsURL,
 		ShelfBrowseURL: cfg.ShelfBrowseURL,
 		JWTKey:         cfg.JWTKey,
+		GeminiKey:      cfg.GeminiKey,
 		FeedbackEmail:  cfg.FeedbackEmail,
 		ILSAPI:         cfg.ILSAPI,
 		CatalogPoolURL: cfg.CatalogPoolURL,
