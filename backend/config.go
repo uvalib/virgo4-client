@@ -61,7 +61,12 @@ type ServiceConfig struct {
 	CatalogPoolURL string
 
 	JWTKey         string
-	GeminiKey      string
+	GeminiKey      string // Deprecated: use AIKey
+	AIProvider     string
+	AIKey          string
+	AIURL          string
+	AIModel        string
+
 	Dev            DevConfig
 	DB             DBConfig
 	SMTP           SMTPConfig
@@ -82,7 +87,13 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.FeedbackEmail, "feedbackemail", "", "Email recipient for feedback")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
 	flag.StringVar(&cfg.CatalogPoolURL, "catalogPoolURL", "https://pool-solr-ws-uva-library-dev.internal.lib.virginia.edu/api/search", "Catalog Pool API URL")
-	flag.StringVar(&cfg.GeminiKey, "geminikey", "", "Gemini API key")
+	flag.StringVar(&cfg.GeminiKey, "geminikey", "", "Gemini API key (Legacy)")
+	
+	// AI Provider settings
+	flag.StringVar(&cfg.AIProvider, "aiprovider", "gemini", "AI Provider (gemini, openai)")
+	flag.StringVar(&cfg.AIKey, "aikey", "", "AI Service API Key")
+	flag.StringVar(&cfg.AIURL, "aiurl", "", "AI Service Base URL (for openai provider)")
+	flag.StringVar(&cfg.AIModel, "aimodel", "", "AI Model name")
 
 	// Dev mode settings
 	flag.StringVar(&cfg.Dev.AuthUser, "devuser", "", "Authorized computing id for dev")
@@ -158,8 +169,13 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("jwtkey param is required")
 	}
 
-	if cfg.GeminiKey == "" {
-		log.Printf("WARN: geminikey not set, AI suggestions will be disabled")
+	// Backwards compatibility for GeminiKey
+	if cfg.AIKey == "" && cfg.GeminiKey != "" {
+		cfg.AIKey = cfg.GeminiKey
+	}
+
+	if cfg.AIKey == "" {
+		log.Printf("WARN: AIKey not set, AI suggestions will be disabled")
 	}
 
 

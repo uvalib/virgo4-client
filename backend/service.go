@@ -18,6 +18,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/uvalib/virgo4-client/backend/providers"
 	"gopkg.in/gomail.v2"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -45,6 +46,7 @@ type ServiceContext struct {
 	HTTPClient      *http.Client
 	SlowHTTPClient  *http.Client
 	RenewHTTPClient *http.Client
+	AIProvider      providers.AIProvider
 }
 
 // RequestError contains http status code and message for a
@@ -117,6 +119,23 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx.RenewHTTPClient = &http.Client{
 		Transport: defaultTransport,
 		Timeout:   5 * time.Minute,
+	}
+
+	// Initialize AI Provider
+	if cfg.AIKey != "" {
+		switch cfg.AIProvider {
+		case "openai":
+			log.Printf("INFO: Initializing OpenAI Provider (URL: %s, Model: %s)", cfg.AIURL, cfg.AIModel)
+			ctx.AIProvider = providers.NewOpenAIProvider(cfg.AIURL, cfg.AIKey, cfg.AIModel, ctx.HTTPClient)
+		case "gemini":
+			log.Printf("INFO: Initializing Gemini Provider")
+			ctx.AIProvider = providers.NewGeminiProvider(cfg.AIKey, ctx.HTTPClient)
+		default:
+			log.Printf("WARN: Unknown AI Provider '%s', defaulting to Gemini", cfg.AIProvider)
+			ctx.AIProvider = providers.NewGeminiProvider(cfg.AIKey, ctx.HTTPClient)
+		}
+	} else {
+		log.Printf("WARN: No AI Key configured, AI Provider disabled")
 	}
 
 	return &ctx, nil

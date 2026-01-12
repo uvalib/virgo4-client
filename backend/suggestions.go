@@ -2,16 +2,14 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/uvalib/virgo4-client/backend/providers"
 )
 
 type SuggestionRequest struct {
@@ -22,45 +20,10 @@ type SuggestionRequest struct {
 	} `json:"contextItems"`
 }
 
-type GeminiContent struct {
-	Parts []GeminiPart `json:"parts"`
-}
-
-type GeminiPart struct {
-	Text string `json:"text"`
-}
-
-type GeminiRequest struct {
-	Contents         []GeminiContent   `json:"contents"`
-	GenerationConfig *GenerationConfig `json:"generationConfig,omitempty"`
-}
-
-type GenerationConfig struct {
-	ResponseMimeType string        `json:"responseMimeType"`
-	ResponseSchema   *GeminiSchema `json:"responseSchema,omitempty"`
-}
-
-type GeminiSchema struct {
-	Type       string                   `json:"type"`
-	Items      *GeminiSchema            `json:"items,omitempty"`
-	Properties map[string]*GeminiSchema `json:"properties,omitempty"`
-}
-
-type AIResponse struct {
-	DidYouMean  string   `json:"didYouMean"`
-	Suggestions []string `json:"suggestions"`
-}
-
-type GeminiResponse struct {
-	Candidates []struct {
-		Content GeminiContent `json:"content"`
-	} `json:"candidates"`
-}
-
-// GetAISuggestions generates search suggestions using Gemini
+// GetAISuggestions generates search suggestions using the configured AI Provider
 func (svc *ServiceContext) GetAISuggestions(c *gin.Context) {
-	if svc.GeminiKey == "" {
-		log.Printf("AISuggestions: GeminiKey is not configured")
+	if svc.AIProvider == nil {
+		log.Printf("AISuggestions: AI Provider is not configured")
 		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "AI suggestions not available"})
 		return
 	}
@@ -71,109 +34,23 @@ func (svc *ServiceContext) GetAISuggestions(c *gin.Context) {
 		return
 	}
 
-	log.Printf("AISuggestions: Generating suggestions for query '%s' with %d context items", req.OriginalQuery, len(req.ContextItems))
+	log.Printf("AISuggestions: Generating suggestions for query '%s' with %d context items using provider '%s'", 
+		req.OriginalQuery, len(req.ContextItems), svc.AIProvider.Name())
 
-	// Construct the prompt
-	var promptBuilder strings.Builder
-	promptBuilder.WriteString(fmt.Sprintf("You are a helpful academic librarian assistant. The user is searching for: \"%s\".\n", req.OriginalQuery))
-	
-	if len(req.ContextItems) > 0 {
-		promptBuilder.WriteString("Here are the top search results found so far:\n")
-		for i, item := range req.ContextItems {
-			promptBuilder.WriteString(fmt.Sprintf("%d. Title: %s\n   Snippet: %s\n", i+1, item.Title, item.Snippet))
+	// Convert context items to provider format
+	providerContext := make([]providers.ContextItem, len(req.ContextItems))
+	for i, item := range req.ContextItems {
+		providerContext[i] = providers.ContextItem{
+			Title:   item.Title,
+			Snippet: item.Snippet,
 		}
-		promptBuilder.WriteString("\nAnalyze the user's query and the search results.\n")
-	} else {
-		promptBuilder.WriteString("\nThere are NO search results found for this query.\n")
 	}
 
-	promptBuilder.WriteString("1. If the query contains an OBVIOUS spelling error (e.g. 'talahassee' -> 'tallahassee'), set 'didYouMean' to the corrected term.\n")
-	promptBuilder.WriteString("2. If the query is likely intentional or archaic (e.g. 'shakespere'), leave 'didYouMean' empty.\n")
-	
-	if len(req.ContextItems) > 0 {
-		promptBuilder.WriteString("3. Populate 'suggestions' with 6-10 short, relevant, academic-style search phrases.\n")
-		promptBuilder.WriteString("   - IMPORTANT: Generate these suggestions using the USER'S ORIGINAL QUERY SPELLING, even if it appears misspelled. Do not automatically correct the spelling in the 'suggestions' list.\n")
-	} else {
-		promptBuilder.WriteString("3. Populate 'suggestions' with 6-10 short, relevant, academic-style search phrases.\n")
-		promptBuilder.WriteString("   - Since there are no results, assume the query is misspelled. Generate refine search phrases using the CORRECTED spelling (if available).\n")
-	}
-
-	// Call Gemini API
-	cleanKey := strings.TrimSpace(svc.GeminiKey)
-	geminiURL := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=%s", cleanKey)
-
-	geminiReqBody := GeminiRequest{
-		Contents: []GeminiContent{
-			{
-				Parts: []GeminiPart{
-					{Text: promptBuilder.String()},
-				},
-			},
-		},
-		GenerationConfig: &GenerationConfig{
-			ResponseMimeType: "application/json",
-			ResponseSchema: &GeminiSchema{
-				Type: "OBJECT",
-				Properties: map[string]*GeminiSchema{
-					"didYouMean": {Type: "STRING"},
-					"suggestions": {
-						Type: "ARRAY",
-						Items: &GeminiSchema{Type: "STRING"},
-					},
-				},
-			},
-		},
-	}
-
-	jsonBody, _ := json.Marshal(geminiReqBody)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", geminiURL, bytes.NewBuffer(jsonBody))
+	// Call AI Provider
+	aiResponse, err := svc.AIProvider.GetSuggestions(req.OriginalQuery, providerContext)
 	if err != nil {
-		log.Printf("AISuggestions: Failed to create request: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
-		return
-	}
-	httpReq.Header.Set("Content-Type", "application/json")
-
-	resp, err := svc.HTTPClient.Do(httpReq)
-	if err != nil {
-		log.Printf("AISuggestions: Call to Gemini failed: %s", err.Error())
-		c.JSON(http.StatusBadGateway, gin.H{"error": "Failed to contact AI service"})
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		log.Printf("AISuggestions: Gemini API returned status %d: %s", resp.StatusCode, string(bodyBytes))
-		log.Printf("AISuggestions: Prompt sent: %s", promptBuilder.String())
+		log.Printf("AISuggestions: Provider '%s' failed: %s", svc.AIProvider.Name(), err.Error())
 		c.JSON(http.StatusBadGateway, gin.H{"error": "AI service returned error"})
-		return
-	}
-
-	var geminiResp GeminiResponse
-	if err := json.NewDecoder(resp.Body).Decode(&geminiResp); err != nil {
-		log.Printf("AISuggestions: Failed to decode Gemini response: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process AI response"})
-		return
-	}
-
-	if len(geminiResp.Candidates) == 0 || len(geminiResp.Candidates[0].Content.Parts) == 0 {
-		log.Printf("AISuggestions: No candidates returned from Gemini")
-		c.JSON(http.StatusOK, gin.H{"suggestions": []string{}})
-		return
-	}
-
-	rawText := geminiResp.Candidates[0].Content.Parts[0].Text
-
-	// ... previous code ...
-	var aiResponse AIResponse
-	if err := json.Unmarshal([]byte(rawText), &aiResponse); err != nil {
-		log.Printf("AISuggestions: Failed to parse generated text as JSON: %s. Text was: %s", err.Error(), rawText)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse suggestions"})
 		return
 	}
 
