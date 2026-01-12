@@ -110,7 +110,7 @@ const opened = ( () => {
 
 const submitRequest = (() => {
    working.value = true
-   axios.post("/api/requests/account", this.accountRequest ).then( _resp => {
+   axios.post("/api/requests/account", registration.value ).then( _resp => {
       working.value = false
       userStore.flagAccountRequested()
       submitted.value = true
