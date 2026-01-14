@@ -75,7 +75,7 @@ func (p *GeminiProvider) GetSuggestions(query string, contextItems []ContextItem
 		promptBuilder.WriteString("\nThere are NO search results found for this query.\n")
 	}
 
-	promptBuilder.WriteString("1. If the query contains an OBVIOUS spelling error (e.g. 'talahassee' -> 'tallahassee'), set 'didYouMean' to the corrected term.\n")
+	promptBuilder.WriteString("1. If the query contains an OBVIOUS spelling error (e.g. 'talahassee cultural conflicts' -> 'tallahassee cultural conflicts'), set 'didYouMean' to the FULL corrected query string.\n")
 	promptBuilder.WriteString("2. If the query is likely intentional or archaic (e.g. 'shakespere'), leave 'didYouMean' empty.\n")
 
 	if len(contextItems) > 0 {
