@@ -122,20 +122,30 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	}
 
 	// Initialize AI Provider
-	if cfg.AIKey != "" {
+	if cfg.AIKey != "" || cfg.AIProvider == "bedrock" {
 		switch cfg.AIProvider {
 		case "openai":
 			log.Printf("INFO: Initializing OpenAI Provider (URL: %s, Model: %s)", cfg.AIURL, cfg.AIModel)
 			ctx.AIProvider = providers.NewOpenAIProvider(cfg.AIURL, cfg.AIKey, cfg.AIModel, ctx.HTTPClient)
 		case "gemini":
 			log.Printf("INFO: Initializing Gemini Provider")
-			ctx.AIProvider = providers.NewGeminiProvider(cfg.AIKey, ctx.HTTPClient)
+			// Gemini still needs a key
+			if cfg.AIKey == "" {
+				log.Printf("WARN: Gemini Key not set, AI suggestions will be disabled")
+			} else {
+				ctx.AIProvider = providers.NewGeminiProvider(cfg.AIKey, ctx.HTTPClient)
+			}
+		case "bedrock":
+			log.Printf("INFO: Initializing Bedrock Provider (Model: %s)", cfg.AIModel)
+			ctx.AIProvider = providers.NewBedrockProvider(cfg.AIModel, ctx.HTTPClient)
 		default:
 			log.Printf("WARN: Unknown AI Provider '%s', defaulting to Gemini", cfg.AIProvider)
-			ctx.AIProvider = providers.NewGeminiProvider(cfg.AIKey, ctx.HTTPClient)
+			if cfg.AIKey != "" {
+				ctx.AIProvider = providers.NewGeminiProvider(cfg.AIKey, ctx.HTTPClient)
+			}
 		}
 	} else {
-		log.Printf("WARN: No AI Key configured, AI Provider disabled")
+		log.Printf("WARN: No AI Key configured and provider is not Bedrock, AI Provider disabled")
 	}
 
 	return &ctx, nil

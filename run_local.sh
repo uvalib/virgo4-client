@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+# Add homebrew to path for go
+export PATH="/opt/homebrew/bin:$PATH"
+
 # Build the backend for macOS
 echo "Building backend..."
 make darwin
@@ -8,9 +12,10 @@ make darwin
 # You can override these by setting environment variables before running the script
 # Example: AI_PROVIDER=openai ./run_local.sh
 
-PROVIDER=${AI_PROVIDER:-gemini}
+PROVIDER=${AI_PROVIDER:-bedrock}
 API_KEY=${AI_KEY:-$(cat gemini.key)}
-# Use cat gemini.key as default fallback even for 'aikey' flag if not provided
+# Use cat gemini.key as default fallback even for 'aikey' flag if not provided.
+# Bedrock does not use this key, but the script passes it.
 # Note: For OpenAI/Grok, you'll need to provide the actual key via AI_KEY env var
 
 # Default URLs
@@ -34,6 +39,9 @@ fi
 
 if [ ! -z "$AI_MODEL" ]; then
   CMD="$CMD -aimodel=$AI_MODEL"
+elif [ "$PROVIDER" = "bedrock" ]; then
+  # Default Bedrock Model if not specified
+  CMD="$CMD -aimodel=anthropic.claude-3-sonnet-20240229-v1:0"
 fi
 
 echo "Running service with provider: $PROVIDER"

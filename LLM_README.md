@@ -39,17 +39,21 @@ AI_MODEL=grok-beta \
 ```
 
 ### 4. AWS Bedrock
-To use Bedrock, you must point to an endpoint that supports the OpenAI Chat Completions API schema.
-*Note: If your Bedrock endpoint requires AWS Signature V4 (SigV4) authentication instead of an API Key, you may need to run a local proxy (like [LiteLLM](https://github.com/BerriAI/litellm)) that handles the signing.*
+To use Bedrock freely, you just need valid AWS credentials in your environment.
+The client uses the standard AWS SDK, so it supports `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, or `~/.aws/config` profiles.
 
-**Example with a local proxy (e.g. LiteLLM running on port 4000):**
 ```bash
-AI_PROVIDER=openai \
-AI_KEY=sk-1234 \
-AI_URL=http://localhost:4000 \
-AI_MODEL=bedrock/anthropic.claude-3-sonnet-20240229-v1:0 \
+# Example with explicit keys
+export AWS_REGION=us-east-1
+export AWS_ACCESS_KEY_ID=AKIA...
+export AWS_SECRET_ACCESS_KEY=...
+
+AI_PROVIDER=bedrock \
+AI_MODEL=anthropic.claude-3-sonnet-20240229-v1:0 \
 ./run_local.sh
 ```
+
+**Note:** This uses the native Bedrock Runtime API (via OpenAI-compatible schema payload), signing requests with your AWS credentials. No proxy is required.
 
 ## Manual Configuration Flags
 

@@ -58,15 +58,17 @@ type OpenAIResponseFormat struct {
 }
 
 type OpenAIJsonSchema struct {
-	Name string `json:"name"`
+	Name   string                 `json:"name"`
 	Schema map[string]interface{} `json:"schema"`
-	Strict bool `json:"strict,omitempty"`
+	Strict bool                   `json:"strict,omitempty"`
+}
+
+type OpenAIChoice struct {
+	Message OpenAIMessage `json:"message"`
 }
 
 type OpenAIResponse struct {
-	Choices []struct {
-		Message OpenAIMessage `json:"message"`
-	} `json:"choices"`
+	Choices []OpenAIChoice `json:"choices"`
 }
 
 func (p *OpenAIProvider) GetSuggestions(query string, contextItems []ContextItem) (AIResponse, error) {
