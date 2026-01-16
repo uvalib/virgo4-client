@@ -32,9 +32,17 @@
                      {{s}}
                   </router-link>
                </template>
-            </div>
-         </div>
-      </div>
+             </div>
+          </div>
+          <div v-if="!feedbackGiven" class="feedback-row">
+             <span class="feedback-label">Helpful?</span>
+             <button @click="giveFeedback('up')" class="feedback-btn" title="Yes, helpful">👍</button>
+             <button @click="giveFeedback('down')" class="feedback-btn" title="No, not helpful">👎</button>
+          </div>
+          <div v-else class="feedback-row">
+             <span class="feedback-thanks">Thanks for your feedback!</span>
+          </div>
+       </div>
    </div>
 </template>
 
@@ -56,6 +64,7 @@ const suggestions = ref([])
 const didYouMean = ref("")
 const loading = ref(false)
 const disabled = ref(cookies.get("virgo4_ai_suggestions_disabled") === "true")
+const feedbackGiven = ref(false)
 
 // Only show the component check logic
 const showComponent = computed(() => {
@@ -96,6 +105,7 @@ const fetchSuggestions = async () => {
    loading.value = true
    suggestions.value = []
    didYouMean.value = ""
+   feedbackGiven.value = false
 
    try {
       // Gather context from the first pool (usually most relevant)
@@ -153,6 +163,25 @@ const getLink = (term) => {
 const suggestionClick = (term) => {
     queryStore.userSearched = true
     analytics.trigger('Results', 'AI_SUGGEST_CLICKED', term)
+}
+
+const giveFeedback = (type) => {
+    feedbackGiven.value = true
+    const entry = {
+        timestamp: new Date().toISOString(),
+        query: queryStore.string,
+        feedback: type,
+        suggestions: suggestions.value
+    }
+    
+    // Save to local storage
+    try {
+        const existing = JSON.parse(localStorage.getItem("virgo4_ai_feedback_log") || "[]")
+        existing.push(entry)
+        localStorage.setItem("virgo4_ai_feedback_log", JSON.stringify(existing))
+    } catch (e) {
+        console.error("Failed to save feedback", e)
+    }
 }
 </script>
 
@@ -303,5 +332,45 @@ h2 {
 
 .sep {
     color: $uva-grey-100;
+}
+
+.feedback-row {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed #cce5ff;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85em;
+    color: #555;
+}
+
+.feedback-label {
+    font-weight: 500;
+}
+
+.feedback-btn {
+    background: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 2px 5px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    
+    &:hover {
+        background-color: rgba(0,0,0,0.05);
+        transform: scale(1.1);
+    }
+    
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+.feedback-thanks {
+    font-style: italic;
+    color: #28a745;
 }
 </style>
