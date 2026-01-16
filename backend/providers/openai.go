@@ -39,6 +39,10 @@ func (p *OpenAIProvider) Name() string {
 	return "openai"
 }
 
+func (p *OpenAIProvider) GetModel() string {
+	return p.Model
+}
+
 // OpenAI-specific structs
 type OpenAIMessage struct {
 	Role    string `json:"role"`

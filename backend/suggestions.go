@@ -34,8 +34,8 @@ func (svc *ServiceContext) GetAISuggestions(c *gin.Context) {
 		return
 	}
 
-	log.Printf("AISuggestions: Generating suggestions for query '%s' with %d context items using provider '%s'", 
-		req.OriginalQuery, len(req.ContextItems), svc.AIProvider.Name())
+	log.Printf("AISuggestions: Generating suggestions for query '%s' with %d context items using provider '%s' (Model: %s)", 
+		req.OriginalQuery, len(req.ContextItems), svc.AIProvider.Name(), svc.AIProvider.GetModel())
 
 	// Convert context items to provider format
 	providerContext := make([]providers.ContextItem, len(req.ContextItems))
@@ -64,9 +64,11 @@ func (svc *ServiceContext) GetAISuggestions(c *gin.Context) {
 		}
 		checkChan := make(chan resultCheck, len(aiResponse.Suggestions))
 
+		jwt := c.GetString("jwt")
+
 		for _, s := range aiResponse.Suggestions {
 			go func(term string) {
-				valid := svc.verifySuggestionHasResults(term)
+				valid := svc.verifySuggestionHasResults(term, jwt)
 				checkChan <- resultCheck{term: term, valid: valid}
 			}(s)
 		}
@@ -102,7 +104,7 @@ type VirgoSearchResponse struct {
 	TotalHits int `json:"total_hits"`
 }
 
-func (svc *ServiceContext) verifySuggestionHasResults(query string) bool {
+func (svc *ServiceContext) verifySuggestionHasResults(query string, jwt string) bool {
 	if svc.SearchAPI == "" {
 		return true // Fail open if search API is not configured
 	}
@@ -122,6 +124,9 @@ func (svc *ServiceContext) verifySuggestionHasResults(query string) bool {
 		return true // Fail open
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
+	if jwt != "" {
+		httpReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwt))
+	}
 
 	// Use a short timeout for verification
 	client := *svc.HTTPClient

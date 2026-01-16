@@ -27,6 +27,10 @@ func (p *GeminiProvider) Name() string {
 	return "gemini"
 }
 
+func (p *GeminiProvider) GetModel() string {
+	return "gemini-2.5-flash-lite"
+}
+
 // Gemini-specific structs
 type GeminiContent struct {
 	Parts []GeminiPart `json:"parts"`

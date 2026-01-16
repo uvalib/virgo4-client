@@ -19,4 +19,7 @@ type AIProvider interface {
 	
 	// Name returns the name of the provider (e.g. "gemini", "openai")
 	Name() string
+
+	// GetModel returns the specific model ID being used
+	GetModel() string
 }

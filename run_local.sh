@@ -48,4 +48,5 @@ echo "Running service with provider: $PROVIDER"
 echo "Command: $CMD"
 
 # Execute
-eval $CMD
+# Execute
+eval $CMD "$@"
