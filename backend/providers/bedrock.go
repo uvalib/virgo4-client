@@ -125,11 +125,20 @@ func (p *BedrockProvider) GetSuggestions(query string, contextItems []ContextIte
 	prompt += "1. If the query contains an OBVIOUS spelling error (e.g. 'talahassee cultural conflicts' -> 'tallahassee cultural conflicts'), set 'didYouMean' to the FULL corrected query string.\n"
 	prompt += "2. If the query is likely intentional or archaic (e.g. 'shakespere'), leave 'didYouMean' empty.\n"
 	
+	prompt += "\nSupported Search Syntax (Solr/Lucene style):\n"
+	prompt += "- Use quotation marks for exact phrases: \"grapes of wrath\"\n"
+	prompt += "- Use uppercase boolean operators: AND, OR, NOT (e.g. kyoto NOT protocol)\n"
+	prompt += "- Use parentheses to group parts: (calico OR \"tortoise shell\") AND cats\n"
+	prompt += "- Use asterisk (*) for wildcard searches: octo* (matches octopus, octothorpe)\n"
+	prompt += "- NOTE: Nested parentheses are NOT supported.\n"
+	
 	if len(contextItems) > 0 {
 		prompt += "3. Populate 'suggestions' with 6-10 short, relevant, academic-style search phrases.\n"
+		prompt += "   - Suggestions should strictly follow the supported syntax usage rules above if using complex logic.\n"
 		prompt += "   - IMPORTANT: Generate these suggestions using the USER'S ORIGINAL QUERY SPELLING, even if it appears misspelled. Do not automatically correct the spelling in the 'suggestions' list.\n"
 	} else {
 		prompt += "3. Populate 'suggestions' with 6-10 short, relevant, academic-style search phrases.\n"
+		prompt += "   - Suggestions should strictly follow the supported syntax usage rules above if using complex logic.\n"
 		prompt += "   - Since there are no results, assume the query is misspelled. Generate refine search phrases using the CORRECTED spelling (if available).\n"
 	}
 	prompt += "\nRespond in JSON format."

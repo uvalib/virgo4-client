@@ -82,11 +82,20 @@ func (p *GeminiProvider) GetSuggestions(query string, contextItems []ContextItem
 	promptBuilder.WriteString("1. If the query contains an OBVIOUS spelling error (e.g. 'talahassee cultural conflicts' -> 'tallahassee cultural conflicts'), set 'didYouMean' to the FULL corrected query string.\n")
 	promptBuilder.WriteString("2. If the query is likely intentional or archaic (e.g. 'shakespere'), leave 'didYouMean' empty.\n")
 
+	promptBuilder.WriteString("\nSupported Search Syntax (Solr/Lucene style):\n")
+	promptBuilder.WriteString("- Use quotation marks for exact phrases: \"grapes of wrath\"\n")
+	promptBuilder.WriteString("- Use uppercase boolean operators: AND, OR, NOT (e.g. kyoto NOT protocol)\n")
+	promptBuilder.WriteString("- Use parentheses to group parts: (calico OR \"tortoise shell\") AND cats\n")
+	promptBuilder.WriteString("- Use asterisk (*) for wildcard searches: octo* (matches octopus, octothorpe)\n")
+	promptBuilder.WriteString("- NOTE: Nested parentheses are NOT supported.\n")
+
 	if len(contextItems) > 0 {
 		promptBuilder.WriteString("3. Populate 'suggestions' with 6-10 short, relevant, academic-style search phrases.\n")
+		promptBuilder.WriteString("   - Suggestions should strictly follow the supported syntax usage rules above if using complex logic.\n")
 		promptBuilder.WriteString("   - IMPORTANT: Generate these suggestions using the USER'S ORIGINAL QUERY SPELLING, even if it appears misspelled. Do not automatically correct the spelling in the 'suggestions' list.\n")
 	} else {
 		promptBuilder.WriteString("3. Populate 'suggestions' with 6-10 short, relevant, academic-style search phrases.\n")
+		promptBuilder.WriteString("   - Suggestions should strictly follow the supported syntax usage rules above if using complex logic.\n")
 		promptBuilder.WriteString("   - Since there are no results, assume the query is misspelled. Generate refine search phrases using the CORRECTED spelling (if available).\n")
 	}
 
