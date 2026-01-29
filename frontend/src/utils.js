@@ -46,10 +46,18 @@ export const preProcessHitFields = ((poolURL, hits) => {
                if (!sep) {
                   sep = "; "
                }
-               hit.header.author = {label: field.label, separator: sep, value: []}
+               hit.header.author = {label: field.label, separator: sep, value: [], alternate_value: []}
             }
             hit.header.author.label = field.label
             hit.header.author.value.push(field.value)
+
+            // track alternate values for use when creating author links.  if provided, these alternate
+            // values will be the author name, without any relators ['(advisor)', '(editor)', etc.]
+            if (field.alternate_value) {
+              hit.header.author.alternate_value.push(field.alternate_value)
+            } else {
+              hit.header.author.alternate_value.push(field.value)
+            }
             return
          }
          if (field.type == "author-display") {

@@ -24,14 +24,14 @@
                <dt class="label">{{details.header.author.label}}</dt>
                <dd class="value">
                   <V4LinksList id="author-links" :inline="true" label="authors"
-                     :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value)" />
+                     :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value, details.header.author.alternate_value)" />
                </dd>
             </template>
             <template v-for="(field) in allDisplayFields">
                <dt class="label">{{field.label}}</dt>
                <dd class="value">
                   <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`" label="subjects"
-                     :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value)"
+                     :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value, field.value)"
                   />
                   <V4LinksList v-else-if="field.name == 'digital_collection' && field.filter" :id="`${field.name}-links`" :inline="true" label="collections"
                      :expand="preferences.expandDetails" :links="getFilterLinks(field.filter, field.value)"
@@ -245,10 +245,10 @@ const extDetailClicked = (() => {
    analytics.trigger('Results', 'MORE_DETAILS_CLICKED', details.value.identifier)
 })
 
-const getBrowseLinks = ( ( name, values ) => {
+const getBrowseLinks = ( ( name, values, alternate_values ) => {
    let out = []
-   values.forEach( v => {
-      let qp = `${name}: {"${encodeURIComponent(v)}"}`
+   values.forEach( (v,idx) => {
+      let qp = `${name}: {"${encodeURIComponent(alternate_values[idx])}"}`
       let link = {label: v, url: `/search?mode=advanced&q=${qp}`}
       out.push(link)
    })
