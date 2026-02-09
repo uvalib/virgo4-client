@@ -82,7 +82,7 @@ onMounted(()=>{
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatBorrow")
       request.value.title = itemStore.details.header.title
       request.value.author = itemStore.details.header.author.value.join("; ")
-      let pubF = itemStore.details.fields.find( f => f.name == "publication_date")
+      let pubF = itemStore.details.fields.find( f => f.name == "published_date")
       if (pubF) {
          request.value.year = pubF.value
       }
