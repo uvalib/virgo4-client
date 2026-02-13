@@ -4,7 +4,7 @@
          <p>
             Use this custom prompt to drive the AI agent used by the suggestor. It uses two variables:
             <ul>
-               <li><pre>$SEARCH</pre>: this will be replaced by the search query.</li>
+               <li><pre>$QUERY</pre>: this will be replaced by the search query.</li>
                <li><pre>$RESULTS</pre>: this will be replaced by the initial suggestor result.</li>
             </ul>
             If either is omitted, that data will not be present in the prompt
@@ -23,12 +23,15 @@
 
 <script setup>
 import { usePreferencesStore } from "@/stores/preferences"
+import { useSystemStore } from "@/stores/system"
 
 const preferences = usePreferencesStore()
+const system = useSystemStore()
 
-function save() {
-   preferences.saveAIPrompt()
-}
+const save = ( async () => {
+   await preferences.saveAIPrompt()
+   system.setToast("Success", "Your custom prompt has been saved")
+})
 </script>
 
 <style lang="scss" scoped>
