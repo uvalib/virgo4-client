@@ -9,11 +9,11 @@ require (
 	github.com/gin-gonic/contrib v0.0.0-20260101091603-d12f07a9136b
 	github.com/gin-gonic/gin v1.11.0
 	github.com/gorilla/feeds v1.2.0
-	github.com/lib/pq v1.11.1
+	github.com/lib/pq v1.11.2
 	github.com/rs/xid v1.6.0
-	github.com/uvalib/virgo4-api v1.0.2
+	github.com/uvalib/virgo4-api v1.1.0
 	github.com/uvalib/virgo4-jwt v1.3.3
-	github.com/zsais/go-gin-prometheus v1.0.2
+	github.com/zsais/go-gin-prometheus v1.0.3
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
@@ -60,11 +60,11 @@ require (
 	go.uber.org/mock v0.6.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	golang.org/x/arch v0.24.0 // indirect
-	golang.org/x/crypto v0.47.0 // indirect
-	golang.org/x/net v0.49.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
+	golang.org/x/net v0.50.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 )

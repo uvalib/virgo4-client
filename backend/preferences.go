@@ -34,7 +34,7 @@ func (svc *ServiceContext) GetPreferences(c *gin.Context) {
 func (svc *ServiceContext) SavePreferences(c *gin.Context) {
 	userID := c.GetInt("v4id")
 	v4UserID := c.Param("uid")
-	var prefs interface{}
+	var prefs any
 	err := c.ShouldBindJSON(&prefs)
 	if err != nil {
 		log.Printf("ERROR: unable to get preference data from %s[%d]: %s", v4UserID, userID, err)

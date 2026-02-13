@@ -5,11 +5,25 @@
       <div class="working" v-if="(poolStore.lookingUp || userStore.lookingUp) && userStore.isSignedIn" >
          <V4Spinner message="Loading admin settings..."/>
       </div>
-      <div v-else class="sections">
-         <template v-if="userStore.isSignedIn">
-            <PickupLibraries class="section" />
-            <JWTAdmin class="section" />
-         </template>
+      <div v-else-if="userStore.isSignedIn" class="sections">
+         <Tabs value="pickup" :lazy="true">
+            <TabList>
+               <Tab value="pickup">Pickup Library Management</Tab>
+               <Tab value="jwt">JWT Managment</Tab>
+               <Tab value="prompt">AI Suggestor Prompt</Tab>
+            </TabList>
+            <TabPanels>
+               <TabPanel value="pickup">
+                  <PickupLibraries/>
+               </TabPanel>
+               <TabPanel value="jwt">
+                  <JWTAdmin/>
+               </TabPanel>
+               <TabPanel value="prompt">
+                  <SuggestorPrompt/>
+               </TabPanel>
+            </TabPanels>
+         </Tabs>
       </div>
    </div>
 </template>
@@ -19,11 +33,17 @@ import SignInRequired from "@/components/account/SignInRequired.vue"
 import JWTAdmin from "@/components/admin/JWTAdmin.vue"
 import PickupLibraries from "@/components/admin/PickupLibraries.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
+import SuggestorPrompt from "@/components/admin/SuggestorPrompt.vue"
 import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { onMounted } from 'vue'
 import analytics from '@/analytics'
 import { useRouter } from 'vue-router'
+import Tabs from 'primevue/tabs'
+import TabList from 'primevue/tablist'
+import Tab from 'primevue/tab'
+import TabPanels from 'primevue/tabpanels'
+import TabPanel from 'primevue/tabpanel'
 
 const userStore = useUserStore()
 const poolStore = usePoolStore()

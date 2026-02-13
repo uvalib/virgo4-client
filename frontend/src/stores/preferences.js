@@ -10,6 +10,7 @@ export const usePreferencesStore = defineStore('preferences', {
       pickupLibrary: {id: "", name: ""},
       collapseGroups: false,
       expandDetails: false,
+      aiPrompt: "",
       searchTemplate: {
          fields: [],
       }
@@ -54,9 +55,15 @@ export const usePreferencesStore = defineStore('preferences', {
          if (prefsObj.searchTemplate ) {
             this.searchTemplate = prefsObj.searchTemplate
          }
+         if (prefsObj.aiPrompt ) {
+            this.aiPrompt = prefsObj.aiPrompt
+         }
       },
       clear() {
          this.$reset()
+      },
+      async saveAIPrompt() {
+         this.savePreferences()
       },
       async saveAdvancedSearchTemplate( template ) {
          this.searchTemplate = template
@@ -105,6 +112,7 @@ export const usePreferencesStore = defineStore('preferences', {
             collapseGroups: this.collapseGroups,
             expandDetails: this.expandDetails,
             searchTemplate: this.searchTemplate,
+            aiPrompt: this.aiPrompt,
          }
          return axios.post(url, data)
       },

@@ -1,9 +1,5 @@
 <template>
-   <div v-if="userStore.isAdmin" class="libary-admin">
-      <h3>
-         <span>Pickup Library Management</span>
-         <VirgoButton @click="addPickupLibraryClicked">Add</VirgoButton>
-      </h3>
+   <div  class="libary-admin">
       <div class="content form">
          <DataTable :value="systemStore.allPickupLibraries" size="small" dataKey="primaryKey"
             editMode="row" @row-edit-save="saveChanges" @row-edit-cancel="editCanceled" v-model:editingRows="editRec"
@@ -43,12 +39,14 @@
                </template>
             </Column>
          </DataTable>
+         <div class="control-bar">
+            <VirgoButton @click="addPickupLibraryClicked">Add Pickup Library</VirgoButton>
+         </div>
       </div>
    </div>
 </template>
 
 <script setup>
-import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
 import { useConfirm } from "primevue/useconfirm"
 import DataTable from 'primevue/datatable'
@@ -57,7 +55,6 @@ import InputText from 'primevue/inputtext'
 import ToggleButton from 'primevue/togglebutton'
 import { ref } from 'vue'
 
-const userStore = useUserStore()
 const systemStore = useSystemStore()
 const confirm = useConfirm()
 
@@ -111,21 +108,9 @@ const saveChanges = ( (event) => {
 
 <style lang="scss" scoped>
 .libary-admin {
-   h3 {
-      margin: 0;
-      padding: 10px 15px;
-      background: $uva-grey-200;
-      border-bottom: 1px solid $uva-grey-100;
-      font-size: 1.2em;
-      flex-flow: row nowrap;
-      justify-content: space-between;
-      align-items: center;
-      display: flex;
-      button {
-         font-size: 14px;
-         padding: 5px 10px;
-      }
-   }
+   border: 1px solid $uva-grey-100;
+   border-top: 0;
+   border-radius: 0 0 0.3rem 0.3rem;
    .content.form {
       padding: 20px;
       .none {
@@ -150,6 +135,10 @@ const saveChanges = ( (event) => {
          display: inline-block;
          text-align: center;
       }
+   }
+   .control-bar {
+      margin-top: 10px;
+      text-align: right;
    }
 }
 </style>
