@@ -1,14 +1,14 @@
 <template>
    <div class="prompt-admin">
       <div class="content form">
-         <p>
+         <div class="help">
             Use this custom prompt to drive the AI agent used by the suggestor. It uses two variables:
             <ul>
                <li><pre>$QUERY</pre>: this will be replaced by the search query.</li>
                <li><pre>$RESULTS</pre>: this will be replaced by the initial suggestor result.</li>
             </ul>
             If either is omitted, that data will not be present in the prompt
-         </p>
+         </div>
          <textarea
             aria-label="modify you custom ai search prompt"
             v-model="preferences.aiPrompt"
@@ -40,11 +40,12 @@ const save = ( async () => {
    border-top: 0;
    border-radius: 0 0 0.3rem 0.3rem;
    .content.form {
-      padding: 5px 20px 20px 20px;
+      padding: 20px;
       display: flex;
       flex-flow: column;
       justify-content: flex-start;
-       p {
+      gap: 14px;
+      div.help {
          text-align: left;
          border-radius: 0.3rem;
          color: $uva-text-color-dark;
@@ -62,7 +63,6 @@ const save = ( async () => {
          border: 1px solid $uva-grey-100;
          padding: 20px;
          border-radius: 0.3rem;
-         margin-bottom: 15px;
       }
    }
 }
