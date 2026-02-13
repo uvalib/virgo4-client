@@ -5,7 +5,7 @@
             Use this custom prompt to drive the AI agent used by the suggestor. It uses two variables:
             <ul>
                <li><pre>$QUERY</pre>: this will be replaced by the search query.</li>
-               <li><pre>$RESULTS</pre>: this will be replaced by the initial suggestor result.</li>
+               <li><pre>$SUGGESTIONS</pre>: these are the default suggestions that will be augmented by AI.</li>
             </ul>
             If either is omitted, that data will not be present in the prompt
          </div>
