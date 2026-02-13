@@ -358,13 +358,15 @@ export const useResultStore = defineStore('result', {
          const filters = useFilterStore()
          const poolStore = usePoolStore()
          const sorting = useSortStore()
+         const prefs = usePreferencesStore()
 
          system.clearMessage()
          let req = {
             query: query.string,
             pagination: { start: 0, rows: this.pageSize },
             filters: filters.allPoolFilters,
-            pool_sorting: sorting.pools
+            pool_sorting: sorting.pools,
+            preferences: { ai_prompt: prefs.aiPrompt }
          }
 
          if (req.query == "") {
@@ -417,6 +419,7 @@ export const useResultStore = defineStore('result', {
          const filterStore = useFilterStore()
          const poolStore = usePoolStore()
          const sortStore = useSortStore()
+         const prefs = usePreferencesStore()
 
          useCollectionStore().clearCollectionDetails()
          this.setSearching(true)
@@ -433,7 +436,8 @@ export const useResultStore = defineStore('result', {
             query: query.string,
             pagination: pagination,
             sort: sort,
-            filters: [filterObj]
+            filters: [filterObj],
+            preferences: { ai_prompt: prefs.aiPrompt }
          }
 
          if (req.query == "") {
