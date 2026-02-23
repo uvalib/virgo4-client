@@ -7,6 +7,7 @@ This process may take a few days to complete.
 
 _______________________________________________________________________
 User ID:         {{.UserID}}
+User Name:       {{.UserName}}
 
 Title:           {{.Title}}
 Barcode:         {{.Barcode}}

@@ -714,6 +714,7 @@ func (svc *ServiceContext) DeleteHold(c *gin.Context) {
 	type holdData struct {
 		HoldID            string `json:"id"`
 		UserID            string `json:"userID"`
+		UserName          string `json:"userName"`
 		Title             string `json:"title"`
 		Author            string `json:"author"`
 		Barcode           string `json:"barcode"`
@@ -738,7 +739,24 @@ func (svc *ServiceContext) DeleteHold(c *gin.Context) {
 		c.String(http.StatusBadRequest, "You must be signed in")
 		return
 	}
+	jwtAny, _ := c.Get("jwt") // if the above passed, the jwt will be available
 	holdToCancel.UserID = v4Claims.UserID
+	holdToCancel.UserName = "Unknown"
+
+	// lookup username
+	userURL := fmt.Sprintf("%s/users/%s", svc.ILSAPI, v4Claims.UserID)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, fmt.Sprintf("%v", jwtAny), svc.HTTPClient)
+	if ilsErr != nil {
+		log.Printf("ERROR: unable to get user %s info from ilsconnector: %s", v4Claims.UserID, ilsErr.Message)
+	} else {
+		var ilsUser ILSUserInfo
+		if err := json.Unmarshal(bodyBytes, &ilsUser); err != nil {
+			log.Printf("ERROR: unable to parse ILS user response: %s", err.Error())
+		} else {
+			holdToCancel.UserName = ilsUser.DisplayName
+		}
+	}
+	log.Printf("INFO: user %s - %s requests cancel hold for %s", holdToCancel.UserID, holdToCancel.UserName, holdToCancel.CallNumber)
 
 	// Hold is able to be cancelled automatically
 	if holdToCancel.Cancellable {
@@ -748,7 +766,6 @@ func (svc *ServiceContext) DeleteHold(c *gin.Context) {
 			c.String(ilsErr.StatusCode, ilsErr.Message)
 			return
 		}
-
 	} else {
 		// Send a lib-circ email to have the hold cancelled manually
 		var renderedEmail bytes.Buffer
