@@ -63,9 +63,14 @@ const digitalItem = computed(()=> {
 })
 
 
-const ocrClicked = ( async () => {
+const ocrClicked = ( () => {
    showDialog.value = true
-   if (digitalItem.value.ocr.status == "NOT_AVAIL") {
+})
+
+const opened = ( async () => {
+   email.value = user.singleEmail
+   error.value = ""
+    if (digitalItem.value.ocr.status == "NOT_AVAIL") {
       analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', digitalItem.value.pid)
       mode.value = "request"
    } else if (digitalItem.value.ocr.status == "READY") {
@@ -77,12 +82,6 @@ const ocrClicked = ( async () => {
       analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', digitalItem.value.pid)
       mode.value = "request"
    }
-})
-
-const opened = (() => {
-   email.value = user.singleEmail
-   error.value = ""
-   mode.value = "init"
 })
 
 const okClicked = (async () => {
