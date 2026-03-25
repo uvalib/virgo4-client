@@ -371,7 +371,8 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 
 	log.Printf("Create long-lived refresh token for %s", v4User.Virgo4ID)
 	refreshToken := xid.New().String()
-	c.SetCookie("v4_refresh", refreshToken, 60*60*24*7, "/", "", false, true)
+	days180 := time.Hour * 24 * 180
+	c.SetCookie("v4_refresh", refreshToken, int(days180), "/", "", false, true)
 
 	return signedStr, nil
 }
