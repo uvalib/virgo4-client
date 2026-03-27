@@ -56,6 +56,7 @@ import '@fortawesome/fontawesome-pro/css/sharp-solid.css'
 import PrimeVue from 'primevue/config'
 import UVA from './assets/theme/uva'
 import Button from 'primevue/button'
+import Tooltip from 'primevue/tooltip'
 import ConfirmationService from 'primevue/confirmationservice'
 import ToastService from 'primevue/toastservice'
 
@@ -71,6 +72,7 @@ app.use(PrimeVue, {
 
 app.use(ToastService)
 app.use(ConfirmationService)
+app.directive('tooltip', Tooltip)
 app.component("VirgoButton", Button) // Override the default name of primevue Button to VirgoButton (later renae to v4button)
 
 // Per some suggestions on vue / pinia git hub issue reports, create and add pinia support LAST

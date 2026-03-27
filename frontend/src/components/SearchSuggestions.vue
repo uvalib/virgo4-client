@@ -6,13 +6,16 @@
          <div class="searches">
             <template v-for="(s,idx) in results.suggestions.slice(0,2)"  :key="`sugest${idx}`">
                <span class="sep" v-if="idx > 0">|</span>
-               <router-link @mousedown="suggestionClick(s.value)"
-                  class="suggestion"
-                  :aria-label="linkLabel(s)"
-                  :to="getRelatedLink(s)"
-               >
-                  {{s.value}}
-               </router-link>
+               <div class="suggestion-item">
+                  <router-link @mousedown="suggestionClick(s.value)"
+                     class="suggestion"
+                     :aria-label="linkLabel(s)"
+                     :to="getRelatedLink(s)"
+                  >
+                     {{s.value}}
+                  </router-link>
+                  <i v-if="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason"></i>
+               </div>
             </template>
             <template v-if="results.suggestions.length > 2 && moreVisible == false">
                <span class="sep">|</span>
@@ -21,12 +24,15 @@
             <template  v-if="results.suggestions.length > 2 && moreVisible == true">
                <template v-for="(s,idx) in results.suggestions.slice(2)"  :key="`sugest${idx+2}`">
                   <span class="sep">|</span>
-                  <router-link  @mousedown="suggestionClick(s.value)"
-                     class="suggestion" :aria-label="linkLabel(s)"
-                     :to="getRelatedLink(s)"
-                  >
-                     {{s.value}}
-                  </router-link>
+                  <div class="suggestion-item">
+                     <router-link  @mousedown="suggestionClick(s.value)"
+                        class="suggestion" :aria-label="linkLabel(s)"
+                        :to="getRelatedLink(s)"
+                     >
+                        {{s.value}}
+                     </router-link>
+                     <i v-if="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason"></i>
+                  </div>
                </template>
                <span class="sep">|</span>
                <VirgoButton  text link size="small" @click="lessClicked" class="more">Show Fewer...</VirgoButton>
@@ -100,7 +106,26 @@ h2 {
    flex-flow: row wrap;
    justify-content: flex-start;
    align-items: center;
-   gap: 10px;
+   gap: 5px 12px;
+}
+
+.suggestion-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.reason-icon {
+    font-size: 0.8em;
+    color: #6c757d; // neutral grey
+    cursor: help;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    
+    &:hover {
+        opacity: 1;
+        color: #232D4B;
+    }
 }
 button.more {
    font-style: italic;
