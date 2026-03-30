@@ -119,6 +119,8 @@ github.com/ugorji/go/codec v1.3.1 h1:waO7eEiFDwidsBN6agj1vJQ4AG7lh2yqXyOXqhgQuyY
 github.com/ugorji/go/codec v1.3.1/go.mod h1:pRBVtBSKl77K30Bv8R2P+cLSGaTtex6fsA2Wjqmfxj4=
 github.com/uvalib/virgo4-api v1.1.0 h1:8wszpVR7nE+YfmtfYPPLXcLjuxURWRCEb2tvve8vEkQ=
 github.com/uvalib/virgo4-api v1.1.0/go.mod h1:p+LmQBQahBom6DErthL8iGZU6NgRJ9aN2wM7EE6VBSE=
+github.com/uvalib/virgo4-api v1.1.1 h1:eaufZdikmzvTwUGvUjD8uNAp0Lv5FU+gT8i8XfZsL/4=
+github.com/uvalib/virgo4-api v1.1.1/go.mod h1:p+LmQBQahBom6DErthL8iGZU6NgRJ9aN2wM7EE6VBSE=
 github.com/uvalib/virgo4-jwt v1.3.3 h1:bjjc9PL51dmvI96JhMflOmMsj8wI1BhX27Pqe+zs1Is=
 github.com/uvalib/virgo4-jwt v1.3.3/go.mod h1:DRJvgFxU66toxScJ66Kn9iLAjRaEVVY1127yDb2/4Ok=
 github.com/zsais/go-gin-prometheus v1.0.3 h1:NIYXItaoGNiyDWXqrIzfQHWcRnen+iwgAw4sX/UieiM=
