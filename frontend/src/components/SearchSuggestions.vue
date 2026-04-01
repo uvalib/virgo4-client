@@ -23,7 +23,7 @@
                   >
                      {{s.value}}
                   </router-link>
-                  <i v-if="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason"></i>
+                  <i v-if="s.reason" tabindex="0" :aria-label="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason"></i>
                </div>
             </template>
             <template v-if="results.suggestions.length > 2 && moreVisible == false">
@@ -40,7 +40,7 @@
                      >
                         {{s.value}}
                      </router-link>
-                     <i v-if="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason"></i>
+                     <i v-if="s.reason" tabindex="0" :aria-label="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason"></i>
                   </div>
                </template>
                <span class="sep">|</span>
