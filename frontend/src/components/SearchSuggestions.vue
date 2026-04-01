@@ -1,5 +1,14 @@
 <template>
-   <div v-if="results.suggestions.length >0" class="suggestions">
+   <div v-if="results.searchingSuggestions" class="suggestions">
+      <h2>Suggestions</h2>
+      <div class="wrapper">
+         <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span class="note ml-10">Finding related authors...</span>
+         </div>
+      </div>
+   </div>
+   <div v-if="!results.searchingSuggestions && results.suggestions.length >0" class="suggestions">
       <h2>Suggestions</h2>
       <div class="wrapper">
          <span class="note">Authors related to your search</span>

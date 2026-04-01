@@ -17,6 +17,7 @@ export const useResultStore = defineStore('result', {
       pageSize: 20,
       results: [{ total: 0, hits: [], pool: { description: "", id: "none", name: "None", summary: "", url: "" } }],
       suggestions: [],
+      searchingSuggestions: false,
       total: -1,
       autoExpandGroupID: "",
       selectedResultsIdx: 0,
@@ -273,6 +274,22 @@ export const useResultStore = defineStore('result', {
             this.suggestions.push(d)
          })
       },
+      async fetchSuggestions(queryStr, aiPrompt) {
+         const system = useSystemStore()
+         this.searchingSuggestions = true
+         this.suggestions = []
+         let req = {
+            query: queryStr,
+            preferences: { ai_prompt: aiPrompt }
+         }
+         await axios.post(`${system.searchAPI}/api/search/suggestions`, req).then((response) => {
+            this.setSuggestions(response.data.suggestions)
+            this.searchingSuggestions = false
+         }).catch((error) => {
+            console.error("SUGGESTIONS FAILED: " + error)
+            this.searchingSuggestions = false
+         })
+      },
 
       setPage(pageOveride) {
          this.noSpinner = true
@@ -384,8 +401,8 @@ export const useResultStore = defineStore('result', {
             poolStore.setPools(response.data.pools)
             this.setSearchResults( response.data, query.targetPool )
             sorting.setActivePool( this.results[this.selectedResultsIdx].pool.id )
-            this.setSuggestions(response.data.suggestions)
             this.setSearching(false)
+            this.fetchSuggestions(query.string, prefs.aiPrompt)
             if ( response.data.total_hits == 0) {
                analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.value.fullPath)
             }
