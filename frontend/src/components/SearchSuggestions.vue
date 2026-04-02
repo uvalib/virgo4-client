@@ -116,7 +116,7 @@ h2 {
 }
 .note  {
    font-weight: 100;
-   font-size:0.9;
+   font-size: 0.9em;
    display: inline-block;
 }
 .searches {
