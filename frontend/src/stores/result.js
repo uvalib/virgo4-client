@@ -274,10 +274,12 @@ export const useResultStore = defineStore('result', {
             this.suggestions.push(d)
          })
       },
-      async fetchSuggestions(queryStr, aiPrompt) {
+      async fetchSuggestions(queryStr, aiPrompt, attempt = 1) {
          const system = useSystemStore()
-         this.searchingSuggestions = true
-         this.suggestions = []
+         if (attempt == 1) {
+            this.searchingSuggestions = true
+            this.suggestions = []
+         }
 
          let url = `${system.suggestionsAPI}/api/suggest`
          let req = {
@@ -292,13 +294,30 @@ export const useResultStore = defineStore('result', {
             }
          }
 
-         await axios.post(url, req).then((response) => {
-            this.setSuggestions(response.data.suggestions)
+         try {
+            const response = await axios.post(url, req)
+            if (response.data && response.data.suggestions && response.data.suggestions.length > 0) {
+               this.setSuggestions(response.data.suggestions)
+               this.searchingSuggestions = false
+            } else {
+               // If suggestions are empty, it might be a transient failure or a very niche query.
+               // Retry once just in case.
+               if (attempt < 2) {
+                  console.warn(`Suggestions empty on attempt ${attempt}. Retrying...`)
+                  await new Promise(resolve => setTimeout(resolve, 500))
+                  return this.fetchSuggestions(queryStr, aiPrompt, attempt + 1)
+               }
+               this.searchingSuggestions = false
+            }
+         } catch (error) {
+            if (attempt < 2) {
+               console.warn(`Suggestions request failed on attempt ${attempt}: ${error}. Retrying...`)
+               await new Promise(resolve => setTimeout(resolve, 500))
+               return this.fetchSuggestions(queryStr, aiPrompt, attempt + 1)
+            }
+            console.error("SUGGESTIONS FAILED after retries: " + error)
             this.searchingSuggestions = false
-         }).catch((error) => {
-            console.error("SUGGESTIONS FAILED: " + error)
-            this.searchingSuggestions = false
-         })
+         }
       },
 
       setPage(pageOveride) {
