@@ -31,6 +31,7 @@ type ServiceContext struct {
 	CollectionsURL  string
 	ShelfBrowseURL  string
 	SearchAPI       string
+	SuggestionsAPI  string
 	FeedbackEmail   string
 	ILSAPI          string
 	CatalogPoolURL  string
@@ -58,6 +59,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx := ServiceContext{Version: version,
 		VirgoURL:       cfg.VirgoURL,
 		SearchAPI:      cfg.SearchAPI,
+		SuggestionsAPI: cfg.SuggestionsAPI,
 		CitationsURL:   cfg.CitationsURL,
 		CollectionsURL: cfg.CollectionsURL,
 		ShelfBrowseURL: cfg.ShelfBrowseURL,
@@ -269,6 +271,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	}
 	type config struct {
 		SearchAPI       string          `json:"searchAPI"`
+		SuggestionsAPI  string          `json:"suggestionsAPI"`
 		CitationsURL    string          `json:"citationsURL"`
 		ColectionsURL   string          `json:"collectionsURL"`
 		ShelfBrowseURL  string          `json:"shelfBrowseURL"`
@@ -279,7 +282,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		Firebase        *FirebaseConfig `json:"firebase,omitempty"`
 		PickupLibraries []pickupLibrary `json:"pickupLibraries"`
 	}
-	cfg := config{SearchAPI: svc.SearchAPI, CitationsURL: svc.CitationsURL,
+	cfg := config{SearchAPI: svc.SearchAPI, SuggestionsAPI: svc.SuggestionsAPI, CitationsURL: svc.CitationsURL,
 		ColectionsURL:  svc.CollectionsURL,
 		ShelfBrowseURL: svc.ShelfBrowseURL,
 		HealthSciURL:   svc.Illiad.HealthSciURL, KioskMode: false,

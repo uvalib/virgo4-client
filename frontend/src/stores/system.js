@@ -33,6 +33,7 @@ export const useSystemStore = defineStore('system', {
       hsILLiadURL: "",
       illiadCfg: {departments: [], buildings: [], schools: []},
       searchAPI: "",
+      suggestionsAPI: "",
       sessionExpired: false,
       locationCodes: [],
       libraryCodes: [],
@@ -192,6 +193,7 @@ export const useSystemStore = defineStore('system', {
 
       setConfig(cfg) {
          this.searchAPI = cfg.searchAPI
+         this.suggestionsAPI = cfg.suggestionsAPI
          this.kiosk = cfg.kiosk
          this.devServer = cfg.devServer
          this.citationsURL = cfg.citationsURL

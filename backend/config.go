@@ -56,6 +56,7 @@ type ServiceConfig struct {
 	CollectionsURL string
 	ShelfBrowseURL string
 	SearchAPI      string
+	SuggestionsAPI string
 	FeedbackEmail  string
 	ILSAPI         string
 	CatalogPoolURL string
@@ -76,6 +77,7 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.CollectionsURL, "collections", "https://collections-ws-dev.internal.lib.virginia.edu", "Collections service URL")
 	flag.StringVar(&cfg.ShelfBrowseURL, "shelf", "https://shelf-browse-ws-dev.internal.lib.virginia.edu", "Shelf Browse service URL")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
+	flag.StringVar(&cfg.SuggestionsAPI, "suggestions", "", "Suggestions API URL")
 	flag.StringVar(&cfg.JWTKey, "jwtkey", "", "JWT signature key")
 	flag.StringVar(&cfg.FeedbackEmail, "feedbackemail", "", "Email recipient for feedback")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
@@ -130,6 +132,11 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("catalog pool param is required")
 	} else {
 		log.Printf("Catalog Pool API endpoint: %s", cfg.CatalogPoolURL)
+	}
+	if cfg.SuggestionsAPI == "" {
+		log.Printf("INFO: suggestions param is not set; will fallback to search-ws proxy")
+	} else {
+		log.Printf("Suggestions API endpoint: %s", cfg.SuggestionsAPI)
 	}
 	if cfg.FeedbackEmail == "" {
 		log.Fatal("feedbackemail param is required")

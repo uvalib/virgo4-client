@@ -278,11 +278,21 @@ export const useResultStore = defineStore('result', {
          const system = useSystemStore()
          this.searchingSuggestions = true
          this.suggestions = []
+
+         let url = `${system.suggestionsAPI}/api/suggest`
          let req = {
             query: queryStr,
-            preferences: { ai_prompt: aiPrompt }
+            aiPrompt: aiPrompt
          }
-         await axios.post(`${system.searchAPI}/api/search/suggestions`, req).then((response) => {
+         if (system.suggestionsAPI == "") {
+            url = `${system.searchAPI}/api/search/suggestions`
+            req = {
+               query: queryStr,
+               preferences: { ai_prompt: aiPrompt }
+            }
+         }
+
+         await axios.post(url, req).then((response) => {
             this.setSuggestions(response.data.suggestions)
             this.searchingSuggestions = false
          }).catch((error) => {
