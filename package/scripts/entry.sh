@@ -44,6 +44,7 @@ cd bin; ./v4srv \
    -fbdb ${V4_FB_DB} \
    -fbproject ${V4_FB_PROJECT} \
    -fbapp ${V4_FB_APP} \
+   -suggestions ${V4_SUGGESTIONS} \
    ${SMTP_USER_OPT} \
    ${SMTP_PASS_OPT}
 
