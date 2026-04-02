@@ -13,7 +13,7 @@
       <div class="wrapper">
          <span class="note">Authors related to your search</span>
          <div class="searches">
-            <template v-for="(s,idx) in results.suggestions.slice(0,2)"  :key="`sugest${idx}`">
+            <template v-for="(s,idx) in results.suggestions"  :key="`sugest${idx}`">
                <span class="sep" v-if="idx > 0">|</span>
                <div class="suggestion-item">
                   <router-link @mousedown="suggestionClick(s.value)"
@@ -26,26 +26,6 @@
                   <i v-if="s.reason" tabindex="0" :aria-label="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason" @focus="onFocus" @blur="onBlur" @keydown.esc="handleEsc"></i>
                </div>
             </template>
-            <template v-if="results.suggestions.length > 2 && moreVisible == false">
-               <span class="sep">|</span>
-               <VirgoButton text link size="small" @click="moreClicked" class="more">Show More...</VirgoButton>
-            </template>
-            <template  v-if="results.suggestions.length > 2 && moreVisible == true">
-               <template v-for="(s,idx) in results.suggestions.slice(2)"  :key="`sugest${idx+2}`">
-                  <span class="sep">|</span>
-                  <div class="suggestion-item">
-                     <router-link  @mousedown="suggestionClick(s.value)"
-                        class="suggestion" :aria-label="linkLabel(s)"
-                        :to="getRelatedLink(s)"
-                     >
-                        {{s.value}}
-                     </router-link>
-                     <i v-if="s.reason" tabindex="0" :aria-label="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason" @focus="onFocus" @blur="onBlur" @keydown.esc="handleEsc"></i>
-                  </div>
-               </template>
-               <span class="sep">|</span>
-               <VirgoButton  text link size="small" @click="lessClicked" class="more">Show Fewer...</VirgoButton>
-            </template>
          </div>
       </div>
    </div>
@@ -53,13 +33,11 @@
 
 <script setup>
 import analytics from '@/analytics'
-import { ref } from 'vue'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 
 const queryStore  = useQueryStore()
 const results = useResultStore()
-const moreVisible = ref(false)
 
 const suggestionClick = ((val) => {
    queryStore.userSearched = true
@@ -74,14 +52,6 @@ const getRelatedLink = ((sug) => {
    let qp = `${sug.type}: {"${encodeURIComponent(sug.value)}"}`
    let url = `/search?mode=advanced&q=${qp}`
    return url
-})
-
-const moreClicked =(() => {
-   moreVisible.value = true
-})
-
-const lessClicked= (() => {
-   moreVisible.value = false
 })
 
 const handleEsc = ((event) => {
