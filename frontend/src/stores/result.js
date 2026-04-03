@@ -433,6 +433,7 @@ export const useResultStore = defineStore('result', {
          this.setSearching(true)
          this.lastSearchScrollPosition = 0
          this.lastSearchURL = ""
+         this.fetchSuggestions(query.string, prefs.aiPrompt)
 
          // POST the search query and wait for the response
          await axios.post(`${system.searchAPI}/api/search`, req).then((response) => {
@@ -440,7 +441,6 @@ export const useResultStore = defineStore('result', {
             this.setSearchResults( response.data, query.targetPool )
             sorting.setActivePool( this.results[this.selectedResultsIdx].pool.id )
             this.setSearching(false)
-            this.fetchSuggestions(query.string, prefs.aiPrompt)
             if ( response.data.total_hits == 0) {
                analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.value.fullPath)
             }
