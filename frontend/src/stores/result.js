@@ -9,6 +9,7 @@ import { useQueryStore } from "@/stores/query"
 import { useFilterStore } from "@/stores/filter"
 import { useCollectionStore } from "@/stores/collection"
 import { usePoolStore } from "@/stores/pool"
+import { useUserStore } from "@/stores/user"
 
 export const useResultStore = defineStore('result', {
    state: () => ({
@@ -275,7 +276,14 @@ export const useResultStore = defineStore('result', {
          })
       },
       async fetchSuggestions(queryStr, aiPrompt, attempt = 1) {
+         const user = useUserStore()
          const system = useSystemStore()
+         if (user.isSignedIn == false) {
+            this.suggestions = []
+            this.searchingSuggestions = false
+            return
+         }
+
          if (attempt == 1) {
             this.searchingSuggestions = true
             this.suggestions = []

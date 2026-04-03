@@ -1,5 +1,5 @@
 <template>
-   <div v-if="results.searchingSuggestions" class="suggestions">
+   <div v-if="userStore.isSignedIn && results.searchingSuggestions" class="suggestions">
       <h2>Suggestions</h2>
       <div class="wrapper">
          <div class="loading">
@@ -8,7 +8,7 @@
          </div>
       </div>
    </div>
-   <div v-if="!results.searchingSuggestions && results.suggestions.length >0" class="suggestions">
+   <div v-if="userStore.isSignedIn && !results.searchingSuggestions && results.suggestions.length >0" class="suggestions">
       <h2>Suggestions</h2>
       <div class="wrapper">
          <span class="note">Authors related to your search</span>
@@ -35,9 +35,11 @@
 import analytics from '@/analytics'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
+import { useUserStore } from "@/stores/user"
 
 const queryStore  = useQueryStore()
 const results = useResultStore()
+const userStore = useUserStore()
 
 const suggestionClick = ((val) => {
    queryStore.userSearched = true
