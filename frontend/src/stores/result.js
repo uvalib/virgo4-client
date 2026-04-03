@@ -278,7 +278,8 @@ export const useResultStore = defineStore('result', {
       async fetchSuggestions(queryStr, aiPrompt, attempt = 1) {
          const user = useUserStore()
          const system = useSystemStore()
-         if (user.isSignedIn == false) {
+         const query = useQueryStore()
+         if (user.isSignedIn == false || query.isKeywordSearch == false) {
             this.suggestions = []
             this.searchingSuggestions = false
             return

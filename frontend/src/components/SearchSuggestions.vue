@@ -1,5 +1,5 @@
 <template>
-   <div v-if="userStore.isSignedIn && results.searchingSuggestions" class="suggestions">
+   <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch && results.searchingSuggestions" class="suggestions">
       <h2>Suggestions</h2>
       <div class="wrapper">
          <div class="loading">
@@ -8,7 +8,7 @@
          </div>
       </div>
    </div>
-   <div v-if="userStore.isSignedIn && !results.searchingSuggestions && results.suggestions.length >0" class="suggestions">
+   <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch && !results.searchingSuggestions && results.suggestions.length >0" class="suggestions">
       <h2>Suggestions</h2>
       <div class="wrapper">
          <span class="note">Authors related to your search</span>

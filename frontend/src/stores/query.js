@@ -113,6 +113,14 @@ export const useQueryStore = defineStore('query', {
 
          return qs
       },
+      isKeywordSearch: state => {
+         if (state.mode == "basic") {
+            return state.basic.length > 0
+         }
+         let activeTerms = state.advanced.filter(t => t.value.length > 0)
+         if (activeTerms.length == 0) return false
+         return activeTerms.every(t => t.field == "keyword")
+      }
    },
    actions: {
       fixDateSearches() {
