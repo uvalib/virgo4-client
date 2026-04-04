@@ -19,6 +19,7 @@ export const useResultStore = defineStore('result', {
       results: [{ total: 0, hits: [], pool: { description: "", id: "none", name: "None", summary: "", url: "" } }],
       suggestions: [],
       searchingSuggestions: false,
+      didYouMean: "",
       total: -1,
       autoExpandGroupID: "",
       selectedResultsIdx: 0,
@@ -305,6 +306,9 @@ export const useResultStore = defineStore('result', {
 
          try {
             const response = await axios.post(url, req)
+            if (response.data && response.data.did_you_mean) {
+               this.didYouMean = response.data.did_you_mean
+            }
             if (response.data && response.data.suggestions && response.data.suggestions.length > 0) {
                this.setSuggestions(response.data.suggestions)
                this.searchingSuggestions = false
@@ -416,6 +420,7 @@ export const useResultStore = defineStore('result', {
          const prefs = usePreferencesStore()
 
          system.clearMessage()
+         this.didYouMean = ""
          let req = {
             query: query.string,
             pagination: { start: 0, rows: this.pageSize },
