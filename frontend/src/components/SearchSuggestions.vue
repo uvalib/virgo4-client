@@ -8,13 +8,13 @@
          </div>
       </div>
    </div>
-   <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch && !results.searchingSuggestions && results.suggestions.length >0" class="suggestions">
+   <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch && !results.searchingSuggestions && (results.suggestions.length > 0 || results.didYouMean)" class="suggestions">
       <h2>Suggestions</h2>
       <div class="wrapper">
-         <div v-if="results.didYouMean" class="did-you-mean">
+         <div v-if="results.didYouMean && results.requestedFeatures.includes('didyoumean')" class="did-you-mean">
             Did you mean: <a href="#" @click.stop.prevent="didYouMeanClick">{{results.didYouMean}}</a>?
          </div>
-         <span class="note">Authors related to your search</span>
+         <span v-if="results.suggestions.length > 0" class="note">Authors related to your search</span>
          <div class="searches">
             <template v-for="(s,idx) in results.suggestions"  :key="`sugest${idx}`">
                <span class="sep" v-if="idx > 0">|</span>
@@ -50,10 +50,12 @@ import analytics from '@/analytics'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useUserStore } from "@/stores/user"
+import { useRouter } from 'vue-router'
 
 const queryStore  = useQueryStore()
 const results = useResultStore()
 const userStore = useUserStore()
+const router = useRouter()
 
 const suggestionClick = ((val) => {
    queryStore.userSearched = true

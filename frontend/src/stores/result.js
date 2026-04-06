@@ -21,6 +21,7 @@ export const useResultStore = defineStore('result', {
       searchingSuggestions: false,
       didYouMean: "",
       suggestionMetadata: null,
+      requestedFeatures: [],
       total: -1,
       autoExpandGroupID: "",
       selectedResultsIdx: 0,
@@ -293,18 +294,21 @@ export const useResultStore = defineStore('result', {
             this.suggestions = []
          }
 
+         this.requestedFeatures = prefs.aiFeatures
          let url = `${system.suggestionsAPI}/api/suggest`
          let req = {
             query: queryStr,
             aiPrompt: aiPrompt,
-            debug: prefs.aiDebug
+            debug: prefs.aiDebug,
+            features: this.requestedFeatures
          }
          if (system.suggestionsAPI == "") {
             url = `${system.searchAPI}/api/search/suggestions`
             req = {
                query: queryStr,
                preferences: { ai_prompt: aiPrompt },
-               debug: prefs.aiDebug
+               debug: prefs.aiDebug,
+               features: this.requestedFeatures
             }
          }
 
@@ -429,6 +433,7 @@ export const useResultStore = defineStore('result', {
          system.clearMessage()
          this.didYouMean = ""
          this.suggestionMetadata = null
+         this.requestedFeatures = []
          let req = {
             query: query.string,
             pagination: { start: 0, rows: this.pageSize },

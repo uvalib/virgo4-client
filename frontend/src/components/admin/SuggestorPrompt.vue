@@ -20,7 +20,14 @@
             <Checkbox v-model="preferences.aiDebug" :binary="true" inputId="ai-debug" />
             <label for="ai-debug" class="ml-10">Enable AI Debug Mode (Admin Only)</label>
          </div>
-         <VirgoButton @click="save">Save Prompt</VirgoButton>
+         <div class="features">
+            <h3>Features</h3>
+            <div class="feature">
+               <Checkbox v-model="preferences.aiFeatures" value="didyoumean" inputId="didyoumean" />
+               <label for="didyoumean" class="ml-10">Enable "Did You Mean" query refinements</label>
+            </div>
+         </div>
+         <VirgoButton @click="save">Save Settings</VirgoButton>
       </div>
    </div>
 </template>
@@ -80,6 +87,24 @@ const save = ( async () => {
          color: $uva-text-color-dark;
          label {
             cursor: pointer;
+         }
+      }
+      .features {
+         text-align: left;
+         h3 {
+             margin: 0 0 10px 0;
+             font-size: 1.1em;
+         }
+         .feature {
+             display: flex;
+             align-items: center;
+             gap: 10px;
+             font-size: 0.9em;
+             font-weight: bold;
+             color: $uva-text-color-dark;
+             label {
+                 cursor: pointer;
+             }
          }
       }
    }
