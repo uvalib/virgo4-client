@@ -30,6 +30,17 @@
                </div>
             </template>
          </div>
+         <div v-if="userStore.isAdmin && results.suggestionMetadata" class="ai-debug-info">
+            <hr/>
+            <div class="debug-details">
+               <span class="label">AI Debug:</span>
+               <span class="metric">Total: {{results.suggestionMetadata.total_time_ms}}ms</span>
+               <span class="sep">|</span>
+               <span class="metric">Cycles: {{results.suggestionMetadata.cycle1_time_ms}} / {{results.suggestionMetadata.cycle2_time_ms}} / {{results.suggestionMetadata.cycle3_time_ms}} ms</span>
+               <span class="sep">|</span>
+               <span class="metric">Tokens: {{results.suggestionMetadata.input_tokens}} in / {{results.suggestionMetadata.output_tokens}} out</span>
+            </div>
+         </div>
       </div>
    </div>
 </template>
@@ -143,5 +154,35 @@ h2 {
 }
 button.more {
    font-style: italic;
+}
+.ai-debug-info {
+   margin-top: 15px;
+   font-family: monospace;
+   font-size: 0.8em;
+   color: #666;
+   hr {
+      border: 0;
+      border-top: 1px solid #eee;
+      margin-bottom: 10px;
+   }
+   .debug-details {
+      display: flex;
+      flex-flow: row wrap;
+      gap: 10px;
+      align-items: center;
+      .label {
+         font-weight: bold;
+         color: $uva-text-color-dark;
+      }
+      .metric {
+         background-color: #f8f9fa;
+         padding: 2px 4px;
+         border-radius: 3px;
+         border: 1px solid #e9ecef;
+      }
+      .sep {
+         color: #ccc;
+      }
+   }
 }
 </style>

@@ -20,6 +20,7 @@ export const useResultStore = defineStore('result', {
       suggestions: [],
       searchingSuggestions: false,
       didYouMean: "",
+      suggestionMetadata: null,
       total: -1,
       autoExpandGroupID: "",
       selectedResultsIdx: 0,
@@ -280,6 +281,7 @@ export const useResultStore = defineStore('result', {
          const user = useUserStore()
          const system = useSystemStore()
          const query = useQueryStore()
+         const prefs = usePreferencesStore()
          if (user.isSignedIn == false || query.isKeywordSearch == false) {
             this.suggestions = []
             this.searchingSuggestions = false
@@ -294,13 +296,15 @@ export const useResultStore = defineStore('result', {
          let url = `${system.suggestionsAPI}/api/suggest`
          let req = {
             query: queryStr,
-            aiPrompt: aiPrompt
+            aiPrompt: aiPrompt,
+            debug: prefs.aiDebug
          }
          if (system.suggestionsAPI == "") {
             url = `${system.searchAPI}/api/search/suggestions`
             req = {
                query: queryStr,
-               preferences: { ai_prompt: aiPrompt }
+               preferences: { ai_prompt: aiPrompt },
+               debug: prefs.aiDebug
             }
          }
 
@@ -308,6 +312,9 @@ export const useResultStore = defineStore('result', {
             const response = await axios.post(url, req)
             if (response.data && response.data.did_you_mean) {
                this.didYouMean = response.data.did_you_mean
+            }
+            if (response.data && response.data.metadata) {
+               this.suggestionMetadata = response.data.metadata
             }
             if (response.data && response.data.suggestions && response.data.suggestions.length > 0) {
                this.setSuggestions(response.data.suggestions)
@@ -421,6 +428,7 @@ export const useResultStore = defineStore('result', {
 
          system.clearMessage()
          this.didYouMean = ""
+         this.suggestionMetadata = null
          let req = {
             query: query.string,
             pagination: { start: 0, rows: this.pageSize },

@@ -16,6 +16,10 @@
             cols="40"
             placeholder="Enter your AI prompt here"
          ></textarea>
+         <div class="ai-debug">
+            <Checkbox v-model="preferences.aiDebug" :binary="true" inputId="ai-debug" />
+            <label for="ai-debug" class="ml-10">Enable AI Debug Mode (Admin Only)</label>
+         </div>
          <VirgoButton @click="save">Save Prompt</VirgoButton>
       </div>
    </div>
@@ -24,6 +28,7 @@
 <script setup>
 import { usePreferencesStore } from "@/stores/preferences"
 import { useSystemStore } from "@/stores/system"
+import Checkbox from 'primevue/checkbox'
 
 const preferences = usePreferencesStore()
 const system = useSystemStore()
@@ -63,6 +68,19 @@ const save = ( async () => {
          border: 1px solid $uva-grey-100;
          padding: 20px;
          border-radius: 0.3rem;
+      }
+      .ai-debug {
+         display: flex;
+         flex-flow: row nowrap;
+         align-items: center;
+         justify-content: flex-start;
+         gap: 10px;
+         font-size: 0.9em;
+         font-weight: bold;
+         color: $uva-text-color-dark;
+         label {
+            cursor: pointer;
+         }
       }
    }
 }
