@@ -16,6 +16,18 @@
             cols="40"
             placeholder="Enter your AI prompt here"
          ></textarea>
+         <div class="ai-model">
+            <h3>AI Model Selection</h3>
+            <p class="model-note">The system uses <b>Google Gemma 3 4B</b> by default.</p>
+            <Dropdown
+               id="ai-model"
+               v-model="preferences.aiModel"
+               :options="modelOptions"
+               optionLabel="label"
+               optionValue="value"
+               placeholder="Select AI Model"
+            />
+         </div>
          <div class="ai-debug">
             <Checkbox v-model="preferences.aiDebug" :binary="true" inputId="ai-debug" />
             <label for="ai-debug" class="ml-10">Enable AI Debug Mode (Admin Only)</label>
@@ -36,9 +48,18 @@
 import { usePreferencesStore } from "@/stores/preferences"
 import { useSystemStore } from "@/stores/system"
 import Checkbox from 'primevue/checkbox'
+import Dropdown from 'primevue/dropdown'
 
 const preferences = usePreferencesStore()
 const system = useSystemStore()
+
+const modelOptions = [
+   { label: "System Default", value: "default" },
+   { label: "Google Gemma 3 12B (it)", value: "google.gemma-3-12b-it" },
+   { label: "Google Gemma 3 27B (it)", value: "google.gemma-3-27b-it" },
+   { label: "Moonshot Kimi k2.5", value: "moonshotai.kimi-k2.5" },
+   { label: "NVIDIA Nemotron Nano 9B v2", value: "nvidia.nemotron-nano-9b-v2" }
+]
 
 const save = ( async () => {
    await preferences.saveAIPrompt()
@@ -105,6 +126,27 @@ const save = ( async () => {
              label {
                  cursor: pointer;
              }
+         }
+      }
+      .ai-model {
+         text-align: left;
+         h3 {
+             margin: 0 0 5px 0;
+             font-size: 1.1em;
+         }
+         .model-note {
+             margin: 0 0 10px 0;
+             font-size: 0.9em;
+             color: $uva-text-color-dark;
+             opacity: 0.8;
+         }
+         :deep(.p-dropdown) {
+            width: 100%;
+            max-width: 400px;
+            text-align: left;
+            .p-dropdown-label {
+               padding: 8px 12px;
+            }
          }
       }
    }

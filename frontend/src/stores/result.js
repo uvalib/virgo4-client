@@ -294,7 +294,10 @@ export const useResultStore = defineStore('result', {
             this.suggestions = []
          }
 
-         this.requestedFeatures = prefs.aiFeatures
+         this.requestedFeatures = [...prefs.aiFeatures]
+         if (prefs.aiModel && prefs.aiModel != "default") {
+            this.requestedFeatures.push(`llm:${prefs.aiModel}`)
+         }
          let url = `${system.suggestionsAPI}/api/suggest`
          let req = {
             query: queryStr,

@@ -13,6 +13,7 @@ export const usePreferencesStore = defineStore('preferences', {
       aiPrompt: "",
       aiDebug: false,
       aiFeatures: [],
+      aiModel: "default",
       searchTemplate: {
          fields: [],
       }
@@ -62,6 +63,7 @@ export const usePreferencesStore = defineStore('preferences', {
          }
          this.aiDebug = prefsObj.aiDebug || false
          this.aiFeatures = prefsObj.aiFeatures || []
+         this.aiModel = prefsObj.aiModel || "default"
       },
       clear() {
          this.$reset()
@@ -119,6 +121,7 @@ export const usePreferencesStore = defineStore('preferences', {
             aiPrompt: this.aiPrompt,
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,
+            aiModel: this.aiModel,
          }
          return axios.post(url, data)
       },
