@@ -40,12 +40,36 @@
                <span class="sep">|</span>
                <span class="metric">Tokens: {{results.suggestionMetadata.input_tokens}} in / {{results.suggestionMetadata.output_tokens}} out</span>
             </div>
+            <div class="debug-toggles">
+               <button v-if="results.suggestionMetadata.input_prompt" class="toggle-link" @click="showPrompt = !showPrompt">
+                  {{ showPrompt ? 'Hide' : 'View' }} Prompt
+               </button>
+               <button v-if="results.suggestionMetadata.raw_output" class="toggle-link" @click="showRaw = !showRaw">
+                  {{ showRaw ? 'Hide' : 'View' }} Raw LLM
+               </button>
+               <button v-if="results.suggestionMetadata.reasoning" class="toggle-link" @click="showReasoning = !showReasoning">
+                  {{ showReasoning ? 'Hide' : 'View' }} Reasoning
+               </button>
+            </div>
+            <div v-if="showPrompt" class="debug-pane">
+               <h5>Input Prompt</h5>
+               <pre>{{results.suggestionMetadata.input_prompt}}</pre>
+            </div>
+            <div v-if="showRaw" class="debug-pane">
+               <h5>Raw LLM Output</h5>
+               <pre>{{results.suggestionMetadata.raw_output}}</pre>
+            </div>
+            <div v-if="showReasoning" class="debug-pane">
+               <h5>Model Reasoning</h5>
+               <pre>{{results.suggestionMetadata.reasoning}}</pre>
+            </div>
          </div>
       </div>
    </div>
 </template>
 
 <script setup>
+import { ref } from 'vue' // NEW: for diagnostics toggles
 import analytics from '@/analytics'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -56,6 +80,11 @@ const queryStore  = useQueryStore()
 const results = useResultStore()
 const userStore = useUserStore()
 const router = useRouter()
+
+// Diagnostics toggles
+const showPrompt = ref(false)
+const showRaw = ref(false)
+const showReasoning = ref(false)
 
 const suggestionClick = ((val) => {
    queryStore.userSearched = true
@@ -184,6 +213,47 @@ button.more {
       }
       .sep {
          color: #ccc;
+      }
+   }
+   .debug-toggles {
+      margin-top: 10px;
+      display: flex;
+      gap: 15px;
+      .toggle-link {
+         background: none;
+         border: none;
+         color: #007bff;
+         cursor: pointer;
+         padding: 0;
+         font-size: 0.9em;
+         text-decoration: underline;
+         &:hover {
+            color: #0056b3;
+         }
+      }
+   }
+   .debug-pane {
+      margin-top: 10px;
+      background-color: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 10px;
+      h5 {
+         margin: 0 0 5px 0;
+         font-size: 0.9em;
+         color: #333;
+         text-transform: uppercase;
+      }
+      pre {
+         margin: 0;
+         white-space: pre-wrap;
+         word-wrap: break-word;
+         max-height: 300px;
+         overflow-y: auto;
+         font-size: 0.9em;
+         background: none;
+         border: none;
+         padding: 0;
       }
    }
 }
