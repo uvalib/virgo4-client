@@ -41,7 +41,7 @@
                <span class="metric">Tokens: {{results.suggestionMetadata.input_tokens}} in / {{results.suggestionMetadata.output_tokens}} out</span>
                <template v-if="results.suggestionMetadata.cost_per_1k">
                   <span class="sep">|</span>
-                  <span class="metric">Cost/1k: ${{results.suggestionMetadata.cost_per_1k.toFixed(4)}}</span>
+                  <span class="metric">Cost/1k requests: ${{results.suggestionMetadata.cost_per_1k.toFixed(4)}}</span>
                </template>
             </div>
             <div class="debug-toggles">
