@@ -39,6 +39,10 @@
                <span class="metric">Cycles: {{results.suggestionMetadata.cycle1_time_ms}} / {{results.suggestionMetadata.cycle2_time_ms}} / {{results.suggestionMetadata.cycle3_time_ms}} ms</span>
                <span class="sep">|</span>
                <span class="metric">Tokens: {{results.suggestionMetadata.input_tokens}} in / {{results.suggestionMetadata.output_tokens}} out</span>
+               <template v-if="results.suggestionMetadata.cost_per_1k">
+                  <span class="sep">|</span>
+                  <span class="metric">Cost/1k: ${{results.suggestionMetadata.cost_per_1k.toFixed(4)}}</span>
+               </template>
             </div>
             <div class="debug-toggles">
                <button v-if="results.suggestionMetadata.input_prompt" class="toggle-link" @click="showPrompt = !showPrompt">
