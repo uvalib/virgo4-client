@@ -58,7 +58,8 @@ const modelOptions = [
    { label: "Google Gemma 3 12B (it)", value: "google.gemma-3-12b-it" },
    { label: "Google Gemma 3 27B (it)", value: "google.gemma-3-27b-it" },
    { label: "Moonshot Kimi k2.5", value: "moonshotai.kimi-k2.5" },
-   { label: "NVIDIA Nemotron Nano 9B v2", value: "nvidia.nemotron-nano-9b-v2" }
+   { label: "NVIDIA Nemotron Nano 9B v2", value: "nvidia.nemotron-nano-9b-v2" },
+   { label: "Anthropic Claude 4.5 Haiku", value: "anthropic.claude-haiku-4-5-20251001-v1:0" }
 ]
 
 const save = ( async () => {
