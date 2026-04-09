@@ -42,6 +42,8 @@
                   <hr/>
                   <div class="debug-details">
                      <span class="label">AI Debug:</span>
+                     <span class="metric">Model: {{results.suggestionMetadata.model}}</span>
+                     <span class="sep">|</span>
                      <span class="metric">Total: {{results.suggestionMetadata.total_time_ms}}ms</span>
                      <span class="sep">|</span>
                      <span class="metric">Cycles: {{results.suggestionMetadata.cycle1_time_ms}} / {{results.suggestionMetadata.cycle2_time_ms}} / {{results.suggestionMetadata.cycle3_time_ms}} ms</span>
