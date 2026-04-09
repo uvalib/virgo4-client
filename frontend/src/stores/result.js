@@ -295,7 +295,7 @@ export const useResultStore = defineStore('result', {
 
          if (attempt == 1) {
             const cached = ui.getSuggestionsFromCache(queryStr)
-            if (cached) {
+            if (cached && !prefs.aiCacheDisabled) {
                this.suggestions = cached.suggestions
                this.didYouMean = cached.didYouMean
                this.suggestionMetadata = cached.metadata
