@@ -14,6 +14,7 @@ export const usePreferencesStore = defineStore('preferences', {
       aiDebug: false,
       aiFeatures: [],
       aiModel: "default",
+      aiCacheDisabled: false,
       searchTemplate: {
          fields: [],
       }
@@ -64,6 +65,7 @@ export const usePreferencesStore = defineStore('preferences', {
          this.aiDebug = prefsObj.aiDebug || false
          this.aiFeatures = prefsObj.aiFeatures || []
          this.aiModel = prefsObj.aiModel || "default"
+         this.aiCacheDisabled = prefsObj.aiCacheDisabled || false
       },
       clear() {
          this.$reset()
@@ -122,6 +124,7 @@ export const usePreferencesStore = defineStore('preferences', {
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,
             aiModel: this.aiModel,
+            aiCacheDisabled: this.aiCacheDisabled,
          }
          return axios.post(url, data)
       },

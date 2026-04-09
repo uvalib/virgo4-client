@@ -62,6 +62,10 @@
                      <button v-if="results.suggestionMetadata.reasoning" class="toggle-link" @click="showReasoning = !showReasoning">
                         {{ showReasoning ? 'Hide' : 'View' }} Reasoning
                      </button>
+                     <div class="cache-toggle">
+                        <input type="checkbox" id="ai-cache-disable" v-model="preferences.aiCacheDisabled" @change="preferences.savePreferences" />
+                        <label for="ai-cache-disable">Disable Cache</label>
+                     </div>
                   </div>
                   <div v-if="showPrompt" class="debug-pane">
                      <h5>Input Prompt</h5>
@@ -97,6 +101,7 @@ const results = useResultStore()
 const userStore = useUserStore()
 const ui = useUIStore()
 const router = useRouter()
+const preferences = usePreferencesStore()
 
 // Diagnostics toggles
 const showPrompt = ref(false)
@@ -138,9 +143,8 @@ const onBlur = ((event) => {
 
 onMounted(() => {
    if (ui.suggestionsOpen && results.suggestions.length == 0 && !results.searchingSuggestions) {
-      const prefs = usePreferencesStore()
       if (queryStore.string) {
-         results.fetchSuggestions(queryStore.string, prefs.aiPrompt)
+         results.fetchSuggestions(queryStore.string, preferences.aiPrompt)
       }
    }
 })
@@ -349,6 +353,27 @@ button.more {
          text-decoration: underline;
          &:hover {
             color: #0056b3;
+         }
+      }
+      .cache-toggle {
+         display: flex;
+         align-items: center;
+         gap: 5px;
+         font-size: 0.9em;
+         font-weight: bold;
+         color: $uva-text-color-dark;
+         background-color: #f1f3f5;
+         padding: 2px 8px;
+         border-radius: 4px;
+         border: 1px solid #dee2e6;
+         input {
+            cursor: pointer;
+            width: 13px;
+            height: 13px;
+         }
+         label {
+            cursor: pointer;
+            white-space: nowrap;
          }
       }
    }
