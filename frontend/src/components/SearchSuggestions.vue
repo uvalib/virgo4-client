@@ -2,7 +2,7 @@
    <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch" class="suggestions" :class="{ open: ui.suggestionsOpen }">
       <div v-if="!ui.suggestionsOpen" class="opt-in-pill" @click="ui.toggleSuggestions" title="Show related author suggestions">
          <i class="fas fa-lightbulb"></i>
-         <span class="label">AI Suggestions</span>
+         <span class="label">Search Suggestions</span>
       </div>
       <div v-else>
          <div class="header">
@@ -169,7 +169,7 @@ onMounted(() => {
 .opt-in-pill {
    position: absolute;
    right: 0;
-   top: 15px; // Align with results-header padding
+   top: -5px; // Move up to avoid overlap with buttons below
    z-index: 10;
    display: flex;
    align-items: center;
