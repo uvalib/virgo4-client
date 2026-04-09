@@ -285,6 +285,8 @@ export const useResultStore = defineStore('result', {
          const system = useSystemStore()
          const query = useQueryStore()
          const prefs = usePreferencesStore()
+         const ui = useUIStore()
+
          if (user.isSignedIn == false || query.isKeywordSearch == false) {
             this.suggestions = []
             this.searchingSuggestions = false
@@ -292,6 +294,14 @@ export const useResultStore = defineStore('result', {
          }
 
          if (attempt == 1) {
+            const cached = ui.getSuggestionsFromCache(queryStr)
+            if (cached) {
+               this.suggestions = cached.suggestions
+               this.didYouMean = cached.didYouMean
+               this.suggestionMetadata = cached.metadata
+               this.searchingSuggestions = false
+               return
+            }
             this.searchingSuggestions = true
             this.suggestions = []
          }
@@ -327,6 +337,7 @@ export const useResultStore = defineStore('result', {
             }
             if (response.data && response.data.suggestions && response.data.suggestions.length > 0) {
                this.setSuggestions(response.data.suggestions)
+               ui.addToSuggestionCache(queryStr, response.data)
                this.searchingSuggestions = false
             } else {
                // If suggestions are empty, it might be a transient failure or a very niche query.
