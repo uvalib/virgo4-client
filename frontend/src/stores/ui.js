@@ -55,6 +55,11 @@ export const useUIStore = defineStore('ui', {
       getSuggestionsFromCache(query) {
          const q = query.trim().toLowerCase()
          return this.suggestionCache.data[q]
+      },
+
+      clearSuggestionCache() {
+         this.suggestionCache = { queries: [], data: {} }
+         localStorage.removeItem('v4_suggestion_cache')
       }
    },
 })
