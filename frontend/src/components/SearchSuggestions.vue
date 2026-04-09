@@ -1,9 +1,9 @@
 <template>
    <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch" class="suggestions" :class="{ open: ui.suggestionsOpen }">
-      <div v-if="!ui.suggestionsOpen" class="opt-in-pill" @click="ui.toggleSuggestions" title="Show related author suggestions">
+      <button v-if="!ui.suggestionsOpen" class="opt-in-pill" @click="ui.toggleSuggestions" title="Show related author suggestions">
          <i class="fas fa-lightbulb"></i>
          <span class="label">Search Suggestions</span>
-      </div>
+      </button>
       <div v-else>
          <div class="header">
             <h2>Suggestions</h2>
@@ -182,12 +182,18 @@ onMounted(() => {
    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
    transition: all 0.2s;
    font-size: 0.85em;
+   font-family: inherit; // Required for button element
 
    &:hover {
       background-color: $uva-blue-alt-400;
       border-color: $uva-blue-alt;
       transform: translateY(-1px);
       box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+   }
+
+   &:focus-visible {
+      outline: 2px solid $uva-blue-alt;
+      outline-offset: 2px;
    }
 
    i {
