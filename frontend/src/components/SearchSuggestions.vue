@@ -169,7 +169,7 @@ onMounted(() => {
 .opt-in-pill {
    position: absolute;
    right: 0;
-   top: -5px; // Move up to avoid overlap with buttons below
+   top: -35px; // Move up to avoid overlap with buttons below
    z-index: 10;
    display: flex;
    align-items: center;
