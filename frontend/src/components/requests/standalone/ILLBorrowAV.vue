@@ -81,10 +81,13 @@ onMounted(()=>{
    if ( props.prefill ) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatBorrow")
       request.value.title = itemStore.details.header.title
-      request.value.author = itemStore.details.header.author.value.join("; ")
+      request.value.author = ""
+      if ( item.details.header.author ) {
+         request.value.author = item.details.header.author.value.join("; ")   
+      }
       let pubF = itemStore.details.fields.find( f => f.name == "published_date")
       if (pubF) {
-         request.value.year = pubF.value
+         request.value.year = pubF.value.replace(/\[|\]/g, "")
       }
    } else {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")

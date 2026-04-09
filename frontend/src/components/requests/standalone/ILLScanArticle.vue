@@ -77,14 +77,17 @@ onMounted(()=>{
    if ( props.prefill ) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatScan")
       request.value.title = item.details.header.title
-      request.value.author = item.details.header.author.value.join("; ")
+      request.value.author = ""
+      if ( item.details.header.author ) {
+         request.value.author = item.details.header.author.value.join("; ")   
+      }
       let isbnF = item.details.fields.find( f => f.name == "isbn")
       if (isbnF) {
          request.value.issn = isbnF.value.join(", ")
       }
       let pubF = item.details.fields.find( f => f.name == "published_date")
       if (pubF) {
-         request.value.year = pubF.value
+         request.value.year = pubF.value.replace(/\[|\]/g, "")
       }
    } else {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
