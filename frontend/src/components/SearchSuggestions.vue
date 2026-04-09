@@ -62,9 +62,6 @@
                      <button v-if="results.suggestionMetadata.reasoning" class="toggle-link" @click="showReasoning = !showReasoning">
                         {{ showReasoning ? 'Hide' : 'View' }} Reasoning
                      </button>
-                     <button class="toggle-link" @click="clearCache">
-                        Clear Suggestion Cache
-                     </button>
                   </div>
                   <div v-if="showPrompt" class="debug-pane">
                      <h5>Input Prompt</h5>
@@ -105,10 +102,6 @@ const router = useRouter()
 const showPrompt = ref(false)
 const showRaw = ref(false)
 const showReasoning = ref(false)
-
-const clearCache = (() => {
-   ui.clearSuggestionCache()
-})
 
 const suggestionClick = ((val) => {
    queryStore.userSearched = true

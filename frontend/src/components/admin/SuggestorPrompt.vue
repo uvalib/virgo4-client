@@ -39,10 +39,7 @@
                <label for="didyoumean" class="ml-10">Enable "Did You Mean" query refinements</label>
             </div>
          </div>
-         <div class="admin-actions">
-            <VirgoButton @click="save">Save Settings</VirgoButton>
-            <VirgoButton class="ml-10" severity="secondary" @click="clearCache">Clear Suggestion Cache</VirgoButton>
-         </div>
+         <VirgoButton @click="save">Save Settings</VirgoButton>
       </div>
    </div>
 </template>
@@ -68,11 +65,6 @@ const modelOptions = [
 const save = ( async () => {
    await preferences.saveAIPrompt()
    system.setToast("Success", "Your custom prompt has been saved")
-})
-
-const clearCache = (() => {
-   ui.clearSuggestionCache()
-   system.setToast("Success", "Suggestion cache has been cleared")
 })
 </script>
 
