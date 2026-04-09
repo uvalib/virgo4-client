@@ -1,72 +1,81 @@
 <template>
-   <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch && results.searchingSuggestions" class="suggestions">
-      <h2>Suggestions</h2>
-      <div class="wrapper">
-         <div class="loading">
-            <i class="fas fa-spinner fa-spin"></i>
-            <span class="note ml-10">Finding related authors...</span>
-         </div>
+   <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch" class="suggestions">
+      <div v-if="!ui.suggestionsOpen" class="opt-in" @click="ui.toggleSuggestions">
+         <i class="fas fa-lightbulb"></i>
+         <span class="prompt">View related author suggestions?</span>
+         <button class="toggle-btn">Show</button>
       </div>
-   </div>
-   <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch && !results.searchingSuggestions && (results.suggestions.length > 0 || results.didYouMean)" class="suggestions">
-      <h2>Suggestions</h2>
-      <div class="wrapper">
-         <div v-if="results.didYouMean && results.requestedFeatures.includes('didyoumean')" class="did-you-mean">
-            Did you mean: <a href="#" @click.stop.prevent="didYouMeanClick">{{results.didYouMean}}</a>?
+      <div v-else>
+         <div class="header">
+            <h2>Suggestions</h2>
+            <button class="close-btn" @click="ui.toggleSuggestions" title="Hide suggestions">
+               <i class="fas fa-times"></i> Hide
+            </button>
          </div>
-         <span v-if="results.suggestions.length > 0" class="note">Authors related to your search</span>
-         <div class="searches">
-            <template v-for="(s,idx) in results.suggestions"  :key="`sugest${idx}`">
-               <span class="sep" v-if="idx > 0">|</span>
-               <div class="suggestion-item">
-                  <router-link @mousedown="suggestionClick(s.value)"
-                     class="suggestion"
-                     :aria-label="linkLabel(s)"
-                     :to="getRelatedLink(s)"
-                  >
-                     {{s.value}}
-                  </router-link>
-                  <i v-if="s.reason" tabindex="0" :aria-label="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason" @focus="onFocus" @blur="onBlur" @keydown.esc="handleEsc"></i>
+         <div class="wrapper">
+            <div v-if="results.searchingSuggestions" class="loading">
+               <i class="fas fa-spinner fa-spin"></i>
+               <span class="note ml-10">Finding related authors...</span>
+            </div>
+            <template v-else-if="results.suggestions.length > 0 || results.didYouMean">
+               <div v-if="results.didYouMean && results.requestedFeatures.includes('didyoumean')" class="did-you-mean">
+                  Did you mean: <a href="#" @click.stop.prevent="didYouMeanClick">{{results.didYouMean}}</a>?
+               </div>
+               <span v-if="results.suggestions.length > 0" class="note">Authors related to your search</span>
+               <div class="searches">
+                  <template v-for="(s,idx) in results.suggestions"  :key="`sugest${idx}`">
+                     <span class="sep" v-if="idx > 0">|</span>
+                     <div class="suggestion-item">
+                        <router-link @mousedown="suggestionClick(s.value)"
+                           class="suggestion"
+                           :aria-label="linkLabel(s)"
+                           :to="getRelatedLink(s)"
+                        >
+                           {{s.value}}
+                        </router-link>
+                        <i v-if="s.reason" tabindex="0" :aria-label="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason" @focus="onFocus" @blur="onBlur" @keydown.esc="handleEsc"></i>
+                     </div>
+                  </template>
+               </div>
+               <div v-if="userStore.isAdmin && results.suggestionMetadata" class="ai-debug-info">
+                  <hr/>
+                  <div class="debug-details">
+                     <span class="label">AI Debug:</span>
+                     <span class="metric">Total: {{results.suggestionMetadata.total_time_ms}}ms</span>
+                     <span class="sep">|</span>
+                     <span class="metric">Cycles: {{results.suggestionMetadata.cycle1_time_ms}} / {{results.suggestionMetadata.cycle2_time_ms}} / {{results.suggestionMetadata.cycle3_time_ms}} ms</span>
+                     <span class="sep">|</span>
+                     <span class="metric">Tokens: {{results.suggestionMetadata.input_tokens}} in / {{results.suggestionMetadata.output_tokens}} out</span>
+                     <template v-if="results.suggestionMetadata.cost_per_1k">
+                        <span class="sep">|</span>
+                        <span class="metric">Cost/1k requests: ${{results.suggestionMetadata.cost_per_1k.toFixed(4)}}</span>
+                     </template>
+                  </div>
+                  <div class="debug-toggles">
+                     <button v-if="results.suggestionMetadata.input_prompt" class="toggle-link" @click="showPrompt = !showPrompt">
+                        {{ showPrompt ? 'Hide' : 'View' }} Prompt
+                     </button>
+                     <button v-if="results.suggestionMetadata.raw_output" class="toggle-link" @click="showRaw = !showRaw">
+                        {{ showRaw ? 'Hide' : 'View' }} Raw LLM
+                     </button>
+                     <button v-if="results.suggestionMetadata.reasoning" class="toggle-link" @click="showReasoning = !showReasoning">
+                        {{ showReasoning ? 'Hide' : 'View' }} Reasoning
+                     </button>
+                  </div>
+                  <div v-if="showPrompt" class="debug-pane">
+                     <h5>Input Prompt</h5>
+                     <pre>{{results.suggestionMetadata.input_prompt}}</pre>
+                  </div>
+                  <div v-if="showRaw" class="debug-pane">
+                     <h5>Raw LLM Output</h5>
+                     <pre>{{results.suggestionMetadata.raw_output}}</pre>
+                  </div>
+                  <div v-if="showReasoning" class="debug-pane">
+                     <h5>Model Reasoning</h5>
+                     <pre>{{results.suggestionMetadata.reasoning}}</pre>
+                  </div>
                </div>
             </template>
-         </div>
-         <div v-if="userStore.isAdmin && results.suggestionMetadata" class="ai-debug-info">
-            <hr/>
-            <div class="debug-details">
-               <span class="label">AI Debug:</span>
-               <span class="metric">Total: {{results.suggestionMetadata.total_time_ms}}ms</span>
-               <span class="sep">|</span>
-               <span class="metric">Cycles: {{results.suggestionMetadata.cycle1_time_ms}} / {{results.suggestionMetadata.cycle2_time_ms}} / {{results.suggestionMetadata.cycle3_time_ms}} ms</span>
-               <span class="sep">|</span>
-               <span class="metric">Tokens: {{results.suggestionMetadata.input_tokens}} in / {{results.suggestionMetadata.output_tokens}} out</span>
-               <template v-if="results.suggestionMetadata.cost_per_1k">
-                  <span class="sep">|</span>
-                  <span class="metric">Cost/1k requests: ${{results.suggestionMetadata.cost_per_1k.toFixed(4)}}</span>
-               </template>
-            </div>
-            <div class="debug-toggles">
-               <button v-if="results.suggestionMetadata.input_prompt" class="toggle-link" @click="showPrompt = !showPrompt">
-                  {{ showPrompt ? 'Hide' : 'View' }} Prompt
-               </button>
-               <button v-if="results.suggestionMetadata.raw_output" class="toggle-link" @click="showRaw = !showRaw">
-                  {{ showRaw ? 'Hide' : 'View' }} Raw LLM
-               </button>
-               <button v-if="results.suggestionMetadata.reasoning" class="toggle-link" @click="showReasoning = !showReasoning">
-                  {{ showReasoning ? 'Hide' : 'View' }} Reasoning
-               </button>
-            </div>
-            <div v-if="showPrompt" class="debug-pane">
-               <h5>Input Prompt</h5>
-               <pre>{{results.suggestionMetadata.input_prompt}}</pre>
-            </div>
-            <div v-if="showRaw" class="debug-pane">
-               <h5>Raw LLM Output</h5>
-               <pre>{{results.suggestionMetadata.raw_output}}</pre>
-            </div>
-            <div v-if="showReasoning" class="debug-pane">
-               <h5>Model Reasoning</h5>
-               <pre>{{results.suggestionMetadata.reasoning}}</pre>
-            </div>
          </div>
       </div>
    </div>
@@ -78,11 +87,13 @@ import analytics from '@/analytics'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useUserStore } from "@/stores/user"
+import { useUIStore } from "@/stores/ui"
 import { useRouter } from 'vue-router'
 
 const queryStore  = useQueryStore()
 const results = useResultStore()
 const userStore = useUserStore()
+const ui = useUIStore()
 const router = useRouter()
 
 // Diagnostics toggles
@@ -130,6 +141,80 @@ const onBlur = ((event) => {
    text-align: left;
    margin: 0;
 }
+.header {
+   display: flex;
+   justify-content: space-between;
+   align-items: baseline;
+   margin-bottom: 10px;
+   h2 {
+      margin: 0;
+   }
+}
+.opt-in {
+   display: flex;
+   align-items: center;
+   gap: 15px;
+   padding: 12px 18px;
+   background-color: #f8f9fa;
+   border: 1px solid $uva-grey-100;
+   border-radius: 0.5rem;
+   cursor: pointer;
+   transition: background-color 0.2s;
+   font-size: 0.95em;
+   color: $uva-text-color-dark;
+
+   &:hover {
+      background-color: $uva-blue-alt-400;
+      border-color: $uva-blue-alt;
+      .toggle-btn {
+         background-color: $uva-blue-alt-200;
+      }
+   }
+
+   i {
+      color: $uva-blue-alt;
+      font-size: 1.1em;
+   }
+
+   .prompt {
+      flex: 1;
+      font-weight: 500;
+   }
+
+   .toggle-btn {
+      background-color: white;
+      border: 1px solid #ced4da;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.2s;
+   }
+}
+
+.close-btn {
+   background: none;
+   border: none;
+   color: #6c757d;
+   font-size: 0.85em;
+   cursor: pointer;
+   display: flex;
+   align-items: center;
+   gap: 5px;
+   padding: 4px 8px;
+   border-radius: 4px;
+   transition: background-color 0.2s;
+
+   &:hover {
+      background-color: #f8f9fa;
+      color: $uva-blue-alt-200;
+   }
+
+   i {
+      font-size: 0.9em;
+   }
+}
+
 h2 {
    margin: 0 0 15px 0;
    padding: 0;

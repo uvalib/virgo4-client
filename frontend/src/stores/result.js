@@ -11,6 +11,8 @@ import { useCollectionStore } from "@/stores/collection"
 import { usePoolStore } from "@/stores/pool"
 import { useUserStore } from "@/stores/user"
 
+import { useUIStore } from "@/stores/ui"
+
 export const useResultStore = defineStore('result', {
    state: () => ({
       noSpinner: false,
@@ -454,7 +456,10 @@ export const useResultStore = defineStore('result', {
          this.setSearching(true)
          this.lastSearchScrollPosition = 0
          this.lastSearchURL = ""
-         this.fetchSuggestions(query.string, prefs.aiPrompt)
+         const ui = useUIStore()
+         if (ui.suggestionsOpen) {
+            this.fetchSuggestions(query.string, prefs.aiPrompt)
+         }
 
          // POST the search query and wait for the response
          await axios.post(`${system.searchAPI}/api/search`, req).then((response) => {
