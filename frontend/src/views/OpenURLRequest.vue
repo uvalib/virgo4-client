@@ -12,7 +12,7 @@
             <tbody>
                <tr>
                   <td class="label">User ID:</td>
-                  <td>{{user.userId}}</td>
+                  <td>{{user.signedInUser}}</td>
                </tr>
                <tr>
                   <td class="label">Title:</td>

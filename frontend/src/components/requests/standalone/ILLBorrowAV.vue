@@ -80,6 +80,9 @@ onMounted(()=>{
    request.value.pickup = preferences.pickupLibrary.id
    if ( props.prefill ) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatBorrow")
+      
+      // NOTE: prefill is only used by worldcat and OCLC info is returned in the identifier field
+      request.value.oclc = item.details.identifier
       request.value.title = itemStore.details.header.title
       request.value.author = ""
       if ( item.details.header.author ) {

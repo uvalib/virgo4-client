@@ -27,7 +27,7 @@
             <h3>We have received your request.</h3>
             <dl>
                <dt>User ID:</dt>
-               <dd>{{user.userId}}</dd>
+               <dd>{{user.signedInUser}}</dd>
                <dt>Item:</dt>
                <dd>{{submittedTitle}}</dd>
                <template v-if="submittedTitle">

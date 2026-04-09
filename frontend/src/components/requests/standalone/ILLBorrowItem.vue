@@ -100,6 +100,8 @@ onMounted(()=>{
       if (item.generalFormat == "Book") {
          request.value.doctype = "Book"
       }
+      // NOTE: prefill is only used by worldcat and OCLC info is returned in the identifier field
+      request.value.oclc = item.details.identifier
       request.value.title = item.details.header.title
       request.value.author = ""
       if ( item.details.header.author ) {

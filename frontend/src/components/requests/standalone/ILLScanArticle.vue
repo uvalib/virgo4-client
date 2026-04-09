@@ -76,6 +76,9 @@ async function submitClicked() {
 onMounted(()=>{
    if ( props.prefill ) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatScan")
+
+      // NOTE: prefill is only used by worldcat and OCLC info is returned in the identifier field
+      request.value.oclc = item.details.identifier
       request.value.title = item.details.header.title
       request.value.author = ""
       if ( item.details.header.author ) {
