@@ -32,7 +32,9 @@
                         >
                            {{s.value}}
                         </router-link>
-                        <i v-if="s.reason" tabindex="0" :aria-label="s.reason" class="fas fa-info-circle reason-icon" v-tooltip="s.reason" @focus="onFocus" @blur="onBlur" @keydown.esc="handleEsc"></i>
+                        <button v-if="s.reason" :aria-label="s.reason" class="reason-icon" v-tooltip="s.reason" @keydown.esc="handleEsc">
+                           <i class="fas fa-info-circle"></i>
+                        </button>
                      </div>
                   </template>
                </div>
@@ -280,10 +282,25 @@ h2 {
     cursor: help;
     opacity: 0.6;
     transition: opacity 0.2s;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     
-    &:hover {
+    &:hover, &:focus-visible {
         opacity: 1;
         color: #232D4B;
+        outline: none;
+    }
+
+    @media (max-width: 768px) {
+       font-size: 1.1em;
+       padding: 5px; // Larger tap target
+       margin-left: 2px;
     }
 }
 button.more {
