@@ -1,9 +1,8 @@
 <template>
-   <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch" class="suggestions">
-      <div v-if="!ui.suggestionsOpen" class="opt-in" @click="ui.toggleSuggestions">
+   <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch" class="suggestions" :class="{ open: ui.suggestionsOpen }">
+      <div v-if="!ui.suggestionsOpen" class="opt-in-pill" @click="ui.toggleSuggestions" title="Show related author suggestions">
          <i class="fas fa-lightbulb"></i>
-         <span class="prompt">View related author suggestions?</span>
-         <button class="toggle-btn">Show</button>
+         <span class="label">AI Suggestions</span>
       </div>
       <div v-else>
          <div class="header">
@@ -147,10 +146,16 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .suggestions {
-   padding: 15px 0;
    text-align: left;
    margin: 0;
+   position: relative;
+   transition: all 0.2s ease;
+
+   &.open {
+      padding: 15px 0;
+   }
 }
+
 .header {
    display: flex;
    justify-content: space-between;
@@ -160,45 +165,38 @@ onMounted(() => {
       margin: 0;
    }
 }
-.opt-in {
+
+.opt-in-pill {
+   position: absolute;
+   right: 0;
+   top: 15px; // Align with results-header padding
+   z-index: 10;
    display: flex;
    align-items: center;
-   gap: 15px;
-   padding: 12px 18px;
-   background-color: #f8f9fa;
+   gap: 8px;
+   padding: 6px 14px;
+   background-color: white;
    border: 1px solid $uva-grey-100;
-   border-radius: 0.5rem;
+   border-radius: 20px;
    cursor: pointer;
-   transition: background-color 0.2s;
-   font-size: 0.95em;
-   color: $uva-text-color-dark;
+   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+   transition: all 0.2s;
+   font-size: 0.85em;
 
    &:hover {
       background-color: $uva-blue-alt-400;
       border-color: $uva-blue-alt;
-      .toggle-btn {
-         background-color: $uva-blue-alt-200;
-      }
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.08);
    }
 
    i {
       color: $uva-blue-alt;
-      font-size: 1.1em;
    }
 
-   .prompt {
-      flex: 1;
-      font-weight: 500;
-   }
-
-   .toggle-btn {
-      background-color: white;
-      border: 1px solid #ced4da;
-      padding: 4px 12px;
-      border-radius: 4px;
-      font-size: 0.9em;
-      cursor: pointer;
-      transition: all 0.2s;
+   .label {
+      font-weight: 600;
+      color: $uva-text-color-dark;
    }
 }
 
