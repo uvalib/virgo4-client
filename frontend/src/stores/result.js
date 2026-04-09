@@ -504,6 +504,10 @@ export const useResultStore = defineStore('result', {
 
          useCollectionStore().clearCollectionDetails()
          this.setSearching(true)
+         const ui = useUIStore()
+         if (ui.suggestionsOpen) {
+            this.fetchSuggestions(query.string, prefs.aiPrompt)
+         }
          let filters = filterStore.poolFilter(params.pool.id)
          let sort = sortStore.poolSort(params.pool.id)
          let filterObj = { pool_id: params.pool.id, facets: filters }

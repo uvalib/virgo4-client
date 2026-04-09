@@ -82,12 +82,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue' // NEW: for diagnostics toggles
+import { ref, onMounted } from 'vue'
 import analytics from '@/analytics'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useUserStore } from "@/stores/user"
 import { useUIStore } from "@/stores/ui"
+import { usePreferencesStore } from "@/stores/preferences"
 import { useRouter } from 'vue-router'
 
 const queryStore  = useQueryStore()
@@ -132,6 +133,15 @@ const onFocus = ((event) => {
 
 const onBlur = ((event) => {
    event.target.dispatchEvent(new MouseEvent('mouseleave'))
+})
+
+onMounted(() => {
+   if (ui.suggestionsOpen && results.suggestions.length == 0 && !results.searchingSuggestions) {
+      const prefs = usePreferencesStore()
+      if (queryStore.string) {
+         results.fetchSuggestions(queryStore.string, prefs.aiPrompt)
+      }
+   }
 })
 </script>
 
