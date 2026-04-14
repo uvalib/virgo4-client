@@ -35,6 +35,9 @@
                         <button v-if="s.reason" :aria-label="s.reason" class="reason-icon" v-tooltip="s.reason" @keydown.esc="handleEsc">
                            <i class="fas fa-info-circle"></i>
                         </button>
+                        <span v-if="userStore.isAdmin && s.source" class="source-badge" :class="s.source">
+                           {{ s.source == 'llm' ? 'lm' : 'kb' }}
+                        </span>
                      </div>
                   </template>
                </div>
@@ -307,6 +310,30 @@ h2 {
        font-size: 1.1em;
        padding: 5px; // Larger tap target
        margin-left: 2px;
+    }
+}
+.source-badge {
+    font-size: 0.7em;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 1px 4px;
+    border-radius: 3px;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 2px;
+    opacity: 0.8;
+    user-select: none;
+
+    &.llm {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        border: 1px solid #bbdefb;
+    }
+    &.kb {
+        background-color: #f1f8e9;
+        color: #388e3c;
+        border: 1px solid #dcedc8;
     }
 }
 button.more {
