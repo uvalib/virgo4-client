@@ -133,6 +133,7 @@ func main() {
 	api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
 	api.DELETE("/requests/hold", svc.AuthMiddleware, svc.DeleteHold)
 	api.POST("/requests/scan", svc.AuthMiddleware, svc.CreateScan)
+	api.POST("/requests/microform", svc.AuthMiddleware, svc.MicroformRequest)
 	api.POST("/requests/standalone/scan", svc.AuthMiddleware, svc.CreateStandaloneScan)
 	api.POST("/requests/standalone/borrow", svc.AuthMiddleware, svc.CreateStandaloneBorrowRequest)
 	api.POST("/requests/standalone/remediate", svc.AuthMiddleware, svc.pdfRemediationRequest)

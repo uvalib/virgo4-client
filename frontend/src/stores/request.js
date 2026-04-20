@@ -125,6 +125,9 @@ export const useRequestStore = defineStore('request', {
             if ( data.hsaScanURL ) {
                this.directLink = data.hsaScanURL
             }
+            if ( data.microformURL ) {
+               this.microformURL = data.microformURL
+            }
          } else {
             this.$reset()
          }
@@ -241,6 +244,23 @@ export const useRequestStore = defineStore('request', {
             this.working = false
          )
       },
+      async submitMicroform( item, pickupLibrary, notes, itemURL ) {
+         const user = useUserStore()
+
+         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "microform")
+         this.working = true
+         this.failed = false
+         this.errors = {}
+         const req = { barcode: item.barcode, callNumber: item.callNumber,
+            notes: notes, userID: user.signedInUser, email: user.singleEmail, userName: user.accountInfo.displayName, 
+            itemURL: itemURL, microformURL: this.microformURL, pickupLibrary: pickupLibrary}
+         await axios.post('/api/requests/microform', req).catch( e => {
+            useSystemStore().setError(e)
+            this.failed = true
+         }).finally(()=>
+            this.working = false
+         )
+      },
 
       async createHold( item, pickupLibrary) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "createHold")
@@ -277,7 +297,7 @@ export const useRequestStore = defineStore('request', {
            .then((response) => {
              if (response.status == 200) {
                useSystemStore().setMessage("Your hold cancellation has been received.")
-               userStore.getRequests();
+               userStore.getRequests()
              } else {
                useSystemStore().setError(response.data);
              }

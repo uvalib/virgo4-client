@@ -2,6 +2,7 @@
    <section class="requests" aria-live="polite">
       <div class="options">
          <!-- sign in and ils account required for all but direct and aeon-->
+         <MicroFormDialog v-if="request.hasOption('microform')" />
          <PlaceHoldDialog v-if="request.hasOption('hold')" />
          <ScanRequestDialog v-if="request.hasOption('scan')" />
          <VideoReserveDialog v-if="user.canMakeReserves && request.hasOption('videoReserve')" />
@@ -20,6 +21,7 @@ import ScanRequestDialog from "@/components/requests/dialogs/ScanRequestDialog.v
 import VideoReserveDialog from "@/components/requests/dialogs/VideoReserveDialog.vue"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
+import MicroFormDialog from "../requests/dialogs/MicroFormDialog.vue"
 
 const request = useRequestStore()
 const user = useUserStore()

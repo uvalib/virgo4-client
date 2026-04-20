@@ -1,0 +1,19 @@
+_______________________________________________________________________
+Microform Request
+_______________________________________________________________________
+
+A microform request has been made for {{ .Barcode }}
+
+_______________________________________________________________________
+User ID:         {{.UserID}}
+User Name:       {{.UserName}}
+
+Barcode:         {{.Barcode}}
+Call Number:     {{.CallNumber}}
+Item URL:        {{.ItemURL}}
+Microform URL:   {{.MicroformURL}}
+Pickup Location: {{.PickupLibrary}}
+
+Notes:
+   {{.Notes}}
+_______________________________________________________________________

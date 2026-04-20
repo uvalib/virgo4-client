@@ -99,8 +99,7 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 		ItemBarcode   string `json:"itemBarcode"`
 	}
 	var holdReq HoldRequest
-	err := c.ShouldBindJSON(&holdReq)
-	if err != nil {
+	if err := c.ShouldBindJSON(&holdReq); err != nil {
 		log.Printf("ERROR: Unable to parse request: %s", err.Error())
 		c.String(http.StatusBadRequest, err.Error())
 		return
@@ -121,9 +120,56 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	}
 
 	// Pass through without modification
-	var result map[string]interface{}
+	var result map[string]any
 	json.Unmarshal([]byte(bodyBytes), &result)
 	c.JSON(http.StatusOK, result)
+}
+
+// MicroformRequest accepts microform request data and generates an email to library@virginia.edu
+func (svc *ServiceContext) MicroformRequest(c *gin.Context) {
+	var mfRequest struct {
+		UserID        string `json:"userID"`
+		UserName      string `json:"userName"`
+		Email         string `json:"email"`
+		Barcode       string `json:"barcode"`
+		CallNumber    string `json:"callNumber"`
+		Notes         string `json:"notes"`
+		ItemURL       string `json:"itemURL"`      // the full url to the item in virgo
+		MicroformURL  string `json:"microformURL"` // the full url contained in MARC 856u
+		PickupLibrary string `json:"pickupLibrary"`
+	}
+	if err := c.ShouldBindJSON(&mfRequest); err != nil {
+		log.Printf("ERROR: Unable to parse microform request: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	_, signedIn := c.Get("claims")
+	if signedIn == false {
+		log.Printf("INFO: microform request requires signin with JWT claims; no claims found")
+		c.String(http.StatusBadRequest, "signin required")
+		return
+	}
+
+	log.Printf("INFO: create hold request: %+v", mfRequest)
+
+	var renderedEmail bytes.Buffer
+	tpl := template.Must(template.New("microform_request.txt").ParseFiles("templates/microform_request.txt"))
+	if err := tpl.Execute(&renderedEmail, mfRequest); err != nil {
+		log.Printf("ERROR: Unable to render microform request email: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	to := []string{"library@virginia.edu"}
+	eRequest := emailRequest{Subject: "Microform Request", To: to, ReplyTo: mfRequest.Email, CC: mfRequest.Email, From: svc.SMTP.Sender, Body: renderedEmail.String()}
+	sendErr := svc.SendEmail(&eRequest)
+	if sendErr != nil {
+		log.Printf("ERROR: Unable to send microform email: %s", sendErr.Error())
+		c.String(http.StatusInternalServerError, sendErr.Error())
+		return
+	}
+
+	c.String(http.StatusOK, "microform request received")
 }
 
 // CreateStandaloneBorrowRequest sends a borrow request to ILLiad for A/V or non-A/V-items
