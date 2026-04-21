@@ -304,6 +304,8 @@ export const useResultStore = defineStore('result', {
             }
             this.searchingSuggestions = true
             this.suggestions = []
+            this.didYouMean = ""
+            this.suggestionMetadata = null
          }
 
          this.requestedFeatures = [...prefs.aiFeatures]
