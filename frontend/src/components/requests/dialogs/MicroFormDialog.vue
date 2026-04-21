@@ -3,7 +3,8 @@
    <Dialog v-model:visible="showDialog" :modal="true" position="top" :draggable="false"
       header="Microform Request" @show="dialogOpened" @hide="dialogClosed"
    >
-      <FormKit v-if="submitted == false" type="form" ref="microform" :actions="false" @submit="submitMicroform">
+      <SignIn v-if="!user.isSignedIn" :embedded="true"/>
+      <FormKit v-else-if="submitted == false" type="form" ref="microform" :actions="false" @submit="submitMicroform">
          <FormKit type="select" label="Preferred pickup location" v-model="pickupLibrary"
             placeholder="Select a location" :options="pickupLibraries"
             validation="required" />
@@ -16,7 +17,7 @@
             v-model="notes" :rows="5" id="microform-item-notes"
          />
       </FormKit>
-      <div  v-else class="confirmation-panel">
+      <div v-else class="confirmation-panel">
          <h2>We have received your request.</h2>
          <p>You will hear from us soon.</p>
          <dl>
@@ -43,17 +44,21 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Dialog from 'primevue/dialog'
-import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
+import SignIn from "@/views/SignIn.vue"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
 import { usePreferencesStore } from "@/stores/preferences"
+import { useRestoreStore } from "@/stores/restore"
+import { useRoute } from "vue-router"
 import analytics from '@/analytics'
 
 const request = useRequestStore()
 const user = useUserStore()
+const restore = useRestoreStore()
 const preferences = usePreferencesStore()
+const route = useRoute()
 
 const selectedItem = ref(null)
 const notes = ref("")
@@ -61,6 +66,13 @@ const pickupLibrary = ref("")
 const submitted = ref(false)
 const microform = ref()
 const showDialog = ref(false)
+
+onMounted( () => {
+   console.log("MICROFORM MOUNTED: ACTIVE="+request.activeRequest)
+   if ( request.activeRequest == "microform") {
+      showDialog.value = true
+   }
+})
 
 const pickupLibraries = computed(()=>{
    let libs = []
@@ -75,6 +87,9 @@ const dialogOpened = (() => {
    selectedItem.value = null
    notes.value = ""
    request.activeRequest = "microform"
+   restore.setActiveRequest( request.activeRequest )
+   restore.setURL(route.fullPath)
+   restore.save()
    if (request.optionItems.length == 1) {
       selectedItem.value = request.optionItems[0].value
    }
