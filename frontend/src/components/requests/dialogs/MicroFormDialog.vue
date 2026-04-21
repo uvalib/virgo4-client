@@ -5,6 +5,14 @@
    >
       <SignIn v-if="!user.isSignedIn" :embedded="true"/>
       <FormKit v-else-if="submitted == false" type="form" ref="microform" :actions="false" @submit="submitMicroform">
+         <div class="note">
+            <div>You are requesting a map or microform item from Ivy Library.</div>
+            <ul>
+               <li>Maps will be delivered for checkout in a map tube.</li>
+               <li>Microform materials can be viewed using the microform scanners in Shannon Library, Government Documents Room 130.</li>
+            </ul>
+            <div>Please contact <a href="mailto:library@virginia.edu">library@virginia.edu</a> to request a microform scanner consultation.</div>
+         </div>
          <FormKit type="select" label="Preferred pickup location" v-model="pickupLibrary"
             placeholder="Select a location" :options="pickupLibraries"
             validation="required" />
@@ -120,7 +128,17 @@ const submitMicroform = (() => {
       width: 100%;
    }
 }
- dl {
+.note {
+   max-width: 450px;
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   ul {
+      margin: 0;
+      padding: 0 0 0 30px;   
+   }
+}
+dl {
    margin-top: 0;
    display: inline-grid;
    grid-template-columns: 1fr 1fr;
