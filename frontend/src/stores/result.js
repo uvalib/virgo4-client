@@ -74,6 +74,16 @@ export const useResultStore = defineStore('result', {
          this.selectedHitGroupIdx = -1
 
          this.results[this.selectedResultsIdx].hits.some( (h,idx) => {
+      },
+
+      clearSuggestions() {
+         this.suggestions = []
+         this.didYouMean = ""
+         this.suggestionMetadata = null
+         this.requestedFeatures = []
+         this.activeSuggestionsCount = 0
+         this.searchingSuggestions = false
+      },
             if (h.identifier == identifier) {
                this.selectedHitIdx = idx
             } else if ( h.grouped == true) {
@@ -294,27 +304,27 @@ export const useResultStore = defineStore('result', {
             return
          }
 
-         if (featuresOverride) {
-            this.requestedFeatures = Array.from(new Set([...this.requestedFeatures, ...featuresOverride]))
-         } else {
-            this.requestedFeatures = [...prefs.aiFeatures]
-         }
-         
+         let requestFeatures = featuresOverride || [...prefs.aiFeatures]
          if (prefs.aiModel && prefs.aiModel != "default") {
-            // only add model if not already present in the features list
-            if (!this.requestedFeatures.some(f => f.startsWith("llm:"))) {
-               this.requestedFeatures.push(`llm:${prefs.aiModel}`)
+            if (!requestFeatures.some(f => f.startsWith("llm:"))) {
+               requestFeatures.push(`llm:${prefs.aiModel}`)
             }
          }
 
+         if (featuresOverride) {
+            this.requestedFeatures = Array.from(new Set([...this.requestedFeatures, ...featuresOverride]))
+         } else {
+            this.requestedFeatures = [...requestFeatures]
+         }
+         
          if (attempt == 1) {
             const cached = ui.getSuggestionsFromCache(queryStr)
             if (cached && !prefs.aiCacheDisabled) {
                const hasAuthors = cached.suggestions && cached.suggestions.length > 0
                const hasDym = !!cached.didYouMean
                
-               const needsAuthors = this.requestedFeatures.includes('author') || this.requestedFeatures.length == 0
-               const needsDym = this.requestedFeatures.includes('didyoumean')
+               const needsAuthors = requestFeatures.includes('author') || requestFeatures.length == 0
+               const needsDym = requestFeatures.includes('didyoumean')
 
                if ((!needsAuthors || hasAuthors) && (!needsDym || hasDym)) {
                   this.suggestions = cached.suggestions
@@ -327,13 +337,13 @@ export const useResultStore = defineStore('result', {
             this.activeSuggestionsCount++
             this.searchingSuggestions = true
             
-            if (this.requestedFeatures.includes('author') || this.requestedFeatures.length == 0) {
+            if (requestFeatures.includes('author') || requestFeatures.length == 0) {
                this.suggestions = []
             }
-            if (this.requestedFeatures.includes('didyoumean')) {
+            if (requestFeatures.includes('didyoumean')) {
                this.didYouMean = ""
             }
-            if (attempt == 1 && (this.requestedFeatures.includes('didyoumean') || !this.suggestionMetadata)) {
+            if (attempt == 1 && (requestFeatures.includes('didyoumean') || !this.suggestionMetadata)) {
                 if (!this.suggestionMetadata) this.suggestionMetadata = null
             }
          }
@@ -343,7 +353,7 @@ export const useResultStore = defineStore('result', {
             query: queryStr,
             aiPrompt: aiPrompt,
             debug: prefs.aiDebug,
-            features: this.requestedFeatures
+            features: requestFeatures
          }
          
          if (system.suggestionsAPI == "") {
@@ -352,7 +362,7 @@ export const useResultStore = defineStore('result', {
                query: queryStr,
                preferences: { ai_prompt: aiPrompt },
                debug: prefs.aiDebug,
-               features: this.requestedFeatures
+               features: requestFeatures
             }
          }
 
@@ -503,6 +513,7 @@ export const useResultStore = defineStore('result', {
          this.lastSearchScrollPosition = 0
          this.lastSearchURL = ""
          const ui = useUIStore()
+         this.clearSuggestions()
          if (ui.suggestionsOpen) {
             this.fetchSuggestions(query.string, prefs.aiPrompt, ['author'])
             if (prefs.aiFeatures.includes('didyoumean')) {
@@ -554,6 +565,7 @@ export const useResultStore = defineStore('result', {
          useCollectionStore().clearCollectionDetails()
          this.setSearching(true)
          const ui = useUIStore()
+         this.clearSuggestions()
          if (ui.suggestionsOpen) {
             this.fetchSuggestions(query.string, prefs.aiPrompt, ['author'])
             if (prefs.aiFeatures.includes('didyoumean')) {

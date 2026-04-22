@@ -18,6 +18,7 @@ export const useUIStore = defineStore('ui', {
          if (this.suggestionsOpen && results.suggestions.length == 0 && results.searchingSuggestions == false) {
             const query = useQueryStore()
             const prefs = usePreferencesStore()
+            results.clearSuggestions()
             if (query.string) {
                results.fetchSuggestions(query.string, prefs.aiPrompt, ['author'])
                if (prefs.aiFeatures.includes('didyoumean')) {
