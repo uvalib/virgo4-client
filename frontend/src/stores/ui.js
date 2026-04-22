@@ -19,7 +19,10 @@ export const useUIStore = defineStore('ui', {
             const query = useQueryStore()
             const prefs = usePreferencesStore()
             if (query.string) {
-               results.fetchSuggestions(query.string, prefs.aiPrompt)
+               results.fetchSuggestions(query.string, prefs.aiPrompt, ['author'])
+               if (prefs.aiFeatures.includes('didyoumean')) {
+                  results.fetchSuggestions(query.string, prefs.aiPrompt, ['didyoumean'])
+               }
             }
          }
       },
@@ -36,11 +39,34 @@ export const useUIStore = defineStore('ui', {
          }
          this.suggestionCache.queries.push(q)
 
-         // Add data
-         this.suggestionCache.data[q] = {
-            suggestions: results.suggestions,
-            didYouMean: results.did_you_mean,
-            metadata: results.metadata,
+         // Initialize or merge data
+         if (!this.suggestionCache.data[q]) {
+            this.suggestionCache.data[q] = {
+               suggestions: [],
+               didYouMean: "",
+               metadata: null
+            }
+         }
+
+         const entry = this.suggestionCache.data[q]
+         if (results.suggestions && results.suggestions.length > 0) {
+            entry.suggestions = results.suggestions
+         }
+         if (results.did_you_mean) {
+            entry.didYouMean = results.did_you_mean
+         }
+         
+         // Merge metadata
+         if (results.metadata) {
+            if (!entry.metadata) {
+               entry.metadata = results.metadata
+            } else {
+               // Sum tokens and use the most comprehensive model info
+               entry.metadata.input_tokens += results.metadata.input_tokens
+               entry.metadata.output_tokens += results.metadata.output_tokens
+               entry.metadata.cycle2_time_ms = Math.max(entry.metadata.cycle2_time_ms, results.metadata.cycle2_time_ms)
+               entry.metadata.total_time_ms = Math.max(entry.metadata.total_time_ms, results.metadata.total_time_ms)
+            }
          }
 
          // Enforce 20 item limit

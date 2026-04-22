@@ -21,6 +21,7 @@ export const useResultStore = defineStore('result', {
       results: [{ total: 0, hits: [], pool: { description: "", id: "none", name: "None", summary: "", url: "" } }],
       suggestions: [],
       searchingSuggestions: false,
+      activeSuggestionsCount: 0,
       didYouMean: "",
       suggestionMetadata: null,
       requestedFeatures: [],
@@ -280,7 +281,7 @@ export const useResultStore = defineStore('result', {
             this.suggestions.push(d)
          })
       },
-      async fetchSuggestions(queryStr, aiPrompt, attempt = 1) {
+      async fetchSuggestions(queryStr, aiPrompt, featuresOverride = null, attempt = 1) {
          const user = useUserStore()
          const system = useSystemStore()
          const query = useQueryStore()
@@ -293,25 +294,50 @@ export const useResultStore = defineStore('result', {
             return
          }
 
+         if (featuresOverride) {
+            this.requestedFeatures = Array.from(new Set([...this.requestedFeatures, ...featuresOverride]))
+         } else {
+            this.requestedFeatures = [...prefs.aiFeatures]
+         }
+         
+         if (prefs.aiModel && prefs.aiModel != "default") {
+            // only add model if not already present in the features list
+            if (!this.requestedFeatures.some(f => f.startsWith("llm:"))) {
+               this.requestedFeatures.push(`llm:${prefs.aiModel}`)
+            }
+         }
+
          if (attempt == 1) {
             const cached = ui.getSuggestionsFromCache(queryStr)
             if (cached && !prefs.aiCacheDisabled) {
-               this.suggestions = cached.suggestions
-               this.didYouMean = cached.didYouMean
-               this.suggestionMetadata = cached.metadata
-               this.searchingSuggestions = false
-               return
+               const hasAuthors = cached.suggestions && cached.suggestions.length > 0
+               const hasDym = !!cached.didYouMean
+               
+               const needsAuthors = this.requestedFeatures.includes('author') || this.requestedFeatures.length == 0
+               const needsDym = this.requestedFeatures.includes('didyoumean')
+
+               if ((!needsAuthors || hasAuthors) && (!needsDym || hasDym)) {
+                  this.suggestions = cached.suggestions
+                  this.didYouMean = cached.didYouMean
+                  this.suggestionMetadata = cached.metadata
+                  this.searchingSuggestions = false
+                  return
+               }
             }
+            this.activeSuggestionsCount++
             this.searchingSuggestions = true
-            this.suggestions = []
-            this.didYouMean = ""
-            this.suggestionMetadata = null
+            
+            if (this.requestedFeatures.includes('author') || this.requestedFeatures.length == 0) {
+               this.suggestions = []
+            }
+            if (this.requestedFeatures.includes('didyoumean')) {
+               this.didYouMean = ""
+            }
+            if (attempt == 1 && (this.requestedFeatures.includes('didyoumean') || !this.suggestionMetadata)) {
+                if (!this.suggestionMetadata) this.suggestionMetadata = null
+            }
          }
 
-         this.requestedFeatures = [...prefs.aiFeatures]
-         if (prefs.aiModel && prefs.aiModel != "default") {
-            this.requestedFeatures.push(`llm:${prefs.aiModel}`)
-         }
          let url = `${system.suggestionsAPI}/api/suggest`
          let req = {
             query: queryStr,
@@ -319,6 +345,7 @@ export const useResultStore = defineStore('result', {
             debug: prefs.aiDebug,
             features: this.requestedFeatures
          }
+         
          if (system.suggestionsAPI == "") {
             url = `${system.searchAPI}/api/search/suggestions`
             req = {
@@ -331,34 +358,40 @@ export const useResultStore = defineStore('result', {
 
          try {
             const response = await axios.post(url, req)
-            if (response.data && response.data.did_you_mean) {
-               this.didYouMean = response.data.did_you_mean
-            }
-            if (response.data && response.data.metadata) {
-               this.suggestionMetadata = response.data.metadata
-            }
-            if (response.data && response.data.suggestions && response.data.suggestions.length > 0) {
-               this.setSuggestions(response.data.suggestions)
-               ui.addToSuggestionCache(queryStr, response.data)
-               this.searchingSuggestions = false
-            } else {
-               // If suggestions are empty, it might be a transient failure or a very niche query.
-               // Retry once just in case.
-               if (attempt < 2) {
-                  console.warn(`Suggestions empty on attempt ${attempt}. Retrying...`)
-                  await new Promise(resolve => setTimeout(resolve, 500))
-                  return this.fetchSuggestions(queryStr, aiPrompt, attempt + 1)
+            if (response.data) {
+               if (response.data.did_you_mean) {
+                  this.didYouMean = response.data.did_you_mean
                }
-               this.searchingSuggestions = false
+               if (response.data.suggestions && response.data.suggestions.length > 0) {
+                  this.setSuggestions(response.data.suggestions)
+               }
+               
+               if (response.data.metadata) {
+                  if (!this.suggestionMetadata) {
+                     this.suggestionMetadata = response.data.metadata
+                  } else {
+                     this.suggestionMetadata.input_tokens += response.data.metadata.input_tokens
+                     this.suggestionMetadata.output_tokens += response.data.metadata.output_tokens
+                     this.suggestionMetadata.cycle2_time_ms = Math.max(this.suggestionMetadata.cycle2_time_ms, response.data.metadata.cycle2_time_ms)
+                     this.suggestionMetadata.total_time_ms = Math.max(this.suggestionMetadata.total_time_ms, response.data.metadata.total_time_ms)
+                  }
+               }
+               ui.addToSuggestionCache(queryStr, response.data)
             }
          } catch (error) {
+            console.error("SUGGESTIONS FAILED: " + error)
             if (attempt < 2) {
-               console.warn(`Suggestions request failed on attempt ${attempt}: ${error}. Retrying...`)
                await new Promise(resolve => setTimeout(resolve, 500))
-               return this.fetchSuggestions(queryStr, aiPrompt, attempt + 1)
+               return this.fetchSuggestions(queryStr, aiPrompt, featuresOverride, attempt + 1)
             }
-            console.error("SUGGESTIONS FAILED after retries: " + error)
-            this.searchingSuggestions = false
+         } finally {
+            if (attempt == 1) {
+               this.activeSuggestionsCount--
+               if (this.activeSuggestionsCount <= 0) {
+                  this.activeSuggestionsCount = 0
+                  this.searchingSuggestions = false
+               }
+            }
          }
       },
 
@@ -471,7 +504,10 @@ export const useResultStore = defineStore('result', {
          this.lastSearchURL = ""
          const ui = useUIStore()
          if (ui.suggestionsOpen) {
-            this.fetchSuggestions(query.string, prefs.aiPrompt)
+            this.fetchSuggestions(query.string, prefs.aiPrompt, ['author'])
+            if (prefs.aiFeatures.includes('didyoumean')) {
+               this.fetchSuggestions(query.string, prefs.aiPrompt, ['didyoumean'])
+            }
          }
 
          // POST the search query and wait for the response
@@ -519,7 +555,10 @@ export const useResultStore = defineStore('result', {
          this.setSearching(true)
          const ui = useUIStore()
          if (ui.suggestionsOpen) {
-            this.fetchSuggestions(query.string, prefs.aiPrompt)
+            this.fetchSuggestions(query.string, prefs.aiPrompt, ['author'])
+            if (prefs.aiFeatures.includes('didyoumean')) {
+               this.fetchSuggestions(query.string, prefs.aiPrompt, ['didyoumean'])
+            }
          }
          let filters = filterStore.poolFilter(params.pool.id)
          let sort = sortStore.poolSort(params.pool.id)

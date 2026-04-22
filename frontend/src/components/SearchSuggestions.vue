@@ -149,7 +149,10 @@ const onBlur = ((event) => {
 onMounted(() => {
    if (ui.suggestionsOpen && results.suggestions.length == 0 && !results.searchingSuggestions) {
       if (queryStore.string) {
-         results.fetchSuggestions(queryStore.string, preferences.aiPrompt)
+         results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['author'])
+         if (preferences.aiFeatures.includes('didyoumean')) {
+            results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['didyoumean'])
+         }
       }
    }
 })
