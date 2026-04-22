@@ -74,16 +74,6 @@ export const useResultStore = defineStore('result', {
          this.selectedHitGroupIdx = -1
 
          this.results[this.selectedResultsIdx].hits.some( (h,idx) => {
-      },
-
-      clearSuggestions() {
-         this.suggestions = []
-         this.didYouMean = ""
-         this.suggestionMetadata = null
-         this.requestedFeatures = []
-         this.activeSuggestionsCount = 0
-         this.searchingSuggestions = false
-      },
             if (h.identifier == identifier) {
                this.selectedHitIdx = idx
             } else if ( h.grouped == true) {
@@ -102,6 +92,15 @@ export const useResultStore = defineStore('result', {
                this.lastSearchScrollPosition = window.scrollY
             }
           }
+      },
+
+      clearSuggestions() {
+         this.suggestions = []
+         this.didYouMean = ""
+         this.suggestionMetadata = null
+         this.requestedFeatures = []
+         this.activeSuggestionsCount = 0
+         this.searchingSuggestions = false
       },
       priorHit() {
          if ( this.selectedHitIdx == -1) return
