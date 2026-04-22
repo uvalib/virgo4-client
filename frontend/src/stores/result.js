@@ -317,6 +317,16 @@ export const useResultStore = defineStore('result', {
          }
          
          if (attempt == 1) {
+            if (requestFeatures.includes('author') || requestFeatures.length == 0) {
+               this.suggestions = []
+            }
+            if (requestFeatures.includes('didyoumean')) {
+               this.didYouMean = ""
+            }
+            if (attempt == 1 && (requestFeatures.includes('didyoumean') || !this.suggestionMetadata)) {
+               if (!this.suggestionMetadata) this.suggestionMetadata = null
+            }
+
             const cached = ui.getSuggestionsFromCache(queryStr)
             if (cached && !prefs.aiCacheDisabled) {
                const hasAuthors = cached.suggestions && cached.suggestions.length > 0
@@ -335,16 +345,6 @@ export const useResultStore = defineStore('result', {
             }
             this.activeSuggestionsCount++
             this.searchingSuggestions = true
-            
-            if (requestFeatures.includes('author') || requestFeatures.length == 0) {
-               this.suggestions = []
-            }
-            if (requestFeatures.includes('didyoumean')) {
-               this.didYouMean = ""
-            }
-            if (attempt == 1 && (requestFeatures.includes('didyoumean') || !this.suggestionMetadata)) {
-                if (!this.suggestionMetadata) this.suggestionMetadata = null
-            }
          }
 
          let url = `${system.suggestionsAPI}/api/suggest`

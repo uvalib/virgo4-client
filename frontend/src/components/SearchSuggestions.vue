@@ -12,12 +12,13 @@
             </button>
          </div>
          <div class="wrapper">
-            <!-- Results Area: Show as they come in -->
-            <template v-if="results.suggestions.length > 0 || results.didYouMean">
-               <div v-if="results.didYouMean && results.requestedFeatures.includes('didyoumean')" class="did-you-mean">
-                  Did you mean: <a href="#" @click.stop.prevent="didYouMeanClick">{{results.didYouMean}}</a>?
-               </div>
-               
+            <!-- Did You Mean Block: Show immediately if available -->
+            <div v-if="results.didYouMean && results.requestedFeatures.includes('didyoumean')" class="did-you-mean">
+               Did you mean: <a href="#" @click.stop.prevent="didYouMeanClick">{{results.didYouMean}}</a>?
+            </div>
+
+            <!-- Author Section: Results or local spinner -->
+            <div class="author-section" :class="{'mt-10': results.didYouMean && (authPending || results.suggestions.length > 0)}">
                <template v-if="results.suggestions.length > 0">
                   <span class="note">Authors related to your search</span>
                   <div class="searches">
@@ -42,60 +43,61 @@
                   </div>
                </template>
 
-               <div v-if="userStore.isAdmin && results.suggestionMetadata" class="ai-debug-info">
-                  <hr/>
-                  <div class="debug-details">
-                     <span class="label">AI Debug:</span>
-                     <span class="metric">Model: {{results.suggestionMetadata.model}}</span>
-                     <span class="sep">|</span>
-                     <span class="metric">Total: {{results.suggestionMetadata.total_time_ms}}ms</span>
-                     <span class="sep">|</span>
-                     <span class="metric">Cycles: {{results.suggestionMetadata.cycle1_time_ms}} / {{results.suggestionMetadata.cycle2_time_ms}} / {{results.suggestionMetadata.cycle3_time_ms}} ms</span>
-                     <span class="sep">|</span>
-                     <span class="metric">Tokens: {{results.suggestionMetadata.input_tokens}} in / {{results.suggestionMetadata.output_tokens}} out</span>
-                     <template v-if="results.suggestionMetadata.cost_per_1k">
-                        <span class="sep">|</span>
-                        <span class="metric">Cost/1k requests: ${{results.suggestionMetadata.cost_per_1k.toFixed(4)}}</span>
-                     </template>
-                  </div>
-                  <div class="debug-toggles">
-                     <button v-if="results.suggestionMetadata.input_prompt" class="toggle-link" @click="showPrompt = !showPrompt">
-                        {{ showPrompt ? 'Hide' : 'View' }} Prompt
-                     </button>
-                     <button v-if="results.suggestionMetadata.raw_output" class="toggle-link" @click="showRaw = !showRaw">
-                        {{ showRaw ? 'Hide' : 'View' }} Raw LLM
-                     </button>
-                     <button v-if="results.suggestionMetadata.reasoning" class="toggle-link" @click="showReasoning = !showReasoning">
-                        {{ showReasoning ? 'Hide' : 'View' }} Reasoning
-                     </button>
-                     <div class="cache-toggle">
-                        <input type="checkbox" id="ai-cache-disable" v-model="preferences.aiCacheDisabled" @change="preferences.savePreferences" />
-                        <label for="ai-cache-disable">Disable Cache</label>
-                     </div>
-                  </div>
-                  <div v-if="showPrompt" class="debug-pane">
-                     <h5>Input Prompt</h5>
-                     <pre>{{results.suggestionMetadata.input_prompt}}</pre>
-                  </div>
-                  <div v-if="showRaw" class="debug-pane">
-                     <h5>Raw LLM Output</h5>
-                     <pre>{{results.suggestionMetadata.raw_output}}</pre>
-                  </div>
-                  <div v-if="showReasoning" class="debug-pane">
-                     <h5>Model Reasoning</h5>
-                     <pre>{{results.suggestionMetadata.reasoning}}</pre>
-                  </div>
+               <!-- Spinner anchored to author section if authors are pending -->
+               <div v-else-if="authPending" class="loading">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span class="note ml-10">{{ suggestionLoadingMessage }}</span>
                </div>
-            </template>
-
-            <!-- Loading Spinner: Show if anything is still pending -->
-            <div v-if="results.searchingSuggestions" class="loading" :class="{'mt-10': results.suggestions.length > 0 || results.didYouMean}">
-               <i class="fas fa-spinner fa-spin"></i>
-               <span class="note ml-10">{{ suggestionLoadingMessage }}</span>
             </div>
 
-            <!-- Empty State: Only when finished and nothing found -->
-            <div v-else-if="results.suggestions.length == 0 && !results.didYouMean" class="no-suggestions note">
+            <!-- Debug Info: Show if we have any data to debug -->
+            <div v-if="userStore.isAdmin && results.suggestionMetadata && (results.suggestions.length > 0 || results.didYouMean)" class="ai-debug-info">
+               <hr/>
+               <div class="debug-details">
+                  <span class="label">AI Debug:</span>
+                  <span class="metric">Model: {{results.suggestionMetadata.model}}</span>
+                  <span class="sep">|</span>
+                  <span class="metric">Total: {{results.suggestionMetadata.total_time_ms}}ms</span>
+                  <span class="sep">|</span>
+                  <span class="metric">Cycles: {{results.suggestionMetadata.cycle1_time_ms}} / {{results.suggestionMetadata.cycle2_time_ms}} / {{results.suggestionMetadata.cycle3_time_ms}} ms</span>
+                  <span class="sep">|</span>
+                  <span class="metric">Tokens: {{results.suggestionMetadata.input_tokens}} in / {{results.suggestionMetadata.output_tokens}} out</span>
+                  <template v-if="results.suggestionMetadata.cost_per_1k">
+                     <span class="sep">|</span>
+                     <span class="metric">Cost/1k requests: ${{results.suggestionMetadata.cost_per_1k.toFixed(4)}}</span>
+                  </template>
+               </div>
+               <div class="debug-toggles">
+                  <button v-if="results.suggestionMetadata.input_prompt" class="toggle-link" @click="showPrompt = !showPrompt">
+                     {{ showPrompt ? 'Hide' : 'View' }} Prompt
+                  </button>
+                  <button v-if="results.suggestionMetadata.raw_output" class="toggle-link" @click="showRaw = !showRaw">
+                     {{ showRaw ? 'Hide' : 'View' }} Raw LLM
+                  </button>
+                  <button v-if="results.suggestionMetadata.reasoning" class="toggle-link" @click="showReasoning = !showReasoning">
+                     {{ showReasoning ? 'Hide' : 'View' }} Reasoning
+                  </button>
+                  <div class="cache-toggle">
+                     <input type="checkbox" id="ai-cache-disable" v-model="preferences.aiCacheDisabled" @change="preferences.savePreferences" />
+                     <label for="ai-cache-disable">Disable Cache</label>
+                  </div>
+               </div>
+               <div v-if="showPrompt" class="debug-pane">
+                  <h5>Input Prompt</h5>
+                  <pre>{{results.suggestionMetadata.input_prompt}}</pre>
+               </div>
+               <div v-if="showRaw" class="debug-pane">
+                  <h5>Raw LLM Output</h5>
+                  <pre>{{results.suggestionMetadata.raw_output}}</pre>
+               </div>
+               <div v-if="showReasoning" class="debug-pane">
+                  <h5>Model Reasoning</h5>
+                  <pre>{{results.suggestionMetadata.reasoning}}</pre>
+               </div>
+            </div>
+
+            <!-- Empty State: Only when finished and nothing found AT ALL -->
+            <div v-if="!results.searchingSuggestions && results.suggestions.length == 0 && !results.didYouMean" class="no-suggestions note">
                No suggestions found for this query.
             </div>
          </div>
@@ -125,17 +127,17 @@ const showPrompt = ref(false)
 const showRaw = ref(false)
 const showReasoning = ref(false)
 
+const dymPending = computed( () => results.searchingSuggestions && results.didYouMean == "" && results.requestedFeatures.includes('didyoumean'))
+const authPending = computed( () => results.searchingSuggestions && results.suggestions.length == 0 && (results.requestedFeatures.includes('author') || results.requestedFeatures.length == 0))
+
 const suggestionLoadingMessage = computed( () => {
    if (!results.searchingSuggestions) return ""
 
-   let dymPending = results.didYouMean == "" && results.requestedFeatures.includes('didyoumean')
-   let authorPending = results.suggestions.length == 0 && results.requestedFeatures.includes('author')
-
    // If both are pending OR if authors return first (DYM still pending)
-   if (dymPending) return "Finding suggestions..."
+   if (dymPending.value) return "Finding suggestions..."
 
    // If only authors are pending
-   if (authorPending) return "Finding authors..."
+   if (authPending.value) return "Finding authors..."
 
    return "Finding suggestions..."
 })
