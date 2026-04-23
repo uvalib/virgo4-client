@@ -18,7 +18,7 @@
             </div>
 
             <!-- Author Section: Results or local spinner -->
-            <div class="author-section" :class="{'mt-10': results.didYouMean && (authPending || results.suggestions.length > 0)}">
+            <div class="author-section" :class="{'mt-10': results.didYouMean && (results.searchingSuggestions || results.suggestions.length > 0)}">
                <template v-if="results.suggestions.length > 0">
                   <span class="note">Authors related to your search</span>
                   <div class="searches">
@@ -43,8 +43,8 @@
                   </div>
                </template>
 
-               <!-- Spinner anchored to author section if authors are pending -->
-               <div v-else-if="authPending" class="loading">
+               <!-- Spinner: Always show if searchingSuggestions is true, anchored to this section -->
+               <div v-if="results.searchingSuggestions" class="loading" :class="{'mt-10': results.suggestions.length > 0}">
                   <i class="fas fa-spinner fa-spin"></i>
                   <span class="note ml-10">{{ suggestionLoadingMessage }}</span>
                </div>

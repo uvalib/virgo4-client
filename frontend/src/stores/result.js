@@ -324,8 +324,12 @@ export const useResultStore = defineStore('result', {
                this.didYouMean = ""
             }
             if (attempt == 1 && (requestFeatures.includes('didyoumean') || !this.suggestionMetadata)) {
-               if (!this.suggestionMetadata) this.suggestionMetadata = null
+               this.suggestionMetadata = null
             }
+
+            // Increment before cache check to maintain global loading state
+            this.activeSuggestionsCount++
+            this.searchingSuggestions = true
 
             const cached = ui.getSuggestionsFromCache(queryStr)
             if (cached && !prefs.aiCacheDisabled) {
@@ -339,12 +343,15 @@ export const useResultStore = defineStore('result', {
                   this.suggestions = cached.suggestions
                   this.didYouMean = cached.didYouMean
                   this.suggestionMetadata = cached.metadata
-                  this.searchingSuggestions = false
+                  
+                  this.activeSuggestionsCount--
+                  if (this.activeSuggestionsCount <= 0) {
+                     this.activeSuggestionsCount = 0
+                     this.searchingSuggestions = false
+                  }
                   return
                }
             }
-            this.activeSuggestionsCount++
-            this.searchingSuggestions = true
          }
 
          let url = `${system.suggestionsAPI}/api/suggest`
@@ -368,10 +375,10 @@ export const useResultStore = defineStore('result', {
          try {
             const response = await axios.post(url, req)
             if (response.data) {
-               if (response.data.did_you_mean) {
+               if (response.data.did_you_mean && requestFeatures.includes('didyoumean')) {
                   this.didYouMean = response.data.did_you_mean
                }
-               if (response.data.suggestions && response.data.suggestions.length > 0) {
+               if (response.data.suggestions && response.data.suggestions.length > 0 && (requestFeatures.includes('author') || requestFeatures.length == 0)) {
                   this.setSuggestions(response.data.suggestions)
                }
                
@@ -379,10 +386,17 @@ export const useResultStore = defineStore('result', {
                   if (!this.suggestionMetadata) {
                      this.suggestionMetadata = response.data.metadata
                   } else {
+                     // Sum tokens and metrics across fragments
                      this.suggestionMetadata.input_tokens += response.data.metadata.input_tokens
                      this.suggestionMetadata.output_tokens += response.data.metadata.output_tokens
-                     this.suggestionMetadata.cycle2_time_ms = Math.max(this.suggestionMetadata.cycle2_time_ms, response.data.metadata.cycle2_time_ms)
-                     this.suggestionMetadata.total_time_ms = Math.max(this.suggestionMetadata.total_time_ms, response.data.metadata.total_time_ms)
+                     if (response.data.metadata.cost_per_1k) {
+                        this.suggestionMetadata.cost_per_1k = (this.suggestionMetadata.cost_per_1k || 0) + response.data.metadata.cost_per_1k
+                     }
+                     // Use the worst-case (longest) times
+                     this.suggestionMetadata.cycle1_time_ms = Math.max(this.suggestionMetadata.cycle1_time_ms || 0, response.data.metadata.cycle1_time_ms || 0)
+                     this.suggestionMetadata.cycle2_time_ms = Math.max(this.suggestionMetadata.cycle2_time_ms || 0, response.data.metadata.cycle2_time_ms || 0)
+                     this.suggestionMetadata.cycle3_time_ms = Math.max(this.suggestionMetadata.cycle3_time_ms || 0, response.data.metadata.cycle3_time_ms || 0)
+                     this.suggestionMetadata.total_time_ms = Math.max(this.suggestionMetadata.total_time_ms || 0, response.data.metadata.total_time_ms || 0)
                   }
                }
                ui.addToSuggestionCache(queryStr, response.data)
