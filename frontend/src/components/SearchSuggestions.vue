@@ -54,12 +54,12 @@
             <div v-if="results.suggestions.some( s => s.type == 'image')" class="image-section mt-10">
                <span class="note">Images related to your search</span>
                <div class="image-grid">
-                  <div v-for="(img, idx) in results.suggestions.filter( s => s.type == 'image')" :key="`img${idx}`" class="suggested-image">
-                     <router-link :to="`/sources/images/items/${img.facet}`" title="View image details">
-                        <img :src="`https://iiif.lib.virginia.edu/iiif/${img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
-                        <span class="img-title">{{ img.value }}</span>
-                     </router-link>
-                  </div>
+             <div v-for="(img, idx) in results.suggestions.filter( s => s.type == 'image')" :key="`img${idx}`" class="suggested-image">
+                <router-link :to="`/sources/images/items/${img.facet}`" title="View image details">
+                   <img :src="`https://iiif.lib.virginia.edu/iiif/${img.iiif_id || img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
+                   <span class="img-title">{{ img.value }}</span>
+                </router-link>
+             </div>
                </div>
             </div>
 

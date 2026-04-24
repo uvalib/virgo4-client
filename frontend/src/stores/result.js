@@ -392,9 +392,10 @@ export const useResultStore = defineStore('result', {
                       this.setSuggestions(response.data.suggestions.filter(s => s.type != 'image'))
                    }
                    if (requestFeatures.includes('images')) {
-                      // Append image suggestions to the existing list
+                      // Append image suggestions to the existing list. Use iiif_id for uniqueness 
+                      // to allow multiple images from the same catalog item.
                       response.data.suggestions.filter(s => s.type == 'image').forEach( img => {
-                         if (!this.suggestions.some( s => s.facet == img.facet)) {
+                         if (!this.suggestions.some( s => s.iiif_id == img.iiif_id)) {
                             this.suggestions.push(img)
                          }
                       })
