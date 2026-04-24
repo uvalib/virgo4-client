@@ -25,6 +25,7 @@ export const useResultStore = defineStore('result', {
       didYouMean: "",
       suggestionMetadata: null,
       requestedFeatures: [],
+      completedFeatures: [],
       total: -1,
       autoExpandGroupID: "",
       selectedResultsIdx: 0,
@@ -99,6 +100,7 @@ export const useResultStore = defineStore('result', {
          this.didYouMean = ""
          this.suggestionMetadata = null
          this.requestedFeatures = []
+         this.completedFeatures = []
          this.activeSuggestionsCount = 0
          this.searchingSuggestions = false
       },
@@ -323,6 +325,7 @@ export const useResultStore = defineStore('result', {
             if (requestFeatures.includes('didyoumean')) {
                this.didYouMean = ""
             }
+            this.completedFeatures = this.completedFeatures.filter( f => !requestFeatures.includes(f))
             if (attempt == 1 && (requestFeatures.includes('didyoumean') || !this.suggestionMetadata)) {
                this.suggestionMetadata = null
             }
@@ -344,6 +347,10 @@ export const useResultStore = defineStore('result', {
                   this.didYouMean = cached.didYouMean
                   this.suggestionMetadata = cached.metadata
                   
+                  requestFeatures.forEach( f => {
+                     if (!this.completedFeatures.includes(f)) this.completedFeatures.push(f)
+                  })
+
                   this.activeSuggestionsCount--
                   if (this.activeSuggestionsCount <= 0) {
                      this.activeSuggestionsCount = 0
@@ -405,10 +412,14 @@ export const useResultStore = defineStore('result', {
             console.error("SUGGESTIONS FAILED: " + error)
             if (attempt < 2) {
                await new Promise(resolve => setTimeout(resolve, 500))
-               return this.fetchSuggestions(queryStr, aiPrompt, featuresOverride, attempt + 1)
+               await this.fetchSuggestions(queryStr, aiPrompt, featuresOverride, attempt + 1)
+               return
             }
          } finally {
             if (attempt == 1) {
+               requestFeatures.forEach( f => {
+                  if (!this.completedFeatures.includes(f)) this.completedFeatures.push(f)
+               })
                this.activeSuggestionsCount--
                if (this.activeSuggestionsCount <= 0) {
                   this.activeSuggestionsCount = 0

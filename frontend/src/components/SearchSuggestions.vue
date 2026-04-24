@@ -97,7 +97,7 @@
             </div>
 
             <!-- Empty State: Only when finished and nothing found AT ALL -->
-            <div v-if="!results.searchingSuggestions && results.suggestions.length == 0 && !results.didYouMean" class="no-suggestions note">
+            <div v-if="!results.searchingSuggestions && results.suggestions.length == 0 && !results.didYouMean && results.completedFeatures.length >= results.requestedFeatures.length" class="no-suggestions note">
                No suggestions found for this query.
             </div>
          </div>
@@ -127,8 +127,8 @@ const showPrompt = ref(false)
 const showRaw = ref(false)
 const showReasoning = ref(false)
 
-const dymPending = computed( () => results.searchingSuggestions && results.didYouMean == "" && results.requestedFeatures.includes('didyoumean'))
-const authPending = computed( () => results.searchingSuggestions && results.suggestions.length == 0 && (results.requestedFeatures.includes('author') || results.requestedFeatures.length == 0))
+const dymPending = computed( () => results.requestedFeatures.includes('didyoumean') && !results.completedFeatures.includes('didyoumean'))
+const authPending = computed( () => (results.requestedFeatures.includes('author') || results.requestedFeatures.length == 0) && !results.completedFeatures.includes('author'))
 
 const suggestionLoadingMessage = computed( () => {
    if (!results.searchingSuggestions) return ""
