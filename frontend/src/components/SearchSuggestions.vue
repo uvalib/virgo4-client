@@ -54,7 +54,7 @@
             <div v-if="results.suggestions.some( s => s.type == 'image')" class="image-section mt-10">
                <span class="note">Images related to your search</span>
                <div class="image-grid">
-             <div v-for="(img, idx) in results.suggestions.filter( s => s.type == 'image')" :key="`img${idx}`" class="suggested-image">
+             <div v-for="(img, idx) in sortedImages" :key="`img${idx}`" class="suggested-image">
                 <router-link :to="`/sources/images/items/${img.facet}`" title="View image details">
                    <img :src="`https://iiif.lib.virginia.edu/iiif/${img.iiif_id || img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
                    <span class="img-title">{{ img.value }}</span>
@@ -143,6 +143,12 @@ const showReasoning = ref(false)
 const dymPending = computed( () => results.requestedFeatures.includes('didyoumean') && !results.completedFeatures.includes('didyoumean'))
 const imgPending = computed( () => results.requestedFeatures.includes('images') && !results.completedFeatures.includes('images'))
 const authPending = computed( () => (results.requestedFeatures.includes('author') || results.requestedFeatures.length == 0) && !results.completedFeatures.includes('author'))
+
+const sortedImages = computed( () => {
+   return results.suggestions.filter( s => s.type == 'image').sort( (a,b) => {
+      return (b.score || 0) - (a.score || 0)
+   })
+})
 
 const suggestionLoadingMessage = computed( () => {
    if (!results.searchingSuggestions) return ""
