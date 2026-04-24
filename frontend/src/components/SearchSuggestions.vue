@@ -35,7 +35,7 @@
                            <button v-if="s.reason" :aria-label="s.reason" class="reason-icon" v-tooltip="s.reason" @keydown.esc="handleEsc">
                               <i class="fas fa-info-circle"></i>
                            </button>
-                           <span v-if="userStore.isAdmin && s.source" class="source-badge" :class="s.source">
+                           <span v-if="userStore.isAdmin && preferences.aiDebug && s.source" class="source-badge" :class="s.source">
                               {{ s.source == 'llm' ? 'lm' : 'kb' }}
                            </span>
                         </div>
