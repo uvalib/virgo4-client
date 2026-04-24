@@ -327,7 +327,7 @@ export const useResultStore = defineStore('result', {
                this.didYouMean = ""
             }
             this.completedFeatures = this.completedFeatures.filter( f => !requestFeatures.includes(f))
-            if (attempt == 1 && (requestFeatures.includes('didyoumean') || !this.suggestionMetadata)) {
+            if (attempt == 1 && (requestFeatures.includes('didyoumean') || requestFeatures.includes('images') || !this.suggestionMetadata)) {
                this.suggestionMetadata = null
             }
 
@@ -609,6 +609,9 @@ export const useResultStore = defineStore('result', {
             this.fetchSuggestions(query.string, prefs.aiPrompt, ['author'])
             if (prefs.aiFeatures.includes('didyoumean')) {
                this.fetchSuggestions(query.string, prefs.aiPrompt, ['didyoumean'])
+            }
+            if (prefs.aiFeatures.includes('images')) {
+               this.fetchSuggestions(query.string, prefs.aiPrompt, ['images'])
             }
          }
          let filters = filterStore.poolFilter(params.pool.id)

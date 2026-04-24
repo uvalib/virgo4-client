@@ -24,6 +24,9 @@ export const useUIStore = defineStore('ui', {
                if (prefs.aiFeatures.includes('didyoumean')) {
                   results.fetchSuggestions(query.string, prefs.aiPrompt, ['didyoumean'])
                }
+               if (prefs.aiFeatures.includes('images')) {
+                  results.fetchSuggestions(query.string, prefs.aiPrompt, ['images'])
+               }
             }
          }
       },
