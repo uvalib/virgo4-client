@@ -38,6 +38,10 @@
                <Checkbox v-model="preferences.aiFeatures" value="didyoumean" inputId="didyoumean" />
                <label for="didyoumean" class="ml-10">Enable "Did You Mean" query refinements</label>
             </div>
+            <div class="feature">
+               <Checkbox v-model="preferences.aiFeatures" value="images" inputId="images" />
+               <label for="images" class="ml-10">Enable Image suggestions (Knowledge Base)</label>
+            </div>
          </div>
          <VirgoButton @click="save">Save Settings</VirgoButton>
       </div>

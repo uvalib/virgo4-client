@@ -287,7 +287,8 @@ export const useResultStore = defineStore('result', {
       },
 
       setSuggestions(data) {
-         this.suggestions = []
+         // Keep non-author suggestions (like images)
+         this.suggestions = this.suggestions.filter(s => s.type != 'author' && s.type != "")
          data.forEach(d => {
             this.suggestions.push(d)
          })
@@ -320,7 +321,7 @@ export const useResultStore = defineStore('result', {
          
          if (attempt == 1) {
             if (requestFeatures.includes('author') || requestFeatures.length == 0) {
-               this.suggestions = []
+               this.suggestions = this.suggestions.filter(s => s.type != 'author' && s.type != "")
             }
             if (requestFeatures.includes('didyoumean')) {
                this.didYouMean = ""
@@ -341,8 +342,9 @@ export const useResultStore = defineStore('result', {
                
                const needsAuthors = requestFeatures.includes('author') || requestFeatures.length == 0
                const needsDym = requestFeatures.includes('didyoumean')
+               const needsImages = requestFeatures.includes('images')
 
-               if ((!needsAuthors || hasAuthors) && (!needsDym || hasDym)) {
+               if ((!needsAuthors || hasAuthors) && (!needsDym || hasDym) && (!needsImages || cached.suggestions.some(s => s.type == 'image'))) {
                   this.suggestions = cached.suggestions
                   this.didYouMean = cached.didYouMean
                   this.suggestionMetadata = cached.metadata
@@ -385,9 +387,19 @@ export const useResultStore = defineStore('result', {
                if (response.data.did_you_mean && requestFeatures.includes('didyoumean')) {
                   this.didYouMean = response.data.did_you_mean
                }
-               if (response.data.suggestions && response.data.suggestions.length > 0 && (requestFeatures.includes('author') || requestFeatures.length == 0)) {
-                  this.setSuggestions(response.data.suggestions)
-               }
+                if (response.data.suggestions && response.data.suggestions.length > 0) {
+                   if (requestFeatures.includes('author') || requestFeatures.length == 0) {
+                      this.setSuggestions(response.data.suggestions.filter(s => s.type != 'image'))
+                   }
+                   if (requestFeatures.includes('images')) {
+                      // Append image suggestions to the existing list
+                      response.data.suggestions.filter(s => s.type == 'image').forEach( img => {
+                         if (!this.suggestions.some( s => s.facet == img.facet)) {
+                            this.suggestions.push(img)
+                         }
+                      })
+                   }
+                }
                
                if (response.data.metadata) {
                   if (!this.suggestionMetadata) {
@@ -542,6 +554,9 @@ export const useResultStore = defineStore('result', {
             this.fetchSuggestions(query.string, prefs.aiPrompt, ['author'])
             if (prefs.aiFeatures.includes('didyoumean')) {
                this.fetchSuggestions(query.string, prefs.aiPrompt, ['didyoumean'])
+            }
+            if (prefs.aiFeatures.includes('images')) {
+               this.fetchSuggestions(query.string, prefs.aiPrompt, ['images'])
             }
          }
 

@@ -1,6 +1,6 @@
 <template>
    <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch" class="suggestions" :class="{ open: ui.suggestionsOpen }">
-      <button v-if="!ui.suggestionsOpen" class="opt-in-pill" @click="ui.toggleSuggestions" title="Show related author suggestions">
+      <button v-if="!ui.suggestionsOpen" class="opt-in-pill" @click="ui.toggleSuggestions" title="Show related search suggestions">
          <i class="fas fa-lightbulb"></i>
          <span class="label">Search Suggestions</span>
       </button>
@@ -47,6 +47,19 @@
                <div v-if="results.searchingSuggestions" class="loading" :class="{'mt-10': results.suggestions.length > 0}">
                   <i class="fas fa-spinner fa-spin"></i>
                   <span class="note ml-10">{{ suggestionLoadingMessage }}</span>
+               </div>
+            </div>
+            
+            <!-- Images Section -->
+            <div v-if="results.suggestions.some( s => s.type == 'image')" class="image-section mt-10">
+               <span class="note">Images related to your search</span>
+               <div class="image-grid">
+                  <div v-for="(img, idx) in results.suggestions.filter( s => s.type == 'image')" :key="`img${idx}`" class="suggested-image">
+                     <router-link :to="`/sources/images/items/${img.facet}`" title="View image details">
+                        <img :src="`https://iiif.lib.virginia.edu/iiif/${img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
+                        <span class="img-title">{{ img.value }}</span>
+                     </router-link>
+                  </div>
                </div>
             </div>
 
@@ -128,13 +141,17 @@ const showRaw = ref(false)
 const showReasoning = ref(false)
 
 const dymPending = computed( () => results.requestedFeatures.includes('didyoumean') && !results.completedFeatures.includes('didyoumean'))
+const imgPending = computed( () => results.requestedFeatures.includes('images') && !results.completedFeatures.includes('images'))
 const authPending = computed( () => (results.requestedFeatures.includes('author') || results.requestedFeatures.length == 0) && !results.completedFeatures.includes('author'))
 
 const suggestionLoadingMessage = computed( () => {
    if (!results.searchingSuggestions) return ""
 
-   // If both are pending OR if authors return first (DYM still pending)
+   // If authors return first (DYM still pending)
    if (dymPending.value) return "Finding suggestions..."
+
+   // If images are pending
+   if (imgPending.value) return "Finding images..."
 
    // If only authors are pending
    if (authPending.value) return "Finding authors..."
@@ -182,6 +199,9 @@ onMounted(() => {
          results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['author'])
          if (preferences.aiFeatures.includes('didyoumean')) {
             results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['didyoumean'])
+         }
+         if (preferences.aiFeatures.includes('images')) {
+            results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['images'])
          }
       }
    }
@@ -469,6 +489,44 @@ button.more {
    align-items: center;
    &.mt-10 {
       margin-top: 10px;
+   }
+}
+
+.image-section {
+   .image-grid {
+      display: flex;
+      flex-flow: row wrap;
+      gap: 15px;
+      margin-top: 10px;
+      .suggested-image {
+         max-width: 150px;
+         text-align: center;
+         a {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            text-decoration: none;
+            color: inherit;
+            &:hover .img-title {
+               text-decoration: underline;
+               color: $uva-blue-alt;
+            }
+         }
+         img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid $uva-grey-100;
+            background-color: #f8f9fa;
+         }
+         .img-title {
+            font-size: 0.85em;
+            font-weight: 600;
+            line-height: 1.2;
+            word-break: break-word;
+         }
+      }
    }
 }
 </style>
