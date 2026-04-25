@@ -55,9 +55,8 @@
                <span class="note">Images related to your search</span>
                <div class="image-grid">
              <div v-for="(img, idx) in sortedImages" :key="`img${idx}`" class="suggested-image">
-                <router-link :to="`/sources/images/items/${img.facet}`" title="View image details">
+                <router-link :to="`/sources/images/items/${img.facet}`" :title="img.value">
                    <img :src="`https://iiif.lib.virginia.edu/iiif/${img.iiif_id || img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
-                   <span class="img-title">{{ img.value }}</span>
                 </router-link>
              </div>
                </div>
@@ -147,7 +146,7 @@ const authPending = computed( () => (results.requestedFeatures.includes('author'
 const sortedImages = computed( () => {
    return results.suggestions.filter( s => s.type == 'image').sort( (a,b) => {
       return (b.score || 0) - (a.score || 0)
-   })
+   }).slice(0, 6)
 })
 
 const sortedAuthors = computed( () => {
@@ -506,35 +505,37 @@ button.more {
    .image-grid {
       display: flex;
       flex-flow: row wrap;
+      justify-content: flex-start;
       gap: 15px;
       margin-top: 10px;
+
       .suggested-image {
+         // Default mobile: ~3 per row (with gap)
+         width: calc(33.3% - 10px);
          max-width: 150px;
-         text-align: center;
+
+         // Desktop: Fit all 6 in one row
+         @media (min-width: 768px) {
+            width: auto;
+            flex: 0 0 auto;
+         }
+
          a {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+            display: block;
             text-decoration: none;
-            color: inherit;
-            &:hover .img-title {
-               text-decoration: underline;
-               color: $uva-blue-alt;
-            }
          }
          img {
-            width: 150px;
-            height: 150px;
+            width: 100%;
+            aspect-ratio: 1 / 1;
             object-fit: cover;
             border-radius: 4px;
             border: 1px solid $uva-grey-100;
             background-color: #f8f9fa;
-         }
-         .img-title {
-            font-size: 0.85em;
-            font-weight: 600;
-            line-height: 1.2;
-            word-break: break-word;
+            transition: transform 0.2s ease;
+            &:hover {
+               transform: scale(1.05);
+               border-color: $uva-blue-alt;
+            }
          }
       }
    }
