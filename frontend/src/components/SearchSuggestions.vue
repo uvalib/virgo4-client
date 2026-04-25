@@ -22,7 +22,7 @@
                <template v-if="results.suggestions.length > 0">
                   <span class="note">Authors related to your search</span>
                   <div class="searches">
-                     <template v-for="(s,idx) in results.suggestions"  :key="`sugest${idx}`">
+                     <template v-for="(s,idx) in sortedAuthors"  :key="`sugest${idx}`">
                         <span class="sep" v-if="idx > 0">|</span>
                         <div class="suggestion-item">
                            <router-link @mousedown="suggestionClick(s.value)"
@@ -148,6 +148,10 @@ const sortedImages = computed( () => {
    return results.suggestions.filter( s => s.type == 'image').sort( (a,b) => {
       return (b.score || 0) - (a.score || 0)
    })
+})
+
+const sortedAuthors = computed( () => {
+   return results.suggestions.filter( s => s.type == 'author' || s.type == "" || !s.type)
 })
 
 const suggestionLoadingMessage = computed( () => {
