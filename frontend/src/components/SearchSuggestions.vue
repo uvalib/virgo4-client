@@ -146,7 +146,7 @@ const authPending = computed( () => (results.requestedFeatures.includes('author'
 const sortedImages = computed( () => {
    return results.suggestions.filter( s => s.type == 'image').sort( (a,b) => {
       return (b.score || 0) - (a.score || 0)
-   }).slice(0, 6)
+   }).slice(0, 10)
 })
 
 const sortedAuthors = computed( () => {
@@ -506,18 +506,16 @@ button.more {
       display: flex;
       flex-flow: row wrap;
       justify-content: flex-start;
-      gap: 15px;
+      gap: 10px;
       margin-top: 10px;
 
       .suggested-image {
-         // Default mobile: ~3 per row (with gap)
-         width: calc(33.3% - 10px);
-         max-width: 150px;
+         // Mobile: 5 per row
+         width: calc(20% - 8px);
 
-         // Desktop: Fit all 6 in one row
+         // Desktop: 10 across in one row
          @media (min-width: 768px) {
-            width: auto;
-            flex: 0 0 auto;
+            width: calc(10% - 9px);
          }
 
          a {
