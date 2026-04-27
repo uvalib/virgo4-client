@@ -20,7 +20,9 @@
             <!-- Author Section: Results or local spinner -->
             <div class="author-section" :class="{'mt-10': results.didYouMean && (results.searchingSuggestions || results.suggestions.length > 0)}">
                <template v-if="results.suggestions.length > 0">
-                  <span class="note">Authors related to your search</span>
+               <div class="section-label">
+                  <i class="fas fa-user-friends"></i> Authors related to your search
+               </div>
                   <div class="searches">
                      <template v-for="(s,idx) in sortedAuthors"  :key="`sugest${idx}`">
                         <span class="sep" v-if="idx > 0">|</span>
@@ -51,8 +53,10 @@
             </div>
             
             <!-- Images Section -->
-            <div v-if="results.suggestions.some( s => s.type == 'image')" class="image-section mt-10">
-               <span class="note">Images related to your search</span>
+            <div v-if="results.suggestions.some( s => s.type == 'image')" class="image-section">
+               <div class="section-label">
+                  <i class="fas fa-images"></i> Images related to your search
+               </div>
                <div class="image-grid">
              <div v-for="(img, idx) in sortedImages" :key="`img${idx}`" class="suggested-image">
                 <router-link :to="`/sources/images/items/${img.facet}`" :title="img.value">
@@ -318,6 +322,67 @@ h2 {
    font-size: 0.9em;
    display: inline-block;
 }
+.section-label {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   font-size: 0.75rem;
+   font-weight: 700;
+   text-transform: uppercase;
+   letter-spacing: 0.05em;
+   color: $uva-brand-blue;
+   margin-bottom: 10px;
+   opacity: 0.8;
+   
+   i {
+      color: $uva-blue-alt;
+      font-size: 1.2em;
+   }
+}
+.author-section {
+   margin-bottom: 25px;
+}
+.image-section {
+   margin-top: 25px;
+   padding-top: 20px;
+   border-top: 1px solid #f0f0f0;
+
+   .image-grid {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 10px;
+
+      .suggested-image {
+         // Mobile: 5 per row
+         width: calc(20% - 8px);
+
+         // Desktop: 10 across in one row
+         @media (min-width: 768px) {
+            width: calc(10% - 9px);
+         }
+
+         a {
+            display: block;
+            text-decoration: none;
+         }
+         img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid $uva-grey-100;
+            background-color: #f8f9fa;
+            transition: transform 0.2s ease;
+            &:hover {
+               transform: scale(1.05);
+               border-color: $uva-blue-alt;
+            }
+         }
+      }
+   }
+}
 .did-you-mean {
     margin-bottom: 10px;
     font-size: 1em;
@@ -501,41 +566,5 @@ button.more {
    }
 }
 
-.image-section {
-   .image-grid {
-      display: flex;
-      flex-flow: row wrap;
-      justify-content: flex-start;
-      gap: 10px;
-      margin-top: 10px;
 
-      .suggested-image {
-         // Mobile: 5 per row
-         width: calc(20% - 8px);
-
-         // Desktop: 10 across in one row
-         @media (min-width: 768px) {
-            width: calc(10% - 9px);
-         }
-
-         a {
-            display: block;
-            text-decoration: none;
-         }
-         img {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-            border-radius: 4px;
-            border: 1px solid $uva-grey-100;
-            background-color: #f8f9fa;
-            transition: transform 0.2s ease;
-            &:hover {
-               transform: scale(1.05);
-               border-color: $uva-blue-alt;
-            }
-         }
-      }
-   }
-}
 </style>
