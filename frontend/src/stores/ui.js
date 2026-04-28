@@ -47,30 +47,35 @@ export const useUIStore = defineStore('ui', {
          if (!this.suggestionCache.data[q]) {
             this.suggestionCache.data[q] = {
                suggestions: [],
-               didYouMean: "",
-               metadata: null
+               didYouMean: ""
             }
          }
 
          const entry = this.suggestionCache.data[q]
+
+         // Merge suggestions with deduplication
          if (results.suggestions && results.suggestions.length > 0) {
-            entry.suggestions = results.suggestions
+            results.suggestions.forEach( s => {
+               const existingIdx = entry.suggestions.findIndex( es => {
+                  if (s.type == 'image' && es.type == 'image') {
+                     // Images are unique by facet (catalog ID) and optionally iiif_id
+                     return s.facet == es.facet && (s.iiif_id == es.iiif_id)
+                  }
+                  // Authors/others are unique by value and type
+                  return s.value == es.value && s.type == es.type
+               })
+
+               if (existingIdx == -1) {
+                  entry.suggestions.push(s)
+               } else {
+                  // Update existing item with any new data (like scores or reasons)
+                  entry.suggestions[existingIdx] = { ...entry.suggestions[existingIdx], ...s }
+               }
+            })
          }
+
          if (results.did_you_mean) {
             entry.didYouMean = results.did_you_mean
-         }
-         
-         // Merge metadata
-         if (results.metadata) {
-            if (!entry.metadata) {
-               entry.metadata = results.metadata
-            } else {
-               // Sum tokens and use the most comprehensive model info
-               entry.metadata.input_tokens += results.metadata.input_tokens
-               entry.metadata.output_tokens += results.metadata.output_tokens
-               entry.metadata.cycle2_time_ms = Math.max(entry.metadata.cycle2_time_ms, results.metadata.cycle2_time_ms)
-               entry.metadata.total_time_ms = Math.max(entry.metadata.total_time_ms, results.metadata.total_time_ms)
-            }
          }
 
          // Enforce 20 item limit

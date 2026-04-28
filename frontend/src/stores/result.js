@@ -337,14 +337,15 @@ export const useResultStore = defineStore('result', {
 
             const cached = ui.getSuggestionsFromCache(queryStr)
             if (cached && !prefs.aiCacheDisabled) {
-               const hasAuthors = cached.suggestions && cached.suggestions.length > 0
+               const hasAuthors = cached.suggestions && cached.suggestions.some(s => s.type == 'author' || s.type == "" || !s.type)
                const hasDym = !!cached.didYouMean
+               const hasImages = cached.suggestions && cached.suggestions.some(s => s.type == 'image')
                
                const needsAuthors = requestFeatures.includes('author') || requestFeatures.length == 0
                const needsDym = requestFeatures.includes('didyoumean')
                const needsImages = requestFeatures.includes('images')
 
-               if ((!needsAuthors || hasAuthors) && (!needsDym || hasDym) && (!needsImages || cached.suggestions.some(s => s.type == 'image'))) {
+               if ((!needsAuthors || hasAuthors) && (!needsDym || hasDym) && (!needsImages || hasImages)) {
                   this.suggestions = cached.suggestions
                   this.didYouMean = cached.didYouMean
                   this.suggestionMetadata = cached.metadata
