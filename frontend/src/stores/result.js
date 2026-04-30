@@ -375,14 +375,20 @@ export const useResultStore = defineStore('result', {
             query: queryStr,
             aiPrompt: aiPrompt,
             debug: prefs.aiDebug,
-            features: requestFeatures
+            features: requestFeatures,
+            authorThreshold: prefs.aiAuthorThreshold,
+            imageThreshold: prefs.aiImageThreshold
          }
          
          if (system.suggestionsAPI == "") {
             url = `${system.searchAPI}/api/search/suggestions`
             req = {
                query: queryStr,
-               preferences: { ai_prompt: aiPrompt },
+               preferences: { 
+                  ai_prompt: aiPrompt,
+                  author_threshold: prefs.aiAuthorThreshold,
+                  image_threshold: prefs.aiImageThreshold
+               },
                debug: prefs.aiDebug,
                features: requestFeatures
             }

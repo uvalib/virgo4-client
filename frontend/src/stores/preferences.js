@@ -16,6 +16,8 @@ export const usePreferencesStore = defineStore('preferences', {
       aiModel: "default",
       aiCacheDisabled: false,
       aiKBOnly: false,
+      aiAuthorThreshold: 0.3,
+      aiImageThreshold: 0.1,
       searchTemplate: {
          fields: [],
       }
@@ -68,6 +70,8 @@ export const usePreferencesStore = defineStore('preferences', {
          this.aiModel = prefsObj.aiModel || "default"
          this.aiCacheDisabled = prefsObj.aiCacheDisabled || false
          this.aiKBOnly = prefsObj.aiKBOnly || false
+         this.aiAuthorThreshold = prefsObj.aiAuthorThreshold || 0.3
+         this.aiImageThreshold = prefsObj.aiImageThreshold || 0.1
       },
       clear() {
          this.$reset()
@@ -128,6 +132,8 @@ export const usePreferencesStore = defineStore('preferences', {
             aiModel: this.aiModel,
             aiCacheDisabled: this.aiCacheDisabled,
             aiKBOnly: this.aiKBOnly,
+            aiAuthorThreshold: this.aiAuthorThreshold,
+            aiImageThreshold: this.aiImageThreshold,
          }
          return axios.post(url, data)
       },

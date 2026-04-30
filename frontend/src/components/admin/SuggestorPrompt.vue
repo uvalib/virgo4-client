@@ -47,6 +47,21 @@
                <label for="images" class="ml-10">Enable Image suggestions (Knowledge Base)</label>
             </div>
          </div>
+
+         <div class="kb-thresholds">
+            <h3>Knowledge Base Thresholds</h3>
+            <div class="threshold">
+               <label for="author-threshold">Author Confidence Threshold: {{ preferences.aiAuthorThreshold.toFixed(2) }}</label>
+               <Slider v-model="preferences.aiAuthorThreshold" :min="0" :max="1" :step="0.01" id="author-threshold" class="mt-10" />
+               <p class="note">Lower values include more authors but may be less relevant (0.3 recommended).</p>
+            </div>
+            <div class="threshold">
+               <label for="image-threshold">Image Confidence Threshold: {{ preferences.aiImageThreshold.toFixed(2) }}</label>
+               <Slider v-model="preferences.aiImageThreshold" :min="0" :max="1" :step="0.01" id="image-threshold" class="mt-10" />
+               <p class="note">Lower values include more images (0.1 recommended).</p>
+            </div>
+         </div>
+
          <VirgoButton @click="save">Save Settings</VirgoButton>
       </div>
    </div>
@@ -57,6 +72,7 @@ import { usePreferencesStore } from "@/stores/preferences"
 import { useSystemStore } from "@/stores/system"
 import Checkbox from 'primevue/checkbox'
 import Dropdown from 'primevue/dropdown'
+import Slider from 'primevue/slider'
 
 const preferences = usePreferencesStore()
 const system = useSystemStore()
@@ -155,6 +171,34 @@ const save = ( async () => {
             text-align: left;
             .p-dropdown-label {
                padding: 8px 12px;
+            }
+         }
+      }
+      .kb-thresholds {
+         text-align: left;
+         border-top: 1px solid $uva-grey-100;
+         padding-top: 20px;
+         h3 {
+             margin: 0 0 15px 0;
+             font-size: 1.1em;
+         }
+         .threshold {
+            margin-bottom: 20px;
+            label {
+               display: block;
+               font-size: 0.9em;
+               font-weight: bold;
+               margin-bottom: 10px;
+               color: $uva-text-color-dark;
+            }
+            .note {
+               margin: 10px 0 0 0;
+               font-size: 0.85em;
+               color: $uva-text-color-dark;
+               opacity: 0.7;
+            }
+            :deep(.p-slider) {
+               max-width: 400px;
             }
          }
       }
