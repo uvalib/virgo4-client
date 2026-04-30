@@ -32,6 +32,10 @@
             <Checkbox v-model="preferences.aiDebug" :binary="true" inputId="ai-debug" />
             <label for="ai-debug" class="ml-10">Enable AI Debug Mode (Admin Only)</label>
          </div>
+         <div class="ai-debug">
+            <Checkbox v-model="preferences.aiKBOnly" :binary="true" inputId="ai-kbonly" />
+            <label for="ai-kbonly" class="ml-10">KB Only Mode (Disable LLM synthesis for Authors)</label>
+         </div>
          <div class="features">
             <h3>Features</h3>
             <div class="feature">

@@ -313,6 +313,12 @@ export const useResultStore = defineStore('result', {
             }
          }
 
+         if (prefs.aiKBOnly) {
+            if (!requestFeatures.includes('kb-only')) {
+               requestFeatures.push('kb-only')
+            }
+         }
+
          if (featuresOverride) {
             this.requestedFeatures = Array.from(new Set([...this.requestedFeatures, ...featuresOverride]))
          } else {
