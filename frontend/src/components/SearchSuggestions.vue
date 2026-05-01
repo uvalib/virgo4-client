@@ -39,7 +39,7 @@
                            </button>
                            <span v-if="userStore.isAdmin && preferences.aiDebug && s.source" class="source-badge" :class="s.source">
                               {{ s.source == 'llm' ? 'lm' : 'kb' }}
-                              <span v-if="s.score" class="score-val">[{{ Math.round(s.score * 100) }}%]</span>
+                              <span v-if="s.score" class="score-val">({{ Math.round(s.score * 100) }}%)</span>
                            </span>
                         </div>
                      </template>

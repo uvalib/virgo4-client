@@ -395,9 +395,10 @@ export const useResultStore = defineStore('result', {
          }
 
          try {
-            const response = await axios.post(url, req)
-            if (response.data) {
-               if (response.data.did_you_mean && requestFeatures.includes('didyoumean')) {
+             const response = await axios.post(url, req)
+             if (response.data) {
+                if (prefs.aiDebug) console.log("SUGGESTIONS API RESPONSE:", response.data)
+                if (response.data.did_you_mean && requestFeatures.includes('didyoumean')) {
                   this.didYouMean = response.data.did_you_mean
                }
                 if (response.data.suggestions && response.data.suggestions.length > 0) {
