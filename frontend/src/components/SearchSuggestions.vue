@@ -38,8 +38,8 @@
                               <i class="fas fa-info-circle"></i>
                            </button>
                            <span v-if="userStore.isAdmin && preferences.aiDebug && s.source" class="source-badge" :class="s.source">
-                              <template v-if="s.score">{{ Math.round(s.score * 100) }}%</template>
-                              <template v-else>{{ s.source == 'llm' ? 'lm' : 'kb' }}</template>
+                              {{ s.source == 'llm' ? 'lm' : 'kb' }}
+                              <span v-if="s.score" class="score-val">[{{ Math.round(s.score * 100) }}%]</span>
                            </span>
                         </div>
                      </template>
