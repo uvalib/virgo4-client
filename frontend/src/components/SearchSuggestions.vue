@@ -64,7 +64,7 @@
                     <img :src="`https://iiif.lib.virginia.edu/iiif/${img.iiif_id || img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
                  </router-link>
                  <span v-if="userStore.isAdmin && preferences.aiDebug && img.score" class="source-badge kb floating">
-                    {{ Math.round(img.score * 100) }}%
+                    kb <span class="score-val">({{ Math.round(img.score * 100) }}%)</span>
                  </span>
               </div>
                </div>
@@ -478,7 +478,7 @@ h2 {
     }
 
     .score-val {
-       display: none;
+       margin-left: 2px;
     }
 }
 button.more {
