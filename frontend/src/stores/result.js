@@ -409,7 +409,8 @@ export const useResultStore = defineStore('result', {
                       // Append image suggestions to the existing list. Use iiif_id for uniqueness 
                       // to allow multiple images from the same catalog item.
                       response.data.suggestions.filter(s => s.type == 'image').forEach( img => {
-                         if (!this.suggestions.some( s => s.iiif_id == img.iiif_id)) {
+                         const imgKey = img.iiif_id || img.facet || img.value;
+                         if (!this.suggestions.some( s => (s.iiif_id || s.facet || s.value) === imgKey)) {
                             this.suggestions.push(img)
                          }
                       })
