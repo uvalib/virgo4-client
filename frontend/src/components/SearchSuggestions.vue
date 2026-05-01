@@ -39,6 +39,7 @@
                            </button>
                            <span v-if="userStore.isAdmin && preferences.aiDebug && s.source" class="source-badge" :class="s.source">
                               {{ s.source == 'llm' ? 'lm' : 'kb' }}
+                              <span v-if="s.score" class="score-val">[{{ s.score.toFixed(2) }}]</span>
                            </span>
                         </div>
                      </template>
@@ -59,10 +60,13 @@
                </div>
                <div class="image-grid">
              <div v-for="(img, idx) in sortedImages" :key="`img${idx}`" class="suggested-image">
-                <router-link :to="`/sources/images/items/${img.facet}`" :title="img.value">
-                   <img :src="`https://iiif.lib.virginia.edu/iiif/${img.iiif_id || img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
-                </router-link>
-             </div>
+                 <router-link :to="`/sources/images/items/${img.facet}`" :title="img.value">
+                    <img :src="`https://iiif.lib.virginia.edu/iiif/${img.iiif_id || img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
+                 </router-link>
+                 <span v-if="userStore.isAdmin && preferences.aiDebug && img.score" class="score-badge kb floating">
+                    {{ img.score.toFixed(2) }}
+                 </span>
+              </div>
                </div>
             </div>
 
@@ -355,6 +359,7 @@ h2 {
       margin-top: 10px;
 
       .suggested-image {
+         position: relative;
          // Mobile: 5 per row
          width: calc(20% - 8px);
 
@@ -461,6 +466,21 @@ h2 {
         background-color: #f1f8e9;
         color: #388e3c;
         border: 1px solid #dcedc8;
+    }
+
+    &.floating {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        z-index: 5;
+        background-color: rgba(241, 248, 233, 0.9); // Slight transparency for images
+        pointer-events: none;
+    }
+
+    .score-val {
+       margin-left: 2px;
+       opacity: 0.8;
+       font-family: monospace;
     }
 }
 button.more {
