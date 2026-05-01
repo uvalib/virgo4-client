@@ -38,8 +38,8 @@
                               <i class="fas fa-info-circle"></i>
                            </button>
                            <span v-if="userStore.isAdmin && preferences.aiDebug && s.source" class="source-badge" :class="s.source">
-                              {{ s.source == 'llm' ? 'lm' : 'kb' }}
-                              <span v-if="s.score" class="score-val">[{{ s.score.toFixed(2) }}]</span>
+                              <template v-if="s.score">{{ Math.round(s.score * 100) }}%</template>
+                              <template v-else>{{ s.source == 'llm' ? 'lm' : 'kb' }}</template>
                            </span>
                         </div>
                      </template>
@@ -63,8 +63,8 @@
                  <router-link :to="`/sources/images/items/${img.facet}`" :title="img.value">
                     <img :src="`https://iiif.lib.virginia.edu/iiif/${img.iiif_id || img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
                  </router-link>
-                 <span v-if="userStore.isAdmin && preferences.aiDebug && img.score" class="score-badge kb floating">
-                    {{ img.score.toFixed(2) }}
+                 <span v-if="userStore.isAdmin && preferences.aiDebug && img.score" class="source-badge kb floating">
+                    {{ Math.round(img.score * 100) }}%
                  </span>
               </div>
                </div>
@@ -478,9 +478,7 @@ h2 {
     }
 
     .score-val {
-       margin-left: 2px;
-       opacity: 0.8;
-       font-family: monospace;
+       display: none;
     }
 }
 button.more {
