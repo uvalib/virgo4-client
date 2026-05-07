@@ -55,7 +55,11 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 		return
 	}
 	membershipStr := c.GetHeader("member")
-	if svc.Dev.Role != "" {
+	if strings.Contains(svc.Dev.Role, "cn=") {
+		// Using a full membership list string
+		membershipStr = svc.Dev.Role
+		log.Printf("Using dev members: %s", membershipStr)
+	} else if svc.Dev.Role != "" {
 		membershipStr = "cn=" + svc.Dev.Role
 		log.Printf("Using dev role: %s", membershipStr)
 	}
@@ -67,9 +71,14 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
+	experimental := false
+	if strings.Contains(membershipStr, "cn=lib-virgo4-experimental") {
+		log.Printf("INFO: Experimental user %s", computingID)
+		experimental = true
+	}
 
 	log.Printf("Generate JWT for %s", computingID)
-	signedStr, jwtErr := svc.generateJWT(c, v4User, v4jwt.Netbadge, role)
+	signedStr, jwtErr := svc.generateJWT(c, v4User, v4jwt.Netbadge, role, experimental)
 	if jwtErr != nil {
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
@@ -187,7 +196,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	resp.SignedIn = true
 
 	log.Printf("Generate JWT for %s", auth.Barcode)
-	signedStr, jwtErr := svc.generateJWT(c, v4User, v4jwt.PIN, v4jwt.User)
+	signedStr, jwtErr := svc.generateJWT(c, v4User, v4jwt.PIN, v4jwt.User, false)
 	if jwtErr != nil {
 		resp.Message = jwtErr.Error()
 		c.JSON(http.StatusForbidden, resp)
@@ -316,12 +325,13 @@ func (svc *ServiceContext) getOrCreateUser(userID string) (*User, error) {
 	return &user, nil
 }
 
-func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum) (string, error) {
+func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum, experimental bool) (string, error) {
 	v4Claims := v4jwt.V4Claims{
 		UserID:     v4User.Virgo4ID,
 		AuthMethod: authMethod,
 		IsUVA:      false,
 		Role:       role,
+		Experimental: experimental,
 	}
 
 	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}

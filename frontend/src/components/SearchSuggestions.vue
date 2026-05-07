@@ -1,5 +1,5 @@
 <template>
-   <div v-if="userStore.isSignedIn && queryStore.isKeywordSearch" class="suggestions" :class="{ open: ui.suggestionsOpen }">
+   <div v-if="userStore.isExperimental && queryStore.isKeywordSearch" class="suggestions" :class="{ open: ui.suggestionsOpen }">
       <button v-if="!ui.suggestionsOpen" class="opt-in-pill" @click="ui.toggleSuggestions" title="Show related search suggestions">
          <i class="fas fa-lightbulb"></i>
          <span class="label">Search Suggestions</span>

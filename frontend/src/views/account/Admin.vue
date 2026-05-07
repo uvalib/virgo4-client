@@ -10,7 +10,7 @@
             <TabList>
                <Tab value="pickup">Pickup Library Management</Tab>
                <Tab value="jwt">JWT Managment</Tab>
-               <Tab value="prompt">AI Suggestor Prompt</Tab>
+               <Tab v-if="userStore.isExperimental" value="prompt">AI Suggestor Prompt</Tab>
             </TabList>
             <TabPanels>
                <TabPanel value="pickup">
@@ -19,7 +19,7 @@
                <TabPanel value="jwt">
                   <JWTAdmin/>
                </TabPanel>
-               <TabPanel value="prompt">
+               <TabPanel v-if="userStore.isExperimental" value="prompt">
                   <SuggestorPrompt/>
                </TabPanel>
             </TabPanels>

@@ -42,7 +42,8 @@ export const useUserStore = defineStore('user', {
       accountRequested: false,
       sirsiUnavailable: false,
       requestInterceptor: null,
-      responseInterceptor: null
+      responseInterceptor: null,
+      experimental: false
    }),
 
    getters: {
@@ -172,6 +173,9 @@ export const useUserStore = defineStore('user', {
          } else {
             return ""
          }
+       },
+       isExperimental: state => {
+         return state.claims.experimental == true
        }
 
    },
@@ -289,6 +293,7 @@ export const useUserStore = defineStore('user', {
             useSIS: parsed.useSIS,
             isUVA: parsed.isUva,
             Barcode: parsed.barcode,
+            experimental: parsed.experimental
          }
 
          this.authMessage = ""
