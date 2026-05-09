@@ -1,7 +1,7 @@
 <template>
    <div class="prompt-admin">
       <div class="content form">
-         <div class="help">
+         <!-- <div class="help">
             Use this custom prompt to drive the AI agent used by the suggestor. It uses two variables:
             <ul>
                <li><pre>$QUERY</pre>: this will be replaced by the search query.</li>
@@ -15,7 +15,7 @@
             rows="20"
             cols="40"
             placeholder="Enter your AI prompt here"
-         ></textarea>
+         ></textarea> -->
          <div class="ai-model">
             <h3>AI Model Selection</h3>
             <p class="model-note">The system uses <b>Google Gemma 3 4B</b> by default.</p>
@@ -46,6 +46,10 @@
                <Checkbox v-model="preferences.aiFeatures" value="images" inputId="images" />
                <label for="images" class="ml-10">Enable Image suggestions (Knowledge Base)</label>
             </div>
+            <div class="feature">
+               <Checkbox v-model="preferences.aiFeatures" value="book" inputId="book" />
+               <label for="book" class="ml-10">Enable Book suggestions (Knowledge Base + LLM)</label>
+            </div>
          </div>
 
          <div class="kb-thresholds">
@@ -59,6 +63,11 @@
                <label for="image-threshold">Image Confidence Threshold: {{ preferences.aiImageThreshold.toFixed(2) }}</label>
                <Slider v-model="preferences.aiImageThreshold" :min="0" :max="1" :step="0.01" id="image-threshold" class="mt-10" />
                <p class="note">Lower values include more images (0.1 recommended).</p>
+            </div>
+            <div class="threshold">
+               <label for="book-threshold">Book Confidence Threshold: {{ preferences.aiBookThreshold.toFixed(2) }}</label>
+               <Slider v-model="preferences.aiBookThreshold" :min="0" :max="1" :step="0.01" id="book-threshold" class="mt-10" />
+               <p class="note">Lower values include more books (0.1 recommended).</p>
             </div>
          </div>
 

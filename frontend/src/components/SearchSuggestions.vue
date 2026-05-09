@@ -53,20 +53,48 @@
                </div>
             </div>
             
+            <!-- Books Section -->
+            <div v-if="results.suggestions.some( s => s.type == 'book')" class="book-section">
+               <div class="section-label">
+                  <i class="fas fa-book"></i> Books related to your search
+               </div>
+               <div class="searches">
+                  <template v-for="(b,idx) in sortedBooks"  :key="`book${idx}`">
+                     <span class="sep" v-if="idx > 0">|</span>
+                     <div class="suggestion-item">
+                        <router-link
+                           class="suggestion"
+                           :aria-label="bookLinkLabel(b)"
+                           :to="`/sources/uva_library/items/${b.id}`"
+                        >
+                           {{b.value}}
+                        </router-link>
+                        <button v-if="b.reason" :aria-label="b.reason" class="reason-icon" v-tooltip="b.reason" @keydown.esc="handleEsc">
+                           <i class="fas fa-info-circle"></i>
+                        </button>
+                        <span v-if="userStore.isAdmin && preferences.aiDebug && b.source" class="source-badge" :class="b.source">
+                           {{ b.source == 'llm' ? 'lm' : 'kb' }}
+                           <span v-if="b.score" class="score-val">({{ Math.round(b.score * 100) }}%)</span>
+                        </span>
+                     </div>
+                  </template>
+               </div>
+            </div>
+
             <!-- Images Section -->
             <div v-if="results.suggestions.some( s => s.type == 'image')" class="image-section">
                <div class="section-label">
                   <i class="fas fa-images"></i> Images related to your search
                </div>
                <div class="image-grid">
-             <div v-for="(img, idx) in sortedImages" :key="`img${idx}`" class="suggested-image">
-                 <router-link :to="`/sources/images/items/${img.facet}`" :title="img.value">
-                    <img :src="`https://iiif.lib.virginia.edu/iiif/${img.iiif_id || img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
-                 </router-link>
-                 <span v-if="userStore.isAdmin && preferences.aiDebug && img.score" class="source-badge kb floating">
-                    kb <span class="score-val">({{ Math.round(img.score * 100) }}%)</span>
-                 </span>
-              </div>
+                  <div v-for="(img, idx) in sortedImages" :key="`img${idx}`" class="suggested-image">
+                     <router-link :to="`/sources/images/items/${img.facet}`" :title="img.value">
+                        <img :src="`https://iiif.lib.virginia.edu/iiif/${img.iiif_id || img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
+                     </router-link>
+                     <span v-if="userStore.isAdmin && preferences.aiDebug && img.score" class="source-badge kb floating">
+                        kb <span class="score-val">({{ Math.round(img.score * 100) }}%)</span>
+                     </span>
+                  </div>
                </div>
             </div>
 
@@ -149,6 +177,7 @@ const showReasoning = ref(false)
 
 const dymPending = computed( () => results.requestedFeatures.includes('didyoumean') && !results.completedFeatures.includes('didyoumean'))
 const imgPending = computed( () => results.requestedFeatures.includes('images') && !results.completedFeatures.includes('images'))
+const bookPending = computed( () => results.requestedFeatures.includes('book') && !results.completedFeatures.includes('book'))
 const authPending = computed( () => (results.requestedFeatures.includes('author') || results.requestedFeatures.length == 0) && !results.completedFeatures.includes('author'))
 
 const sortedImages = computed( () => {
@@ -161,6 +190,10 @@ const sortedAuthors = computed( () => {
    return results.suggestions.filter( s => s.type == 'author' || s.type == "" || !s.type)
 })
 
+const sortedBooks = computed( () => {
+   return results.suggestions.filter( s => s.type == 'book')
+})
+
 const suggestionLoadingMessage = computed( () => {
    if (!results.searchingSuggestions) return ""
 
@@ -169,6 +202,9 @@ const suggestionLoadingMessage = computed( () => {
 
    // If images are pending
    if (imgPending.value) return "Finding images..."
+
+   // If books are pending
+   if (bookPending.value) return "Finding books..."
 
    // If only authors are pending
    if (authPending.value) return "Finding authors..."
@@ -189,6 +225,10 @@ const didYouMeanClick = (() => {
 
 const linkLabel = ((sug) => {
    return `${sug.value}, suggested author related to your search`
+})
+
+const bookLinkLabel = ((sug) => {
+   return `${sug.value}, suggested book related to your search`
 })
 
 const getRelatedLink = ((sug) => {
@@ -219,6 +259,9 @@ onMounted(() => {
          }
          if (preferences.aiFeatures.includes('images')) {
             results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['images'])
+         }
+         if (preferences.aiFeatures.includes('book')) {
+            results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['book'])
          }
       }
    }
@@ -343,7 +386,7 @@ h2 {
       font-size: 1.2em;
    }
 }
-.author-section {
+.author-section, .book-section {
    margin-bottom: 25px;
 }
 .image-section {

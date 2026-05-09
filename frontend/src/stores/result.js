@@ -346,12 +346,14 @@ export const useResultStore = defineStore('result', {
                const hasAuthors = cached.suggestions && cached.suggestions.some(s => s.type == 'author' || s.type == "" || !s.type)
                const hasDym = !!cached.didYouMean
                const hasImages = cached.suggestions && cached.suggestions.some(s => s.type == 'image')
+               const hasBooks = cached.suggestions && cached.suggestions.some(s => s.type == 'book')
                
                const needsAuthors = requestFeatures.includes('author') || requestFeatures.length == 0
                const needsDym = requestFeatures.includes('didyoumean')
                const needsImages = requestFeatures.includes('images')
+               const needsBooks = requestFeatures.includes('book')
 
-               if ((!needsAuthors || hasAuthors) && (!needsDym || hasDym) && (!needsImages || hasImages)) {
+               if ((!needsAuthors || hasAuthors) && (!needsDym || hasDym) && (!needsImages || hasImages) && (!needsBooks || hasBooks)) {
                   this.suggestions = cached.suggestions
                   this.didYouMean = cached.didYouMean
                   this.suggestionMetadata = cached.metadata
@@ -377,7 +379,8 @@ export const useResultStore = defineStore('result', {
             debug: prefs.aiDebug,
             features: requestFeatures,
             authorThreshold: prefs.aiAuthorThreshold,
-            imageThreshold: prefs.aiImageThreshold
+            imageThreshold: prefs.aiImageThreshold,
+            bookThreshold: prefs.aiBookThreshold
          }
          
          if (system.suggestionsAPI == "") {
@@ -387,7 +390,8 @@ export const useResultStore = defineStore('result', {
                preferences: { 
                   ai_prompt: aiPrompt,
                   author_threshold: prefs.aiAuthorThreshold,
-                  image_threshold: prefs.aiImageThreshold
+                  image_threshold: prefs.aiImageThreshold,
+                  book_threshold: prefs.aiBookThreshold
                },
                debug: prefs.aiDebug,
                features: requestFeatures
@@ -403,7 +407,7 @@ export const useResultStore = defineStore('result', {
                }
                 if (response.data.suggestions && response.data.suggestions.length > 0) {
                    if (requestFeatures.includes('author') || requestFeatures.length == 0) {
-                      this.setSuggestions(response.data.suggestions.filter(s => s.type != 'image'))
+                      this.setSuggestions(response.data.suggestions.filter(s => s.type != 'image' && s.type != 'book'))
                    }
                    if (requestFeatures.includes('images')) {
                       // Append image suggestions to the existing list. Use iiif_id for uniqueness 
@@ -412,6 +416,14 @@ export const useResultStore = defineStore('result', {
                          const imgKey = img.iiif_id || img.facet || img.value;
                          if (!this.suggestions.some( s => (s.iiif_id || s.facet || s.value) === imgKey)) {
                             this.suggestions.push(img)
+                         }
+                      })
+                   }
+                   if (requestFeatures.includes('book')) {
+                      // Append book suggestions to the existing list. Use ID for uniqueness.
+                      response.data.suggestions.filter(s => s.type == 'book').forEach( book => {
+                         if (!this.suggestions.some( s => s.type == 'book' && s.id === book.id)) {
+                            this.suggestions.push(book)
                          }
                       })
                    }
@@ -628,6 +640,9 @@ export const useResultStore = defineStore('result', {
             }
             if (prefs.aiFeatures.includes('images')) {
                this.fetchSuggestions(query.string, prefs.aiPrompt, ['images'])
+            }
+            if (prefs.aiFeatures.includes('book')) {
+               this.fetchSuggestions(query.string, prefs.aiPrompt, ['book'])
             }
          }
          let filters = filterStore.poolFilter(params.pool.id)
