@@ -38,8 +38,8 @@
                               <i class="fas fa-info-circle"></i>
                            </button>
                            <span v-if="userStore.isAdmin && preferences.aiDebug && s.source" class="source-badge" :class="s.source">
-                              {{ s.source == 'llm' ? 'lm' : 'kb' }}
-                              <span v-if="s.score" class="score-val">({{ Math.round(s.score * 100) }}%)</span>
+                              {{ s.source == 'llm' ? 'llm' : 'kb' }}
+                              <span v-if="s.score && s.source != 'llm'" class="score-val">({{ Math.round(s.score * 100) }}%)</span>
                            </span>
                         </div>
                      </template>
@@ -73,8 +73,8 @@
                            <i class="fas fa-info-circle"></i>
                         </button>
                         <span v-if="userStore.isAdmin && preferences.aiDebug && b.source" class="source-badge" :class="b.source">
-                           {{ b.source == 'llm' ? 'lm' : 'kb' }}
-                           <span v-if="b.score" class="score-val">({{ Math.round(b.score * 100) }}%)</span>
+                           {{ b.source == 'llm' ? 'llm' : 'kb' }}
+                           <span v-if="b.score && b.source != 'llm'" class="score-val">({{ Math.round(b.score * 100) }}%)</span>
                         </span>
                      </div>
                   </template>
@@ -91,8 +91,9 @@
                      <router-link :to="`/sources/images/items/${img.facet}`" :title="img.value">
                         <img :src="`https://iiif.lib.virginia.edu/iiif/${img.iiif_id || img.facet}/square/150,150/0/default.jpg`" :alt="img.value" />
                      </router-link>
-                     <span v-if="userStore.isAdmin && preferences.aiDebug && img.score" class="source-badge kb floating">
-                        kb <span class="score-val">({{ Math.round(img.score * 100) }}%)</span>
+                     <span v-if="userStore.isAdmin && preferences.aiDebug && img.source" class="source-badge floating" :class="img.source">
+                        {{ img.source == 'llm' ? 'llm' : 'kb' }}
+                        <span v-if="img.score && img.source != 'llm'" class="score-val">({{ Math.round(img.score * 100) }}%)</span>
                      </span>
                   </div>
                </div>
