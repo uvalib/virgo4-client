@@ -13,7 +13,7 @@
                <li>
                   <a href="https://www.instagram.com/uvalibrary/" aria-label="Library Instagram Account"><i class="fab fa-instagram"></i></a>
                   <a href="https://www.facebook.com/University-of-Virginia-Library-136530559704906/" aria-label="Library Facebook Account"><i class="fab fa-facebook-square"></i></a>
-                  <a href="https://twitter.com/UVaLibrary" aria-label="Library Twitter Account"><i class="fab fa-twitter-square"></i></a>
+                  <a href="https://bsky.app/profile/uvalibrary.bsky.social" aria-label="Library Bluesky Account"><i class="fab fa-bluesky"></i></a>
                </li>
                <li>
                   <address>
