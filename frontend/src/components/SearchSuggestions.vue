@@ -65,7 +65,7 @@
                         <router-link
                            class="suggestion"
                            :aria-label="bookLinkLabel(b)"
-                           :to="`/sources/uva_library/items/${b.id}`"
+                           :to="getRelatedLink(b)"
                         >
                            {{b.value}}
                         </router-link>
@@ -233,6 +233,9 @@ const bookLinkLabel = ((sug) => {
 })
 
 const getRelatedLink = ((sug) => {
+   if (sug.type == 'book' && sug.id) {
+      return `/sources/uva_library/items/${sug.id}`
+   }
    let qp = `${sug.type}: {"${encodeURIComponent(sug.value)}"}`
    let url = `/search?mode=advanced&q=${qp}`
    return url
