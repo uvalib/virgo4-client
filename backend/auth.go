@@ -75,6 +75,8 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	if strings.Contains(membershipStr, "cn=lib-virgo4-experimental") {
 		log.Printf("INFO: Experimental user %s", computingID)
 		experimental = true
+	} else if svc.Dev.AuthUser != "" {
+		experimental = true
 	}
 
 	log.Printf("Generate JWT for %s", computingID)
@@ -327,10 +329,10 @@ func (svc *ServiceContext) getOrCreateUser(userID string) (*User, error) {
 
 func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum, experimental bool) (string, error) {
 	v4Claims := v4jwt.V4Claims{
-		UserID:     v4User.Virgo4ID,
-		AuthMethod: authMethod,
-		IsUVA:      false,
-		Role:       role,
+		UserID:       v4User.Virgo4ID,
+		AuthMethod:   authMethod,
+		IsUVA:        false,
+		Role:         role,
 		Experimental: experimental,
 	}
 
