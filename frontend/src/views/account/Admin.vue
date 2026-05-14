@@ -10,7 +10,7 @@
             <TabList>
                <Tab value="pickup">Pickup Library Management</Tab>
                <Tab value="jwt">JWT Managment</Tab>
-               <Tab v-if="userStore.isExperimental" value="prompt">AI Suggestor Prompt</Tab>
+               <Tab v-if="userStore.isExperimental" value="prompt">Suggestor Configutaion</Tab>
             </TabList>
             <TabPanels>
                <TabPanel value="pickup">
@@ -20,7 +20,7 @@
                   <JWTAdmin/>
                </TabPanel>
                <TabPanel v-if="userStore.isExperimental" value="prompt">
-                  <SuggestorPrompt/>
+                  <SuggestorConfig />
                </TabPanel>
             </TabPanels>
          </Tabs>
@@ -33,7 +33,7 @@ import SignInRequired from "@/components/account/SignInRequired.vue"
 import JWTAdmin from "@/components/admin/JWTAdmin.vue"
 import PickupLibraries from "@/components/admin/PickupLibraries.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
-import SuggestorPrompt from "@/components/admin/SuggestorPrompt.vue"
+import SuggestorConfig from "@/components/admin/SuggestorConfig.vue"
 import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { onMounted } from 'vue'
