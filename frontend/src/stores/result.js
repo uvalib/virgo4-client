@@ -382,21 +382,6 @@ export const useResultStore = defineStore('result', {
             imageThreshold: prefs.aiImageThreshold,
             bookThreshold: prefs.aiBookThreshold
          }
-         
-         if (system.suggestionsAPI == "") {
-            url = `${system.searchAPI}/api/search/suggestions`
-            req = {
-               query: queryStr,
-               preferences: { 
-                  ai_prompt: aiPrompt,
-                  author_threshold: prefs.aiAuthorThreshold,
-                  image_threshold: prefs.aiImageThreshold,
-                  book_threshold: prefs.aiBookThreshold
-               },
-               debug: prefs.aiDebug,
-               features: requestFeatures
-            }
-         }
 
          try {
              const response = await axios.post(url, req)

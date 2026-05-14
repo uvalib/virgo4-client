@@ -97,6 +97,9 @@ export const useSystemStore = defineStore('system', {
          return (url) => {
             return ( url.indexOf("/api/reauth") == 0 || url.indexOf("/authenticate") == 0 )
          }
+      },
+      useSuggestor: state => {
+         return state.suggestionsAPI != ""
       }
    },
 

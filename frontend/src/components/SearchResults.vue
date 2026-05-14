@@ -1,7 +1,7 @@
 <template>
    <PrintedSearchResults  v-if="systemStore.printing"/>
    <div tabindex="-1" id="results-container" class="search-results" aria-describedby="search-summary">
-      <SearchSuggestions />
+      <SearchSuggestions v-if="systemStore.useSuggestor" />
       <div class="results-header" role="heading" aria-level="2">
          <div id="search-summary" class="summary">
             <div class="query">Showing {{$formatNum(resultStore.total)}} results for:</div>
