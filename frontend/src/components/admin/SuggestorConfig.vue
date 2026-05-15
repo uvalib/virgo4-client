@@ -6,7 +6,7 @@
             <h3>AI Model Selection</h3>
             <div class="section-content">
                <p class="model-note">The system uses <b>Google Gemma 3 4B</b> by default.</p>
-               <Dropdown
+               <Select style="max-width: 400px"
                   id="ai-model"
                   v-model="preferences.aiModel"
                   :options="modelOptions"
@@ -78,7 +78,7 @@
 import { usePreferencesStore } from "@/stores/preferences"
 import { useSystemStore } from "@/stores/system"
 import Checkbox from 'primevue/checkbox'
-import Dropdown from 'primevue/dropdown'
+import Select from 'primevue/select'
 import Slider from 'primevue/slider'
 
 const preferences = usePreferencesStore()
@@ -95,7 +95,7 @@ const modelOptions = [
 
 const save = ( async () => {
    await preferences.saveAIPrompt()
-   system.setToast("Success", "Your custom prompt has been saved")
+   system.setToast("Success", "Your suggestor configuration has been saved.")
 })
 </script>
 
