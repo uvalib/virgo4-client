@@ -4,6 +4,15 @@ import { useFilterStore } from "@/stores/filter"
 import { useSortStore } from "@/stores/sort"
 import { usePoolStore } from "@/stores/pool"
 
+function isEmpty(obj) {
+   for (const prop in obj) {
+      if (Object.hasOwn(obj, prop)) {
+         return false;
+      }
+   }
+   return true;
+}
+
 export function useRouteUtils( router,route ) {
 
    // Map query params to the various stores. If a search is needed, the
@@ -14,6 +23,9 @@ export function useRouteUtils( router,route ) {
       const filters = useFilterStore()
       const sortStore = useSortStore()
       const query = route.query
+
+      // no query params, nothing to do
+      if ( isEmpty(query) ) return
 
       // Flags to control search and facet refresh. They will be updated below. userSearched will always trigger both.
       let runSearch = queryStore.userSearched      // changes in sort, filter and query will run search
