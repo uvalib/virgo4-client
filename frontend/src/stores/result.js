@@ -9,9 +9,7 @@ import { useQueryStore } from "@/stores/query"
 import { useFilterStore } from "@/stores/filter"
 import { useCollectionStore } from "@/stores/collection"
 import { usePoolStore } from "@/stores/pool"
-import { useUserStore } from "@/stores/user"
-
-import { useUIStore } from "@/stores/ui"
+import { useSuggestorStore } from "@/stores/suggestor"
 
 export const useResultStore = defineStore('result', {
    state: () => ({
@@ -20,12 +18,6 @@ export const useResultStore = defineStore('result', {
       pageSize: 20,
       results: [{ total: 0, hits: [], pool: { description: "", id: "none", name: "None", summary: "", url: "" } }],
       suggestions: [],
-      searchingSuggestions: false,
-      activeSuggestionsCount: 0,
-      didYouMean: "",
-      suggestionMetadata: null,
-      requestedFeatures: [],
-      completedFeatures: [],
       total: -1,
       autoExpandGroupID: "",
       selectedResultsIdx: 0,
@@ -93,16 +85,6 @@ export const useResultStore = defineStore('result', {
                this.lastSearchScrollPosition = window.scrollY
             }
           }
-      },
-
-      clearSuggestions() {
-         this.suggestions = []
-         this.didYouMean = ""
-         this.suggestionMetadata = null
-         this.requestedFeatures = []
-         this.completedFeatures = []
-         this.activeSuggestionsCount = 0
-         this.searchingSuggestions = false
       },
       priorHit() {
          if ( this.selectedHitIdx == -1) return
@@ -286,174 +268,6 @@ export const useResultStore = defineStore('result', {
          this.total = data.total_hits
       },
 
-      setSuggestions(data) {
-         // Keep non-author suggestions (like images)
-         this.suggestions = this.suggestions.filter(s => s.type != 'author' && s.type != "")
-         data.forEach(d => {
-            this.suggestions.push(d)
-         })
-      },
-      async fetchSuggestions(queryStr, aiPrompt, featuresOverride = null, attempt = 1) {
-         const user = useUserStore()
-         const system = useSystemStore()
-         const query = useQueryStore()
-         const prefs = usePreferencesStore()
-         const ui = useUIStore()
-
-         if (user.isSignedIn == false || query.isKeywordSearch == false) {
-            this.suggestions = []
-            this.searchingSuggestions = false
-            return
-         }
-
-         let requestFeatures = featuresOverride || [...prefs.aiFeatures]
-         if (prefs.aiModel && prefs.aiModel != "default") {
-            if (!requestFeatures.some(f => f.startsWith("llm:"))) {
-               requestFeatures.push(`llm:${prefs.aiModel}`)
-            }
-         }
-
-         if (prefs.aiKBOnly) {
-            if (!requestFeatures.includes('kb-only')) {
-               requestFeatures.push('kb-only')
-            }
-         }
-
-         if (featuresOverride) {
-            this.requestedFeatures = Array.from(new Set([...this.requestedFeatures, ...featuresOverride]))
-         } else {
-            this.requestedFeatures = [...requestFeatures]
-         }
-         
-         if (attempt == 1) {
-            if (requestFeatures.includes('author') || requestFeatures.length == 0) {
-               this.suggestions = this.suggestions.filter(s => s.type != 'author' && s.type != "")
-            }
-            if (requestFeatures.includes('didyoumean')) {
-               this.didYouMean = ""
-            }
-            this.completedFeatures = this.completedFeatures.filter( f => !requestFeatures.includes(f))
-            if (attempt == 1 && (requestFeatures.includes('didyoumean') || requestFeatures.includes('images') || !this.suggestionMetadata)) {
-               this.suggestionMetadata = null
-            }
-
-            // Increment before cache check to maintain global loading state
-            this.activeSuggestionsCount++
-            this.searchingSuggestions = true
-
-            const cached = ui.getSuggestionsFromCache(queryStr)
-            if (cached && !prefs.aiCacheDisabled) {
-               const hasAuthors = cached.suggestions && cached.suggestions.some(s => s.type == 'author' || s.type == "" || !s.type)
-               const hasDym = !!cached.didYouMean
-               const hasImages = cached.suggestions && cached.suggestions.some(s => s.type == 'image')
-               const hasBooks = cached.suggestions && cached.suggestions.some(s => s.type == 'book')
-               
-               const needsAuthors = requestFeatures.includes('author') || requestFeatures.length == 0
-               const needsDym = requestFeatures.includes('didyoumean')
-               const needsImages = requestFeatures.includes('images')
-               const needsBooks = requestFeatures.includes('book')
-
-               if ((!needsAuthors || hasAuthors) && (!needsDym || hasDym) && (!needsImages || hasImages) && (!needsBooks || hasBooks)) {
-                  this.suggestions = cached.suggestions
-                  this.didYouMean = cached.didYouMean
-                  this.suggestionMetadata = cached.metadata
-                  
-                  requestFeatures.forEach( f => {
-                     if (!this.completedFeatures.includes(f)) this.completedFeatures.push(f)
-                  })
-
-                  this.activeSuggestionsCount--
-                  if (this.activeSuggestionsCount <= 0) {
-                     this.activeSuggestionsCount = 0
-                     this.searchingSuggestions = false
-                  }
-                  return
-               }
-            }
-         }
-
-         let url = `${system.suggestionsAPI}/api/suggest`
-         let req = {
-            query: queryStr,
-            aiPrompt: aiPrompt,
-            debug: prefs.aiDebug,
-            features: requestFeatures,
-            authorThreshold: prefs.aiAuthorThreshold,
-            imageThreshold: prefs.aiImageThreshold,
-            bookThreshold: prefs.aiBookThreshold
-         }
-
-         try {
-             const response = await axios.post(url, req)
-             if (response.data) {
-                if (prefs.aiDebug) console.log("SUGGESTIONS API RESPONSE:", response.data)
-                if (response.data.did_you_mean && requestFeatures.includes('didyoumean')) {
-                  this.didYouMean = response.data.did_you_mean
-               }
-                if (response.data.suggestions && response.data.suggestions.length > 0) {
-                   if (requestFeatures.includes('author') || requestFeatures.length == 0) {
-                      this.setSuggestions(response.data.suggestions.filter(s => s.type != 'image' && s.type != 'book'))
-                   }
-                   if (requestFeatures.includes('images')) {
-                      // Append image suggestions to the existing list. Use iiif_id for uniqueness 
-                      // to allow multiple images from the same catalog item.
-                      response.data.suggestions.filter(s => s.type == 'image').forEach( img => {
-                         const imgKey = img.iiif_id || img.facet || img.value;
-                         if (!this.suggestions.some( s => (s.iiif_id || s.facet || s.value) === imgKey)) {
-                            this.suggestions.push(img)
-                         }
-                      })
-                   }
-                   if (requestFeatures.includes('book')) {
-                      // Append book suggestions to the existing list. Use ID for uniqueness.
-                      response.data.suggestions.filter(s => s.type == 'book').forEach( book => {
-                         if (!this.suggestions.some( s => s.type == 'book' && s.id === book.id)) {
-                            this.suggestions.push(book)
-                         }
-                      })
-                   }
-                }
-               
-               if (response.data.metadata) {
-                  if (!this.suggestionMetadata) {
-                     this.suggestionMetadata = response.data.metadata
-                  } else {
-                     // Sum tokens and metrics across fragments
-                     this.suggestionMetadata.input_tokens += response.data.metadata.input_tokens
-                     this.suggestionMetadata.output_tokens += response.data.metadata.output_tokens
-                     if (response.data.metadata.cost_per_1k) {
-                        this.suggestionMetadata.cost_per_1k = (this.suggestionMetadata.cost_per_1k || 0) + response.data.metadata.cost_per_1k
-                     }
-                     // Use the worst-case (longest) times
-                     this.suggestionMetadata.cycle1_time_ms = Math.max(this.suggestionMetadata.cycle1_time_ms || 0, response.data.metadata.cycle1_time_ms || 0)
-                     this.suggestionMetadata.cycle2_time_ms = Math.max(this.suggestionMetadata.cycle2_time_ms || 0, response.data.metadata.cycle2_time_ms || 0)
-                     this.suggestionMetadata.cycle3_time_ms = Math.max(this.suggestionMetadata.cycle3_time_ms || 0, response.data.metadata.cycle3_time_ms || 0)
-                     this.suggestionMetadata.total_time_ms = Math.max(this.suggestionMetadata.total_time_ms || 0, response.data.metadata.total_time_ms || 0)
-                  }
-               }
-               ui.addToSuggestionCache(queryStr, response.data)
-            }
-         } catch (error) {
-            console.error("SUGGESTIONS FAILED: " + error)
-            if (attempt < 2) {
-               await new Promise(resolve => setTimeout(resolve, 500))
-               await this.fetchSuggestions(queryStr, aiPrompt, featuresOverride, attempt + 1)
-               return
-            }
-         } finally {
-            if (attempt == 1) {
-               requestFeatures.forEach( f => {
-                  if (!this.completedFeatures.includes(f)) this.completedFeatures.push(f)
-               })
-               this.activeSuggestionsCount--
-               if (this.activeSuggestionsCount <= 0) {
-                  this.activeSuggestionsCount = 0
-                  this.searchingSuggestions = false
-               }
-            }
-         }
-      },
-
       setPage(pageOveride) {
          this.noSpinner = true
          this.results[this.selectedResultsIdx].page = pageOveride
@@ -541,9 +355,6 @@ export const useResultStore = defineStore('result', {
          const prefs = usePreferencesStore()
 
          system.clearMessage()
-         this.didYouMean = ""
-         this.suggestionMetadata = null
-         this.requestedFeatures = []
          let req = {
             query: query.string,
             pagination: { start: 0, rows: this.pageSize },
@@ -561,17 +372,8 @@ export const useResultStore = defineStore('result', {
          this.setSearching(true)
          this.lastSearchScrollPosition = 0
          this.lastSearchURL = ""
-         const ui = useUIStore()
-         this.clearSuggestions()
-         if (ui.suggestionsOpen) {
-            this.fetchSuggestions(query.string, prefs.aiPrompt, ['author'])
-            if (prefs.aiFeatures.includes('didyoumean')) {
-               this.fetchSuggestions(query.string, prefs.aiPrompt, ['didyoumean'])
-            }
-            if (prefs.aiFeatures.includes('images')) {
-               this.fetchSuggestions(query.string, prefs.aiPrompt, ['images'])
-            }
-         }
+
+         useSuggestorStore().fetch( query.string )
 
          // POST the search query and wait for the response
          await axios.post(`${system.searchAPI}/api/search`, req).then((response) => {
@@ -616,20 +418,8 @@ export const useResultStore = defineStore('result', {
 
          useCollectionStore().clearCollectionDetails()
          this.setSearching(true)
-         const ui = useUIStore()
-         this.clearSuggestions()
-         if (ui.suggestionsOpen) {
-            this.fetchSuggestions(query.string, prefs.aiPrompt, ['author'])
-            if (prefs.aiFeatures.includes('didyoumean')) {
-               this.fetchSuggestions(query.string, prefs.aiPrompt, ['didyoumean'])
-            }
-            if (prefs.aiFeatures.includes('images')) {
-               this.fetchSuggestions(query.string, prefs.aiPrompt, ['images'])
-            }
-            if (prefs.aiFeatures.includes('book')) {
-               this.fetchSuggestions(query.string, prefs.aiPrompt, ['book'])
-            }
-         }
+
+         useSuggestorStore().fetch( query.string )
          let filters = filterStore.poolFilter(params.pool.id)
          let sort = sortStore.poolSort(params.pool.id)
          let filterObj = { pool_id: params.pool.id, facets: filters }

@@ -1,25 +1,25 @@
 <template>
-   <div v-if="userStore.isExperimental && queryStore.isKeywordSearch" class="suggestions" :class="{ open: ui.suggestionsOpen }">
-      <button v-if="!ui.suggestionsOpen" class="opt-in-pill" @click="ui.toggleSuggestions" title="Show related search suggestions">
+   <div class="suggestions" :class="{ open: suggestor.open }">
+      <button v-if="!suggestor.open" class="opt-in-pill" @click="suggestor.toggle" title="Show related search suggestions">
          <i class="fas fa-lightbulb"></i>
          <span class="label">Search Suggestions</span>
       </button>
       <div v-else>
          <div class="header">
             <h2>Suggestions</h2>
-            <button class="close-btn" @click="ui.toggleSuggestions" title="Hide suggestions">
+            <button class="close-btn" @click="suggestor.toggle" title="Hide suggestions">
                <i class="fas fa-times"></i> Hide
             </button>
          </div>
          <div class="wrapper">
             <!-- Did You Mean Block: Show immediately if available -->
-            <div v-if="results.didYouMean && results.requestedFeatures.includes('didyoumean')" class="did-you-mean">
-               Did you mean: <a href="#" @click.stop.prevent="didYouMeanClick">{{results.didYouMean}}</a>?
+            <div v-if="suggestor.didYouMean && suggestor.requestedFeatures.includes('didyoumean')" class="did-you-mean">
+               Did you mean: <a href="#" @click.stop.prevent="didYouMeanClick">{{suggestor.didYouMean}}</a>?
             </div>
 
             <!-- Author Section: Results or local spinner -->
-            <div class="author-section" :class="{'mt-10': results.didYouMean && (results.searchingSuggestions || results.suggestions.length > 0)}">
-               <template v-if="results.suggestions.length > 0">
+            <div class="author-section" :class="{'mt-10': suggestor.didYouMean && (suggestor.searchingSuggestions || suggestor.suggestions.length > 0)}">
+               <template v-if="suggestor.suggestions.length > 0">
                <div class="section-label">
                   <i class="fas fa-user-friends"></i> Authors related to your search
                </div>
@@ -47,14 +47,14 @@
                </template>
 
                <!-- Spinner: Always show if searchingSuggestions is true, anchored to this section -->
-               <div v-if="results.searchingSuggestions" class="loading" :class="{'mt-10': results.suggestions.length > 0}">
+               <div v-if="suggestor.searchingSuggestions" class="loading" :class="{'mt-10': suggestor.suggestions.length > 0}">
                   <i class="fas fa-spinner fa-spin"></i>
-                  <span class="note ml-10">{{ suggestionLoadingMessage }}</span>
+                  <span class="note ml-10">Finding suggestions...</span>
                </div>
             </div>
             
             <!-- Books Section -->
-            <div v-if="results.suggestions.some( s => s.type == 'book')" class="book-section">
+            <div v-if="suggestor.suggestions.some( s => s.type == 'book')" class="book-section">
                <div class="section-label">
                   <i class="fas fa-book"></i> Books related to your search
                </div>
@@ -82,7 +82,7 @@
             </div>
 
             <!-- Images Section -->
-            <div v-if="results.suggestions.some( s => s.type == 'image')" class="image-section">
+            <div v-if="suggestor.suggestions.some( s => s.type == 'image')" class="image-section">
                <div class="section-label">
                   <i class="fas fa-images"></i> Images related to your search
                </div>
@@ -100,30 +100,30 @@
             </div>
 
             <!-- Debug Info: Show if we have any data to debug -->
-            <div v-if="userStore.isAdmin && results.suggestionMetadata && (results.suggestions.length > 0 || results.didYouMean)" class="ai-debug-info">
+            <div v-if="userStore.isAdmin && suggestor.suggestionMetadata && (suggestor.suggestions.length > 0 || suggestor.didYouMean)" class="ai-debug-info">
                <hr/>
                <div class="debug-details">
                   <span class="label">AI Debug:</span>
-                  <span class="metric">Model: {{results.suggestionMetadata.model}}</span>
+                  <span class="metric">Model: {{suggestor.suggestionMetadata.model}}</span>
                   <span class="sep">|</span>
-                  <span class="metric">Total: {{results.suggestionMetadata.total_time_ms}}ms</span>
+                  <span class="metric">Total: {{suggestor.suggestionMetadata.total_time_ms}}ms</span>
                   <span class="sep">|</span>
-                  <span class="metric">Cycles: {{results.suggestionMetadata.cycle1_time_ms}} / {{results.suggestionMetadata.cycle2_time_ms}} / {{results.suggestionMetadata.cycle3_time_ms}} ms</span>
+                  <span class="metric">Cycles: {{suggestor.suggestionMetadata.cycle1_time_ms}} / {{suggestor.suggestionMetadata.cycle2_time_ms}} / {{suggestor.suggestionMetadata.cycle3_time_ms}} ms</span>
                   <span class="sep">|</span>
-                  <span class="metric">Tokens: {{results.suggestionMetadata.input_tokens}} in / {{results.suggestionMetadata.output_tokens}} out</span>
-                  <template v-if="results.suggestionMetadata.cost_per_1k">
+                  <span class="metric">Tokens: {{suggestor.suggestionMetadata.input_tokens}} in / {{suggestor.suggestionMetadata.output_tokens}} out</span>
+                  <template v-if="suggestor.suggestionMetadata.cost_per_1k">
                      <span class="sep">|</span>
-                     <span class="metric">Cost/1k requests: ${{results.suggestionMetadata.cost_per_1k.toFixed(4)}}</span>
+                     <span class="metric">Cost/1k requests: ${{suggestor.suggestionMetadata.cost_per_1k.toFixed(4)}}</span>
                   </template>
                </div>
                <div class="debug-toggles">
-                  <button v-if="results.suggestionMetadata.input_prompt" class="toggle-link" @click="showPrompt = !showPrompt">
+                  <button v-if="suggestor.suggestionMetadata.input_prompt" class="toggle-link" @click="showPrompt = !showPrompt">
                      {{ showPrompt ? 'Hide' : 'View' }} Prompt
                   </button>
-                  <button v-if="results.suggestionMetadata.raw_output" class="toggle-link" @click="showRaw = !showRaw">
+                  <button v-if="suggestor.suggestionMetadata.raw_output" class="toggle-link" @click="showRaw = !showRaw">
                      {{ showRaw ? 'Hide' : 'View' }} Raw LLM
                   </button>
-                  <button v-if="results.suggestionMetadata.reasoning" class="toggle-link" @click="showReasoning = !showReasoning">
+                  <button v-if="suggestor.suggestionMetadata.reasoning" class="toggle-link" @click="showReasoning = !showReasoning">
                      {{ showReasoning ? 'Hide' : 'View' }} Reasoning
                   </button>
                   <div class="cache-toggle">
@@ -133,20 +133,20 @@
                </div>
                <div v-if="showPrompt" class="debug-pane">
                   <h5>Input Prompt</h5>
-                  <pre>{{results.suggestionMetadata.input_prompt}}</pre>
+                  <pre>{{suggestor.suggestionMetadata.input_prompt}}</pre>
                </div>
                <div v-if="showRaw" class="debug-pane">
                   <h5>Raw LLM Output</h5>
-                  <pre>{{results.suggestionMetadata.raw_output}}</pre>
+                  <pre>{{suggestor.suggestionMetadata.raw_output}}</pre>
                </div>
                <div v-if="showReasoning" class="debug-pane">
                   <h5>Model Reasoning</h5>
-                  <pre>{{results.suggestionMetadata.reasoning}}</pre>
+                  <pre>{{suggestor.suggestionMetadata.reasoning}}</pre>
                </div>
             </div>
 
             <!-- Empty State: Only when finished and nothing found AT ALL -->
-            <div v-if="!results.searchingSuggestions && results.suggestions.length == 0 && !results.didYouMean && results.completedFeatures.length >= results.requestedFeatures.length" class="no-suggestions note">
+            <div v-if="!suggestor.searchingSuggestions && suggestor.suggestions.length == 0 && !suggestor.didYouMean && suggestor.completedFeatures.length >= suggestor.requestedFeatures.length" class="no-suggestions note">
                No suggestions found for this query.
             </div>
          </div>
@@ -158,16 +158,14 @@
 import { ref, onMounted, computed } from 'vue'
 import analytics from '@/analytics'
 import { useQueryStore } from "@/stores/query"
-import { useResultStore } from "@/stores/result"
 import { useUserStore } from "@/stores/user"
-import { useUIStore } from "@/stores/ui"
+import { useSuggestorStore } from "@/stores/suggestor"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useRouter } from 'vue-router'
 
 const queryStore  = useQueryStore()
-const results = useResultStore()
 const userStore = useUserStore()
-const ui = useUIStore()
+const suggestor = useSuggestorStore()
 const router = useRouter()
 const preferences = usePreferencesStore()
 
@@ -176,41 +174,18 @@ const showPrompt = ref(false)
 const showRaw = ref(false)
 const showReasoning = ref(false)
 
-const dymPending = computed( () => results.requestedFeatures.includes('didyoumean') && !results.completedFeatures.includes('didyoumean'))
-const imgPending = computed( () => results.requestedFeatures.includes('images') && !results.completedFeatures.includes('images'))
-const bookPending = computed( () => results.requestedFeatures.includes('book') && !results.completedFeatures.includes('book'))
-const authPending = computed( () => (results.requestedFeatures.includes('author') || results.requestedFeatures.length == 0) && !results.completedFeatures.includes('author'))
-
 const sortedImages = computed( () => {
-   return results.suggestions.filter( s => s.type == 'image').sort( (a,b) => {
+   return suggestor.suggestions.filter( s => s.type == 'image').sort( (a,b) => {
       return (b.score || 0) - (a.score || 0)
    }).slice(0, 10)
 })
 
 const sortedAuthors = computed( () => {
-   return results.suggestions.filter( s => s.type == 'author' || s.type == "" || !s.type)
+   return suggestor.suggestions.filter( s => s.type == 'author' || s.type == "" || !s.type)
 })
 
 const sortedBooks = computed( () => {
-   return results.suggestions.filter( s => s.type == 'book')
-})
-
-const suggestionLoadingMessage = computed( () => {
-   if (!results.searchingSuggestions) return ""
-
-   // If authors return first (DYM still pending)
-   if (dymPending.value) return "Finding suggestions..."
-
-   // If images are pending
-   if (imgPending.value) return "Finding images..."
-
-   // If books are pending
-   if (bookPending.value) return "Finding books..."
-
-   // If only authors are pending
-   if (authPending.value) return "Finding authors..."
-
-   return "Finding suggestions..."
+   return suggestor.suggestions.filter( s => s.type == 'book')
 })
 
 const suggestionClick = ((val) => {
@@ -219,9 +194,9 @@ const suggestionClick = ((val) => {
 })
 
 const didYouMeanClick = (() => {
-   analytics.trigger('Results', 'DID_YOU_MEAN_CLICKED', results.didYouMean)
-   queryStore.basic = results.didYouMean
-   router.push("/search?q="+encodeURIComponent(results.didYouMean))
+   analytics.trigger('Results', 'DID_YOU_MEAN_CLICKED', suggestor.didYouMean)
+   queryStore.basic = suggestor.didYouMean
+   router.push("/search?q="+encodeURIComponent(suggestor.didYouMean))
 })
 
 const linkLabel = ((sug) => {
@@ -254,21 +229,7 @@ const onBlur = ((event) => {
 })
 
 onMounted(() => {
-   if (ui.suggestionsOpen && results.suggestions.length == 0 && !results.searchingSuggestions) {
-      if (queryStore.string) {
-         results.clearSuggestions()
-         results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['author'])
-         if (preferences.aiFeatures.includes('didyoumean')) {
-            results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['didyoumean'])
-         }
-         if (preferences.aiFeatures.includes('images')) {
-            results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['images'])
-         }
-         if (preferences.aiFeatures.includes('book')) {
-            results.fetchSuggestions(queryStore.string, preferences.aiPrompt, ['book'])
-         }
-      }
-   }
+   suggestor.fetch( queryStore.string )
 })
 </script>
 
