@@ -10,7 +10,7 @@
             <TabList>
                <Tab value="pickup">Pickup Library Management</Tab>
                <Tab value="jwt">JWT Managment</Tab>
-               <Tab v-if="userStore.isExperimental" value="prompt">Suggestor Configutaion</Tab>
+               <Tab v-if="userStore.isExperimental" value="prompt">Suggestor Configuration</Tab>
             </TabList>
             <TabPanels>
                <TabPanel value="pickup">
