@@ -360,7 +360,6 @@ export const useResultStore = defineStore('result', {
             pagination: { start: 0, rows: this.pageSize },
             filters: filters.allPoolFilters,
             pool_sorting: sorting.pools,
-            preferences: { ai_prompt: prefs.aiPrompt }
          }
 
          if (req.query == "") {
@@ -434,7 +433,6 @@ export const useResultStore = defineStore('result', {
             pagination: pagination,
             sort: sort,
             filters: [filterObj],
-            preferences: { ai_prompt: prefs.aiPrompt }
          }
 
          if (req.query == "") {

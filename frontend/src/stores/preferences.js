@@ -10,7 +10,6 @@ export const usePreferencesStore = defineStore('preferences', {
       pickupLibrary: {id: "", name: ""},
       collapseGroups: false,
       expandDetails: false,
-      aiPrompt: "",
       aiDebug: false,
       aiFeatures: [],
       aiModel: "default",
@@ -63,9 +62,7 @@ export const usePreferencesStore = defineStore('preferences', {
          if (prefsObj.searchTemplate ) {
             this.searchTemplate = prefsObj.searchTemplate
          }
-         if (prefsObj.aiPrompt ) {
-            this.aiPrompt = prefsObj.aiPrompt
-         }
+
          this.aiDebug = prefsObj.aiDebug || false
          this.aiFeatures = prefsObj.aiFeatures || []
          this.aiModel = prefsObj.aiModel || "default"
@@ -128,7 +125,6 @@ export const usePreferencesStore = defineStore('preferences', {
             collapseGroups: this.collapseGroups,
             expandDetails: this.expandDetails,
             searchTemplate: this.searchTemplate,
-            aiPrompt: this.aiPrompt,
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,
             aiModel: this.aiModel,
