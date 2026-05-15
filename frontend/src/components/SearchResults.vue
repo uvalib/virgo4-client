@@ -1,7 +1,7 @@
 <template>
    <PrintedSearchResults  v-if="systemStore.printing"/>
    <div tabindex="-1" id="results-container" class="search-results" aria-describedby="search-summary">
-      <SearchSuggestions v-if="systemStore.useSuggestor" />
+      <SearchSuggestions v-if="canUseSuggestor" />
       <div class="results-header" role="heading" aria-level="2">
          <div id="search-summary" class="summary">
             <div class="query">Showing {{$formatNum(resultStore.total)}} results for:</div>
@@ -48,6 +48,7 @@ import { computed, nextTick, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
+import { useUserStore } from "@/stores/user"
 import { scrollToItem } from '@/utils'
 import { useRouteUtils } from '@/composables/routeutils'
 
@@ -57,6 +58,7 @@ const routeUtils = useRouteUtils(router, route)
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
+const user = useUserStore()
 
 const printStyle = `
 <style type="text/css">
@@ -98,6 +100,16 @@ const printStyle = `
 }
 </style>`
 
+
+const canUseSuggestor = computed(() => {
+   // If there is no suggestor configured, never show it. If configured,
+   // suggestor is only available for keyword searches issued 
+   // by signed in users that are part of the experimental group
+   if ( systemStore.useSuggestor == false ) return false
+   if ( user.isSignedIn == false ) return false 
+   if ( user.isExperimental == false ) return false 
+   return queryStore.isKeywordSearch
+})
 const showPrintButton = computed(()=>{
    return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
 })
