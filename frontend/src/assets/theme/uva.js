@@ -274,11 +274,12 @@ const UVA = definePreset(Aura, {
       },
       popover: {
          root: {
-            borderColor: colors.grey100,
-            color: colors.textDark,
+            background: colors.greyDark,
+            borderColor: "black",
+            color: "white",
          },
          content: {
-            padding: '0',
+            padding: '10px',
         }
       },
       select: {
