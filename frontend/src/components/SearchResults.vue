@@ -8,7 +8,8 @@
             <div class="qs">{{queryString}}</div>
          </div>
          <span class="buttons" role="toolbar">
-            <VirgoButton severity="secondary" @click="resetSearch" >Reset Search</VirgoButton>
+            <VirgoButton severity="secondary"  @click="resetSearch" >Reset Search</VirgoButton>
+            <VirgoButton @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
             <SaveSearch />
             <VirgoButton v-if="showPrintButton" @click="printResults">Print Results</VirgoButton>
          </span>
@@ -48,6 +49,7 @@ import { computed, nextTick, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
+import { useSuggestorStore } from "@/stores/suggestor"
 import { useUserStore } from "@/stores/user"
 import { scrollToItem } from '@/utils'
 import { useRouteUtils } from '@/composables/routeutils'
@@ -58,6 +60,7 @@ const routeUtils = useRouteUtils(router, route)
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
+const suggestor = useSuggestorStore()
 const user = useUserStore()
 
 const printStyle = `
@@ -210,11 +213,6 @@ const poolSelected = (( poolID ) => {
          font-size: 1.1em;
       }
    }
-   .buttons {
-      display: flex;
-      flex-flow: row nowrap;
-      gap: 5px 10px;
-   }
 }
 
 .results-wrapper {
@@ -270,12 +268,26 @@ const poolSelected = (( poolID ) => {
    div.search-results {
       margin: 0;
       padding: 0 5vw 20px 5vw;
+      .buttons {
+         display: flex;
+         flex-flow: row nowrap;
+         gap: 5px;
+      }
    }
 }
 @media only screen and (max-width: 768px) {
    div.search-results {
       margin: 0;
       padding: 0 2vw 20px 2vw;
+      .buttons {
+         margin-top: 10px;
+         display: flex;
+         flex-flow: row wrap;
+         gap: 10px;
+         .p-button {
+            flex-grow: 1;
+         }
+      }
    }
 }
 </style>
