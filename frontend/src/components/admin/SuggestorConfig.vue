@@ -77,12 +77,14 @@
 <script setup>
 import { usePreferencesStore } from "@/stores/preferences"
 import { useSystemStore } from "@/stores/system"
+import { useSuggestorStore } from "@/stores/suggestor"
 import Checkbox from 'primevue/checkbox'
 import Select from 'primevue/select'
 import Slider from 'primevue/slider'
 
 const preferences = usePreferencesStore()
 const system = useSystemStore()
+const suggestor = useSuggestorStore()
 
 const modelOptions = [
    { label: "System Default", value: "default" },
@@ -96,6 +98,10 @@ const modelOptions = [
 const save = ( async () => {
    await preferences.saveAIPrompt()
    system.setToast("Success", "Your suggestor configuration has been saved.")
+   
+   // since settings have changed, purge the suggestor cache
+   suggestor.clearCache()
+
 })
 </script>
 

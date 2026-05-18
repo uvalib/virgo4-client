@@ -32,6 +32,11 @@ export const useSuggestorStore = defineStore('suggestor', {
          }
       },
 
+      close() {
+         this.open = !this.open
+         localStorage.setItem('v4_suggestions_open', this.open)   
+      },
+
       clearSuggestions() {
          this.suggestions = []
          this.didYouMean = ""
@@ -224,6 +229,14 @@ export const useSuggestorStore = defineStore('suggestor', {
          data.forEach(d => {
             this.suggestions.push(d)
          })
+      },
+
+      clearCache() {
+         localStorage.removeItem('v4_suggestion_cache')
+         this.cache = {
+            "queries": [],
+            "data": {}
+         }
       },
 
       updateCache(query, results) {
