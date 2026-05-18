@@ -21,11 +21,15 @@
             <div class="section-content">
                <div class="config-opt">
                   <Checkbox v-model="preferences.aiDebug" :binary="true" inputId="ai-debug" />
-                  <label for="ai-debug" class="ml-10">Enable AI Debug Mode (Admin Only)</label>
+                  <label for="ai-debug">Enable AI Debug Mode (Admin Only)</label>
                </div>
                <div class="config-opt">
                   <Checkbox v-model="preferences.aiKBOnly" :binary="true" inputId="ai-kbonly" />
-                  <label for="ai-kbonly" class="ml-10">KB Only Mode (Disable LLM synthesis for Authors)</label>
+                  <label for="ai-kbonly">KB Only Mode (Disable LLM synthesis for Authors)</label>
+               </div>
+               <div class="config-opt">
+                  <Checkbox v-model="preferences.aiCacheDisabled" :binary="true" inputId="ai-nocache" />
+                  <label for="ai-nocache">Disable recent suggestions cache</label>
                </div>
             </div>
          </div>
@@ -35,15 +39,15 @@
             <div class="section-content">
                <div class="config-opt">
                   <Checkbox v-model="preferences.aiFeatures" value="didyoumean" inputId="didyoumean" />
-                  <label for="didyoumean" class="ml-10">Enable "Did You Mean" query refinements</label>
+                  <label for="didyoumean">Enable "Did You Mean" query refinements</label>
                </div>
                <div class="config-opt">
                   <Checkbox v-model="preferences.aiFeatures" value="images" inputId="images" />
-                  <label for="images" class="ml-10">Enable Image suggestions (Knowledge Base)</label>
+                  <label for="images">Enable Image suggestions (Knowledge Base)</label>
                </div>
                <div class="config-opt">
                   <Checkbox v-model="preferences.aiFeatures" value="book" inputId="book" />
-                  <label for="book" class="ml-10">Enable Book suggestions (Knowledge Base + LLM)</label>
+                  <label for="book">Enable Book suggestions (Knowledge Base + LLM)</label>
                </div>
             </div>
          </div>
