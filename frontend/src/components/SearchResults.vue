@@ -9,7 +9,7 @@
          </div>
          <span class="buttons" role="toolbar">
             <VirgoButton severity="secondary"  @click="resetSearch" >Reset Search</VirgoButton>
-            <VirgoButton @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
+            <VirgoButton v-if="canUseSuggestor" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
             <SaveSearch />
             <VirgoButton v-if="showPrintButton" @click="printResults">Print Results</VirgoButton>
          </span>
