@@ -245,6 +245,10 @@ export const useQueryStore = defineStore('query', {
 
       setAdvancedSearch() {
          this.mode = "advanced"
+         if ( this.basic != "") {
+            this.advanced.splice(0, this.advanced.length)
+            this.advanced.push({ op: "AND", value: this.basic, field: "keyword", comparison: "EQUAL", endVal: "" })
+         }
       },
       setTargetPool(pool) {
          this.targetPool = pool
