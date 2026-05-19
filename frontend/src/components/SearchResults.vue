@@ -130,6 +130,9 @@ const sourceTabs = computed(()=>{
 onMounted( () => {
    if ( !resultStore.selectedHit ) {
       scrollToItem("results-container", true)
+   } else {
+      // return search results to currently selected item
+      scrollToItem(resultStore.selectedHit.identifier, false, true)
    }
 })
 

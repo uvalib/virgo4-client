@@ -200,7 +200,7 @@ export const getGroupHitMetadata = ((group, hit) => {
    delete group.fields
 })
 
-export const scrollToItem = (( tgtID, focus=false ) => {
+export const scrollToItem = (( tgtID, focus=false, instant=false ) => {
    setTimeout( () => {
       let tgtEle = document.getElementById(tgtID)
       if (tgtEle) {
@@ -209,9 +209,13 @@ export const scrollToItem = (( tgtID, focus=false ) => {
          var elementPosition = tgtEle.getBoundingClientRect().top
          let pad = window.getComputedStyle(tgtEle, null).getPropertyValue('padding-top')
          var offsetPosition = elementPosition - headerOffset - parseInt(pad)
+         var behavior = "smooth"
+         if (instant) {
+            behavior = "instant"
+         }
          window.scrollBy({
             top: offsetPosition,
-            behavior: "smooth"
+            behavior: behavior
          })
          if ( focus == true ) {
             tgtEle.focus({preventScroll:true})
