@@ -17,7 +17,6 @@ export const useResultStore = defineStore('result', {
       searching: false,
       pageSize: 20,
       results: [{ total: 0, hits: [], pool: { description: "", id: "none", name: "None", summary: "", url: "" } }],
-      suggestions: [],
       total: -1,
       autoExpandGroupID: "",
       selectedResultsIdx: 0,
@@ -274,7 +273,6 @@ export const useResultStore = defineStore('result', {
       },
 
       resetSearchResults() {
-         this.suggestions = []
          this.results = [{ total: 0, hits: [], pool: { description: "", id: "none", name: "None", summary: "", url: "" } }]
          this.total = -1
          this.lastSearchScrollPosition = 0

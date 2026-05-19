@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
 import Select from 'primevue/select'
@@ -41,6 +41,13 @@ watch( selectedResultsIdx, (newValue) => {
    if (newValue < systemStore.maxPoolTabs) {
       selectedPoolID.value = ""
    }
+})
+
+onMounted( () =>{
+   let selResults = resultStore.selectedResultsIdx
+   if ( selResults > 2 && selResults < (resultStore.results.length-1)) {
+      selectedPoolID.value = resultStore.results[selResults].pool.id    
+   } 
 })
 
 const pools = computed(()=>{
