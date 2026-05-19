@@ -187,17 +187,22 @@ export const useSuggestorStore = defineStore('suggestor', {
                   if (!this.suggestionMetadata) {
                      this.suggestionMetadata = response.data.metadata
                   } else {
-                     // Sum tokens and metrics across fragments
-                     this.suggestionMetadata.input_tokens += response.data.metadata.input_tokens
-                     this.suggestionMetadata.output_tokens += response.data.metadata.output_tokens
-                     if (response.data.metadata.cost_per_1k) {
-                        this.suggestionMetadata.cost_per_1k = (this.suggestionMetadata.cost_per_1k || 0) + response.data.metadata.cost_per_1k
-                     }
-                     // Use the worst-case (longest) times
-                     this.suggestionMetadata.cycle1_time_ms = Math.max(this.suggestionMetadata.cycle1_time_ms || 0, response.data.metadata.cycle1_time_ms || 0)
-                     this.suggestionMetadata.cycle2_time_ms = Math.max(this.suggestionMetadata.cycle2_time_ms || 0, response.data.metadata.cycle2_time_ms || 0)
-                     this.suggestionMetadata.cycle3_time_ms = Math.max(this.suggestionMetadata.cycle3_time_ms || 0, response.data.metadata.cycle3_time_ms || 0)
-                     this.suggestionMetadata.total_time_ms = Math.max(this.suggestionMetadata.total_time_ms || 0, response.data.metadata.total_time_ms || 0)
+                     // Merge feature-specific metadata
+                     Object.keys(response.data.metadata).forEach(feature => {
+                        if (!this.suggestionMetadata[feature]) {
+                           this.suggestionMetadata[feature] = response.data.metadata[feature]
+                        } else {
+                           this.suggestionMetadata[feature].input_tokens += response.data.metadata[feature].input_tokens
+                           this.suggestionMetadata[feature].output_tokens += response.data.metadata[feature].output_tokens
+                           if (response.data.metadata[feature].cost_per_1k) {
+                              this.suggestionMetadata[feature].cost_per_1k = (this.suggestionMetadata[feature].cost_per_1k || 0) + response.data.metadata[feature].cost_per_1k
+                           }
+                           this.suggestionMetadata[feature].cycle1_time_ms = Math.max(this.suggestionMetadata[feature].cycle1_time_ms || 0, response.data.metadata[feature].cycle1_time_ms || 0)
+                           this.suggestionMetadata[feature].cycle2_time_ms = Math.max(this.suggestionMetadata[feature].cycle2_time_ms || 0, response.data.metadata[feature].cycle2_time_ms || 0)
+                           this.suggestionMetadata[feature].cycle3_time_ms = Math.max(this.suggestionMetadata[feature].cycle3_time_ms || 0, response.data.metadata[feature].cycle3_time_ms || 0)
+                           this.suggestionMetadata[feature].total_time_ms = Math.max(this.suggestionMetadata[feature].total_time_ms || 0, response.data.metadata[feature].total_time_ms || 0)
+                        }
+                     })
                   }
                }
                this.updateCache(queryStr, response.data)
