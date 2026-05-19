@@ -21,14 +21,16 @@
 import UvaLibraryLogo from "@/components/UvaLibraryLogo.vue"
 import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
+import { useQueryStore } from "@/stores/query"
 
 const results = useResultStore()
 const systemStore = useSystemStore()
+const query = useQueryStore()
 
-function homeClicked() {
+const homeClicked = (() => {
+   query.setBasicSearch()
    results.resetSearch()
-}
-
+})
 </script>
 
 <style scoped lang="scss">
