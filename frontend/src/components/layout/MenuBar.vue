@@ -28,6 +28,7 @@
 import Menubar from 'primevue/menubar'
 import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
+import { useQueryStore } from "@/stores/query"
 import { useUserStore } from "@/stores/user"
 import { useAlertStore } from "@/stores/alert"
 import { computed } from 'vue'
@@ -39,6 +40,7 @@ const alertStore = useAlertStore()
 const systemStore = useSystemStore()
 const userStore = useUserStore()
 const results = useResultStore()
+const query = useQueryStore()
 const router = useRouter()
 
 const v4Menu = computed( () => {
@@ -95,6 +97,7 @@ const alertClicked =(() => {
 
 const searchClicked = (() => {
    router.push("/")
+   query.setBasicSearch()
    results.resetSearch()
    window.scrollTo({
       top: 0,
