@@ -143,6 +143,7 @@ const suggestionClick = ((suggType, val) => {
    if (suggType == 'author') {
       analytics.trigger('Results', 'AUTHOR_SUGGEST_CLICKED', val)
    } else if (suggType == 'book') {
+      queryStore.widenSearch()   // soem of the book suggestions are in WC, HathiTrust or JRML. Expand search to enclude everything
       analytics.trigger('Results', 'BOOK_SUGGEST_CLICKED', val)
    } else if (suggType == 'image') {
       analytics.trigger('Results', 'IMAGE_SUGGEST_CLICKED', val)
@@ -155,33 +156,15 @@ const didYouMeanClick = (() => {
    router.push("/search?q="+encodeURIComponent(suggestor.didYouMean))
 })
 
-const linkLabel = ((sug) => {
-   return `${sug.value}, suggested author related to your search`
-})
-
-const bookLinkLabel = ((sug) => {
-   return `${sug.value}, suggested book related to your search`
-})
-
 const getRelatedLink = ((sug) => {
    if (sug.type == 'book' && sug.id) {
-      return `/sources/uva_library/items/${sug.id}`
+      let qp = `identifier: {${encodeURIComponent(sug.id)}}`
+      let url = `/search?mode=advanced&q=${qp}`
+      return url
    }
    let qp = `${sug.type}: {"${encodeURIComponent(sug.value)}"}`
    let url = `/search?mode=advanced&q=${qp}`
    return url
-})
-
-const handleEsc = ((event) => {
-   event.target.blur()
-})
-
-const onFocus = ((event) => {
-   event.target.dispatchEvent(new MouseEvent('mouseenter'))
-})
-
-const onBlur = ((event) => {
-   event.target.dispatchEvent(new MouseEvent('mouseleave'))
 })
 
 onMounted(() => {
