@@ -28,12 +28,8 @@
          <div class="item" v-for="(co,idx) in userStore.checkouts" :key="idx">
             <h3 class="item-title">
                <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
-               <template v-if="co.id">
-                  <router-link :to="`/sources/uva_library/items/u${co.id}`">{{co.title}}</router-link>
-               </template>
-               <template v-else>
-                  {{co.title}}
-               </template>
+               <router-link v-if="co.id" :to="`/sources/uva_library/items/u${co.id}`" v-html="co.title"/>
+               <span v-else v-html="co.title"/>
             </h3>
             <dl>
                <template v-if="co.author.length > 0">

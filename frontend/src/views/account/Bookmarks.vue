@@ -73,9 +73,9 @@
                      <Column field="title" header="Title">
                         <template #body="slotProps">
                            <template v-if="slotProps.data.identifier">
-                              <router-link @click="bookmarkFollowed(slotProps.data.identifier)" :to="detailsURL(slotProps.data)">
-                                 {{slotProps.data.details.title}}
-                              </router-link>
+                              <router-link @click="bookmarkFollowed(slotProps.data.identifier)" 
+                                 :to="detailsURL(slotProps.data)"  v-html="slotProps.data.details.title"
+                              />
                               <abbr class="" :title="itemURL(slotProps.data)" :data-folder-id="folderInfo.id"></abbr>
                            </template>
                            <AvailabilityNotice v-else :label="slotProps.data.details.title " message="This item is no longer available in Virgo."/>

@@ -19,7 +19,7 @@
                   <dd>{{co.photoArticleAuthor}}</dd>
                   <template v-if="co.photoArticleTitle">
                      <dt>Article Title:</dt>
-                     <dd>{{co.photoArticleTitle}}</dd>
+                     <dd v-html="co.photoArticleTitle"/>
                   </template>
                   <template v-if="co.photoJournalVolume">
                      <dt>Volume:</dt>

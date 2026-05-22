@@ -11,7 +11,7 @@
             You have no ILL checkouts.
          </div>
          <div class="item" v-for="(co,idx) in illiadCheckouts" :key="idx">
-            <h3 class="item-title">{{co.loanTitle}}</h3>
+            <h3 class="item-title" v-html="co.loanTitle" />
             <dl>
                <dt>Author:</dt>
                   <dd>{{co.loanAuthor}}</dd>

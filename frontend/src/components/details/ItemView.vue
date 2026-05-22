@@ -1,8 +1,8 @@
 <template>
    <div class="item-header" >
       <h1>
-         <span>{{ details.header.title }}</span>
-         <span v-if="details.header.subtitle" class="subtitle">{{ details.header.subtitle }}</span>
+         <span v-html="details.header.title"/>
+         <span v-if="details.header.subtitle" class="subtitle" v-html="details.header.subtitle"/>
       </h1>
       <span class="nav-wrap"  v-if="resultStore.selectedHitIdx > -1">
          <V4Pager

@@ -105,7 +105,7 @@
                   <template v-slot:title><span class="section-title">UVA Holds</span></template>
                   <div class="request-list">
                      <div class="request" v-for="(req,idx) in userStore.requests.holds" :key="`ils-${idx}`">
-                        <h3 class="title">{{req.title}}</h3>
+                        <h3 class="title" v-html="req.title"/>
                         <dl>
                            <template v-if="req.author">
                               <dt>Author:</dt>
