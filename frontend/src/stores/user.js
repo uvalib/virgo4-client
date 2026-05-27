@@ -10,6 +10,7 @@ import { useBookmarkStore } from "@/stores/bookmark"
 import { useSearchStore } from "@/stores/search"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
+import { useSuggestorStore } from "@/stores/suggestor"
 import { useJwt } from '@vueuse/integrations/useJwt'
 
 export const useUserStore = defineStore('user', {
@@ -560,22 +561,18 @@ export const useUserStore = defineStore('user', {
       },
 
       async signout(resetSearch) {
-         const alerts = useAlertStore()
-         const savedSearches = useSearchStore()
-         const bookmarks = useBookmarkStore()
-         const preferences = usePreferencesStore()
-
-         this.clear()
-         preferences.clear()
-         bookmarks.clear()
-         savedSearches.clear()
-         alerts.clearSeenAlerts()
+         useSuggestorStore().reset()
+         usePreferencesStore().clear()
+         useBookmarkStore().clear()
+         useSearchStore().clear()
+         useAlertStore().clearSeenAlerts()
          if ( resetSearch === true) {
-            const results = useResultStore()
-            results.resetSearch()
+             useResultStore().resetSearch()
          }
          localStorage.removeItem("v4_jwt")
-         await axios.post("/signout", null)
+         await axios.post("/api/signout", null)
+         this.clear()
+
          this.router.push("/signedout")
       },
 

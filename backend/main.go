@@ -69,8 +69,7 @@ func main() {
 	router.GET("/version", svc.GetVersion)
 	router.GET("/healthcheck", svc.HealthCheck)
 	router.GET("/config", svc.GetConfig)
-	router.POST("/authorize", svc.Authorize)
-	router.POST("/signout", svc.SignOut)
+	router.POST("/authorize", svc.authorizeGuest)
 
 	// No version headers for RSS
 	apiWithoutVersion := router.Group("/api")
@@ -164,6 +163,7 @@ func main() {
 		auth.GET("/netbadge", svc.NetbadgeAuthentication)
 		auth.POST("/public", svc.PublicAuthentication)
 	}
+	api.POST("/signout", svc.signOut)
 
 	// Note: in dev mode, this is never actually used. The front end is served
 	// by yarn and it proxies all requests to the API to the routes above

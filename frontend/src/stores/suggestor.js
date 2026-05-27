@@ -32,6 +32,12 @@ export const useSuggestorStore = defineStore('suggestor', {
          }
       },
 
+      reset() {
+         this.clearSuggestions()
+         localStorage.removeItem('v4_suggestions_open') 
+         localStorage.removeItem('v4_suggestion_cache') 
+      },
+
       close() {
          this.open = !this.open
          localStorage.setItem('v4_suggestions_open', this.open)   

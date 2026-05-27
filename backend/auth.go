@@ -15,9 +15,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// Authorize is the API for minting JWT for accessing the API as a guest
-func (svc *ServiceContext) Authorize(c *gin.Context) {
-	log.Printf("Generate API access token")
+func (svc *ServiceContext) authorizeGuest(c *gin.Context) {
+	log.Printf("INFO: generate guest access token")
 	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
 	signedStr, err := v4jwt.Mint(guestClaim, 30*time.Minute, svc.JWTKey)
 	if err != nil {
@@ -254,9 +253,23 @@ func (svc *ServiceContext) RefreshAuthentication(c *gin.Context) {
 }
 
 // SignOut ends a user session and removes the refresh token
-func (svc *ServiceContext) SignOut(c *gin.Context) {
+func (svc *ServiceContext) signOut(c *gin.Context) {
+	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		log.Printf("WARNING: call to signout missing auth header: %s", err.Error())
+	} else {
+		v4Claims, jwtErr := v4jwt.Validate(tokenStr, svc.JWTKey)
+		if jwtErr != nil {
+			log.Printf("WARNING: unable to validate jwt auth: %s", jwtErr)
+		} else {
+			log.Printf("INFO: user %s signs out", v4Claims.UserID)
+		}
+	}
+
+	log.Printf("INFO: invalidate session cookies")
 	c.SetCookie("v4_refresh", "invalid", -1, "/", "", false, true)
 	c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
+	log.Printf("INFO: signout complete")
 }
 
 // SetAdminClaims sets claims and regenerates the auth token
@@ -336,8 +349,9 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 		Experimental: experimental,
 	}
 
+	// The call to ILSConnect requires a valid JWT so mint a temporary guest one to lookup the user
 	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
-	guestJWT, _ := v4jwt.Mint(guestClaim, 1*time.Minute, svc.JWTKey)
+	guestJWT, _ := v4jwt.Mint(guestClaim, 15*time.Second, svc.JWTKey)
 
 	// NOTES: First a user is looked up n the uva user-ws. If this user is not found, they are flagged with CommunityUser = true.
 	// Next, sirsi is checked. If a community user is not found in sirsi, a 404 error is returned, resulting in the user being redirected
