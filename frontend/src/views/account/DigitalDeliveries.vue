@@ -1,5 +1,6 @@
 <template>
    <div v-if="systemStore.sirsiDown" class="digital-deliveries error">
+      <AccountActivities />
       <h3>Digitial delivery information is temporarily unavailable.</h3>
    </div>
    <div v-else class="digital-deliveries">

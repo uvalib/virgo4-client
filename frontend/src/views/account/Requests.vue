@@ -1,6 +1,7 @@
 <template>
    <div v-if="systemStore.sirsiDown" class="requests error">
-      <h3>Rewquest information is temporarily unavailable.</h3>
+      <AccountActivities />
+      <h3>Request information is temporarily unavailable.</h3>
    </div>
    <div v-else class="requests">
       <SignInRequired v-if="userStore.isSignedIn == false" targetPage="request information"/>

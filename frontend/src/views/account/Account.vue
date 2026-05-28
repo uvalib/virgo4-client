@@ -1,5 +1,6 @@
 <template>
    <div v-if="systemStore.sirsiDown" class="account error">
+      <AccountActivities />
       <h3>Account information is temporarily unavailable.</h3>
    </div>
    <div v-else class="account">

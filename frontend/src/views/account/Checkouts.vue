@@ -1,5 +1,6 @@
 <template>
    <div v-if="systemStore.sirsiDown" class="checkout error">
+      <AccountActivities />
       <h3>Checkout information is temporarily unavailable.</h3>
    </div>
    <div v-else class="checkout">
