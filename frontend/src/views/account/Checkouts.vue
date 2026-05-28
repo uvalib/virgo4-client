@@ -1,5 +1,8 @@
 <template>
-   <div class="checkout">
+   <div v-if="systemStore.sirsiDown" class="checkout error">
+      <h3>Checkout information is temporarily unavailable.</h3>
+   </div>
+   <div v-else class="checkout">
       <SignInRequired v-if="userStore.isSignedIn == false" targetPage="checkout information"/>
       <template v-else>
          <RenewSummary />
@@ -86,13 +89,18 @@ onMounted( () => {
       if (route.query.overdue) {
          userStore.checkoutsOrder = "OVERDUE"
       }
-      userStore.getCheckouts()
+      if (systemStore.sirsiDown == false ) {
+         userStore.getCheckouts()
+      }
    }
 })
 
 </script>
 
 <style lang="scss" scoped>
+.checkout.error {
+   text-align: center;
+}
 .checkout {
    min-height: 400px;
    position: relative;

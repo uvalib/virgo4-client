@@ -139,14 +139,16 @@ async function initVirgo() {
    if ( userStore.isSignedIn ) {
       await userStore.getAccountInfo()
 
-      // defer configuring until after acccount request is done. details pages require full account
-      // and bookmark info to be loaded before they can be displayed
-      configuring.value = false
-      if ( userStore.noILSAccount == false ) {
-         userStore.getBillDetails()
-         if (route.name != 'checkouts') {
-            // the checkouts page always asks for latest checkout info, so dont ask here too
-            userStore.getCheckouts()
+         if ( systemStore.sirsiError == false ) {
+         // defer configuring until after acccount request is done. details pages require full account
+         // and bookmark info to be loaded before they can be displayed
+         configuring.value = false
+         if ( userStore.noILSAccount == false ) {
+            userStore.getBillDetails()
+            if (route.name != 'checkouts') {
+               // the checkouts page always asks for latest checkout info, so dont ask here too
+               userStore.getCheckouts()
+            }
          }
       }
       if ( userStore.isUndergraduate ) {

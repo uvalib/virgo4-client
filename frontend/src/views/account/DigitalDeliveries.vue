@@ -1,5 +1,8 @@
 <template>
-   <div class="digital-deliveries">
+   <div v-if="systemStore.sirsiDown" class="digital-deliveries error">
+      <h3>Digitial delivery information is temporarily unavailable.</h3>
+   </div>
+   <div v-else class="digital-deliveries">
       <SignInRequired v-if="userStore.isSignedIn == false" targetPage="digital deliveries"/>
       <AccountActivities v-if="userStore.isSignedIn"/>
       <V4Spinner v-if="userStore.lookingUp && userStore.isSignedIn" message="Working..." v-bind:overlay="true"/>
@@ -131,6 +134,9 @@ div.notice {
          margin: 0 0 10px 0;
       }
    }
+}
+.digital-deliveries.error {
+   text-align: center;
 }
 .digital-deliveries {
    min-height: 400px;

@@ -1,5 +1,8 @@
 <template>
-   <div class="account">
+   <div v-if="systemStore.sirsiDown" class="account error">
+      <h3>Account information is temporarily unavailable.</h3>
+   </div>
+   <div v-else class="account">
       <SignInRequired v-if="userStore.isSignedIn == false" targetPage="account information"/>
       <AccountActivities v-if="userStore.isSignedIn"/>
       <div class="working" v-if="!expandBilling && userStore.lookingUp" >
@@ -271,11 +274,15 @@ onMounted(() =>{
       width: 90%;
    }
 }
+.account.error {
+   text-align: center;
+}
 .account {
    position: relative;
    margin: 0 auto;
    text-align: left;
    padding-bottom: 50px;
+   min-height: 400px;
    h4 {
       margin: 0 0 5px 0;
       text-decoration: underline;

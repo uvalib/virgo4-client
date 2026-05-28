@@ -1,5 +1,8 @@
 <template>
-   <div class="requests">
+   <div v-if="systemStore.sirsiDown" class="requests error">
+      <h3>Rewquest information is temporarily unavailable.</h3>
+   </div>
+   <div v-else class="requests">
       <SignInRequired v-if="userStore.isSignedIn == false" targetPage="request information"/>
       <AccountActivities  v-if="userStore.isSignedIn"/>
       <div class="details" v-if="userStore.isSignedIn">
@@ -391,7 +394,7 @@ const hideCancelHold = (() => {
 })
 
 onMounted(() =>{
-   if ( userStore.isSignedIn) {
+   if ( userStore.isSignedIn && systemStore.sirsiDown == false) {
       analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")
       userStore.getRequests()
 
@@ -404,6 +407,9 @@ onMounted(() =>{
 <style lang="scss" scoped>
 .regional-alert{
    padding: 20px 10px 0 10px;
+}
+.requests.error {
+   text-align: center;
 }
 .requests {
    min-height: 400px;
