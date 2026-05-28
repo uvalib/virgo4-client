@@ -356,11 +356,10 @@ export const useItemStore = defineStore('item', {
             }
             this.availability.searching = false
          }).catch((error) => {
+            console.error("Get availability FAILED:")
             console.error(error)
-            this.details.searching = false
-            if (error.response && error.response.status != 404) {
-               this.availability.error = error.response.data
-            }
+            this.availability.searching = false
+            this.availability.error = "Availability for this item is temporarily unavailable."
          })
       },
 

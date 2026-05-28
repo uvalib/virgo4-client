@@ -3,6 +3,10 @@
       <div class="working" v-if="item.availability.searching" >
          <V4Spinner message="Loading Availability..."/>
       </div>
+      <div v-else-if="item.availability.error" class="availability-content error">
+         <h2>Availability</h2>
+         {{ item.availability.error }}
+      </div>
       <div class="availability-content" v-else-if="hasOnlineContent || hasItems">
          <h2>Availability</h2>
          <div class="online" v-if="hasOnlineContent">
