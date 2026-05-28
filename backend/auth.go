@@ -67,7 +67,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	v4User, uErr := svc.getOrCreateUser(computingID)
 	if uErr != nil {
 		log.Printf("ERROR: unable to get or create user %s - %s: %s", computingID, role, uErr.Error())
-		c.Redirect(http.StatusFound, "/forbidden")
+		c.Redirect(http.StatusFound, "/error")
 		return
 	}
 	experimental := false
@@ -81,7 +81,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	log.Printf("Generate JWT for %s", computingID)
 	signedStr, jwtErr := svc.generateJWT(c, v4User, v4jwt.Netbadge, role, experimental)
 	if jwtErr != nil {
-		c.Redirect(http.StatusFound, "/forbidden")
+		c.Redirect(http.StatusFound, "/error")
 		return
 	}
 
@@ -212,14 +212,17 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 // RefreshAuthentication will use the long-lived refresh token for a user to generate a short-lived
 // auth token, then regenerate the lon-lived token
-func (svc *ServiceContext) RefreshAuthentication(c *gin.Context) {
+func (svc *ServiceContext) refreshAuthentication(c *gin.Context) {
+	uid := c.Param("uid")
+	log.Printf("INFO: %s requests auth refresh", uid)
 	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("ERROR: Authentication failed, no JWT in header: [%s]", err.Error())
+		log.Printf("ERROR: reauthentication failed, no jwt in header: [%s]", err.Error())
 		c.String(http.StatusUnauthorized, "unauthorized request")
 		return
 	}
 
+	// TODO try removing the long lived token
 	refreshToken, err := c.Cookie("v4_refresh")
 	if err != nil {
 		log.Printf("Authentication failed, refresh token for %s expired or not accessible %s", tokenStr, err.Error())
@@ -245,9 +248,16 @@ func (svc *ServiceContext) RefreshAuthentication(c *gin.Context) {
 		return
 	}
 
+	if uid != v4Claims.UserID {
+		log.Printf("ERROR: user id of refreshed jwt mismach; %s vs %s", uid, v4Claims.UserID)
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// TODO try removing this
 	log.Printf("Regenerate long-lived refresh token for %s", v4Claims.UserID)
 	refreshToken = xid.New().String()
-	c.SetCookie("v4_refresh", refreshToken, 60*60*24*7, "/", "", false, true)
+	c.SetCookie("v4_refresh", refreshToken, 60*60*24*180, "/", "", false, true)
 
 	c.String(http.StatusOK, refreshed)
 }
@@ -357,9 +367,11 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 	// Next, sirsi is checked. If a community user is not found in sirsi, a 404 error is returned, resulting in the user being redirected
 	// to forbidden page. If a non-community user is not found in sirs, success is returned, but just the
 	// basics are included (id, title, dept, desctiption). The user is signed in and redirected the user to the account registration form.
+	// In this case, use the slow http client. The ILSConnect user call makes two calls; one to the user-ws and the other to sirsi. Both
+	// calls have a 10 second timeout. The slow http client has a 30 second timeout, so it should hande teh case when both requests are slow.
 	log.Printf("Get ILS Connector data for user %s", v4User.Virgo4ID)
 	userURL := fmt.Sprintf("%s/users/%s", svc.ILSAPI, v4User.Virgo4ID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, guestJWT, svc.HTTPClient)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, guestJWT, svc.SlowHTTPClient)
 	if ilsErr != nil {
 		return "", errors.New(ilsErr.Message)
 	}
@@ -389,12 +401,13 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
-	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Minute, svc.JWTKey)
+	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Second, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		return "", err
 	}
 
+	// TODO try removing this
 	log.Printf("Create long-lived refresh token for %s", v4User.Virgo4ID)
 	refreshToken := xid.New().String()
 	days180 := time.Hour * 24 * 180

@@ -148,8 +148,6 @@ func main() {
 
 	api.POST("/feedback", svc.AuthMiddleware, svc.SendFeedback)
 
-	api.POST("/reauth", svc.RefreshAuthentication)
-
 	api.POST("/createTempAccount", svc.AuthMiddleware, svc.CreateTempAccount)
 	api.GET("/activateTempAccount/:token", svc.ActivateTempAccount)
 
@@ -163,6 +161,7 @@ func main() {
 		auth.GET("/netbadge", svc.NetbadgeAuthentication)
 		auth.POST("/public", svc.PublicAuthentication)
 	}
+	api.POST("/reauth/:uid", svc.refreshAuthentication)
 	api.POST("/signout", svc.signOut)
 
 	// Note: in dev mode, this is never actually used. The front end is served

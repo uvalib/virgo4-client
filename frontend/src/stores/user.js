@@ -397,8 +397,7 @@ export const useUserStore = defineStore('user', {
             })
          } else {
             console.log("Refreshing sign-in session")
-            //await axios.post("/api/reauth/"+this.signedInUser, null).then( response => {
-            await axios.post("/api/reauth", null).then( response => {
+            await axios.post("/api/reauth/"+this.signedInUser, null).then( response => {
                this.setUserJWT(response.data )
                console.log(`Session refreshed`)
             }).catch( async () => {
