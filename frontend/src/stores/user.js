@@ -477,6 +477,7 @@ export const useUserStore = defineStore('user', {
             console.error("Get account info failed:")
             console.error(error)
             this.lookingUp = false
+            const system = useSystemStore()
             if (error.response && error.response.status == 403) {
                system.setError( "Account information is temporarily unavailable.")
                system.sirsiDown = true
