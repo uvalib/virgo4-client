@@ -139,7 +139,7 @@ async function initVirgo() {
    if ( userStore.isSignedIn ) {
       await userStore.getAccountInfo()
 
-         if ( systemStore.sirsiError == false ) {
+      if ( systemStore.sirsiError == false ) {
          // defer configuring until after acccount request is done. details pages require full account
          // and bookmark info to be loaded before they can be displayed
          configuring.value = false
@@ -150,17 +150,16 @@ async function initVirgo() {
                userStore.getCheckouts()
             }
          }
+         if ( userStore.isUndergraduate ) {
+            analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
+         } else if ( userStore.isGraduate) {
+            analytics.trigger('User', 'NETBADGE_SIGNIN', "graduate")
+         } else {
+            analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
+         }
       }
-      if ( userStore.isUndergraduate ) {
-         analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
-      } else if ( userStore.isGraduate) {
-         analytics.trigger('User', 'NETBADGE_SIGNIN', "graduate")
-      } else {
-         analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
-      }
-   } else {
-      configuring.value = false
-   }
+   } 
+   configuring.value = false
 
    filterStore.getPreSearchFilters()
 }
