@@ -18,6 +18,7 @@ export const useSystemStore = defineStore('system', {
          content: "",
          detail: ""
       },
+      sirsiDown: false,
       showMessage: false,
       toast: {
          title: "",

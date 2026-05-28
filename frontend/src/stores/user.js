@@ -397,6 +397,7 @@ export const useUserStore = defineStore('user', {
             })
          } else {
             console.log("Refreshing sign-in session")
+            //await axios.post("/api/reauth/"+this.signedInUser, null).then( response => {
             await axios.post("/api/reauth", null).then( response => {
                this.setUserJWT(response.data )
                console.log(`Session refreshed`)
@@ -473,9 +474,15 @@ export const useUserStore = defineStore('user', {
             }
             this.lookingUp = false
           }).catch((error) => {
-            const system = useSystemStore()
-            system.setError( error)
+            console.error("Get account info failed:")
+            console.error(error)
             this.lookingUp = false
+            if (error.response && error.response.status == 403) {
+               system.setError( "Account information is temporarily unavailable.")
+               system.sirsiDown = true
+            } else {
+                system.setError( error )   
+            }
           })
       },
 
