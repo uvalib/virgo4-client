@@ -121,8 +121,8 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	resp.Barcode = auth.Barcode
 	v4User, uErr := svc.getOrCreateUser(auth.Barcode)
 	if uErr != nil {
-		log.Printf("ERROR: unable to find user %s: %s", auth.Barcode, uErr.Error())
-		c.JSON(http.StatusForbidden, resp)
+		log.Printf("ERROR: unable to find or create user %s: %s", auth.Barcode, uErr.Error())
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
 
@@ -169,7 +169,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	authURL := fmt.Sprintf("%s/users/check_password", svc.ILSAPI)
 	bodyBytes, ilsErr := svc.ILSConnectorPost(authURL, auth, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil && ilsErr.StatusCode == 503 {
-		c.String(503, "Password sign in is temporarily unavailable. Please try again later.")
+		c.String(http.StatusServiceUnavailable, "Password sign in is temporarily unavailable. Please try again later.")
 		return
 	}
 
@@ -200,7 +200,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	signedStr, jwtErr := svc.generateJWT(c, v4User, v4jwt.PIN, v4jwt.User, false)
 	if jwtErr != nil {
 		resp.Message = jwtErr.Error()
-		c.JSON(http.StatusForbidden, resp)
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
 

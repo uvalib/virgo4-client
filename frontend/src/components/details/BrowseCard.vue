@@ -22,7 +22,7 @@
             <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.data.source}/items/${props.data.id}`" class="title">
                {{truncateTitle(props.data.title)}}
             </router-link>
-            <span class="year">[{{props.data.published_date}}]</span>
+            <span v-if="props.data.published_date" class="year">[{{props.data.published_date}}]</span>
             <span class="loc">{{props.data.location}}</span>
          </div>
          <BookmarkButton :pool="props.data.source" :data="data" @clicked="bookmarkClicked(props.data.id)"/>
