@@ -46,7 +46,7 @@
                   aria-describedby="new-window">here</a> and let us know where you would like your item to be delivered.
             </div>
          </div>
-         <div class="medium-rare-message" v-if="pickupLibrary == 'SPEC-COLL'">
+         <div class="medium-rare-message" v-if="isMediumRare">
             <p>
                This item does not circulate.<br />When you request this item from Ivy, it will be delivered to the Small
                Special Collections Library for you to use in the reading room only.
@@ -104,8 +104,13 @@ onMounted( () => {
    }
 })
 
+const isMediumRare = computed( () => {
+    if ( selectedItem.value && selectedItem.value.location=="LOCKEDSTKS" ) return true 
+    return false
+})
+
 const pickupLibraries = computed(()=>{
-   if ( selectedItem.value && selectedItem.value.callNumber.includes("Ivy limited circulation") ) {
+   if ( isMediumRare ) {
       pickupLibrary.value = "SPEC-COLL"
       return [{value: "SPEC-COLL", label: "Small Special Collections Reading Room"}]
    }
@@ -128,13 +133,19 @@ const dialogOpened = (() => {
    restore.setActiveRequest( request.activeRequest )
    restore.setURL(route.fullPath)
    restore.save()
-   if ( preferences.pickupLibrary && preferences.pickupLibrary.id != "") {
-      pickupLibrary.value = preferences.pickupLibrary.id
-   }
+
    if (user.isSignedIn) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
       if ( request.optionItems.length == 1) {
          selectedItem.value = request.optionItems[0].value
+      }
+   }
+
+   if ( isMediumRare.value ) {
+      pickupLibrary.value = "SPEC-COLL"   
+   } else {
+      if ( preferences.pickupLibrary && preferences.pickupLibrary.id != "") {
+         pickupLibrary.value = preferences.pickupLibrary.id
       }
    }
 })
