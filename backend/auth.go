@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/xid"
 	"github.com/uvalib/virgo4-jwt/v4jwt"
 	"gorm.io/gorm"
 )
@@ -79,7 +78,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	}
 
 	log.Printf("Generate JWT for %s", computingID)
-	signedStr, jwtErr := svc.generateJWT(c, v4User, v4jwt.Netbadge, role, experimental)
+	signedStr, jwtErr := svc.generateJWT(v4User, v4jwt.Netbadge, role, experimental)
 	if jwtErr != nil {
 		c.Redirect(http.StatusFound, "/error")
 		return
@@ -197,7 +196,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	resp.SignedIn = true
 
 	log.Printf("Generate JWT for %s", auth.Barcode)
-	signedStr, jwtErr := svc.generateJWT(c, v4User, v4jwt.PIN, v4jwt.User, false)
+	signedStr, jwtErr := svc.generateJWT(v4User, v4jwt.PIN, v4jwt.User, false)
 	if jwtErr != nil {
 		resp.Message = jwtErr.Error()
 		c.JSON(http.StatusInternalServerError, resp)
@@ -222,15 +221,8 @@ func (svc *ServiceContext) refreshAuthentication(c *gin.Context) {
 		return
 	}
 
-	// TODO try removing the long lived token
-	refreshToken, err := c.Cookie("v4_refresh")
-	if err != nil {
-		log.Printf("Authentication failed, refresh token for %s expired or not accessible %s", tokenStr, err.Error())
-		c.String(http.StatusUnauthorized, "unauthorized request")
-		return
-	}
-
-	refreshed, err := v4jwt.Refresh(tokenStr, 30*time.Minute, svc.JWTKey)
+	log.Printf("SHORT REFESH==============================")
+	refreshed, err := v4jwt.Refresh(tokenStr, 30*time.Second, svc.JWTKey) // FIXME
 	if err != nil {
 		log.Printf("ERROR: Unable to refresh JWT %s: %s", tokenStr, err.Error())
 		c.String(http.StatusUnauthorized, "unauthorized request")
@@ -253,11 +245,6 @@ func (svc *ServiceContext) refreshAuthentication(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-
-	// TODO try removing this
-	log.Printf("Regenerate long-lived refresh token for %s", v4Claims.UserID)
-	refreshToken = xid.New().String()
-	c.SetCookie("v4_refresh", refreshToken, 60*60*24*180, "/", "", false, true)
 
 	c.String(http.StatusOK, refreshed)
 }
@@ -301,7 +288,7 @@ func (svc *ServiceContext) SetAdminClaims(c *gin.Context) {
 		return
 	}
 
-	var claims map[string]interface{}
+	var claims map[string]any
 	// Take the claims received as-is. Expecting admins to not screw this up.
 	if err := c.BindJSON(&claims); err != nil {
 		log.Printf("Unable to parse claims: %s", err.Error())
@@ -350,7 +337,7 @@ func (svc *ServiceContext) getOrCreateUser(userID string) (*User, error) {
 	return &user, nil
 }
 
-func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum, experimental bool) (string, error) {
+func (svc *ServiceContext) generateJWT(v4User *User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum, experimental bool) (string, error) {
 	v4Claims := v4jwt.V4Claims{
 		UserID:       v4User.Virgo4ID,
 		AuthMethod:   authMethod,
@@ -401,17 +388,12 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
-	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Second, svc.JWTKey)
+	log.Printf("SHORT JWT ==============================")
+	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Second, svc.JWTKey) // FIXME
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		return "", err
 	}
-
-	// TODO try removing this
-	log.Printf("Create long-lived refresh token for %s", v4User.Virgo4ID)
-	refreshToken := xid.New().String()
-	days180 := time.Hour * 24 * 180
-	c.SetCookie("v4_refresh", refreshToken, int(days180), "/", "", false, true)
 
 	return signedStr, nil
 }
