@@ -221,8 +221,7 @@ func (svc *ServiceContext) refreshAuthentication(c *gin.Context) {
 		return
 	}
 
-	log.Printf("SHORT REFESH==============================")
-	refreshed, err := v4jwt.Refresh(tokenStr, 30*time.Second, svc.JWTKey) // FIXME
+	refreshed, err := v4jwt.Refresh(tokenStr, 30*time.Minute, svc.JWTKey)
 	if err != nil {
 		log.Printf("ERROR: Unable to refresh JWT %s: %s", tokenStr, err.Error())
 		c.String(http.StatusUnauthorized, "unauthorized request")
@@ -388,8 +387,7 @@ func (svc *ServiceContext) generateJWT(v4User *User, authMethod v4jwt.AuthEnum, 
 
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
-	log.Printf("SHORT JWT ==============================")
-	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Second, svc.JWTKey) // FIXME
+	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Minute, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		return "", err
