@@ -110,7 +110,7 @@ const isMediumRare = computed( () => {
 })
 
 const pickupLibraries = computed(()=>{
-   if ( isMediumRare ) {
+   if ( isMediumRare.value ) {
       pickupLibrary.value = "SPEC-COLL"
       return [{value: "SPEC-COLL", label: "Small Special Collections Reading Room"}]
    }
