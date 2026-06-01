@@ -43,12 +43,18 @@ const opened = (() => {
    notes.value = ""
 })
 
-const printClicked = ( async () => {
+const printClicked = ( () => {
    analytics.trigger('Bookmarks', 'PRINT_CLICKED')
+   // NOTES: using async/await prevents PDF from opening in a separate tab in safari
+   // Also, if generation takes too long it is blocked. To work around all cases, open
+   // a window with a loading message. Pass it into the print call and set it wth the object URL.
+   // Use a callback instead asyn/await to close the popup when done.
+   var pdfWindow = window.open("/public/loading")
    okDisabled.value = true
-   await bookmarkStore.printBookmarks( title.value, notes.value, props.bookmarks )
-   showDialog.value = false
-   okDisabled.value = false
+   bookmarkStore.printBookmarks( pdfWindow, title.value, notes.value, props.bookmarks, ()=>{
+      showDialog.value = false
+      okDisabled.value = false
+   })
 })
 
 </script>

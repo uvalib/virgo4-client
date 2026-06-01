@@ -323,17 +323,19 @@ export const useBookmarkStore = defineStore('bookmark', {
             useSystemStore().setError(error)
          }
       },
-      async printBookmarks(title, notes, items) {
+      printBookmarks(tgtWindow, title, notes, items, successCallback) {
          // note: items list requires pool and identifier fields
          const system = useSystemStore()
          let req = {title: title, notes: notes, items: items}
          let url = system.searchAPI + "/api/pdf"
-         await axios.post(url, req, {responseType: "blob"}).then((response) => {
-            let blob = new Blob([response.data], { type: response.headers['content-type'] })
-            let href = window.URL.createObjectURL(blob)
-            window.open(href)
+         axios.post(url, req, {responseType: "blob"}).then((response) => {
+            const blob = new Blob([response.data], { type: 'application/pdf' })
+            const href = window.URL.createObjectURL(blob)
+            tgtWindow.location = href
+            successCallback()
          }).catch((error) => {
-             system.setError(error)
+            system.setError(error)
+            tgtWindow.close()
          })
       },
       async exportBookmarks(folderName) {
