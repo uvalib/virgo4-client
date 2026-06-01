@@ -494,7 +494,30 @@ func (svc *ServiceContext) getOutstandingRemediationRequestCount(userID string) 
 
 func (svc *ServiceContext) getOutstandingOtherRequestsCount(userID string) (int, *RequestError) {
 	log.Printf("INFO: get other standalone requests counts for %s", userID)
-	return 0, nil
+
+	// Active requests are identified by TransactionStatus NOT matching the list below
+	activeStatuses := []string{"Delivered to Web", "Request Finished", "Cancelled by ILL Staff", "Cancelled by Customer"}
+
+	// build a transaction query with a filter for these statuses
+	filter := make([]string, 0)
+	for _, s := range activeStatuses {
+		filter = append(filter, fmt.Sprintf("TransactionStatus ne '%s'", s))
+	}
+	filterStr := fmt.Sprintf("$filter=(%s)", strings.Join(filter, " and "))
+	filterStr = strings.ReplaceAll(filterStr, " ", "+")
+	queryURI := fmt.Sprintf("/Transaction/UserRequests/%s?%s", userID, filterStr)
+	resp, respErr := svc.ILLiadRequest("GET", queryURI, nil)
+	if respErr != nil {
+		return 0, respErr
+	}
+
+	var parsed []any
+	parseErr := json.Unmarshal(resp, &parsed)
+	if parseErr != nil {
+		return 0, &RequestError{StatusCode: http.StatusInternalServerError, Message: parseErr.Error()}
+	}
+
+	return len(parsed), nil
 }
 
 // CreateStandaloneScan send a request for a standalone scan to ILLiad
