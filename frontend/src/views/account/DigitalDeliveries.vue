@@ -70,6 +70,7 @@
 <script setup>
 import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
+import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { computed, onMounted } from 'vue'
 import analytics from '@/analytics'
