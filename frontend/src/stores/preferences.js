@@ -8,6 +8,7 @@ export const usePreferencesStore = defineStore('preferences', {
 	state: () => ({
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
+      searchExclusions: [],
       collapseGroups: false,
       expandDetails: false,
       aiDebug: false,
@@ -26,6 +27,11 @@ export const usePreferencesStore = defineStore('preferences', {
    getters: {
       hasSearchTemplate: state => {
          return state.searchTemplate && state.searchTemplate.fields.length > 0
+      },
+      isPoolExcluded: state => {
+         return (poolID) => {
+           return state.searchExclusions.includes(poolID)
+         }
       },
    },
 
@@ -63,6 +69,8 @@ export const usePreferencesStore = defineStore('preferences', {
             this.searchTemplate = prefsObj.searchTemplate
          }
 
+         this.searchExclusions = prefsObj.searchExclusions || []
+
          this.aiDebug = prefsObj.aiDebug || false
          this.aiFeatures = prefsObj.aiFeatures || []
          this.aiModel = prefsObj.aiModel || "default"
@@ -93,6 +101,14 @@ export const usePreferencesStore = defineStore('preferences', {
          }
          await this.savePreferences()
          window.location.reload()
+      },
+      toggleSearchExclusion( poolID ) {
+         if (this.searchExclusions.includes(poolID)) {
+            this.searchExclusions = this.searchExclusions.filter( pID => pID != poolID)
+         } else {
+            this.searchExclusions.push(poolID)
+         }
+         this.savePreferences()
       },
       toggleCollapseGroups() {
          this.collapseGroups = !this.collapseGroups
@@ -125,6 +141,7 @@ export const usePreferencesStore = defineStore('preferences', {
             collapseGroups: this.collapseGroups,
             expandDetails: this.expandDetails,
             searchTemplate: this.searchTemplate,
+            searchExclusions: this.searchExclusions,
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,
             aiModel: this.aiModel,

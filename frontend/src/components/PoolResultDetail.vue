@@ -13,6 +13,7 @@
          <CollectionContext />
          <div class="sort-section">
             <V4Sort :pool="selectedResults.pool" />
+            <ExcludePool v-if="canExclude"/>
          </div>
       </div>
       <template v-if="!resultStore.searching">
@@ -64,11 +65,12 @@ import SearchFilters from "@/components/SearchFilters.vue"
 import V4Sort from "@/components/V4Sort.vue"
 import ExpandSearch from "@/components/ExpandSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
-import {ref,computed} from 'vue'
-import {useRoute} from 'vue-router'
+import { ref,computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useResultStore } from "@/stores/result"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
+import ExcludePool from "./modals/ExcludePool.vue"
 
 const route = useRoute()
 const resultStore = useResultStore()
@@ -76,6 +78,7 @@ const poolStore = usePoolStore()
 const filters = useFilterStore()
 
 const loadingMore = ref(false)
+
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
 })
@@ -87,6 +90,12 @@ const hasURL = computed(()=>{
 })
 const selectedResults = computed(()=>{
    return resultStore.selectedResults
+})
+
+const canExclude = computed(() => {
+   if ( !resultStore.selectedResults ) return
+   console.log("can exclude "+resultStore.selectedResults.pool.id)
+   return ( resultStore.selectedResults.pool.id != 'uva_library' &&  resultStore.selectedResults.pool.id != 'images')
 })
 
 async function retrySearch() {
@@ -113,9 +122,16 @@ async function loadMoreResults() {
 </script>
 <style lang="scss" scoped>
 .sort-section {
+   color: $uva-grey-B;
    background: white;
    border: 1px solid $uva-grey-100;
+   padding: 0 15px 15px 10px;
    border-top: 0;
+   display: flex;
+   flex-flow: row wrap;
+   gap: 10px;
+   justify-content: space-between;
+   align-items: center;
 }
 .desc  {
    padding: 15px 10px 10px 10px;
@@ -207,6 +223,10 @@ div.pool-header {
    }
    div.pool-header {
       margin: 0 0 1rem 0;
+   }
+   .sort-section {
+      justify-content: flex-start;
+      padding-bottom: 10px;
    }
 }
 .expand-panel {

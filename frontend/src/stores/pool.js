@@ -9,6 +9,13 @@ export const usePoolStore = defineStore('pool', {
    }),
 
    getters: {
+      canExcludeList: state => {
+         return state.list.filter( p => p.id != 'uva_library' && p.id != 'images').sort( (a, b)=> {
+            if (a.name < b.name) return -1
+            if (a.name > b.name) return 1
+            return 0   
+         })
+      },
       poolDetails: state => {
          return (id) => {
             return state.list.find( p => p.id == id)
@@ -176,6 +183,7 @@ export const usePoolStore = defineStore('pool', {
             if (!p.sort_options) {
                p.sort_options=[]
             }
+            p.primary = (p.id == "uva_library" || p.id=="images" || p.id == "articles" )
             this.list.push(p)
          })
       },

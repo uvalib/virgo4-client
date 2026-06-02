@@ -14,13 +14,11 @@
          </p>
 
          <label for="pickup-sel">Pickup location:
-            <transition name="fade" v-on:after-enter="showSaved = false">
-               <span v-if="showSaved" class="success"> Saved</span>
-            </transition>
             <select v-model="preferencesStore.pickupLibrary" id="pickup-sel"  @change="update">
                <option :value="{id:'', name:''}">Select a location</option>
                <option v-for="l in userStore.libraries" :key="l.id" :value="l">{{l.name}}</option>
             </select>
+            <Message variant="simple" severity="success" v-if="showSaved" :life="2000" >Saved</Message>
          </label>
       </div>
    </div>
@@ -30,6 +28,7 @@
 import { usePreferencesStore } from "@/stores/preferences"
 import { useUserStore }  from "@/stores/user"
 import { ref } from 'vue'
+import Message from 'primevue/message'
 
 const preferencesStore = usePreferencesStore()
 const userStore = useUserStore()
@@ -38,6 +37,7 @@ const showSaved = ref(false)
 function update() {
    preferencesStore.savePreferences().then(() => {
       showSaved.value = true
+      setTimeout( ()=>{showSaved.value = false}, 2100)
    })
 }
 </script>
@@ -45,6 +45,7 @@ function update() {
 <style lang="scss" scoped>
 .pickup-options {
    text-align: left;
+   padding-bottom: 20px;
     @media only screen and (max-width: 768px) {
       // prevent overflow on small screens
       width: 100%;
@@ -71,18 +72,8 @@ function update() {
    }
    #pickup-sel {
       max-width: 100%;
-      margin-bottom: 30px;
       display: block;
-   }
-   .success {
-      color: $uva-green-A;
-   }
-
-   .fade-leave-active {
-      transition: all 1s ease-in 1s;
-   }
-   .fade-enter {
-      opacity: 1;
+      margin-bottom: 10px;
    }
 }
 </style>

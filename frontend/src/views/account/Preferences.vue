@@ -69,7 +69,6 @@ onMounted( async () => {
    .section {
       margin: 0;
       border: 1px solid $uva-grey-100;
-      padding: 0;
       text-align: left;
    }
 }
