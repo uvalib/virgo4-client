@@ -37,6 +37,7 @@ import { useQueryStore } from "@/stores/query"
 import { ref, computed } from 'vue'
 import { useRouteUtils } from '@/composables/routeutils'
 import { useRouter, useRoute } from 'vue-router'
+import analytics from '@/analytics'
 
 const router = useRouter()
 const route = useRoute()
@@ -58,6 +59,11 @@ const excludeResults = (() =>{
 
 const confirmExclude = ((poolID)=>{
    preferences.toggleSearchExclusion(poolID)
+   if (preferences.isPoolExcluded(poolID)) {
+      analytics.trigger('Preferences', 'ADD_POOL_EXCLUSION', poolID)
+   } else {
+      analytics.trigger('Preferences', 'REMOVE_POOL_EXCLUSION', poolID)   
+   }
 })
 
 const rerunSearch = (() => {

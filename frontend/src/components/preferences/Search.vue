@@ -46,6 +46,7 @@ import { usePreferencesStore } from "@/stores/preferences"
 import { usePoolStore } from "@/stores/pool"
 import { useQueryStore } from "@/stores/query"
 import Message from 'primevue/message'
+import analytics from '@/analytics'
 
 const preferencesStore = usePreferencesStore()
 const pools = usePoolStore()
@@ -63,6 +64,11 @@ const toggleSearchExclude = (( poolID) => {
    saved.value = "exclude"
    setTimeout( ()=>{ saved.value = "" }, 2100)
    queryStore.searchSources  = "all"
+   if (preferencesStore.isPoolExcluded(poolID)) {
+      analytics.trigger('Preferences', 'ADD_POOL_EXCLUSION', poolID)
+   } else {
+      analytics.trigger('Preferences', 'REMOVE_POOL_EXCLUSION', poolID)   
+   }
 })
 
 const fullDetailClicked = (() => {

@@ -77,6 +77,7 @@ import { useQueryStore } from "@/stores/query"
 import ExcludePool from "./modals/ExcludePool.vue"
 import { useRouteUtils } from '@/composables/routeutils'
 import { useRouter, useRoute } from 'vue-router'
+import analytics from '@/analytics'
 
 const route = useRoute()
 const router = useRouter()
@@ -124,6 +125,7 @@ const poolExclusionString = computed( () => {
 })
 const removeSearchExclusions = (() => {
    preferences.removeSearchExclusions()
+   analytics.trigger('Preferences', 'REMOVE_POOL_EXCLUSION', "all")   
    queryStore.userSearched = true
    queryStore.searchSources = "all"
    resultStore.searchAllPools()
