@@ -48,7 +48,10 @@
          </div>
          <span role="toolbar"  v-if="selectedResults.hits.length > 0">
             <ExpandSearch class="expand-panel" />
-
+            <div v-if="queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
+               <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
+               <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
+            </div>
             <VirgoButton v-if="resultStore.hasMoreHits" @click="loadMoreResults">
                <V4Spinner v-if="loadingMore" color="white"/>
                <span v-else>Load More Results</span>
@@ -66,16 +69,24 @@ import V4Sort from "@/components/V4Sort.vue"
 import ExpandSearch from "@/components/ExpandSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
 import { ref,computed } from 'vue'
-import { useRoute } from 'vue-router'
 import { useResultStore } from "@/stores/result"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
+import { usePreferencesStore } from "@/stores/preferences"
+import { useQueryStore } from "@/stores/query"
 import ExcludePool from "./modals/ExcludePool.vue"
+import { useRouteUtils } from '@/composables/routeutils'
+import { useRouter, useRoute } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
+const routeUtils = useRouteUtils(router, route)
+
 const resultStore = useResultStore()
 const poolStore = usePoolStore()
 const filters = useFilterStore()
+const preferences = usePreferencesStore()
+const queryStore = useQueryStore()
 
 const loadingMore = ref(false)
 
@@ -97,6 +108,27 @@ const canExclude = computed(() => {
    console.log("can exclude "+resultStore.selectedResults.pool.id)
    return ( resultStore.selectedResults.pool.id != 'uva_library' &&  resultStore.selectedResults.pool.id != 'images')
 })
+const poolExclusionString = computed( () => {
+   let msg = ""
+   preferences.searchExclusions.forEach( (s, idx) => {
+      if (idx > 0 ) {
+         if ( idx == preferences.searchExclusions.length -1) {
+            msg += " and "
+         } else {
+            msg += ", "
+         }
+      }
+      msg += poolStore.poolDetails( s ).name
+   })
+   return msg
+})
+const removeSearchExclusions = (() => {
+   preferences.removeSearchExclusions()
+   queryStore.userSearched = true
+   queryStore.searchSources = "all"
+   resultStore.searchAllPools()
+})
+
 
 async function retrySearch() {
    resultStore.clearSelectedPoolResults()
@@ -133,6 +165,12 @@ async function loadMoreResults() {
    justify-content: space-between;
    align-items: center;
 }
+.reminder {
+   background: white;
+   border: 1px solid $uva-grey-100;
+   padding: 15px;
+   margin: 20px 0;
+}  
 .desc  {
    padding: 15px 10px 10px 10px;
    border-left: 1px solid $uva-brand-blue;

@@ -21,6 +21,10 @@
             </div>
             <div class="search-mode">
                <router-link tabindex="0" to="/search?mode=advanced">Advanced Search</router-link>
+               <template v-if="userStore.isSignedIn">
+                  <span>|</span>
+                  <router-link tabindex="0" to="/preferences">Search Preferences</router-link>
+               </template>
             </div>
          </template>
          <AdvancedSearch v-else/>
@@ -213,6 +217,10 @@ async function searchClicked() {
    .search-mode {
       text-align: center;
       margin: 10px 0 5px 0;
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: center;
+      gap: 20px;
    }
 }
 

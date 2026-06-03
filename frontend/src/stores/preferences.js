@@ -102,6 +102,10 @@ export const usePreferencesStore = defineStore('preferences', {
          await this.savePreferences()
          window.location.reload()
       },
+      removeSearchExclusions() {
+         this.searchExclusions = []
+         this.savePreferences()
+      },
       toggleSearchExclusion( poolID ) {
          if (this.searchExclusions.includes(poolID)) {
             this.searchExclusions = this.searchExclusions.filter( pID => pID != poolID)
