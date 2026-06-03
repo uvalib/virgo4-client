@@ -189,7 +189,7 @@ export const useResultStore = defineStore('result', {
          }
       },
 
-      setSearchResults(data, tgtPool) {
+      setSearchResults(data, tgtPool, poolExclusions) {
          // this is called from top level search; resets results from all pools
          const pools = usePoolStore()
          this.total = -1
@@ -198,6 +198,12 @@ export const useResultStore = defineStore('result', {
          let tgtPoolIdx = -1
 
          data.pool_results.forEach((pr, idx) => {
+            // TODO remove me when exclusions are passed to search-ws
+            if (poolExclusions.includes(pr.pool_id)) {
+               console.log("drop results from excluded pool "+pr.pool_id)
+               return
+            }
+            
             if (!pr.group_list) {
                pr.group_list = []
             }
@@ -375,7 +381,7 @@ export const useResultStore = defineStore('result', {
          // POST the search query and wait for the response
          await axios.post(`${system.searchAPI}/api/search`, req).then((response) => {
             poolStore.setPools(response.data.pools)
-            this.setSearchResults( response.data, query.targetPool )
+            this.setSearchResults( response.data, query.targetPool,  prefs.searchExclusions)
             sorting.setActivePool( this.results[this.selectedResultsIdx].pool.id )
             this.setSearching(false)
             if ( response.data.total_hits == 0) {
