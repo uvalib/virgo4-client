@@ -130,7 +130,6 @@ const sourceTabs = computed(()=>{
    // get all non-excluded primary (catalog, images, articles) and other pools
    resultStore.results.forEach( r => {
       if ( preferences.searchExclusions.includes(r.pool.id) == false ) {
-         console.log(`POOL ${r.pool.id} PRIMARY: ${r.pool.primary}`)
          if (r.pool.primary ) {
             tabs.push(r)
          } else {

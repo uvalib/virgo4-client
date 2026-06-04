@@ -364,7 +364,9 @@ export const useResultStore = defineStore('result', {
             pagination: { start: 0, rows: this.pageSize },
             filters: filters.allPoolFilters,
             pool_sorting: sorting.pools,
-            exclude_pools: prefs.searchExclusions
+            preferences: {
+               exclude_pools: prefs.searchExclusions
+            }
          }
 
          if (req.query == "") {

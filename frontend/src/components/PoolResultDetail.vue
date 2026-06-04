@@ -69,6 +69,7 @@ import V4Sort from "@/components/V4Sort.vue"
 import ExpandSearch from "@/components/ExpandSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
 import { ref,computed } from 'vue'
+import { useUserStore } from "@/stores/user"
 import { useResultStore } from "@/stores/result"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
@@ -88,6 +89,7 @@ const poolStore = usePoolStore()
 const filters = useFilterStore()
 const preferences = usePreferencesStore()
 const queryStore = useQueryStore()
+const user = useUserStore()
 
 const loadingMore = ref(false)
 
@@ -105,12 +107,15 @@ const selectedResults = computed(()=>{
 })
 
 const canExclude = computed(() => {
-   if ( !resultStore.selectedResults ) return
-   console.log("can exclude "+resultStore.selectedResults.pool.id)
+   if ( !resultStore.selectedResults ) return false
+   if ( user.isSignedIn == false ) return false
    return ( resultStore.selectedResults.pool.id != 'uva_library' &&  resultStore.selectedResults.pool.id != 'images')
 })
 const poolExclusionString = computed( () => {
    let msg = ""
+   // NOTES: if a pool has been set as excluded in preferences and that pool
+   // is later diabled at a system level in the sources table (or it fails identify), it will no longer
+   // be in the poolStore and the detals lookup will fail. Must handle this case
    preferences.searchExclusions.forEach( (s, idx) => {
       if (idx > 0 ) {
          if ( idx == preferences.searchExclusions.length -1) {
@@ -119,7 +124,11 @@ const poolExclusionString = computed( () => {
             msg += ", "
          }
       }
-      msg += poolStore.poolDetails( s ).name
+      console.log("lookup details for excluded pool "+s)
+      let detail = poolStore.poolDetails( s )
+      if ( detail != null && detail.name  ) {
+         msg += detail.name
+      }
    })
    return msg
 })
