@@ -197,13 +197,7 @@ export const useResultStore = defineStore('result', {
          let firstPoolWithHits = -1
          let tgtPoolIdx = -1
 
-         data.pool_results.forEach((pr, idx) => {
-            // TODO remove me when exclusions are passed to search-ws
-            if (poolExclusions.includes(pr.pool_id)) {
-               console.log("drop results from excluded pool "+pr.pool_id)
-               return
-            }
-            
+         data.pool_results.forEach((pr, idx) => {         
             if (!pr.group_list) {
                pr.group_list = []
             }

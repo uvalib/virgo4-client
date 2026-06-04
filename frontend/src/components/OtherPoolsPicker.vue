@@ -25,14 +25,12 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
-import { usePreferencesStore } from "@/stores/preferences"
 import Select from 'primevue/select'
 import { storeToRefs } from "pinia"
 import * as utils from '../utils'
 
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
-const preferences = usePreferencesStore()
 
 const selectedPoolID = ref("")
 
@@ -54,18 +52,16 @@ onMounted( () =>{
 
 const pools = computed(()=>{
    let opts = []
-   resultStore.results.forEach( r => {
-      if ( r.pool.primary == false && preferences.searchExclusions.includes(r.pool.id) == false) {
-         let opt = {  pool: {id: r.pool.id, name: r.pool.name}, failed: false, skipped: false, total: 0}
-         if (poolFailed(r)) {
-            opt.failed = true
-         } else if (poolSkipped(r)) {
-            opt.skipped = true
-         } else {
-            opt.total = utils.formatNum(r.total)
-         }
-         opts.push(opt)
+   resultStore.results.filter( r => r.pool.primary == false).forEach( r => {
+      let opt = {  pool: {id: r.pool.id, name: r.pool.name}, failed: false, skipped: false, total: 0}
+      if (poolFailed(r)) {
+         opt.failed = true
+      } else if (poolSkipped(r)) {
+         opt.skipped = true
+      } else {
+         opt.total = utils.formatNum(r.total)
       }
+      opts.push(opt)
    })
 
    return opts.sort( (a,b) => {

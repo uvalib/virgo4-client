@@ -50,7 +50,6 @@ import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useSuggestorStore } from "@/stores/suggestor"
-import { usePreferencesStore } from "@/stores/preferences"
 import { useUserStore } from "@/stores/user"
 import { scrollToItem } from '@/utils'
 import { useRouteUtils } from '@/composables/routeutils'
@@ -63,7 +62,6 @@ const resultStore = useResultStore()
 const systemStore = useSystemStore()
 const suggestor = useSuggestorStore()
 const user = useUserStore()
-const preferences = usePreferencesStore()
 
 const printStyle = `
 <style type="text/css">
@@ -129,12 +127,10 @@ const sourceTabs = computed(()=>{
    let other = []
    // get all non-excluded primary (catalog, images, articles) and other pools
    resultStore.results.forEach( r => {
-      if ( preferences.searchExclusions.includes(r.pool.id) == false ) {
-         if (r.pool.primary ) {
-            tabs.push(r)
-         } else {
-            other.push(r)
-         }
+      if (r.pool.primary ) {
+         tabs.push(r)
+      } else {
+         other.push(r)
       }
    })
 
