@@ -24,6 +24,7 @@ export const useResultStore = defineStore('result', {
       selectedHitGroupIdx: -1,
       lastSearchScrollPosition: 0,
       lastSearchURL: "",
+      ignoreExclusion: ""
    }),
 
    getters: {
@@ -353,15 +354,19 @@ export const useResultStore = defineStore('result', {
          const prefs = usePreferencesStore()
 
          system.clearMessage()
+
+         // NOTE: when clicking a saved search, the target pool is set in ignoreExclusion.
+         // This pool filtered out of the exclusion for this search, then reset
          let req = {
             query: query.string,
             pagination: { start: 0, rows: this.pageSize },
             filters: filters.allPoolFilters,
             pool_sorting: sorting.pools,
             preferences: {
-               exclude_pools: prefs.searchExclusions
+               exclude_pools: prefs.searchExclusions.filter( e => e != this.ignoreExclusion)
             }
          }
+         this.ignoreExclusion = ""
 
          if (req.query == "") {
             let err = {message: 'EMPTY QUERY', caller: 'searchAllPools', query: query.stateObject}

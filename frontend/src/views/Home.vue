@@ -43,18 +43,20 @@ import SourceSelector from "@/components/SourceSelector.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import { scrollToItem } from '@/utils'
 import analytics from '@/analytics'
-import { onMounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { onBeforeMount, computed } from 'vue'
+import { useRouter, useRoute, parseQuery } from 'vue-router'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useRestoreStore } from "@/stores/restore"
 import { useSystemStore } from "@/stores/system"
 import { useSearchStore } from "@/stores/search"
 import { useUserStore } from "@/stores/user"
+import { usePreferencesStore } from "@/stores/preferences"
 import { usePoolStore } from "@/stores/pool"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { watchDeep } from '@vueuse/core'
 import { useRouteUtils } from '@/composables/routeutils'
+import axios from 'axios'
 
 const router = useRouter()
 const route = useRoute()
@@ -66,6 +68,8 @@ const systemStore = useSystemStore()
 const searchStore = useSearchStore()
 const userStore = useUserStore()
 const poolStore = usePoolStore()
+const preferences = usePreferencesStore()
+
 const { polite, assertive } = useAnnouncer()
 
 
@@ -80,8 +84,9 @@ function setPageTitle() {
    }
 }
 
+// NOTE: this catches raoute changes after the initial page load. Initial route is handled onBeforeMount
 watchDeep( route, () => {
-   console.log("NEW HOME ROUTE "+ route.fullPath)
+   console.log("SEARCH CHANGED: "+ route.fullPath)
    if ( queryStore.userSearched && userStore.isSignedIn) {
       searchStore.updateHistory(userStore.signedInUser, route.fullPath)
    }
@@ -89,22 +94,37 @@ watchDeep( route, () => {
    setPageTitle()
 })
 
-onMounted( async () =>{
+onBeforeMount( async () => { 
+   console.log("INITIAL ROUTE: "+route.fullPath)
+
    // When restoring a saved search, the call will be /search/:token
-   let token = route.params.id
+   const token = route.params.id
    if ( token ) {
       // Load the search from the token and restore it
-      await queryStore.loadSearch(token)
-   }
-   if ( route.query.pool ) {
-      // if a pool is set on initial page load, narrow the search to just that pool
-      queryStore.searchSources = route.query.pool
-   }
-   handleQueryParamChange()
-   setPageTitle()
+      axios.get(`/api/searches/${token}`).then( (response) => {
+         if (response.data.url == "") {
+            router.push("/not_found")
+         } else {
+            // This will trigger the route watcher which will do the interpretation of the params and initiate search
+            const tgtPool =  parseQuery(response.data.url ).pool
+            queryStore.searchSources = tgtPool
+            resultStore.ignoreExclusion = tgtPool
+            router.replace( response.data.url ) 
+         }
+      }).catch (( error ) => {
+         router.push("/not_found")
+      })
+   } else {
+      if ( route.query.pool ) {
+         // if a pool is set on initial page load, narrow the search to just that pool
+         queryStore.searchSources = route.query.pool
+      }
+      handleQueryParamChange()
+      setPageTitle()
 
-   if ( queryStore.mode == "basic") {
-      polite(`virgo search has loaded`)
+      if ( queryStore.mode == "basic") {
+         polite(`virgo search has loaded`)
+      }
    }
 })
 
