@@ -100,7 +100,7 @@ const modelOptions = [
 ]
 
 const save = ( async () => {
-   await preferences.saveAIPrompt()
+   await preferences.save()
    system.setToast("Success", "Your suggestor configuration has been saved.")
    
    // since settings have changed, purge the suggestor cache

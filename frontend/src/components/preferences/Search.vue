@@ -8,7 +8,7 @@
          </p>
          <div class="check">
             <label>
-               <input id="collapse-pref" @change="collapseGroupsClicked" class="choice" :checked="preferencesStore.collapseGroups" type="checkbox"
+               <input id="collapse-pref" @change="collapseGroupsClicked" class="choice" :checked="preferences.collapseGroups" type="checkbox"
                   aria-label="toggle barcode group collapse functionality"/>Collapse Grouped Results
             </label>
             <Message variant="simple" severity="success" v-if="saved=='groups'" :life="2000" >Saved</Message>
@@ -21,7 +21,7 @@
          </p>
          <div class="check">
             <label>
-               <input id="full-detail-pref" @change="fullDetailClicked" class="choice" :checked="preferencesStore.expandDetails" type="checkbox"
+               <input id="full-detail-pref" @change="fullDetailClicked" class="choice" :checked="preferences.expandDetails" type="checkbox"
                   aria-label="toggle display of full item details"/>Expand Item Details
             </label>
             <Message variant="simple" severity="success" v-if="saved=='expand'" :life="2000" >Saved</Message>
@@ -31,7 +31,7 @@
          <h4>Exclude from search</h4>
          <div v-for="p in pools.canExcludeList" class="check">
             <label>
-               <input id="full-detail-pref" @change="toggleSearchExclude(p.id)" class="choice" :checked="preferencesStore.isPoolExcluded(p.id)" type="checkbox"
+               <input id="full-detail-pref" @change="toggleSearchExclude(p.id)" class="choice" :checked="preferences.isPoolExcluded(p.id)" type="checkbox"
                   aria-label="toggle display of full item details"/>{{ p.name }}
             </label>
          </div>
@@ -48,31 +48,31 @@ import { useQueryStore } from "@/stores/query"
 import Message from 'primevue/message'
 import analytics from '@/analytics'
 
-const preferencesStore = usePreferencesStore()
+const preferences = usePreferencesStore()
 const pools = usePoolStore()
 const queryStore = useQueryStore()
 const saved = ref("")
 
-const collapseGroupsClicked = (() => {
-   preferencesStore.toggleCollapseGroups()
+const collapseGroupsClicked = ( async () => {
+   await preferences.toggleCollapseGroups()
    saved.value = "groups"
    setTimeout( ()=>{ saved.value = "" }, 2100)
 })
 
-const toggleSearchExclude = (( poolID) => {
-   preferencesStore.toggleSearchExclusion(poolID)
+const toggleSearchExclude = ( async (poolID) => {
+   await preferences.toggleSearchExclusion(poolID)
    saved.value = "exclude"
    setTimeout( ()=>{ saved.value = "" }, 2100)
    queryStore.searchSources  = "all"
-   if (preferencesStore.isPoolExcluded(poolID)) {
+   if (preferences.isPoolExcluded(poolID)) {
       analytics.trigger('Preferences', 'ADD_POOL_EXCLUSION', poolID)
    } else {
       analytics.trigger('Preferences', 'REMOVE_POOL_EXCLUSION', poolID)   
    }
 })
 
-const fullDetailClicked = (() => {
-   preferencesStore.toggleExpandDetails()
+const fullDetailClicked = ( async () => {
+   await preferences.toggleExpandDetails()
    saved.value = "expand"
    setTimeout( ()=>{ saved.value = "" }, 2100)
 })

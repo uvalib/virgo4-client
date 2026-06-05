@@ -14,7 +14,7 @@
          </p>
 
          <label for="pickup-sel">Pickup location:
-            <select v-model="preferencesStore.pickupLibrary" id="pickup-sel"  @change="update">
+            <select v-model="tgtLibrary" id="pickup-sel"  @change="update">
                <option :value="{id:'', name:''}">Select a location</option>
                <option v-for="l in userStore.libraries" :key="l.id" :value="l">{{l.name}}</option>
             </select>
@@ -30,16 +30,16 @@ import { useUserStore }  from "@/stores/user"
 import { ref } from 'vue'
 import Message from 'primevue/message'
 
-const preferencesStore = usePreferencesStore()
+const preferences = usePreferencesStore()
 const userStore = useUserStore()
 const showSaved = ref(false)
+const tgtLibrary = ref(preferences.pickupLibrary)
 
-function update() {
-   preferencesStore.savePreferences().then(() => {
-      showSaved.value = true
-      setTimeout( ()=>{showSaved.value = false}, 2100)
-   })
-}
+const update = ( async () => {
+   await preferences.updatePickupLibrary(tgtLibrary.value)
+   showSaved.value = true
+   setTimeout( ()=>{showSaved.value = false}, 2100)
+})
 </script>
 
 <style lang="scss" scoped>

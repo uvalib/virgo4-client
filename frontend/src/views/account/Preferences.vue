@@ -28,13 +28,13 @@ import { onMounted } from 'vue'
 import analytics from '@/analytics'
 
 const userStore = useUserStore()
-const preferencesStore = usePreferencesStore()
+const preferences = usePreferencesStore()
 const poolStore = usePoolStore()
 
 onMounted( async () => {
    if ( userStore.isSignedIn) {
       analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
-      await preferencesStore.loadPreferences()
+      await preferences.load()
    }
 })
 </script>
