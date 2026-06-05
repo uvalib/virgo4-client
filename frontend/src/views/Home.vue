@@ -118,7 +118,7 @@ onBeforeMount( async () => {
       if ( route.query.pool ) {
          // if a pool is set on initial page load, narrow the search to just that pool and temporarily ignore exclusions
          queryStore.searchSources = route.query.pool
-         resultStore.ignoreExclusion = tgtPool
+         resultStore.ignoreExclusion = route.query.pool
       }
       handleQueryParamChange()
       setPageTitle()
