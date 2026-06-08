@@ -172,6 +172,7 @@ func main() {
 	// based on no-history config setup info here:
 	//    https://router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations
 	router.NoRoute(func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache")
 		c.File("./public/index.html")
 	})
 
