@@ -38,6 +38,17 @@
                         of {{ requestStore.requestStats.remediationLimit }} PDF remediation requests at a time.
                      </div>
                   </div>
+                  <div class="important ra-box ra-fiy">
+                     <div>
+                        <b>Important</b>: You are limited to 10 active PDF remediation requests and {{ requestStore.requestStats.otherRequestsLimit }} ILL and/or scan requests at a time.
+                     </div>
+                     <div>
+                        Information about these limits can be found 
+                        <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
+                           here<i aria-hidden="true" class="link-icon fal fa-external-link-alt">.</i>
+                        </a>
+                     </div>
+                  </div>
                   <h4>For course materials</h4>
                   <div>
                      <ul>
@@ -438,6 +449,12 @@ onMounted(() =>{
    }
    .subcontent.no-illiad {
       align-items: flex-start;
+   }
+   .important {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
    }
    .subcontent {
       margin-bottom: 0px;
