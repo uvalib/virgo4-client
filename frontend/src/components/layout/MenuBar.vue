@@ -96,9 +96,11 @@ const alertClicked =(() => {
 })
 
 const searchClicked = (() => {
-   router.push("/")
-   query.setBasicSearch()
    results.resetSearch()
+   query.searchSources = "all"
+   query.setBasicSearch()
+   router.push("/")
+  
    window.scrollTo({
       top: 0,
       behavior: "auto"

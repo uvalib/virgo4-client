@@ -281,6 +281,7 @@ export const useResultStore = defineStore('result', {
          this.selectedHitIdx = -1
          this.selectedHitGroupIdx = -1
          this.selectedResultsIdx = 0
+         this.ignoreExclusion = ""
       },
 
       resetSearch() {
