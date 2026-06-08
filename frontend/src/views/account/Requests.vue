@@ -25,25 +25,26 @@
                      To request an item for pickup, click the &quot;<strong>Request item</strong>&quot; button in the item's record and follow the prompts. This option will not be available for all items.
                   </div>
                   <div class="errors" v-if="requestStore.otherRequestsDisabled || requestStore.isRemediateDisabled">
-                  <div class="reason ils-error" v-if="requestStore.otherRequestsDisabled">
-                     <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
-                        You've reached the active request limit<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
-                     </a>
-                     of {{ requestStore.requestStats.otherRequestsLimit }} ILL and/or scan requests at a time.
+                     <div class="reason ils-error" v-if="requestStore.otherRequestsDisabled">
+                        <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
+                           You've reached the active request limit<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
+                        </a>
+                        of {{ requestStore.requestStats.otherRequestsLimit }} ILL and/or scan requests at a time.
+                     </div>
+                     <div class="reason ils-error" v-if="requestStore.isRemediateDisabled">
+                        <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
+                           You've reached the active request limit<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
+                        </a>
+                        of {{ requestStore.requestStats.remediationLimit }} PDF remediation requests at a time.
+                     </div>
                   </div>
-                  <div class="reason ils-error" v-if="requestStore.isRemediateDisabled">
-                     <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
-                        You've reached the active request limit<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
-                     </a>
-                     of {{ requestStore.requestStats.remediationLimit }} PDF remediation requests at a time.
-                  </div>
-               </div>
                   <h4>For course materials</h4>
                   <div>
                      <ul>
                         <li>
                            <a href="#" @click="instructionalScanClick">Make an instructional scanning request</a>
-                           for course materials or for materials posted to Canvas. </li>
+                           for course materials or for materials posted to Canvas. 
+                        </li>
                         <li>
                            <a href="#" @click="pdfRemediationClick">Make a PDF remediation request</a>
                            for updating or improving the accessibility of an older scan made from sources available in the UVA Library collection.

@@ -206,6 +206,21 @@ func (svc *ServiceContext) CreateStandaloneBorrowRequest(c *gin.Context) {
 		return
 	}
 
+	// Check and enforce request limits
+	log.Printf("INFO: get standalone request counts for %s", v4Claims.UserID)
+	requestsInfo, cntErr := svc.getStandaloneRequestStats(v4Claims.UserID, v4Claims.Profile)
+	if cntErr != nil {
+		log.Printf("ERROR: unable to check standalone request count: %s", cntErr.Message)
+		c.String(http.StatusInternalServerError, cntErr.Message)
+		return
+	}
+	if requestsInfo.RequestCount >= requestsInfo.RequestLimit {
+		log.Printf("INFO: %s makes standalone borrow request with %d outstanding, which exceeds the limit (%d); rejected",
+			v4Claims.UserID, requestsInfo.RequestCount, requestsInfo.RequestLimit)
+		c.String(http.StatusBadRequest, fmt.Sprintf("you have exceeded the request limit (%d)", requestsInfo.RequestLimit))
+		return
+	}
+
 	log.Printf("Process borrow from %s for %s '%s'", v4Claims.UserID, req.BorrowType, req.Title)
 	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Loan", ProcessType: "Borrowing"}
 	borrowReq := illiadBorrowRequest{LoanTitle: req.Title, LoanAuthor: req.Author, LoanDate: req.Year,
@@ -322,6 +337,21 @@ func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 	jwtIface, _ := c.Get("jwt")
 	jwt, _ := jwtIface.(string)
 
+	// Check and enforce request limits
+	log.Printf("INFO: get pdf remediation request counts for %s", v4Claims.UserID)
+	remediateInfo, cntErr := svc.getPDFRequestStats(v4Claims.UserID)
+	if cntErr != nil {
+		log.Printf("ERROR: unable to check pdf remediation request count: %s", cntErr.Message)
+		c.String(http.StatusInternalServerError, cntErr.Message)
+		return
+	}
+	if remediateInfo.RequestCount >= remediateInfo.RequestLimit {
+		log.Printf("INFO: %s requests pdf remediation with %d outstanding reuests with limit %d; rejected",
+			v4Claims.UserID, remediateInfo.RequestCount, remediateInfo.RequestLimit)
+		c.String(http.StatusBadRequest, fmt.Sprintf("you have exceeded the request limit (%d)", remediateInfo.RequestLimit))
+		return
+	}
+
 	// pull required data from form fields
 	work := formData.Value["work"][0]
 	title := formData.Value["title"][0]
@@ -417,6 +447,11 @@ func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
 }
 
+type requestLimitInfo struct {
+	RequestCount int
+	RequestLimit int
+}
+
 func (svc *ServiceContext) getOutstandingStandaloneRequests(c *gin.Context) {
 	v4Claims, _ := getJWTClaims(c)
 	resp := struct {
@@ -429,39 +464,34 @@ func (svc *ServiceContext) getOutstandingStandaloneRequests(c *gin.Context) {
 	}{}
 
 	log.Printf("INFO: get standalone request counts for %s", v4Claims.UserID)
-	remediateCnt, err := svc.getOutstandingRemediationRequestCount(v4Claims.UserID)
+	pdfInfo, err := svc.getPDFRequestStats(v4Claims.UserID)
 	if err != nil {
 		log.Printf("ERROR: unable to get remediation request count: %s", err.Message)
 		c.String(http.StatusInternalServerError, err.Message)
 		return
 	}
 
-	log.Printf("INFO: user %s has %d outstanding remediation requests", v4Claims.UserID, remediateCnt)
-	resp.RemediationRequests = remediateCnt
-	resp.RemediationLimit = 10
+	log.Printf("INFO: user %s has %d outstanding remediation requests", v4Claims.UserID, pdfInfo.RequestCount)
+	resp.RemediationRequests = pdfInfo.RequestCount
+	resp.RemediationLimit = pdfInfo.RequestLimit
 	resp.RemediationDisabled = (resp.RemediationRequests >= resp.RemediationLimit)
 
-	otherCnt, err := svc.getOutstandingOtherRequestsCount(v4Claims.UserID)
+	otherInfo, err := svc.getStandaloneRequestStats(v4Claims.UserID, v4Claims.Profile)
 	if err != nil {
 		log.Printf("ERROR: unable to get other requests count: %s", err.Message)
 		c.String(http.StatusInternalServerError, err.Message)
 		return
 	}
 
-	// The active request limit by user status should: FACULTY: 50, GRADUATE: 25, EMPLOYEE: 25, UNDERGRAD: 25.
-	reqLimit := 25
-	if strings.EqualFold(v4Claims.Profile, "FACULTY") {
-		reqLimit = 50
-	}
-	log.Printf("INFO: user %s has %d outstanding non-remediation requests", v4Claims.UserID, otherCnt)
-	resp.OtherRequests = otherCnt
-	resp.OtherRequestsLimit = reqLimit
+	log.Printf("INFO: user %s has %d outstanding non-remediation requests", v4Claims.UserID, otherInfo.RequestCount)
+	resp.OtherRequests = otherInfo.RequestCount
+	resp.OtherRequestsLimit = otherInfo.RequestLimit
 	resp.OtherRequestsDisabled = (resp.OtherRequests >= resp.OtherRequestsLimit)
 
 	c.JSON(http.StatusOK, resp)
 }
 
-func (svc *ServiceContext) getOutstandingRemediationRequestCount(userID string) (int, *RequestError) {
+func (svc *ServiceContext) getPDFRequestStats(userID string) (*requestLimitInfo, *RequestError) {
 	log.Printf("INFO: get pdf remediation count for %s", userID)
 
 	// Users are only allowed a maximum of 5 active PDF remediation requests.
@@ -480,19 +510,24 @@ func (svc *ServiceContext) getOutstandingRemediationRequestCount(userID string) 
 	queryURI := fmt.Sprintf("/Transaction/UserRequests/%s?%s", userID, filterStr)
 	resp, respErr := svc.ILLiadRequest("GET", queryURI, nil)
 	if respErr != nil {
-		return 0, respErr
+		return nil, respErr
 	}
 
 	var parsed []any
 	parseErr := json.Unmarshal(resp, &parsed)
 	if parseErr != nil {
-		return 0, &RequestError{StatusCode: http.StatusInternalServerError, Message: parseErr.Error()}
+		return nil, &RequestError{StatusCode: http.StatusInternalServerError, Message: parseErr.Error()}
 	}
 
-	return len(parsed), nil
+	info := requestLimitInfo{
+		RequestCount: len(parsed),
+		RequestLimit: 10,
+	}
+
+	return &info, nil
 }
 
-func (svc *ServiceContext) getOutstandingOtherRequestsCount(userID string) (int, *RequestError) {
+func (svc *ServiceContext) getStandaloneRequestStats(userID string, profile string) (*requestLimitInfo, *RequestError) {
 	log.Printf("INFO: get other standalone requests counts for %s", userID)
 
 	// Active requests are identified by TransactionStatus NOT matching the list below
@@ -508,16 +543,27 @@ func (svc *ServiceContext) getOutstandingOtherRequestsCount(userID string) (int,
 	queryURI := fmt.Sprintf("/Transaction/UserRequests/%s?%s", userID, filterStr)
 	resp, respErr := svc.ILLiadRequest("GET", queryURI, nil)
 	if respErr != nil {
-		return 0, respErr
+		return nil, respErr
 	}
 
 	var parsed []any
 	parseErr := json.Unmarshal(resp, &parsed)
 	if parseErr != nil {
-		return 0, &RequestError{StatusCode: http.StatusInternalServerError, Message: parseErr.Error()}
+		return nil, &RequestError{StatusCode: http.StatusInternalServerError, Message: parseErr.Error()}
 	}
 
-	return len(parsed), nil
+	// The active request limit by user status should: FACULTY: 50, GRADUATE: 25, EMPLOYEE: 25, UNDERGRAD: 25.
+	info := requestLimitInfo{
+		RequestCount: len(parsed),
+		RequestLimit: 25,
+	}
+
+	if strings.EqualFold(profile, "FACULTY") {
+		log.Printf("INFO: %s is faculty and has a higher request limit", userID)
+		info.RequestLimit = 50
+	}
+
+	return &info, nil
 }
 
 // CreateStandaloneScan send a request for a standalone scan to ILLiad
@@ -552,6 +598,21 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	if error != nil {
 		log.Printf("ERROR: %s", error.Error())
 		c.String(http.StatusUnauthorized, error.Error())
+		return
+	}
+
+	// Check and enforce request limits
+	log.Printf("INFO: get standalone request counts for %s", v4Claims.UserID)
+	requestsInfo, cntErr := svc.getStandaloneRequestStats(v4Claims.UserID, v4Claims.Profile)
+	if cntErr != nil {
+		log.Printf("ERROR: unable to check standalone request count: %s", cntErr.Message)
+		c.String(http.StatusInternalServerError, cntErr.Message)
+		return
+	}
+	if requestsInfo.RequestCount >= requestsInfo.RequestLimit {
+		log.Printf("INFO: %s makes standalone scan request with %d outstanding, which exceeds the limit (%d); rejected",
+			v4Claims.UserID, requestsInfo.RequestCount, requestsInfo.RequestLimit)
+		c.String(http.StatusBadRequest, fmt.Sprintf("you have exceeded the request limit (%d)", requestsInfo.RequestLimit))
 		return
 	}
 
