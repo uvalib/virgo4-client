@@ -45,7 +45,7 @@
                      <div>
                         Information about these limits can be found 
                         <a href="https://library.virginia.edu/services/ils/iss#limit " target="_blank">
-                           here<i aria-hidden="true" class="link-icon fal fa-external-link-alt">.</i>
+                           here.<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                         </a>
                      </div>
                   </div>
