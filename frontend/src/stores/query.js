@@ -274,20 +274,5 @@ export const useQueryStore = defineStore('query', {
          this.targetPool = ""
          this.searchSources = "all"
       },
-
-      async loadSearch(token) {
-         try {
-            let response = await axios.get(`/api/searches/${token}`)
-            let searchURL = response.data.url
-            if (searchURL == "") {
-               this.router.push("/not_found")
-            } else {
-               await this.router.replace(searchURL)
-            }
-         } catch(error) {
-            console.error(error)
-            this.router.push("/not_found")
-         }
-      }
    }
 })

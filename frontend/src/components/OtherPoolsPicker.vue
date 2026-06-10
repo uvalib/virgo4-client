@@ -52,13 +52,7 @@ onMounted( () =>{
 
 const pools = computed(()=>{
    let opts = []
-   let others = resultStore.results.slice(systemStore.maxPoolTabs).sort( (a,b) => {
-      if (a.pool.name < b.pool.name) return -1
-      if (a.pool.name > b.pool.name) return 1
-      return 0
-   })
-
-   others.forEach( r=>{
+   resultStore.results.filter( r => r.pool.primary == false).forEach( r => {
       let opt = {  pool: {id: r.pool.id, name: r.pool.name}, failed: false, skipped: false, total: 0}
       if (poolFailed(r)) {
          opt.failed = true
@@ -69,7 +63,12 @@ const pools = computed(()=>{
       }
       opts.push(opt)
    })
-   return opts
+
+   return opts.sort( (a,b) => {
+      if (a.pool.name < b.pool.name) return -1
+      if (a.pool.name > b.pool.name) return 1
+      return 0
+   })
 })
 
 const selection = computed (() => {

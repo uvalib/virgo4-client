@@ -13,7 +13,7 @@
             >
             <span>Catalog Only</span>
          </label>
-         <label for="search-articles">
+         <label for="search-articles" v-if="preferences.isPoolExcluded('articles') == false">
             <input @click="sourcesClicked('articles')" id="search-articles" type="radio"
                v-model="queryStore.searchSources" value="articles" name="sources"
             >
@@ -33,6 +33,9 @@ import { useQueryStore } from "@/stores/query"
 import { useRouter, useRoute } from 'vue-router'
 import analytics from '@/analytics'
 import { useRouteUtils } from '@/composables/routeutils'
+import { usePreferencesStore } from "@/stores/preferences"
+
+const preferences = usePreferencesStore()
 
 const props = defineProps({
    help: {

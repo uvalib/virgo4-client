@@ -24,6 +24,7 @@ export const useResultStore = defineStore('result', {
       selectedHitGroupIdx: -1,
       lastSearchScrollPosition: 0,
       lastSearchURL: "",
+      ignoreExclusion: ""
    }),
 
    getters: {
@@ -189,7 +190,7 @@ export const useResultStore = defineStore('result', {
          }
       },
 
-      setSearchResults(data, tgtPool) {
+      setSearchResults(data, tgtPool, poolExclusions) {
          // this is called from top level search; resets results from all pools
          const pools = usePoolStore()
          this.total = -1
@@ -197,7 +198,7 @@ export const useResultStore = defineStore('result', {
          let firstPoolWithHits = -1
          let tgtPoolIdx = -1
 
-         data.pool_results.forEach((pr, idx) => {
+         data.pool_results.forEach((pr, idx) => {         
             if (!pr.group_list) {
                pr.group_list = []
             }
@@ -280,6 +281,7 @@ export const useResultStore = defineStore('result', {
          this.selectedHitIdx = -1
          this.selectedHitGroupIdx = -1
          this.selectedResultsIdx = 0
+         this.ignoreExclusion = ""
       },
 
       resetSearch() {
@@ -353,12 +355,19 @@ export const useResultStore = defineStore('result', {
          const prefs = usePreferencesStore()
 
          system.clearMessage()
+
+         // NOTE: when clicking a saved search, the target pool is set in ignoreExclusion.
+         // This pool filtered out of the exclusion for this search, then reset
          let req = {
             query: query.string,
             pagination: { start: 0, rows: this.pageSize },
             filters: filters.allPoolFilters,
             pool_sorting: sorting.pools,
+            preferences: {
+               exclude_pools: prefs.searchExclusions.filter( e => e != this.ignoreExclusion)
+            }
          }
+         this.ignoreExclusion = ""
 
          if (req.query == "") {
             let err = {message: 'EMPTY QUERY', caller: 'searchAllPools', query: query.stateObject}
@@ -375,7 +384,7 @@ export const useResultStore = defineStore('result', {
          // POST the search query and wait for the response
          await axios.post(`${system.searchAPI}/api/search`, req).then((response) => {
             poolStore.setPools(response.data.pools)
-            this.setSearchResults( response.data, query.targetPool )
+            this.setSearchResults( response.data, query.targetPool,  prefs.searchExclusions)
             sorting.setActivePool( this.results[this.selectedResultsIdx].pool.id )
             this.setSearching(false)
             if ( response.data.total_hits == 0) {

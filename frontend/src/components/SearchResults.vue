@@ -27,7 +27,7 @@
                      <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
                   </span>
                </button>
-               <OtherPoolsPicker  v-if="resultStore.results.length > systemStore.maxPoolTabs" @selected="poolSelected" />
+               <OtherPoolsPicker v-if="showMore" @selected="poolSelected" />
             </div>
             <PoolResultDetail />
          </div>
@@ -45,7 +45,7 @@ import SaveSearch from "@/components/modals/SaveSearch.vue"
 import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick, onMounted } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -103,6 +103,8 @@ const printStyle = `
 }
 </style>`
 
+const showMore = ref(resultStore.results.length > systemStore.maxPoolTabs)
+
 
 const canUseSuggestor = computed(() => {
    // If there is no suggestor configured, never show it. If configured,
@@ -121,10 +123,23 @@ const queryString = computed(()=>{
 })
 
 const sourceTabs = computed(()=>{
-   if (resultStore.results.length <= systemStore.maxPoolTabs) {
-      return resultStore.results
+   let tabs = [] 
+   let other = []
+   // get all non-excluded primary (catalog, images, articles) and other pools
+   resultStore.results.forEach( r => {
+      if (r.pool.primary ) {
+         tabs.push(r)
+      } else {
+         other.push(r)
+      }
+   })
+
+   // if there is only 1 in the other list, promote it to a top-level tab and set a flag to remove More
+   if (other.length == 1) {
+      tabs.push( other[0])
+      showMore.value = false
    }
-   return resultStore.results.slice(0, systemStore.maxPoolTabs )
+   return tabs
 })
 
 onMounted( () => {

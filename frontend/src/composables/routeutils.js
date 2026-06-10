@@ -97,6 +97,7 @@ export function useRouteUtils( router,route ) {
       } else {
          // just a pool change, don't force a reload - but facets will reload if marked dirty, or none have previously been loaded
          filters.getSelectedResultFacets(false)
+         resultStore.ignoreExclusion = "" // reset any temporary overrides to avoid unexpected behavior
       }
    })
 

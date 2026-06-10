@@ -8,6 +8,7 @@ export const usePreferencesStore = defineStore('preferences', {
 	state: () => ({
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
+      searchExclusions: [],
       collapseGroups: false,
       expandDetails: false,
       aiDebug: false,
@@ -26,6 +27,11 @@ export const usePreferencesStore = defineStore('preferences', {
    getters: {
       hasSearchTemplate: state => {
          return state.searchTemplate && state.searchTemplate.fields.length > 0
+      },
+      isPoolExcluded: state => {
+         return (poolID) => {
+           return state.searchExclusions.includes(poolID)
+         }
       },
    },
 
@@ -63,6 +69,8 @@ export const usePreferencesStore = defineStore('preferences', {
             this.searchTemplate = prefsObj.searchTemplate
          }
 
+         this.searchExclusions = prefsObj.searchExclusions || []
+
          this.aiDebug = prefsObj.aiDebug || false
          this.aiFeatures = prefsObj.aiFeatures || []
          this.aiModel = prefsObj.aiModel || "default"
@@ -75,12 +83,9 @@ export const usePreferencesStore = defineStore('preferences', {
       clear() {
          this.$reset()
       },
-      async saveAIPrompt() {
-         this.savePreferences()
-      },
       async saveAdvancedSearchTemplate( template ) {
          this.searchTemplate = template
-         this.savePreferences()
+         await this.save()
       },
       async toggleOptOut() {
          const { cookies } = useCookies()
@@ -91,32 +96,50 @@ export const usePreferencesStore = defineStore('preferences', {
          } else {
             cookies.remove("v4_optout")
          }
-         await this.savePreferences()
+         await this.save()
          window.location.reload()
       },
-      toggleCollapseGroups() {
+      async removeSearchExclusions() {
+         this.searchExclusions = []
+         await this.save()
+      },
+      async toggleSearchExclusion( poolID ) {
+         if (this.searchExclusions.includes(poolID)) {
+            this.searchExclusions = this.searchExclusions.filter( pID => pID != poolID)
+         } else {
+            this.searchExclusions.push(poolID)
+         }
+         await this.save()
+      },
+      async toggleCollapseGroups() {
          this.collapseGroups = !this.collapseGroups
-         this.savePreferences()
+         await this.save()
       },
-      toggleExpandDetails() {
+      async toggleExpandDetails() {
          this.expandDetails = !this.expandDetails
-         this.savePreferences()
+         await this.save()
       },
-      async loadPreferences() {
+      async updatePickupLibrary( pl ) {
+         this.pickupLibrary = pl
+         await this.save()
+      },
+      async pickupLibraryDeleted(id) {
+         if (this.pickupLibrary.id == id) {
+            this.pickupLibrary = {id: "", name: ""}
+            await this.save()
+         }
+      },
+      async load() { // TODO CHECK THOS
          const userStore = useUserStore()
          let url = `/api/users/${userStore.signedInUser}/preferences`
-         return axios.get(url).then((response) => {
+         await axios.get(url).then((response) => {
             this.setPreferences(JSON.parse(response.data))
          }).catch((error) => {
             const system = useSystemStore()
             system.setError(error)
         })
       },
-      updatePickupLibrary( pl ) {
-         this.pickupLibrary = pl
-         this.savePreferences()
-      },
-      savePreferences() {
+      async save() {
          const userStore = useUserStore()
          let url = `/api/users/${userStore.signedInUser}/preferences`
          let data = {
@@ -125,6 +148,7 @@ export const usePreferencesStore = defineStore('preferences', {
             collapseGroups: this.collapseGroups,
             expandDetails: this.expandDetails,
             searchTemplate: this.searchTemplate,
+            searchExclusions: this.searchExclusions,
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,
             aiModel: this.aiModel,
@@ -134,12 +158,12 @@ export const usePreferencesStore = defineStore('preferences', {
             aiImageThreshold: this.aiImageThreshold,
             aiBookThreshold: this.aiBookThreshold,
          }
-         return axios.post(url, data)
+         await axios.post(url, data).then( () => {
+            console.log("preferences saved")
+         }).catch( (error) => {
+            const system = useSystemStore()
+            system.setError(error)   
+         })
       },
-      pickupLibraryDeleted(id) {
-         if (this.pickupLibrary.id == id) {
-            this.pickupLibrary = {id: "", name: ""}
-         }
-      }
    }
 })
