@@ -7,7 +7,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@formkit/vue": "^2.0.0",
+    "@formkit/vue": "^2.1.0",
     "@fortawesome/fontawesome-pro": "^7.2.0",
     "@primeuix/themes": "^2.0.3",
     "@vue-a11y/announcer": "^3.1.4",
@@ -18,7 +18,7 @@
     "jwt-decode": "^4.0.0",
     "pinia": "^3.0.4",
     "primevue": "^4.5.5",
-    "vue": "^3.5.35",
+    "vue": "^3.5.38",
     "vue-router": "^5.1.0",
     "vue3-cookies": "^1.0.6",
     "xml-beautifier": "^0.5.0"
