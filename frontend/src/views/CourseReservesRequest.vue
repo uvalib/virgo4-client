@@ -10,8 +10,9 @@
          </p>
       </div>
       <div v-else class="reserves-content">
-         <div class="note important">
-            Please allow 14 days to process requests
+         <div class="ra-box ra-fiy">
+            Please allow 14 days to process requests for the current semester. Early requests are welcomed but may be filled closer to the start of that semester. 
+            Reserve requests are otherwise processed in the order in which they are received.
          </div>
          <div class="note">
             If you need to recommend a purchase or have a personal copy to place on reserve,<br/>please click 'Submit Request' and follow the links on the next page.
