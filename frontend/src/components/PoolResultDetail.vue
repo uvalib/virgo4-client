@@ -48,7 +48,11 @@
          </div>
          <span role="toolbar"  v-if="selectedResults.hits.length > 0">
             <ExpandSearch class="expand-panel" />
-            <div v-if="queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
+            <div v-if="signInRequired" class="reminder">
+               <div>Results from {{ poolExclusionString }} are turned off for guest users.</div>
+                <div><VirgoButton link @click="signInClicked" label="Sign in to see all results" v-focus /></div>
+            </div>
+            <div v-else-if="user.isSignedIn && queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
                <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
                <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
             </div>
@@ -75,6 +79,7 @@ import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useQueryStore } from "@/stores/query"
+import { useRestoreStore } from '@/stores/restore'
 import ExcludePool from "./modals/ExcludePool.vue"
 import { useRouteUtils } from '@/composables/routeutils'
 import { useRouter, useRoute } from 'vue-router'
@@ -90,6 +95,7 @@ const filters = useFilterStore()
 const preferences = usePreferencesStore()
 const queryStore = useQueryStore()
 const user = useUserStore()
+const restore = useRestoreStore()
 
 const loadingMore = ref(false)
 
@@ -104,6 +110,9 @@ const hasURL = computed(()=>{
 })
 const selectedResults = computed(()=>{
    return resultStore.selectedResults
+})
+const signInRequired = computed(()=>{
+   return (user.isSignedIn == false && queryStore.searchSources == "all" )
 })
 
 const canExclude = computed(() => {
@@ -124,7 +133,6 @@ const poolExclusionString = computed( () => {
             msg += ", "
          }
       }
-      console.log("lookup details for excluded pool "+s)
       let detail = poolStore.poolDetails( s )
       if ( detail != null && detail.name  ) {
          msg += detail.name
@@ -140,6 +148,10 @@ const removeSearchExclusions = (() => {
    resultStore.searchAllPools()
 })
 
+const signInClicked = (() => {
+   // restore.setRestoreSaveSearch()
+   router.push("/signin")
+})
 
 async function retrySearch() {
    resultStore.clearSelectedPoolResults()

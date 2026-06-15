@@ -76,6 +76,7 @@ import { useToast } from "primevue/usetoast"
 import { useAlertStore } from "@/stores/alert"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
+import { usePreferencesStore } from "@/stores/preferences"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { useCollectionStore } from "@/stores/collection"
@@ -158,7 +159,10 @@ async function initVirgo() {
             analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
          }
       }
-   } 
+   } else {
+      console.log("user is not authenticated; set default pool exclusion")
+      usePreferencesStore().setGuestPoolExclusions()
+   }
    configuring.value = false
 
    filterStore.getPreSearchFilters()

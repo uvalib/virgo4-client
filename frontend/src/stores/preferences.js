@@ -83,6 +83,10 @@ export const usePreferencesStore = defineStore('preferences', {
       clear() {
          this.$reset()
       },
+      setGuestPoolExclusions() {
+         // by default, guest users cannot search certain pools. Add them to the searchExclusions
+         this.searchExclusions = ["worldcat", "jmrl"]
+      },
       async saveAdvancedSearchTemplate( template ) {
          this.searchTemplate = template
          await this.save()

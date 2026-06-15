@@ -13,7 +13,7 @@
     "@vue-a11y/announcer": "^3.1.4",
     "@vueuse/core": "^14.3.0",
     "@vueuse/integrations": "^14.3.0",
-    "axios": "^1.17.0",
+    "axios": "^1.18.0",
     "firebase": "^12.14.0",
     "jwt-decode": "^4.0.0",
     "pinia": "^3.0.4",

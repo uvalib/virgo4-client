@@ -568,8 +568,10 @@ export const useUserStore = defineStore('user', {
       },
 
       async signout(resetSearch) {
+         const preferences = usePreferencesStore()
          useSuggestorStore().reset()
-         usePreferencesStore().clear()
+         preferences.clear()
+         preferences.setGuestPoolExclusions()
          useBookmarkStore().clear()
          useSearchStore().clear()
          useAlertStore().clearSeenAlerts()
