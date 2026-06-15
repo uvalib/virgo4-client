@@ -251,7 +251,16 @@ func (svc *ServiceContext) CreateStandaloneBorrowRequest(c *gin.Context) {
 		c.String(illErr.StatusCode, IlliadErrorMessage)
 		return
 	}
-	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
+
+	requestsInfo.RequestCount++
+	out := struct {
+		TransactionNumber int               `json:"transactionNum"`
+		Stats             *requestLimitInfo `json:"stats"`
+	}{
+		TransactionNumber: transactionNum,
+		Stats:             requestsInfo,
+	}
+	c.JSON(http.StatusOK, out)
 }
 
 // CreateOpenURLRequest will send an openURL request to ILLiad
@@ -444,12 +453,20 @@ func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
+	remediateInfo.RequestCount++
+	resp := struct {
+		TransactionNumber int               `json:"transactionNum"`
+		Stats             *requestLimitInfo `json:"stats"`
+	}{
+		TransactionNumber: transactionNum,
+		Stats:             remediateInfo,
+	}
+	c.JSON(http.StatusOK, resp)
 }
 
 type requestLimitInfo struct {
-	RequestCount int
-	RequestLimit int
+	RequestCount int `json:"requestCount"`
+	RequestLimit int `json:"requestLimit"`
 }
 
 func (svc *ServiceContext) getOutstandingStandaloneRequests(c *gin.Context) {
@@ -670,7 +687,16 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		c.String(illErr.StatusCode, IlliadErrorMessage)
 		return
 	}
-	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
+
+	requestsInfo.RequestCount++
+	out := struct {
+		TransactionNumber int               `json:"transactionNum"`
+		Stats             *requestLimitInfo `json:"stats"`
+	}{
+		TransactionNumber: transactionNum,
+		Stats:             requestsInfo,
+	}
+	c.JSON(http.StatusOK, out)
 }
 
 func (svc *ServiceContext) createILLiadTransaction(payload any, note string) (int, *RequestError) {
