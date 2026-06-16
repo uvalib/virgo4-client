@@ -164,6 +164,11 @@ func main() {
 	api.POST("/reauth/:uid", svc.refreshAuthentication)
 	api.POST("/signout", svc.signOut)
 
+	router.GET("/", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache")
+		c.File("./public/index.html")
+	})
+
 	// Note: in dev mode, this is never actually used. The front end is served
 	// by yarn and it proxies all requests to the API to the routes above
 	router.Use(static.Serve("/", static.LocalFile("./public", true)))
