@@ -48,14 +48,14 @@
          </div>
          <span role="toolbar"  v-if="selectedResults.hits.length > 0">
             <ExpandSearch class="expand-panel" />
-            <div v-if="signInRequired" class="reminder">
-               <div>Results from {{ poolExclusionString }} are turned off for guest users.</div>
-                <div><VirgoButton link @click="signInClicked" label="Sign in to see all results" v-focus /></div>
-            </div>
-            <div v-else-if="user.isSignedIn && queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
-               <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
-               <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
-            </div>
+               <div v-if="signInRequired" class="reminder">
+                  <div>Results from {{ poolExclusionString }} are turned off for guest users.</div>
+                  <div><VirgoButton link @click="signInClicked" label="Sign in to see all results"/></div>
+               </div>
+               <div v-else-if="user.isSignedIn && queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
+                  <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
+                  <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
+               </div>
             <VirgoButton v-if="resultStore.hasMoreHits" @click="loadMoreResults">
                <V4Spinner v-if="loadingMore" color="white"/>
                <span v-else>Load More Results</span>
