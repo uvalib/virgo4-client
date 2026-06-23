@@ -3,6 +3,10 @@
       <div class="working" v-if="loadingDetails" >
          <V4Spinner message="Looking up details..."/>
       </div>
+      <div class="guest-exclusion" v-else-if="excludedPool">
+         <div>Details for items from {{ excludedPool }} are not available to guest users.</div>
+         <div><VirgoButton link @click="signInClicked" label="Sign in to view details"/></div>
+      </div>
       <template v-else>
          <FullPageCollectionView v-if="collection.isFullPage && item.isCollection && collection.isAvailable" />
          <ItemView v-else />
@@ -14,12 +18,15 @@
 import ItemView from "@/components/details/ItemView.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
 import { onMounted, onUpdated, ref } from 'vue'
-import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { useCollectionStore } from "@/stores/collection"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { useSystemStore } from "@/stores/system"
+import { useUserStore } from "@/stores/user"
+import { usePoolStore } from "@/stores/pool"
+import { usePreferencesStore } from "@/stores/preferences"
 import analytics from '@/analytics'
 
 const collection = useCollectionStore()
@@ -27,8 +34,13 @@ const item = useItemStore()
 const restore = useRestoreStore()
 const bookmarks = useBookmarkStore()
 const system = useSystemStore()
+const user = useUserStore()
+const pools = usePoolStore()
+const preferences = usePreferencesStore()
 const route = useRoute()
+const router = useRouter()
 const loadingDetails = ref(true)
+const excludedPool = ref()
 
 onBeforeRouteUpdate(async (to) => {
    getDetails(to.params.src, to.params.id, false)
@@ -69,6 +81,11 @@ const getDetails = ( async (src, id, initialPage) => {
    }
 })
 
+const signInClicked = (() => {
+   // restore.setRestoreSaveSearch()
+   router.push("/signin")
+})
+
 const getCollectionContext = (async () => {
    if ( item.isCollection || item.isCollectionHead) {
       let collName = item.collectionName
@@ -101,7 +118,14 @@ function zoteroItemUpdated() {
 }
 
 onMounted(()=>{
-   getDetails(route.params.src, route.params.id, true)
+   if (user.isSignedIn == false && preferences.isPoolExcluded(route.params.src)) {
+      console.log(route.params.src+ " is excluded for guest users")
+      excludedPool.value = pools.poolDetails(route.params.src).name
+      console.log(`EXCLUDED [${excludedPool.value}]`)
+      loadingDetails.value = false
+   } else {
+       getDetails(route.params.src, route.params.id, true)
+   }
 })
 
 onUpdated(()=>{
@@ -123,6 +147,28 @@ onUpdated(()=>{
    }
    .working img {
       margin: 30px 0;
+   }
+}
+.guest-exclusion {
+   margin: 0 auto;
+   min-height: 400px;
+   position: relative;
+   text-align: center;
+   padding-top: 5%;
+   div {
+      margin-bottom: 20px;
+      font-size: 1.25rem;
+      font-weight: bold;
+   }
+}
+@media only screen and (min-width: 768px) {
+   div.guest-exclusion  {
+       width: 70%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.guest-exclusion  {
+       width: 95%;
    }
 }
 </style>
