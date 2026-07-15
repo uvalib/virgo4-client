@@ -10,7 +10,7 @@ export const usePreferencesStore = defineStore('preferences', {
       pickupLibrary: {id: "", name: ""},
       searchExclusions: [],
       collapseGroups: false,
-      expandDetails: false,
+      collapseDetails: false,
       aiDebug: false,
       aiFeatures: [],
       aiModel: "default",
@@ -33,6 +33,9 @@ export const usePreferencesStore = defineStore('preferences', {
            return state.searchExclusions.includes(poolID)
          }
       },
+      expandDetails: state => {
+         return !state.collapseDetails
+      }
    },
 
    actions: {
@@ -40,8 +43,8 @@ export const usePreferencesStore = defineStore('preferences', {
          if (prefsObj.collapseGroups ) {
             this.collapseGroups = prefsObj.collapseGroups
          }
-         if (prefsObj.expandDetails ) {
-            this.expandDetails = prefsObj.expandDetails
+         if (prefsObj.collapseDetails ) {
+            this.collapseDetails = prefsObj.collapseDetails
          }
          if ( prefsObj.trackingOptOut) {
             const { cookies } = useCookies()
@@ -119,8 +122,8 @@ export const usePreferencesStore = defineStore('preferences', {
          this.collapseGroups = !this.collapseGroups
          await this.save()
       },
-      async toggleExpandDetails() {
-         this.expandDetails = !this.expandDetails
+      async toggleCollapseDetails() {
+         this.collapseDetails = !this.collapseDetails
          await this.save()
       },
       async updatePickupLibrary( pl ) {
@@ -150,7 +153,7 @@ export const usePreferencesStore = defineStore('preferences', {
             trackingOptOut: this.trackingOptOut,
             pickupLibrary: this.pickupLibrary,
             collapseGroups: this.collapseGroups,
-            expandDetails: this.expandDetails,
+            collapseDetails: this.collapseDetails,
             searchTemplate: this.searchTemplate,
             searchExclusions: this.searchExclusions,
             aiDebug: this.aiDebug,
