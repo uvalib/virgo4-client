@@ -240,8 +240,10 @@ export const useSystemStore = defineStore('system', {
       reportError(data) {
          let err = {
             url: this.router.currentRoute.value.fullPath,
+            priorURL: this.router.options.history.state.back,
             userAgent: navigator.userAgent,
-            error: JSON.stringify(data)
+            error: JSON.stringify(data),
+            stack: (new Error()).stack
          }
          if (err.error == "{}" ) {
             err.error = data.toString()
