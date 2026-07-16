@@ -111,6 +111,7 @@ export function useRouteUtils( router,route ) {
       let newQ = Object.assign({}, route.query)
       newQ.q = queryStore.string
       if (queryStore.mode == "advanced") {
+         newQ.mode = "advanced"  // ensure mode is in the query params
          if ( resultStore.hasResults == false && filters.preSearchFilterApplied ) {
             filters.promotePreSearchFilters()
             newQ.filter = filters.asQueryParam('presearch')
