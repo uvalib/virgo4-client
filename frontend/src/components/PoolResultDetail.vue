@@ -335,6 +335,7 @@ div.pool-header {
       background: white;
       padding: 5px;
       text-align: left;
+      border: 1px solid $uva-grey-100;
       .logo {
          max-height:90px;
          display: inline-block;
