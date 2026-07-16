@@ -168,7 +168,7 @@ const getRelatedLink = ((sug) => {
 })
 
 onMounted(() => {
-   suggestor.fetch( queryStore.string )
+   suggestor.fetch( queryStore.searchString )
 })
 </script>
 

@@ -74,6 +74,12 @@ export const useQueryStore = defineStore('query', {
          }
          return found
       },
+      searchString: state=> {
+         // NOTE: when adding a date filter from the search details page, it is added as an advanced search
+         // term but the field is date_filter instead of date so it can receive special handling. The pool searches
+         // do not understand date_filer, so when the query is used to search, rename date_filter t0 date
+         return state.string.replace("date_filter", "date")
+      }, 
       string: state => {
          // convert into the standard v4 search string format. Ex:
          //     ( calico OR "tortoise shell" ) AND cats =>
@@ -92,14 +98,14 @@ export const useQueryStore = defineStore('query', {
                   // after the first term, use the search op to combine
                   qs += ` ${term.op} `
                }
-               if (term.field == "date") {
+               if (term.field == "date" || term.field == "date_filter") {
                   // special handling for date as it can include a range and a type
                   if (term.comparison == "BETWEEN") {
-                     qs += `date: {${term.value} TO ${term.endVal}}`
+                     qs += `${term.field}: {${term.value} TO ${term.endVal}}`
                   } else if (term.comparison == "EQUAL") {
-                     qs += `date: {${term.value}}`
+                     qs += `${term.field}: {${term.value}}`
                   } else {
-                     qs += `date: {${term.comparison} ${term.value}}`
+                     qs += `${term.field}: {${term.comparison} ${term.value}}`
                   }
                } else {
                   qs += `${term.field}: {${term.value}}`
@@ -120,6 +126,11 @@ export const useQueryStore = defineStore('query', {
          let activeTerms = state.advanced.filter(t => t.value.length > 0)
          if (activeTerms.length == 0) return false
          return activeTerms.every(t => t.field == "keyword")
+      },
+      dateFilter: state => {
+         let f = state.advanced.find( f => f.field == "date_filter" )   
+         if ( f == null ) return null 
+         return {startDate: f.value, comparison: f.comparison, endDate: f.endVal }
       }
    },
    actions: {
@@ -140,6 +151,26 @@ export const useQueryStore = defineStore('query', {
                }
             }
          })
+      },
+      setDateFilter( comparison, startDate, endDate ) {
+         if ( this.mode == "basic" ) {
+            this.setAdvancedSearch()
+         } else {
+            this.removeDateFilter()
+         }
+         // tag the advanced search tem for a date filter differently from a normal date param so it can be handled differently
+         // later (show date on the result detail and not show it as an advanced term)
+         if ( comparison == "BETWEEN") {
+            this.advanced.push({ op: "AND", value: startDate, field: "date_filter", comparison: "BETWEEN", endVal: endDate })
+         } else {
+            this.advanced.push({ op: "AND", value: startDate, field: "date_filter", comparison: comparison, endVal: ""})
+         }
+      },
+      removeDateFilter( ) {
+         let idx = this.advanced.findIndex( f => f.field == "date_filter" )
+         if (idx > -1 ) {
+            this.advanced.splice(idx, 1)
+         }
       },
       resetAdvancedForm() {
          this.advanced.splice(0, this.advanced.length)
@@ -225,7 +256,7 @@ export const useQueryStore = defineStore('query', {
                continue
             }
 
-            if ( term.field == "date" ) {
+            if ( term.field == "date" || term.field == "date_filter" ) {
                // date values have 4 formats: {1988} {AFTER 1988} {BEFORE 1988} {1970 TO 2000}
                if ( value.includes("AFTER") || value.includes("after")  ) {
                   term.comparison = "AFTER"

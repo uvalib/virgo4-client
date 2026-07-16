@@ -359,7 +359,7 @@ export const useResultStore = defineStore('result', {
          // NOTE: when clicking a saved search, the target pool is set in ignoreExclusion.
          // This pool filtered out of the exclusion for this search, then reset
          let req = {
-            query: query.string,
+            query: query.searchString,
             pagination: { start: 0, rows: this.pageSize },
             filters: filters.allPoolFilters,
             pool_sorting: sorting.pools,
@@ -379,7 +379,7 @@ export const useResultStore = defineStore('result', {
          this.lastSearchScrollPosition = 0
          this.lastSearchURL = ""
 
-         useSuggestorStore().fetch( query.string )
+         useSuggestorStore().fetch( query.searchString )
 
          // POST the search query and wait for the response
          await axios.post(`${system.searchAPI}/api/search`, req).then((response) => {
@@ -425,7 +425,7 @@ export const useResultStore = defineStore('result', {
          useCollectionStore().clearCollectionDetails()
          this.setSearching(true)
 
-         useSuggestorStore().fetch( query.string )
+         useSuggestorStore().fetch( query.searchString )
          let filters = filterStore.poolFilter(params.pool.id)
          let sort = sortStore.poolSort(params.pool.id)
          let filterObj = { pool_id: params.pool.id, facets: filters }
@@ -436,7 +436,7 @@ export const useResultStore = defineStore('result', {
          let pagination = { start: startPage * this.pageSize, rows: this.pageSize }
 
          let req = {
-            query: query.string,
+            query: query.searchString,
             pagination: pagination,
             sort: sort,
             filters: [filterObj],
