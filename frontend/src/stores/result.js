@@ -362,7 +362,7 @@ export const useResultStore = defineStore('result', {
             query: query.searchString,
             pagination: { start: 0, rows: this.pageSize },
             filters: filters.allPoolFilters,
-            pool_sorting: sorting.pools,
+            pool_sorting: sorting.poolSort("all"),
             preferences: {
                exclude_pools: prefs.searchExclusions.filter( e => e != this.ignoreExclusion)
             }
@@ -427,7 +427,7 @@ export const useResultStore = defineStore('result', {
 
          useSuggestorStore().fetch( query.searchString )
          let filters = filterStore.poolFilter(params.pool.id)
-         let sort = sortStore.poolSort(params.pool.id)
+         let sort = sortStore.poolSort(params.pool.id) 
          let filterObj = { pool_id: params.pool.id, facets: filters }
          let startPage = params.page
          if (!startPage) {
