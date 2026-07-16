@@ -7,7 +7,7 @@
          <div class="filters-section">
             <div class="filters-head">
                <span class="title">Applied Filters</span>
-               <VirgoButton v-if="hasFilter || hasNaFilter" @click="clearClicked">Clear All</VirgoButton>
+               <VirgoButton v-if="hasFilter || hasNaFilter" @click="clearClicked" label="Clear Applied Filters" severity="secondary" size="small"/>
             </div>
             <dl class="filter-display" v-if="hasFilter">
                <template  v-for="(values, filter) in appliedFilters" :key="`${filter}-values`">
@@ -105,8 +105,7 @@ async function clearClicked() {
 .filters {
    background: white;
    color: $uva-text-color-dark;
-   padding: 5px 5px 10px 5px;
-   margin-top: 5px;
+   padding: 10px;
    border-left: 1px solid $uva-grey-100;
    border-right: 1px solid $uva-grey-100;
    .working {
