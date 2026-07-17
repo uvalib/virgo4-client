@@ -9,6 +9,29 @@
             </a>
              <img v-else class ="logo" :src="poolStore.log(selectedResults.pool.id)">
          </div>
+         <div class="date-wrapper" v-if="canDateFilter">
+            <div class="date-section">
+               <label>Published</label>
+               <div class="date-entry">
+                  <select v-model="dateType" name="date-type" @change="dateTypeChanged">
+                     <option value="AFTER">AFTER</option>
+                     <option value="BEFORE">BEFORE</option>
+                     <option value="BETWEEN">BETWEEN</option>
+                     <option value="EQUAL">IN</option>
+                  </select>
+                  <input v-model="startDate" placeholder="YYYY"/>
+                  <template v-if="dateType == 'BETWEEN'">
+                     <span>and</span>
+                     <input v-model="endDate" placeholder="YYYY"/>
+                  </template>
+               </div>
+               <div class="date-acts">
+                  <VirgoButton label="Apply Date Filter" size="small" @click="applyDateFilterClicked"/>
+                  <VirgoButton label="Clear Date Filter" severity="secondary" size="small" @click="clearDateFilterClicked"/>
+               </div>
+            </div>
+            <div class="error" v-if="dateErr">{{ dateErr }}</div>
+         </div>
          <SearchFilters v-if="hasFacets" />
          <CollectionContext />
          <div class="sort-section">
@@ -72,7 +95,7 @@ import SearchFilters from "@/components/SearchFilters.vue"
 import V4Sort from "@/components/V4Sort.vue"
 import ExpandSearch from "@/components/ExpandSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
-import { ref,computed } from 'vue'
+import { ref,computed, onMounted, watch } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useResultStore } from "@/stores/result"
 import { usePoolStore } from "@/stores/pool"
@@ -84,6 +107,7 @@ import ExcludePool from "./modals/ExcludePool.vue"
 import { useRouteUtils } from '@/composables/routeutils'
 import { useRouter, useRoute } from 'vue-router'
 import analytics from '@/analytics'
+import { storeToRefs } from "pinia"
 
 const route = useRoute()
 const router = useRouter()
@@ -98,7 +122,38 @@ const user = useUserStore()
 const restore = useRestoreStore()
 
 const loadingMore = ref(false)
+const dateType = ref("BETWEEN")
+const startDate = ref("")
+const endDate = ref("")
+const dateErr = ref("")
 
+const { targetPool } = storeToRefs(queryStore)
+watch( targetPool, (newVal) => {
+   updateDateFilter()
+})
+
+onMounted( () => {
+   updateDateFilter()
+})
+
+const updateDateFilter = (() => {
+   if ( queryStore.dateFilter ) {
+      dateType.value = queryStore.dateFilter.comparison
+      startDate.value = queryStore.dateFilter.startDate
+      endDate.value = queryStore.dateFilter.endDate
+   } else {
+      dateType.value = "BETWEEN"
+      startDate.value = ""
+      endDate.value = ""
+      dateErr.value = ""
+   }
+})
+
+const canDateFilter = computed(() => {
+   if (resultStore.selectedResults.pool.mode == 'image') return false
+   if ( hasFacets.value == false ) return false
+   return true
+})
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
 })
@@ -140,6 +195,47 @@ const poolExclusionString = computed( () => {
    })
    return msg
 })
+
+const dateTypeChanged = (() => {
+   dateErr.value = ""
+   if ( dateType.value != "BETWEEN" ) {
+      endDate.value = ""
+   }   
+})
+
+const clearDateFilterClicked = (() => {
+   dateType.value = "BETWEEN"
+   startDate.value = ""
+   endDate.value = ""
+   dateErr.value = ""
+   queryStore.removeDateFilter( resultStore.selectedResults.pool.id )
+   queryStore.userSearched = true
+   routeUtils.searchChanged()
+})
+
+const applyDateFilterClicked = (() => {
+   dateErr.value = ""
+   var year1 = parseInt(startDate.value, 10)
+   if ( (""+year1) !=  startDate.value || startDate.value.length != 4) {
+      dateErr.value = "Please enter all dates as a four digit year"
+      return
+   }
+   if ( dateType.value == "BETWEEN") {
+      var year2 = parseInt(endDate.value, 10)
+      if ( (""+year2) !=  endDate.value || endDate.value.length != 4) {
+         dateErr.value = "Please enter all dates as a four digit year"
+         return
+      } 
+      if (year2 <= year1) {
+         dateErr.value = "End date must be greater than the start date"
+         return   
+      }  
+   }
+   queryStore.setDateFilter( resultStore.selectedResults.pool.id, dateType.value, startDate.value, endDate.value )
+   queryStore.userSearched = true
+   routeUtils.searchChanged()
+})
+
 const removeSearchExclusions = (() => {
    preferences.removeSearchExclusions()
    analytics.trigger('Preferences', 'REMOVE_POOL_EXCLUSION', "all")   
@@ -176,17 +272,52 @@ async function loadMoreResults() {
 }
 </script>
 <style lang="scss" scoped>
-.sort-section {
+.sort-section, .date-wrapper {
    color: $uva-grey-B;
    background: white;
    border: 1px solid $uva-grey-100;
-   padding: 0 15px 15px 10px;
-   border-top: 0;
+   border-top: 1px solid $uva-grey-200;
+   padding: 10px;
+   display: flex;
+   gap: 10px;
+   label {
+      font-weight: bold;
+   }
+}
+ .date-wrapper  {
+   flex-direction: column;
+   .error {
+      color: $uva-red-A;
+      font-style: italic;
+   }
+ }
+.sort-section {
+   justify-content: space-between;
+   align-items: center;
+   flex-flow: row wrap;
+}
+.date-section {
    display: flex;
    flex-flow: row wrap;
    gap: 10px;
-   justify-content: space-between;
+   justify-content: flex-start;
    align-items: center;
+   .date-entry {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 10px;
+      input {
+         width: 75px;
+      }
+   }
+   .date-acts {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 10px;
+      margin-left: auto;
+   }
 }
 .reminder {
    background: white;
@@ -194,12 +325,23 @@ async function loadMoreResults() {
    padding: 15px;
    margin: 20px 0;
 }  
-.desc  {
-   padding: 15px 10px 10px 10px;
-   border-left: 1px solid $uva-brand-blue;
-   border-right: 1px solid $uva-brand-blue;
-   font-size: 0.9em;
+.pool-results {
+   border: 0;
+   position: relative;
 }
+div.pool-header {
+   margin: 0 0 1rem 0;
+   text-align: left;
+   display: flex;
+   flex-direction: column;
+   .desc  {
+      padding: 15px 10px 10px 10px;
+      border-left: 1px solid $uva-brand-blue;
+      border-right: 1px solid $uva-brand-blue;
+      background: $uva-brand-blue;
+      color: white;
+      background: $uva-brand-blue;
+   }
 .desc :deep(a) {
    color: white !important;
    text-decoration: underline !important;
@@ -208,19 +350,11 @@ async function loadMoreResults() {
       font-style: italic !important;
    }
 }
-.pool-results {
-   border: 0;
-   position: relative;
-}
-div.pool-header {
-   color: white;
-   background: $uva-brand-blue;
-   margin: 0 0 1rem 0;
-   text-align: left;
    .source-logo {
       background: white;
       padding: 5px;
       text-align: left;
+      border: 1px solid $uva-grey-100;
       .logo {
          max-height:90px;
          display: inline-block;

@@ -3,7 +3,7 @@
       <AdvancedFacets />
       <div class="advanced-wrap">
          <FormKit type="form" id="advanced-search" :actions="false" @submit="doAdvancedSearch">
-            <div v-for="(term,idx) in advancedTerms" :key="idx" class="search-term">
+            <div v-for="(term,idx) in queryStore.advanced" :key="idx" class="search-term">
                <div class="controls-wrapper">
                   <div class="options">
                      <FormKit v-if="idx > 0" type="select" label="" v-model="term.op" :options="['AND', 'OR', 'NOT']" outer-class="$reset op" />
@@ -85,9 +85,6 @@ const dateValidator = [ ['matches', /^\d{4}$|^\d{4}-(0[1-9]|1[012])$|^\d{4}-(0[1
 
 const canDeleteCriteria = computed(()=>{
    return queryStore.advanced.length > 1
-})
-const advancedTerms = computed(()=>{
-   return queryStore.advanced.filter( t => t.field != "filter")
 })
 const sortOptions = computed(()=>{
    let out = []

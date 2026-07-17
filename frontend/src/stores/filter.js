@@ -160,17 +160,20 @@ export const useFilterStore = defineStore('filter', {
 
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( facet => {
-            // if this is in the preserved selected items, select it and remove from saved list
-            facet.buckets.forEach( fb => {
-               let idx = selected.findIndex( s => facet.id == s.facet_id && fb.value == s.value )
-               if ( idx > -1) {
-                  fb.selected  = true
-                  selected.splice(idx,1)
-               }
-            })
+            // NOTES: since the pool details now includes a date filter, the FilterDate facet is not needed. Skip it
+            if (facet.id != "FilterDate" ) {
+               // if this is in the preserved selected items, select it and remove from saved list
+               facet.buckets.forEach( fb => {
+                  let idx = selected.findIndex( s => facet.id == s.facet_id && fb.value == s.value )
+                  if ( idx > -1) {
+                     fb.selected  = true
+                     selected.splice(idx,1)
+                  }
+               })
 
-            if ( facet.buckets.length > 0) {
-               tgtFacets.push(facet)
+               if ( facet.buckets.length > 0) {
+                  tgtFacets.push(facet)
+               }
             }
          })
 
