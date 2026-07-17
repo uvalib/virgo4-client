@@ -68,7 +68,7 @@ export const useSortStore = defineStore('sort', {
             // if this pool supports the preSearch sort, carry on.
             let hasSort = (currPool.sort_options.findIndex( opt => opt.id == sort.sort_id) > -1)
             if (hasSort) {
-               this.pools.set(poolID, sort)
+               this.pools.set(currPool.id, sort)
             }
          })
       },
