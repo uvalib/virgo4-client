@@ -9,7 +9,7 @@
             </a>
              <img v-else class ="logo" :src="poolStore.log(selectedResults.pool.id)">
          </div>
-         <div class="date-wrapper">
+         <div class="date-wrapper" v-if="canDateFilter">
             <div class="date-section">
                <label>Published</label>
                <div class="date-entry">
@@ -17,6 +17,7 @@
                      <option value="AFTER">AFTER</option>
                      <option value="BEFORE">BEFORE</option>
                      <option value="BETWEEN">BETWEEN</option>
+                     <option value="EQUAL">IN</option>
                   </select>
                   <input v-model="startDate" placeholder="YYYY"/>
                   <template v-if="dateType == 'BETWEEN'">
@@ -94,7 +95,7 @@ import SearchFilters from "@/components/SearchFilters.vue"
 import V4Sort from "@/components/V4Sort.vue"
 import ExpandSearch from "@/components/ExpandSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
-import { ref,computed, onMounted } from 'vue'
+import { ref,computed, onMounted, watch } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useResultStore } from "@/stores/result"
 import { usePoolStore } from "@/stores/pool"
@@ -106,6 +107,7 @@ import ExcludePool from "./modals/ExcludePool.vue"
 import { useRouteUtils } from '@/composables/routeutils'
 import { useRouter, useRoute } from 'vue-router'
 import analytics from '@/analytics'
+import { storeToRefs } from "pinia"
 
 const route = useRoute()
 const router = useRouter()
@@ -125,16 +127,33 @@ const startDate = ref("")
 const endDate = ref("")
 const dateErr = ref("")
 
+const { targetPool } = storeToRefs(queryStore)
+watch( targetPool, (newVal) => {
+   updateDateFilter()
+})
+
 onMounted( () => {
-   // find the advanced term with field = 'date_filter' and use it 
-   // to set the variables that control the date filer UI
+   updateDateFilter()
+})
+
+const updateDateFilter = (() => {
    if ( queryStore.dateFilter ) {
       dateType.value = queryStore.dateFilter.comparison
       startDate.value = queryStore.dateFilter.startDate
       endDate.value = queryStore.dateFilter.endDate
+   } else {
+      dateType.value = "BETWEEN"
+      startDate.value = ""
+      endDate.value = ""
+      dateErr.value = ""
    }
 })
 
+const canDateFilter = computed(() => {
+   if (resultStore.selectedResults.pool.mode == 'image') return false
+   if ( hasFacets.value == false ) return false
+   return true
+})
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
 })
@@ -189,7 +208,7 @@ const clearDateFilterClicked = (() => {
    startDate.value = ""
    endDate.value = ""
    dateErr.value = ""
-   queryStore.removeDateFilter()
+   queryStore.removeDateFilter( resultStore.selectedResults.pool.id )
    queryStore.userSearched = true
    routeUtils.searchChanged()
 })
@@ -212,7 +231,7 @@ const applyDateFilterClicked = (() => {
          return   
       }  
    }
-   queryStore.setDateFilter(dateType.value, startDate.value, endDate.value)
+   queryStore.setDateFilter( resultStore.selectedResults.pool.id, dateType.value, startDate.value, endDate.value )
    queryStore.userSearched = true
    routeUtils.searchChanged()
 })

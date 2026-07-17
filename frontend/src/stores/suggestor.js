@@ -26,8 +26,8 @@ export const useSuggestorStore = defineStore('suggestor', {
          
          if (this.open && this.suggestions.length == 0 && this.searchingSuggestions == false) {
             const query = useQueryStore()
-            if (query.searchString) {
-               this.fetch( query.searchString )
+            if (query.string) {
+               this.fetch( query.string )
             }
          }
       },

@@ -37,7 +37,11 @@ export function useRouteUtils( router,route ) {
          queryStore.setBasicSearch()
       }
 
-      const oldQ = queryStore.string
+      // be sure to set target pool first as the query parsing depends on it being set
+      queryStore.setTargetPool( query.pool )
+
+      // use the poolQuersyString here to ensure any pool-specific addons are included
+      const oldQ = queryStore.poolQueryString  
       if (query.q) {
          queryStore.restoreFromURL(query.q)
          if ( oldQ != query.q) {
@@ -47,8 +51,6 @@ export function useRouteUtils( router,route ) {
       }
 
       if (query.pool) {
-         queryStore.setTargetPool( query.pool )
-
          const oldSortObj = sortStore.poolSort( query.pool )
          const oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
          if (query.sort) {
@@ -109,7 +111,8 @@ export function useRouteUtils( router,route ) {
       const poolStore = usePoolStore()
 
       let newQ = Object.assign({}, route.query)
-      newQ.q = queryStore.string
+      // use the poolQuersyString here to ensure any pool-specific addons are included
+      newQ.q = queryStore.poolQueryString 
       if (queryStore.mode == "advanced") {
          newQ.mode = "advanced"  // ensure mode is in the query params
          if ( resultStore.hasResults == false && filters.preSearchFilterApplied ) {
@@ -132,7 +135,8 @@ export function useRouteUtils( router,route ) {
       delete newQ.page
 
       queryStore.setBasicSearch()
-      newQ.q = queryStore.string
+      // use the poolQuersyString here to ensure any pool-specific addons are included
+      newQ.q = queryStore.poolQueryString
       newQ.filter = filters.asQueryParam( "presearch" )
       newQ.pool = queryStore.targetPool
 
@@ -219,6 +223,7 @@ export function useRouteUtils( router,route ) {
          if (resultStore.selectedResults.page > 0) {
             newQ.page = resultStore.selectedResults.page +1
          }
+         newQ.q = queryStore.poolQueryString
       }
       if ( route.query != newQ ) {
          router.push({path: "/search", query: newQ})

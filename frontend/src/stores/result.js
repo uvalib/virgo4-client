@@ -359,10 +359,12 @@ export const useResultStore = defineStore('result', {
          // NOTE: when clicking a saved search, the target pool is set in ignoreExclusion.
          // This pool filtered out of the exclusion for this search, then reset
          let req = {
-            query: query.searchString,
+            // use the general search string here and add filters for specific pools in pool_query_addons
+            query: query.string, 
             pagination: { start: 0, rows: this.pageSize },
             filters: filters.allPoolFilters,
             pool_sorting: sorting.poolSort("all"),
+            pool_query_addons: query.poolQueryAddons,
             preferences: {
                exclude_pools: prefs.searchExclusions.filter( e => e != this.ignoreExclusion)
             }
@@ -379,7 +381,7 @@ export const useResultStore = defineStore('result', {
          this.lastSearchScrollPosition = 0
          this.lastSearchURL = ""
 
-         useSuggestorStore().fetch( query.searchString )
+         useSuggestorStore().fetch( query.string )
 
          // POST the search query and wait for the response
          await axios.post(`${system.searchAPI}/api/search`, req).then((response) => {
@@ -425,7 +427,7 @@ export const useResultStore = defineStore('result', {
          useCollectionStore().clearCollectionDetails()
          this.setSearching(true)
 
-         useSuggestorStore().fetch( query.searchString )
+         useSuggestorStore().fetch( query.string )
          let filters = filterStore.poolFilter(params.pool.id)
          let sort = sortStore.poolSort(params.pool.id) 
          let filterObj = { pool_id: params.pool.id, facets: filters }
@@ -436,7 +438,9 @@ export const useResultStore = defineStore('result', {
          let pagination = { start: startPage * this.pageSize, rows: this.pageSize }
 
          let req = {
-            query: query.searchString,
+            // Pool specific queries can contain date filters tagged as 'date_filter'. Search does not
+            // understand this, so convert it to the normal 'date' term
+            query: query.poolQueryString.replaceAll("date_filter", "date"),
             pagination: pagination,
             sort: sort,
             filters: [filterObj],

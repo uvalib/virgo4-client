@@ -119,7 +119,7 @@ const showPrintButton = computed(()=>{
    return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
 })
 const queryString = computed(()=>{
-   return queryStore.searchString.replace(/\{|\}/g, "")
+   return queryStore.string.replace(/\{|\}/g, "")
 })
 
 const sourceTabs = computed(()=>{

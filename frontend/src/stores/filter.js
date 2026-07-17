@@ -391,7 +391,7 @@ export const useFilterStore = defineStore('filter', {
 
          // Recreate the query for the target pool, but include a request for ALL facet info
          let req = {
-            query: query.searchString,
+            query: query.string,
             pagination: { start: 0, rows: 0 },
             filters: [filterObj]
          }
