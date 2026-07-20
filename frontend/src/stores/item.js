@@ -11,7 +11,7 @@ export const useItemStore = defineStore('item', {
       details: {searching: true, source: "", identifier:"", fields:[], related:[] },
       digitalContent: [],
       loadingDigitalContent: false,
-      availability: {searching: true, titleId: "", libraries: [], bound_with: [], error: ""},
+      availability: {searching: true, titleId: "", libraries: [], boundWith: [], error: ""},
       primaryFields: ["author", "format", "published_date", "subject", "subject_summary"]
    }),
 
@@ -74,21 +74,7 @@ export const useItemStore = defineStore('item', {
          return state.digitalContent.length > 0
       },
       hasBoundWithItems: state => {
-         return Array.isArray(state.availability.bound_with) && state.availability.bound_with.length > 0
-      },
-      boundIn: state => {
-         if (state.availability && state.availability.bound_with){
-            return state.availability.bound_with.filter(item => item.is_parent == true)
-         }else{
-            return []
-         }
-      },
-      boundWith: state => {
-         if (state.availability && state.availability.bound_with){
-            return state.availability.bound_with.filter(item => item.is_parent == false)
-         }else{
-            return []
-         }
+         return state.availability.boundWith && state.availability.boundWith.length > 0
       }
    },
 
@@ -146,7 +132,7 @@ export const useItemStore = defineStore('item', {
          useRequestStore().clearAll()
       },
       clearAvailability() {
-        this.availability = {searching: true, titleId: '', libraries: [], bound_with: [], error: ""}
+        this.availability = {searching: true, titleId: '', libraries: [], boundWith: [], error: ""}
          useRequestStore().clearAll()
       },
       setCatalogKeyDetails(data) {
@@ -335,7 +321,7 @@ export const useItemStore = defineStore('item', {
          return axios.get(url).then((response) => {
             if (response.data) {
                this.availability.titleId = response.data.title_id
-               this.availability.bound_with = response.data.bound_with
+               this.availability.boundWith = response.data.boundWith
                this.availability.libraries = response.data.libraries
 
                // sort avvailability libraries by name
