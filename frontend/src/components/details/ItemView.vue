@@ -245,13 +245,33 @@ const extDetailClicked = (() => {
    analytics.trigger('Results', 'MORE_DETAILS_CLICKED', details.value.identifier)
 })
 
-const getBrowseLinks = ( ( name, values, alternate_values ) => {
+const getBrowseLinks = ( ( name, values, altValues ) => {
    let out = []
+   let found = []
    values.forEach( (v,idx) => {
-      let qp = `${name}: {"${encodeURIComponent(alternate_values[idx])}"}`
-      let link = {label: v, url: `/search?mode=advanced&q=${qp}`}
-      out.push(link)
+      if ( v.includes("--") ) {
+         let links = [] 
+         v.split("--").forEach( v2 => {
+            const dcVal = v2.trim().toLowerCase() 
+            if ( found.includes(dcVal) == false ) {
+               found.push(dcVal)
+               let qp = `${name}: {"${encodeURIComponent(v2.trim())}"}`
+               let link = {label: v2, url: `/search?mode=advanced&q=${qp}`}
+               links.push(link)
+            } 
+         })
+         out.push(links)
+      } else {
+         const linkParam = altValues[idx].toLowerCase() 
+         if ( found.includes(linkParam) == false ) {
+            found.push(linkParam)
+            let qp = `${name}: {"${encodeURIComponent(altValues[idx])}"}`
+            let link = [{label: v, url: `/search?mode=advanced&q=${qp}`}]
+            out.push(link)
+         }
+      }
    })
+   console.log("NAME "+name+" = "+out)
    return out
 })
 
