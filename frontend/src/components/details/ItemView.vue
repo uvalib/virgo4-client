@@ -251,14 +251,15 @@ const getBrowseLinks = ( ( name, values, altValues ) => {
    values.forEach( (v,idx) => {
       if ( v.includes("--") ) {
          let links = [] 
-         v.split("--").forEach( v2 => {
-            const dcVal = v2.trim().toLowerCase() 
-            if ( found.includes(dcVal) == false ) {
-               found.push(dcVal)
-               let qp = `${name}: {"${encodeURIComponent(v2.trim())}"}`
-               let link = {label: v2, url: `/search?mode=advanced&q=${qp}`}
-               links.push(link)
-            } 
+         let qpVal = ""
+         v.split("--").forEach( (v2,idx) => {
+            if ( idx > 0 ) {
+               qpVal += " -- "
+            }
+            qpVal += encodeURIComponent(v2.trim())
+            let qp = `${name}: {"${qpVal}"}`
+            let link = {label: v2.trim(), url: `/search?mode=advanced&q=${qp}`}
+            links.push(link)
          })
          out.push(links)
       } else {
