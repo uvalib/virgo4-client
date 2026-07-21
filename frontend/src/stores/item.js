@@ -331,6 +331,13 @@ export const useItemStore = defineStore('item', {
                   return 0
                })
 
+                // sort boundwith by call
+               this.availability.boundWith.sort( (a,b) => {
+                  if (a.callNumber > b.callNumber) return 1
+                  if (a.callNumber < b.callNumber) return -1
+                  return 0
+               })
+
                // // HACK IN A SPECIAL ITEM OPTION
                // if ( response.data.request_options.length > 0) {
                //    if ( response.data.request_options[0].item_options.length > 1) {
