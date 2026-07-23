@@ -37,6 +37,22 @@
          </div>
          <Message  v-if="saved =='exclude'" :life="2000" variant="simple" severity="success">Saved</Message>
        </div>
+       <div class="grouping">
+         <h4>Catalog Filters</h4>
+         <p>
+            The catalog allows results to be filtered by numerious categories, some of which may not be useful for you. 
+            Use the list below to disable unwanted filters.
+         </p>
+         <div><b>Disabled Filters</b></div>
+         <div v-for="pf in pools.filters('uva_library')" class="check">
+            <label>
+               <input @change="toggleFilter(pf.id)" class="choice" :checked="preferences.isFilterExcluded(pf.id)" type="checkbox"
+                  :aria-label="`toggle availablity of filter ${pf.name }`"/>
+               {{ pf.name }}
+            </label>
+         </div>
+       </div>
+       <Message  v-if="saved =='filter'" :life="2000" variant="simple" severity="success">Saved</Message>
    </div>
 </template>
 
@@ -69,6 +85,12 @@ const toggleSearchExclude = ( async (poolID) => {
    } else {
       analytics.trigger('Preferences', 'REMOVE_POOL_EXCLUSION', poolID)   
    }
+})
+
+const toggleFilter = ( async (filterID) => {
+   await preferences.toggleFilterExclusion(filterID)
+   saved.value = "filter"
+   setTimeout( ()=>{ saved.value = "" }, 2100)
 })
 
 const detailToggleClicke = ( async () => {

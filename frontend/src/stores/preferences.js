@@ -9,6 +9,7 @@ export const usePreferencesStore = defineStore('preferences', {
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       searchExclusions: [],
+      filterExclusions: [],
       collapseGroups: false,
       collapseDetails: false,
       aiDebug: false,
@@ -31,6 +32,11 @@ export const usePreferencesStore = defineStore('preferences', {
       isPoolExcluded: state => {
          return (poolID) => {
            return state.searchExclusions.includes(poolID)
+         }
+      },
+      isFilterExcluded: state => {
+         return (fID) => {
+           return state.filterExclusions.includes(fID)
          }
       },
       expandDetails: state => {
@@ -73,6 +79,7 @@ export const usePreferencesStore = defineStore('preferences', {
          }
 
          this.searchExclusions = prefsObj.searchExclusions || []
+         this.filterExclusions = prefsObj.filterExclusions || []
 
          this.aiDebug = prefsObj.aiDebug || false
          this.aiFeatures = prefsObj.aiFeatures || []
@@ -118,6 +125,14 @@ export const usePreferencesStore = defineStore('preferences', {
          }
          await this.save()
       },
+      async toggleFilterExclusion( filterID ) {
+         if (this.filterExclusions.includes(filterID)) {
+            this.filterExclusions = this.filterExclusions.filter( fID => fID != filterID)
+         } else {
+            this.filterExclusions.push(filterID)
+         }
+         await this.save()
+      },
       async toggleCollapseGroups() {
          this.collapseGroups = !this.collapseGroups
          await this.save()
@@ -136,7 +151,7 @@ export const usePreferencesStore = defineStore('preferences', {
             await this.save()
          }
       },
-      async load() { // TODO CHECK THOS
+      async load() { 
          const userStore = useUserStore()
          let url = `/api/users/${userStore.signedInUser}/preferences`
          await axios.get(url).then((response) => {
@@ -156,6 +171,7 @@ export const usePreferencesStore = defineStore('preferences', {
             collapseDetails: this.collapseDetails,
             searchTemplate: this.searchTemplate,
             searchExclusions: this.searchExclusions,
+            filterExclusions: this.filterExclusions,
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,
             aiModel: this.aiModel,

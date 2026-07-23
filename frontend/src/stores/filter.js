@@ -6,6 +6,7 @@ import { usePoolStore } from "@/stores/pool"
 import { useResultStore } from "@/stores/result"
 import { useQueryStore } from "@/stores/query"
 import { useCollectionStore } from "@/stores/collection"
+import { usePreferencesStore } from "@/stores/preferences"
 
 export const useFilterStore = defineStore('filter', {
 	state: () => ({
@@ -402,9 +403,20 @@ export const useFilterStore = defineStore('filter', {
             return
          }
 
+         if ( pool.id == "uva_library") {
+            const preferences = usePreferencesStore()
+            req.preferences = {
+               exclude_filters: preferences.filterExclusions
+            }
+         }
+
          let tgtURL = pool.url+"/api/search/facets"
          this.updatingFacets = true
+         let startTime = new Date()
          axios.post(tgtURL, req).then((response) => {
+            let endTime = new Date();
+            var timeDiff = endTime - startTime; 
+            console.log("TIME TO GET FACETS "+timeDiff+" MS")
             let facets = response.data.facet_list
             if (!facets) {
                facets = []

@@ -88,6 +88,13 @@ export const usePoolStore = defineStore('pool', {
             return attr.supported
          }
       },
+      filters: state => {
+         return (id) => {
+            let pool = state.list.find( p => p.id == id)
+            if (!pool) return []
+            return pool.facets
+         }
+      },
       sortOptions: state => {
          return (id) => {
             let pool = state.list.find( p => p.id == id)
@@ -184,6 +191,15 @@ export const usePoolStore = defineStore('pool', {
                p.sort_options=[]
             }
             p.primary = (p.id == "uva_library" || p.id=="images" || p.id == "articles" )
+
+            if (p.facets) {
+               p.facets = p.facets.sort( (a,b) => {
+                  if (a.name > b.name) return 1
+                  if (a.name < b.name) return -1
+                  return 0
+               })
+            }
+            
             this.list.push(p)
          })
       },
