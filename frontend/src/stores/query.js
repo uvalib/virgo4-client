@@ -190,6 +190,9 @@ export const useQueryStore = defineStore('query', {
       removeDateFilter( poolID ) {
          this.poolDateFilters.delete( poolID )
       },
+      resetAllDateFilters() {
+         this.poolDateFilters = new Map()
+      },
       resetAdvancedForm() {
          this.advanced.splice(0, this.advanced.length)
          this.advanced.push({ op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" })

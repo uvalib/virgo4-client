@@ -117,6 +117,7 @@ export function useRouteUtils( router,route ) {
 
       if ( resetFilters ) {
          delete newQ.filter
+         queryStore.resetAllDateFilters()
          if (queryStore.mode == "advanced") {
             newQ.mode = "advanced"                             // ensure mode is in the query params
             newQ.filter = filters.asQueryParam('presearch')    // set the filters in the query params
