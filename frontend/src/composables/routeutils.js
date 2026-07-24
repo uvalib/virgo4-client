@@ -116,8 +116,8 @@ export function useRouteUtils( router,route ) {
       if (queryStore.mode == "advanced") {
          newQ.mode = "advanced"  // ensure mode is in the query params
          if ( resultStore.hasResults == false && filters.preSearchFilterApplied ) {
-            filters.promotePreSearchFilters()
             newQ.filter = filters.asQueryParam('presearch')
+            filters.promotePreSearchFilters()
          }
          sortStore.promotePreSearchSort( poolStore.list )
       }
