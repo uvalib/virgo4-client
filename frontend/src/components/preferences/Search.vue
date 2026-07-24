@@ -40,7 +40,7 @@
        <div class="grouping">
          <h4>Catalog Filters</h4>
          <p>
-            The catalog allows results to be filtered by numerious categories, some of which may not be useful for you. 
+            The catalog allows results to be filtered by numerous categories, some of which may not be useful for you. 
             Use the list below to disable unwanted filters.
          </p>
          <div><b>Disabled Filters</b></div>

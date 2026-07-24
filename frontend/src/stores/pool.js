@@ -172,7 +172,7 @@ export const usePoolStore = defineStore('pool', {
 
             // no providers in new data?
             if ( !(p.providers && p.providers.length > 0) ) {
-               if (prior) {
+               if ( prior && prior.providers ) {
                   p.providers = prior.providers.slice()
                } else {
                   p.providers = []
@@ -189,8 +189,8 @@ export const usePoolStore = defineStore('pool', {
 
             // no filters in new data?
             if ( !(p.filters && p.filters.length > 0) ) {
-               if (prior) {
-                  p.filters = prior.filters.slice()
+               if (prior && prior.providers) {
+                  p.filters = prior.providers.slice()
                }   
             }
 
@@ -209,6 +209,7 @@ export const usePoolStore = defineStore('pool', {
             
             this.list.push(p)
          })
+         console.log("SET POOLS DONE")
       },
 
       async getPools() {
