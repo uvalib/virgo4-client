@@ -235,6 +235,19 @@ export const useFilterStore = defineStore('filter', {
          }
       },
 
+      resetPresearchFilters() {
+         let pre = this.facets.find( pf => pf.pool=="presearch")
+         if (pre) {
+            // if presearch filters exist, just flag them all as unselected instead of removing
+            // this is because they are only requested once at initial search page load
+            pre.facets.forEach( f => {
+               f.buckets.forEach(b => {
+                  b.selected = false
+               })
+            })
+         }  
+      },
+
       reset() {
          let pre = this.facets.find( pf => pf.pool=="presearch")
          if (pre) {
@@ -299,25 +312,31 @@ export const useFilterStore = defineStore('filter', {
       promotePreSearchFilters() {
          const pools = usePoolStore()
          let psf = this.facets.find( pf => pf.pool == "presearch")
+
+         // apply any presearch filters to all pools that support facets
          pools.list.forEach( pool => {
-            let tgtPFObj = this.facets.find( pf => pf.pool == pool.id)
-            if ( !tgtPFObj ) {
-               tgtPFObj = {pool: pool.id, facets: [], placeholder: true}
-               this.facets.push(tgtPFObj)
-            }
-            psf.facets.forEach( pf => {
-               pf.buckets.forEach( b => {
-                  if (b.selected) {
-                     let tgtFacet = tgtPFObj.facets.find( tf => tf.id == pf.id)
-                     if ( !tgtFacet ) {
-                        tgtFacet = {id: pf.id, name: pf.name, sort: pf.sort, type: pf.type, buckets: []}
-                        tgtPFObj.facets.push(tgtFacet)
+            if ( pools.facetSupport( pool.id ) ) {
+               this.resetPoolFilters(pool.id)
+               let tgtPFObj = this.facets.find( pf => pf.pool == pool.id)
+               if ( !tgtPFObj ) {
+                  tgtPFObj = {pool: pool.id, facets: [], placeholder: true}
+                  this.facets.push(tgtPFObj)
+               }
+               psf.facets.forEach( pf => {
+                  pf.buckets.forEach( b => {
+                     if (b.selected) {
+                        let tgtFacet = tgtPFObj.facets.find( tf => tf.id == pf.id)
+                        if ( !tgtFacet ) {
+                           tgtFacet = {id: pf.id, name: pf.name, sort: pf.sort, type: pf.type, buckets: []}
+                           tgtPFObj.facets.push(tgtFacet)
+                        }
+                        tgtFacet.buckets.push({value: b.value, selected: true})
                      }
-                     tgtFacet.buckets.push({value: b.value, selected: true})
-                  }
+                  })
                })
-            })
+            }
          })
+         this.resetPresearchFilters()
       },
 
       async getPreSearchFilters() {
