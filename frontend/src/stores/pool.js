@@ -92,7 +92,7 @@ export const usePoolStore = defineStore('pool', {
          return (id) => {
             let pool = state.list.find( p => p.id == id)
             if (!pool) return []
-            return pool.facets
+            return pool.filters
          }
       },
       sortOptions: state => {
@@ -162,7 +162,7 @@ export const usePoolStore = defineStore('pool', {
 
    actions: {
       setPools(data) {
-         // Copy old items to preserve providers lists for each, then wipe out list
+         // Copy old items to preserve providers/filters lists for each, then wipe out list
          let old = this.list.slice()
          this.list.splice(0, this.list.length)
 
@@ -187,13 +187,20 @@ export const usePoolStore = defineStore('pool', {
                })
             }
 
+            // no filters in new data?
+            if ( !(p.filters && p.filters.length > 0) ) {
+               if (prior) {
+                  p.filters = prior.filters.slice()
+               }   
+            }
+
             if (!p.sort_options) {
                p.sort_options=[]
             }
             p.primary = (p.id == "uva_library" || p.id=="images" || p.id == "articles" )
 
-            if (p.facets) {
-               p.facets = p.facets.sort( (a,b) => {
+            if (p.filters) {
+               p.filters = p.filters.sort( (a,b) => {
                   if (a.name > b.name) return 1
                   if (a.name < b.name) return -1
                   return 0

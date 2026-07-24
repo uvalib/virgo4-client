@@ -134,7 +134,8 @@ async function doAdvancedSearch() {
       }
    }
 
-   routeUtils.searchChanged()
+   // send a true flag to route utils indicating a new search was initiated
+   routeUtils.searchChanged( true )
 }
 
 function addClicked() {
