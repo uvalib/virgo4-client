@@ -272,7 +272,7 @@ const getBrowseLinks = ( ( name, values, altValues ) => {
          }
       }
    })
-   console.log("NAME "+name+" = "+out)
+   console.log("NAME "+name+" = "+JSON.stringify(out))
    return out
 })
 
@@ -281,9 +281,10 @@ const getFilterLinks = ( ( filter, values ) => {
    values.forEach( v => {
       let qp = `keyword:{}`
       let fp = `{"${filter}":["${encodeURIComponent(v)}"]}`
-      let link = {label: v, url: `/search?mode=advanced&q=${qp}&filter=${fp}`}
+      let link = [{label: v, url: `/search?mode=advanced&q=${qp}&filter=${fp}`}]
       out.push(link)
    })
+   console.log("FILTER "+filter+" = "+JSON.stringify(out))
    return out
 })
 
