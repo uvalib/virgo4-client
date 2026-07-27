@@ -114,7 +114,7 @@ export const useFilterStore = defineStore('filter', {
             }
          })
       },
-      setPreSearchFilters(filters) {
+      setPreSearchFilters(filters) {      
          // Clear out PRESEARCH filter only. Leave others alone because they
          // may have been restored from query params
          let psfIdx = this.facets.findIndex( pf => pf.pool == "presearch")
@@ -122,17 +122,21 @@ export const useFilterStore = defineStore('filter', {
             this.facets.splice(psfIdx, 1)
          }
 
+         const preferences = usePreferencesStore()
+
          // Place all of this data into a transient 'presearch' pool that can be
          // used to apply filters to any pool before search
          let tgtPFObj = {pool: "presearch", facets: []}
          filters.forEach( f => {
-            // pre-search filter data format: { id,label,values: [{value,count}] }
-            // POSTsearch filter format:      { id,name,type,sort, buckets: [{value,count,selected}] }
-            let newF = {id: f.id, name: f.label, type: "", sort: "", hidden: f.hidden, buckets: []}
-            f.values.forEach( v => {
-               newF.buckets.push( {selected: false, value: v.value, count: v.count} )
-            })
-            tgtPFObj.facets.push(newF)
+            if (preferences.filterExclusions.includes(f.id) == false ) {
+               // pre-search filter data format: { id,label,values: [{value,count}] }
+               // POSTsearch filter format:      { id,name,type,sort, buckets: [{value,count,selected}] }
+               let newF = {id: f.id, name: f.label, type: "", sort: "", hidden: f.hidden, buckets: []}
+               f.values.forEach( v => {
+                  newF.buckets.push( {selected: false, value: v.value, count: v.count} )
+               })
+               tgtPFObj.facets.push(newF)
+            }
          })
          this.facets.push(tgtPFObj)
 
