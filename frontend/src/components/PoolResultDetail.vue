@@ -38,7 +38,7 @@
             <V4Sort :pool="selectedResults.pool" />
             <ExcludePool v-if="canExclude"/>
          </div>
-         <div v-if="hasFilter" class="keep-section">
+         <div v-if="selectedResults.pool.id=='uva_library' && (hasFilter || queryStore.poolDateFilters.has('uva_library'))" class="keep-section">
             <label>
                Keep settings for this session
                <input type="checkbox" v-model="queryStore.keepSettings"/>
