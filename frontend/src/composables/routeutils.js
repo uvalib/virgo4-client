@@ -115,7 +115,10 @@ export function useRouteUtils( router,route ) {
 
       let newQ = Object.assign({}, route.query)
 
-      if ( resetFilters ) {
+      console.log("SEARCH CHANGED; RESET "+resetFilters+" PRESERVE "+queryStore.keepFilters)
+
+      if ( resetFilters && queryStore.keepSettings == false ) {
+         console.log("RESET FILTERS / SORT FOR NEW QUERRY")
          delete newQ.filter
          queryStore.resetAllDateFilters()
          if (queryStore.mode == "advanced") {
@@ -127,6 +130,7 @@ export function useRouteUtils( router,route ) {
             filters.reset()  
          }
       } else {
+         console.log("PRESERVE FILTERS / SORT")
          if (queryStore.mode == "advanced") {
             newQ.mode = "advanced"                             // ensure mode is in the query params
             sortStore.promotePreSearchSort( poolStore.list )   // set the filters in the query params

@@ -38,6 +38,12 @@
             <V4Sort :pool="selectedResults.pool" />
             <ExcludePool v-if="canExclude"/>
          </div>
+         <div v-if="hasFilter" class="keep-section">
+            <label>
+               Keep settings for this session
+               <input type="checkbox" v-model="queryStore.keepSettings"/>
+            </label>
+         </div>
       </div>
       <template v-if="!resultStore.searching">
          <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
@@ -149,6 +155,9 @@ const updateDateFilter = (() => {
    }
 })
 
+const hasFilter = computed(()=>{
+   return filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na != true).length > 0
+})
 const canDateFilter = computed(() => {
    if (resultStore.selectedResults.pool.mode == 'image') return false
    if ( hasFacets.value == false ) return false
@@ -272,7 +281,7 @@ async function loadMoreResults() {
 }
 </script>
 <style lang="scss" scoped>
-.sort-section, .date-wrapper {
+.sort-section, .date-wrapper, .keep-section  {
    color: $uva-grey-B;
    background: white;
    border: 1px solid $uva-grey-100;
@@ -295,6 +304,18 @@ async function loadMoreResults() {
    justify-content: space-between;
    align-items: center;
    flex-flow: row wrap;
+}
+.keep-section {
+   flex-flow: row nowrap;
+   justify-content: flex-end;
+   align-items: center;
+   label {
+      font-weight: normal;
+   }
+   input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+   }
 }
 .date-section {
    display: flex;
