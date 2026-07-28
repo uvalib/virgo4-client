@@ -1,10 +1,10 @@
 <template>
-   <section class="facet-sidebar" :class="{overlay: !startExpanded}" role="group">
+   <section class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
       <AccordionContent id="pool-filter" class="filter"
          :background=colors.brandBlue
-         color="white" :expanded="startExpanded"
+         color="white" :expanded="startSidebarExpanded"
          :borderColor=colors.brandBlue
-         :invert="!startExpanded">
+         :invert="!startSidebarExpanded">
          <template v-slot:title>{{poolFilterTitle}}</template>
 
          <div v-if="!hasFacets" class="body">
@@ -17,33 +17,45 @@
             <div v-else-if="facets.length == 0" class="no-facets">
                Filters are not available for this search
             </div>
-            <dl v-else="filterStore.updatingFacets == false">
-               <template v-for="facetInfo in facets" :key="facetInfo.id">
-                  <dt :id="facetInfo.id">{{facetInfo.name}}</dt>
-                  <div role="group" :aria-labelledby="facetInfo.id">
-                     <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
-                        <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @update:modelValue="filterChanged(facetInfo.id, fv)"/>
-                        <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
-                        <span class="cnt" v-if="$formatNum(fv.count)">({{$formatNum(fv.count)}})</span>
-                     </dd>
-                     <dd v-if="facetValuesCount(facetInfo) > 5" :key="`more${facetInfo.id}`">
-                        <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
-                           <template v-slot:title>
-                              <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
-                           </template>
-                           <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
+            <template v-else="filterStore.updatingFacets == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
+               <div v-if="facetInfo.id=='PeerReviewedOnly'" class="seer-review">
+                  <label class="cb-label">
+                     <Checkbox  v-model="facetInfo.buckets[0].selected" :binary="true" 
+                        @update:modelValue="filterChanged(facetInfo.id, facetInfo.buckets[0])"
+                     />
+                     {{ facetInfo.buckets[0].value}}
+                  </label>
+               </div>
+               <AccordionContent v-else
+                  :id="facetInfo.id" :background=colors.grey200 
+                  @accordion-collapsed="filterCollapsed(facetInfo.id)" :expanded="idx < 4"
+               >
+                  <template v-slot:title>{{ facetInfo.name }}</template>
+                  <ul :aria-labelledby="facetInfo.id">
+                     <li v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
+                        <span class="filter-check">
+                           <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @update:modelValue="filterChanged(facetInfo.id, fv)"/>
+                           <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
+                        </span>
+                        <span class="cnt">({{$formatNum(fv.count)}})</span>   
+                     </li>
+                     <template v-if="facetValuesCount(facetInfo) > 5" >
+                        <li v-if="isFilterExpanded(facetInfo.id) == false" class="more">
+                           <VirgoButton severity="secondary" size="small" 
+                              :label="`Show all ${facetValuesCount(facetInfo)} filters`" icon="fal fa-plus" @click="toggleFilterExpand(facetInfo.id)"
+                           />
+                        </li>
+                        <li v-else v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
+                           <span class="filter-check">
                               <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @update:modelValue="filterChanged(facetInfo.id, fv)"/>
                               <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
-                              <span class="cnt">({{$formatNum(fv.count)}})</span>
-                           </div>
-                           <template v-slot:footer>
-                              <span :aria-label="`see less ${facetInfo.name} filters`"><b>See Less</b></span>
-                           </template>
-                        </AccordionContent>
-                     </dd>
-                  </div>
-               </template>
-            </dl>
+                           </span>
+                           <span class="cnt">({{$formatNum(fv.count)}})</span>   
+                        </li>
+                     </template>
+                  </ul>
+               </AccordionContent>
+            </template>
          </div>
       </AccordionContent>
    </section>
@@ -52,7 +64,7 @@
 <script setup>
 import AccordionContent from "@/components/AccordionContent.vue"
 import Checkbox from 'primevue/checkbox'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { usePoolStore } from "@/stores/pool"
@@ -70,15 +82,17 @@ const resultStore = useResultStore()
 const filterStore = useFilterStore()
 const poolStore = usePoolStore()
 
+const expandedFilters = ref([])
+
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
 })
 
-const startExpanded = computed(()=>{
+const startSidebarExpanded = computed(()=>{
    return width.value > 810
 })
 const poolFilterTitle = computed(()=>{
-   if ( !startExpanded.value ) {
+   if ( !startSidebarExpanded.value ) {
       return `Filter ${resultStore.selectedResults.pool.name}`
    }
    return `Filter ${resultStore.selectedResults.pool.name} By`
@@ -99,6 +113,20 @@ function facetValues(facet, start, end) {
 function valueKey(idx, facetID) {
    return facetID+"_val_"+idx
 }
+
+const filterCollapsed = ((filterID) => {
+   expandedFilters.value = expandedFilters.value.filter(fID => fID != filterID)
+})
+const isFilterExpanded = ((filterID) => {
+   return expandedFilters.value.includes(filterID)
+})
+const toggleFilterExpand = ((filterID) => {
+   if ( isFilterExpanded(filterID) ) {
+         
+   }  else {
+      expandedFilters.value.push(filterID)
+   }
+})
 
 async function filterChanged(facetID, facetValue) {
    if (facetValue.selected) {
@@ -125,16 +153,45 @@ async function filterChanged(facetID, facetValue) {
       border: 1px solid $uva-grey-100;
       border-top: 0;
       text-align: left;
-      padding: 0;
       margin: 0;
       background: white;
       position: relative;
       min-height: 150px;
-      padding: 5px 15px 15px 15px;
-      span.cnt {
-         margin-left: 5px;
-         margin-left: auto;
-         font-size: 0.8em;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+       ul  {
+         margin: 0;
+         padding: 10px;
+         border: 1px solid $uva-grey-100;
+         border-top: 0;
+         li {
+            cursor: pointer;
+            font-size: 1em;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            padding: 3px 2px;
+            font-weight: normal;
+            gap: 15px;
+            .filter-check {
+               display: flex;
+               flex-flow: row nowrap;  
+               justify-content: flex-start;
+               align-items: flex-start;
+               gap: 10px;
+            }
+            .cnt {
+               font-size: .8em;
+            }
+         }
+         li.more {
+            margin-top: 5px;
+            button {
+               flex-grow: 1;
+            }
+         }
       }
    }
 }
@@ -143,39 +200,8 @@ div.no-facets {
    margin:25px 5px;
    font-size: 1.25em;
 }
-dl  {
-   margin: 0;
-}
-dt {
-   font-weight: bold;
-   margin: 10px 0 5px 0;
-}
-.group {
-   margin-bottom: 20px;
-}
-dd {
-   cursor: pointer;
-   font-size: 1em;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: flex-start;
-   padding: 3px 2px;
-   margin-left: 15px;
-   font-weight: normal;
-   gap: 15px;
-}
 .working {
    text-align: center;
-}
-.expanded-item {
-   padding: 3px 0;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: flex-start;
-   font-weight: normal;
-   gap: 15px;
 }
 .facet-sidebar.overlay {
    position: fixed;
@@ -195,13 +221,6 @@ dd {
    .body {
       max-height: 450px;
       overflow: scroll;
-   }
-}
-:deep(.accordion.more) {
-   width: 100%;
-   .title, .footer {
-      padding: 5px 0;
-      font-weight: bold;
    }
 }
 </style>
