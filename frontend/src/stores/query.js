@@ -30,7 +30,7 @@ export const useQueryStore = defineStore('query', {
       ],
       targetPool: "",
       poolDateFilters: new Map(),
-      keepSettings: false,
+      keepPoolSettings: [],
    }),
    getters: {
       stateObject: state => {
@@ -159,7 +159,12 @@ export const useQueryStore = defineStore('query', {
             return state.poolDateFilters.get( state.targetPool )
          }
          return null
-      }
+      },
+      keepSettings: state => {
+         return (poolID) => {
+            return state.keepPoolSettings.includes(poolID)
+         }
+      },
    },
    actions: {
       // TODO is this needed? validate dates instead and flag error?
