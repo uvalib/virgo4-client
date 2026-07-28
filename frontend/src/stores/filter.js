@@ -142,6 +142,32 @@ export const useFilterStore = defineStore('filter', {
 
       },
 
+      setSortOrder(poolID, filterID, sortBy, sortOrder ) {
+         let tgtPFObj = this.facets.find(pf => pf.pool == poolID)
+         if ( !tgtPFObj ) return 
+         let tgtF = tgtPFObj.facets.find(f => f.id == filterID )
+         if (!tgtF ) return
+
+         tgtF.sort = sortBy   
+         tgtF.order = sortOrder
+         let dir = 1
+         if (sortOrder == 'asc') {
+            dir = -1
+         }
+
+         tgtF.buckets = tgtF.buckets.sort( (a,b) => {
+            if (tgtF.sort == 'alpha') {
+               if (a.value > b.value) return -1*dir
+               if (a.value < b.value) return dir
+               return 0
+            } else {
+               if (a.count > b.count) return -1*dir
+               if (a.count < b.count) return dir
+               return 0    
+            }   
+         })
+      },
+
       setPoolFacets(data) {
          // Get currently selected facets (both valid and N/A), then clear everything out
          // repopulate with data from API call, and restore prior selected state
@@ -167,6 +193,11 @@ export const useFilterStore = defineStore('filter', {
          data.facets.forEach( facet => {
             // NOTES: since the pool details now includes a date filter, the FilterDate facet is not needed. Skip it
             if (facet.id != "FilterDate" && facet.id != "PublicationYear" ) {
+               // add default sort direction; count = desc, alpha = asc
+               facet.order = "asc"
+               if ( facet.sort == 'count') {
+                  facet.order = "desc"   
+               }
                // if this is in the preserved selected items, select it and remove from saved list
                facet.buckets.forEach( fb => {
                   let idx = selected.findIndex( s => facet.id == s.facet_id && fb.value == s.value )

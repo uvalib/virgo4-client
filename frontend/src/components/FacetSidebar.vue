@@ -32,6 +32,10 @@
                >
                   <template v-slot:title>{{ facetInfo.name }}</template>
                   <ul :aria-labelledby="facetInfo.id">
+                     <li class="control" v-if="facetValuesCount(facetInfo) > 5" >
+                        <button @click="setFilterSort(facetInfo.id,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
+                        <button @click="setFilterSort(facetInfo.id,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
+                     </li>
                      <li v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
                         <span class="filter-check">
                            <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @update:modelValue="filterChanged(facetInfo.id, fv)"/>
@@ -114,6 +118,36 @@ function valueKey(idx, facetID) {
    return facetID+"_val_"+idx
 }
 
+const setFilterSort = ((filterID, type) => {
+   let order = "desc"
+   let filter = filterStore.poolFacets(resultStore.selectedResults.pool.id).find(f => f.id == filterID)
+   if (filter ) {
+       if (filter.sort == type ) {
+         if ( filter.order == "desc") {
+            order = "asc"
+         }
+       } else {
+         if ( type == "alpha") {
+            order = "asc"   
+         }
+      }
+      filterStore.setSortOrder(resultStore.selectedResults.pool.id, filterID, type, order)
+   }
+})
+const filterSort = ((filterID, type) => {
+   let out = "fa-arrow-down-short-wide" // ASCENDING
+   let filter = filterStore.poolFacets(resultStore.selectedResults.pool.id).find(f => f.id == filterID)
+   if (filter ) {
+      console.log(`FILTER sort ${filter.sort} order ${filter.order}` )
+      if (filter.sort != type ) {
+         out = "fa-arrow-down-arrow-up"  
+      } else if (filter.order == "desc") {
+         out = "fa-arrow-down-wide-short"   
+      }
+   }
+   return out
+})
+
 const filterCollapsed = ((filterID) => {
    expandedFilters.value = expandedFilters.value.filter(fID => fID != filterID)
 })
@@ -184,6 +218,24 @@ async function filterChanged(facetID, facetValue) {
             }
             .cnt {
                font-size: .8em;
+            }
+         }
+         li.control {
+            border-bottom: 1px solid $uva-grey-100;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            font-size: 0.8em;
+            button {
+               background-color: transparent;
+               border:none;
+               &:focus {
+                  outline: 1px dashed $uva-brand-blue-100;
+                  outline-offset: 2px;
+               }
+            }
+            i {
+               display: inline-block;
+               margin-left: 5px;
             }
          }
          li.more {
