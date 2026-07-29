@@ -7,26 +7,23 @@
          <div class="filters-section">
             <div class="filters-head">
                <span class="title">Applied Filters</span>
-               <VirgoButton v-if="hasFilter || hasNaFilter" @click="clearClicked" label="Clear Applied Filters" severity="secondary" size="small"/>
+               <VirgoButton v-if="hasFilter" @click="clearClicked" label="Clear Applied Filters" severity="secondary" size="small"/>
             </div>
-            <dl class="filter-display" v-if="hasFilter">
+            <div class="filter-display" v-if="hasFilter">
                <template  v-for="(values, filter) in appliedFilters" :key="`${filter}-values`">
-                  <dt class="label" v-show="filter != 'undefined'">{{filter}}</dt>
-                  <dd class="label">
-                     <span v-for="fv in values" class="selected" :key="`${filter}-${fv.value}`">
-                        <VirgoButton class="remove" @click="removeFilter(fv)" :aria-label="`remove filter ${fv.value}`">
+                     <template v-for="fv in values" :key="`${filter}-${fv.value}`">
+                        <button class="remove" @click="removeFilter(fv)" :aria-label="`remove filter ${fv.value}`">
                            <i class="fas fa-times-circle"></i>
-                           <span aria-hidden="true">{{fv.value}}</span>
-                        </VirgoButton>
-                     </span>
-                  </dd>
+                           <span aria-hidden="true">{{filter}}: {{fv.value}}</span>
+                        </button>
+                     </template>
                </template>
-            </dl>
+            </div>
             <div v-else class="no-filter">
                <span>None</span>
             </div>
          </div>
-         <div v-if="hasNaFilter" class="filters-section">
+         <!-- <div v-if="hasNaFilter" class="filters-section">
             <div class="filters-head">
                <span class="title">Not Applicable Filters</span>
             </div>
@@ -38,7 +35,7 @@
                   </VirgoButton>
                </span>
             </div>
-         </div>
+         </div> -->
       </template>
    </div>
 </template>
@@ -59,20 +56,20 @@ const resultStore = useResultStore()
 const filters = useFilterStore()
 const queryStore = useQueryStore()
 
-const naFilters = computed(()=>{
-   let out = []
-   filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na === true).forEach(pf=>{
-      let val = pf.value
-      out.push( {facet_id: pf.facet_id, value: val} )
-   })
-   return out
-})
+// const naFilters = computed(()=>{
+//    let out = []
+//    filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na === true).forEach(pf=>{
+//       let val = pf.value
+//       out.push( {facet_id: pf.facet_id, value: val} )
+//    })
+//    return out
+// })
 const hasFilter = computed(()=>{
    return filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na != true).length > 0
 })
-const hasNaFilter = computed(()=>{
-   return filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na === true).length > 0
-})
+// const hasNaFilter = computed(()=>{
+//    return filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na === true).length > 0
+// })
 const appliedFilters = computed(()=>{
    // display is grouped by facet, raw data is just a series of
    // facet_id/value pairs. Convert to display
@@ -116,7 +113,7 @@ async function clearClicked() {
    padding-bottom: 0px;
    .filters-head {
       font-weight: bold;
-      margin: 0;
+      margin: 0 0 10px 0;
       padding: 0;
       display: flex;
       flex-flow: row wrap;
@@ -133,28 +130,21 @@ async function clearClicked() {
       display: block;
    }
    .filter-display {
-      margin: 0 20px;
-      font-size: 0.9em;
-      dt {
-         font-weight: 500;
-      }
-      dd {
-         font-weight: normal;
-         margin: 5px 0 10px 20px;
-         display: flex;
-         flex-flow: row wrap;
-         justify-content: flex-start;
-         align-items: flex-start;
-         gap: 10px;
-      }
+      margin: 0 0 0 10px;
+      display: flex;
+      flex-flow: row wrap;
+      gap: 5px;
       button.remove {
          border: 1px solid $uva-grey-100;
-         padding: 2px 15px 2px 3px;
-         border-radius: 10px;
+         padding: 4px 15px 4px 4px;
+         border-radius: 0.3rem;
          margin: 0px;
          background: white;
          color: $uva-text-color-dark;
          cursor: pointer;
+         span {
+            white-space: nowrap;
+         }
          i {
             margin: 1px 10px 0 0;
             color: $uva-red;
