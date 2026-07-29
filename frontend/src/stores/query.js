@@ -30,7 +30,7 @@ export const useQueryStore = defineStore('query', {
       ],
       targetPool: "",
       poolDateFilters: new Map(),
-      keepPoolSettings: [],
+      keepSettings: false
    }),
    getters: {
       stateObject: state => {
@@ -159,11 +159,6 @@ export const useQueryStore = defineStore('query', {
             return state.poolDateFilters.get( state.targetPool )
          }
          return null
-      },
-      keepSettings: state => {
-         return (poolID) => {
-            return state.keepPoolSettings.includes(poolID)
-         }
       },
    },
    actions: {
@@ -333,6 +328,7 @@ export const useQueryStore = defineStore('query', {
          })
          this.targetPool = ""
          this.poolDateFilters = new Map()
+         this.keepSettings = false
       },
       widenSearch() {
          this.targetPool = ""

@@ -115,9 +115,9 @@ export function useRouteUtils( router,route ) {
 
       let newQ = Object.assign({}, route.query)
 
-      console.log("SEARCH CHANGED; RESET "+resetFilters+" PRESERVE "+queryStore.keepFilters)
+      console.log(`SEARCH CHANGED; POOL ${queryStore.targetPool} RESET ${resetFilters} PRESERVE ${queryStore.keepSettings}`)
 
-      if ( resetFilters && queryStore.keepSettings(resultStore.selectedResults.pool.id) == false ) {
+      if ( resetFilters &&  queryStore.keepSettings == false ) {
          console.log("RESET FILTERS / SORT FOR NEW QUERRY")
          delete newQ.filter
          queryStore.resetAllDateFilters()

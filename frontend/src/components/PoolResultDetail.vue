@@ -38,10 +38,10 @@
             <V4Sort :pool="selectedResults.pool" />
             <ExcludePool v-if="canExclude"/>
          </div>
-         <div v-if="hasFilter || queryStore.keepSettings(selectedResults.pool.id)" class="keep-section">
+         <div class="keep-section">
             <label>
                Keep settings for this session
-               <input type="checkbox" v-model="keepSettings" @change="keepSettingsClicked"/>
+               <input type="checkbox" v-model="queryStore.keepSettings" />
             </label>
          </div>
       </div>
@@ -132,7 +132,6 @@ const dateType = ref("BETWEEN")
 const startDate = ref("")
 const endDate = ref("")
 const dateErr = ref("")
-const keepSettings = ref(queryStore.keepSettings(resultStore.selectedResults.pool.id))
 
 const { targetPool } = storeToRefs(queryStore)
 watch( targetPool, (newVal) => {
@@ -204,17 +203,6 @@ const poolExclusionString = computed( () => {
       }
    })
    return msg
-})
-
-
-const keepSettingsClicked = (() => {
-   if (keepSettings.value) {
-      if ( queryStore.keepSettings(resultStore.selectedResults.pool.id) == false) {
-         queryStore.keepPoolSettings.push(resultStore.selectedResults.pool.id)
-      }
-   } else {
-      queryStore.keepPoolSettings = queryStore.keepPoolSettings.filter( p => p != resultStore.selectedResults.pool.id)   
-   }
 })
 
 const dateTypeChanged = (() => {
