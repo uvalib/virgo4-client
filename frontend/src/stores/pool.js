@@ -189,7 +189,7 @@ export const usePoolStore = defineStore('pool', {
 
             // no filters in new data?
             if ( !(p.filters && p.filters.length > 0) ) {
-               if (prior && prior.providers) {
+               if (prior && prior.filters) {
                   p.filters = prior.filters.slice()
                }   
             }
