@@ -14,7 +14,7 @@
             <div v-if="filterStore.updatingFacets" class="working">
                <V4Spinner message="Loading filters..."/>
             </div>
-            <div v-else-if="facets.length == 0" class="no-facets">
+            <div v-else-if="facets.length == 0 || resultStore.selectedResults.total==0" class="no-facets">
                Filters are not available for this search
             </div>
             <template v-else="filterStore.updatingFacets == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >

@@ -53,8 +53,8 @@ export const useFilterStore = defineStore('filter', {
             pfObj.facets.forEach( f => {
                f.buckets.forEach( bucket => {
                   if (bucket.selected == true ) {
-                     let na = (bucket.na === true)
-                     filter.push( {facet_id: f.id, facet_name: f.name, value: bucket.value, na: na})
+                     // let na = (bucket.na === true)
+                     filter.push( {facet_id: f.id, facet_name: f.name, value: bucket.value})//, na: na})
                   }
                })
             })
@@ -248,12 +248,12 @@ export const useFilterStore = defineStore('filter', {
                analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facetID}:${value}`)
             }
          }
-         if ( bucket.na ) {
-            facetInfo.buckets.splice(bIdx,1)
-            if ( facetInfo.buckets.length == 0) {
-               pfObj.facets.splice(fIdx,1)
-            }
-         }
+         // if ( bucket.na ) {
+         //    facetInfo.buckets.splice(bIdx,1)
+         //    if ( facetInfo.buckets.length == 0) {
+         //       pfObj.facets.splice(fIdx,1)
+         //    }
+         // }
          this.facets.splice(idx, 1, pfObj)
       },
 
