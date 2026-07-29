@@ -138,7 +138,6 @@ const filterSort = ((filterID, type) => {
    let out = "fa-arrow-down-short-wide" // ASCENDING
    let filter = filterStore.poolFacets(resultStore.selectedResults.pool.id).find(f => f.id == filterID)
    if (filter ) {
-      console.log(`FILTER sort ${filter.sort} order ${filter.order}` )
       if (filter.sort != type ) {
          out = "fa-arrow-down-arrow-up"  
       } else if (filter.order == "desc") {

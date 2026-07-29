@@ -272,7 +272,6 @@ const getBrowseLinks = ( ( name, values, altValues ) => {
          }
       }
    })
-   console.log("NAME "+name+" = "+JSON.stringify(out))
    return out
 })
 
@@ -284,7 +283,6 @@ const getFilterLinks = ( ( filter, values ) => {
       let link = [{label: v, url: `/search?mode=advanced&q=${qp}&filter=${fp}`}]
       out.push(link)
    })
-   console.log("FILTER "+filter+" = "+JSON.stringify(out))
    return out
 })
 
