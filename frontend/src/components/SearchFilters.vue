@@ -11,9 +11,9 @@
             </div>
             <div class="filter-display" v-if="hasFilter">
                <template  v-for="filter in appliedFilters" :key="`${filter}-values`">
-                  <button class="remove" @click="removeFilter(filter.value)" :aria-label="`remove filter ${filter.value}`">
+                  <button class="remove" @click="removeFilter(filter)" :aria-label="`remove filter ${filter.value}`">
                      <i class="fas fa-times-circle"></i>
-                     <span v-if="filter.name" aria-hidden="true">{{filter.name}}: {{filter.value}}</span>
+                     <span v-if="filter.facet_name" aria-hidden="true">{{filter.facet_name}}: {{filter.value}}</span>
                      <span v-else aria-hidden="true">{{filter.value}}</span>
                   </button>
                </template>
