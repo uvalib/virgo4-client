@@ -10,32 +10,18 @@
                <VirgoButton v-if="hasFilter" @click="clearClicked" label="Clear Applied Filters" severity="secondary" size="small"/>
             </div>
             <div class="filter-display" v-if="hasFilter">
-               <template  v-for="(values, filter) in appliedFilters" :key="`${filter}-values`">
-                     <template v-for="fv in values" :key="`${filter}-${fv.value}`">
-                        <button class="remove" @click="removeFilter(fv)" :aria-label="`remove filter ${fv.value}`">
-                           <i class="fas fa-times-circle"></i>
-                           <span aria-hidden="true">{{filter}}: {{fv.value}}</span>
-                        </button>
-                     </template>
+               <template  v-for="filter in appliedFilters" :key="`${filter}-values`">
+                  <button class="remove" @click="removeFilter(filter.value)" :aria-label="`remove filter ${filter.value}`">
+                     <i class="fas fa-times-circle"></i>
+                     <span v-if="filter.name" aria-hidden="true">{{filter.name}}: {{filter.value}}</span>
+                     <span v-else aria-hidden="true">{{filter.value}}</span>
+                  </button>
                </template>
             </div>
             <div v-else class="no-filter">
                <span>None</span>
             </div>
          </div>
-         <!-- <div v-if="hasNaFilter" class="filters-section">
-            <div class="filters-head">
-               <span class="title">Not Applicable Filters</span>
-            </div>
-            <div class="unsupported filter-display" >
-               <span v-for="naF in naFilters" class="selected" :key="`na-${naF.value}`">
-                  <VirgoButton class="remove" @click="removeFilter(naF)" :aria-label="`remove filter ${naF.value}`">
-                     <i class="fas fa-times-circle"></i>
-                     <span aria-hidden="true">{{naF.value}}</span>
-                  </VirgoButton>
-               </span>
-            </div>
-         </div> -->
       </template>
    </div>
 </template>
@@ -56,33 +42,11 @@ const resultStore = useResultStore()
 const filters = useFilterStore()
 const queryStore = useQueryStore()
 
-// const naFilters = computed(()=>{
-//    let out = []
-//    filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na === true).forEach(pf=>{
-//       let val = pf.value
-//       out.push( {facet_id: pf.facet_id, value: val} )
-//    })
-//    return out
-// })
 const hasFilter = computed(()=>{
-   return filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na != true).length > 0
+   return filters.poolFilter(resultStore.selectedResults.pool.id).length > 0
 })
-// const hasNaFilter = computed(()=>{
-//    return filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na === true).length > 0
-// })
 const appliedFilters = computed(()=>{
-   // display is grouped by facet, raw data is just a series of
-   // facet_id/value pairs. Convert to display
-   let out = {}
-   filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na != true).forEach(pf=>{
-      let val = pf.value
-      let facetName = pf.facet_name
-      if ( Object.prototype.hasOwnProperty.call(out, facetName) == false ) {
-         out[facetName] = []
-      }
-      out[facetName].push( {facet_id: pf.facet_id, value: val} )
-   })
-   return out
+   return filters.poolFilter(resultStore.selectedResults.pool.id)
 })
 
 function removeFilter( filter ) {
