@@ -87,7 +87,6 @@ const appliedFilters = computed(()=>{
 
 function removeFilter( filter ) {
    filters.toggleFilter(resultStore.selectedResults.pool.id, filter.facet_id, filter.value)
-   resultStore.clearSelectedPoolResults()
    routeUtils.filterChanged()
 }
 

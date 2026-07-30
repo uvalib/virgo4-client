@@ -193,6 +193,9 @@ export const useFilterStore = defineStore('filter', {
          data.facets.forEach( facet => {
             // NOTES: since the pool details now includes a date filter, the FilterDate facet is not needed. Skip it
             if (facet.id != "FilterDate" && facet.id != "PublicationYear" ) {
+               if (facet.id=="PeerReviewedOnly") {
+                  facet.name = "Peer Review Status"
+               }
                // add default sort direction; count = desc, alpha = asc
                facet.order = "asc"
                if ( facet.sort == 'count') {

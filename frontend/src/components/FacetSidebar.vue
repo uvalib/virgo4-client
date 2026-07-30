@@ -11,37 +11,31 @@
             <div class="no-facets">{{resultStore.selectedResults.pool.name}} does not support filtering</div>
          </div>
          <div v-else class="body">
-            <div v-if="filterStore.updatingFacets" class="working">
-               <V4Spinner message="Loading filters..."/>
+            <div v-if="filterStore.updatingFacets || resultStore.searching" class="dimmer">
+               <div class="working">
+                  Filters loading...
+                  <div class="spinner-animation">
+                     <div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>
+                  </div>
+               </div>
             </div>
-            <div v-else-if="facets.length == 0 || resultStore.selectedResults.total==0" class="no-facets">
+            <div v-if="(facets.length == 0 || resultStore.selectedResults.total==0) && filterStore.updatingFacets == false" class="no-facets">
                Filters are not available for this search
             </div>
             <template v-else="filterStore.updatingFacets == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
-               <div v-if="facetInfo.id=='PeerReviewedOnly'" class="seer-review">
-                  <label class="cb-label">
-                     <Checkbox  v-model="facetInfo.buckets[0].selected" :binary="true" 
-                        @update:modelValue="filterChanged(facetInfo.id, facetInfo.buckets[0])"
-                     />
-                     {{ facetInfo.buckets[0].value}}
-                  </label>
-               </div>
-               <AccordionContent v-else
+               <AccordionContent v-if="facetValuesCount(facetInfo) > 0"
                   :id="facetInfo.id" :background=colors.grey200 
                   @accordion-collapsed="filterCollapsed(facetInfo.id)" :expanded="idx < 4"
                >
                   <template v-slot:title>{{ facetInfo.name }}</template>
                   <ul :aria-labelledby="facetInfo.id">
-                     <li class="control" v-if="facetValuesCount(facetInfo) > 5" >
+                     <li class="control" v-if="facetValuesCount(facetInfo) > 1">
                         <button @click="setFilterSort(facetInfo.id,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
                         <button @click="setFilterSort(facetInfo.id,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
                      </li>
                      <li v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
-                        <span class="filter-check">
-                           <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @update:modelValue="filterChanged(facetInfo.id, fv)"/>
-                           <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
-                        </span>
-                        <span class="cnt">({{$formatNum(fv.count)}})</span>   
+                        <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
+                        <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>   
                      </li>
                      <template v-if="facetValuesCount(facetInfo) > 5" >
                         <li v-if="isFilterExpanded(facetInfo.id) == false" class="more">
@@ -50,10 +44,7 @@
                            />
                         </li>
                         <li v-else v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
-                           <span class="filter-check">
-                              <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @update:modelValue="filterChanged(facetInfo.id, fv)"/>
-                              <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
-                           </span>
+                           <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
                            <span class="cnt">({{$formatNum(fv.count)}})</span>   
                         </li>
                      </template>
@@ -67,7 +58,6 @@
 
 <script setup>
 import AccordionContent from "@/components/AccordionContent.vue"
-import Checkbox from 'primevue/checkbox'
 import { computed, ref } from 'vue'
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
@@ -107,11 +97,11 @@ const facets = computed(()=>{
 
 function facetValuesCount(facet) {
    if (!facet.buckets) return 0
-   return facet.buckets.filter(b=>b.value && b.na != true).length
+   return facet.buckets.filter(b=>b.value && b.selected == false).length
 }
 function facetValues(facet, start, end) {
    if (!facet.buckets) return []
-   let out = facet.buckets.filter(b=> b.value && b.na != true).slice(start,end)
+   let out = facet.buckets.filter(b=> b.value && b.selected == false).slice(start,end)
    return out
 }
 function valueKey(idx, facetID) {
@@ -161,15 +151,11 @@ const toggleFilterExpand = ((filterID) => {
    }
 })
 
-async function filterChanged(facetID, facetValue) {
-   if (facetValue.selected) {
-      analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facetID}:${facetValue.value}`)
-   } else {
-      analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facetID}:${facetValue.value}`)
-   }
-   resultStore.clearSelectedPoolResults()
+const filterSelected = ((facetID, facetValue) => {
+   facetValue.selected = true
+   analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facetID}:${facetValue.value}`)
    routeUtils.filterChanged()
-}
+})
 </script>
 <style lang="scss" scoped>
 .facet-sidebar {
@@ -194,7 +180,26 @@ async function filterChanged(facetID, facetValue) {
       display: flex;
       flex-direction: column;
       gap: 15px;
-       ul  {
+      position: relative;
+      button.filter {
+         flex-grow: 1;
+         background-color: transparent;
+         border:none;
+         text-align: left;
+         font-size: 1em;
+         border-radius: 0.3rem;
+         color: $uva-blue-alt-A;
+         cursor: pointer;
+         &:focus {
+            outline: 1px dashed $uva-brand-blue-100;
+            outline-offset: 2px;
+         }
+         &:hover {
+            text-decoration: underline;
+            font-weight: 500;
+         }
+      }
+      ul  {
          margin: 0;
          padding: 10px;
          border: 1px solid $uva-grey-100;
@@ -208,13 +213,6 @@ async function filterChanged(facetID, facetValue) {
             padding: 3px 2px;
             font-weight: normal;
             gap: 15px;
-            .filter-check {
-               display: flex;
-               flex-flow: row nowrap;  
-               justify-content: flex-start;
-               align-items: flex-start;
-               gap: 10px;
-            }
             .cnt {
                font-size: .8em;
             }
@@ -251,8 +249,23 @@ div.no-facets {
    margin:25px 5px;
    font-size: 1.25em;
 }
-.working {
-   text-align: center;
+.dimmer {
+   position: absolute;
+   left: 0px;
+   right: 0px;
+   top: 0;
+   bottom: 0;
+   z-index: 1;
+   backdrop-filter: blur(1.5px);
+   .working {
+      text-align: center;
+      background: white;
+      margin: 10% 10px 0 10px;
+      border: 2px solid $uva-grey;
+      border-radius: 0.3rem;
+      padding: 25px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+   }
 }
 .facet-sidebar.overlay {
    position: fixed;
@@ -272,6 +285,42 @@ div.no-facets {
    .body {
       max-height: 450px;
       overflow: scroll;
+   }
+}
+.spinner-animation {
+  margin: 5px auto;
+  width: 80px;
+  text-align: center;
+}
+.spinner-animation > div {
+   width: 12px;
+   height: 12px;
+   border-radius: 100%;
+   display: inline-block;
+   -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+   animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+   margin: 0 2px;
+   background-color: $uva-grey-100;
+}
+.spinner-animation .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+.spinner-animation .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+@-webkit-keyframes sk-bouncedelay {
+  0%, 80%, 100% { -webkit-transform: scale(0) }
+  40% { -webkit-transform: scale(1.0) }
+}
+@keyframes sk-bouncedelay {
+   0%, 80%, 100% {
+      -webkit-transform: scale(0);
+      transform: scale(0);
+   } 40% {
+      -webkit-transform: scale(1.0);
+      transform: scale(1.0);
    }
 }
 </style>

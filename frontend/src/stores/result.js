@@ -42,7 +42,7 @@ export const useResultStore = defineStore('result', {
          return state.selectedHitIdx > -1 && this.selectedHit.number > 1
       },
       hasResults: state => {
-         return state.searching == false && state.total >= 0
+         return state.total >= 0
       },
       selectedResults: state => {
          return state.results[state.selectedResultsIdx]

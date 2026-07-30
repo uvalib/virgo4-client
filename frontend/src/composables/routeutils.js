@@ -80,7 +80,7 @@ export function useRouteUtils( router,route ) {
 
       // only re-run search when query, sort or filtering has changed - or a user has initiated a search with a UI element
       if ( runSearch == true ) {
-         resultStore.resetSearchResults()
+         // // resultStore.resetSearchResults()
          queryStore.userSearched = false
 
          await searchCallback(queryStore.searchSources)
