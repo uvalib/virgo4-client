@@ -67,6 +67,7 @@ import colors from '@/assets/theme/colors.module.scss'
 import analytics from '@/analytics'
 import { useWindowSize } from '@vueuse/core'
 import { useRouteUtils } from '@/composables/routeutils'
+import { scrollToItem } from '@/utils'
 
 const { width } = useWindowSize()
 const route = useRoute()
@@ -155,6 +156,7 @@ const filterSelected = ((facetID, facetValue) => {
    facetValue.selected = true
    analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facetID}:${facetValue.value}`)
    routeUtils.filterChanged()
+    scrollToItem("results-container", true)
 })
 </script>
 <style lang="scss" scoped>
@@ -251,12 +253,12 @@ div.no-facets {
 }
 .dimmer {
    position: absolute;
-   left: 0px;
-   right: 0px;
-   top: 0;
-   bottom: 0;
+   left: 1px;
+   right: 1px;
+   top: 1px;
+   bottom: 1px;
    z-index: 1;
-   backdrop-filter: blur(1.5px);
+   backdrop-filter: blur(2px);
    .working {
       text-align: center;
       background: white;
