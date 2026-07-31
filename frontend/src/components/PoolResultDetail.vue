@@ -138,6 +138,11 @@ watch( targetPool, (newVal) => {
    updateDateFilter()
 })
 
+const { poolDateFilters } = storeToRefs(queryStore)
+watch( poolDateFilters, (newVal) => {
+   updateDateFilter()
+})
+
 onMounted( () => {
    updateDateFilter()
 })
