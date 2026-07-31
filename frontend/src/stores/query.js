@@ -328,7 +328,6 @@ export const useQueryStore = defineStore('query', {
          })
          this.targetPool = ""
          this.poolDateFilters = new Map()
-         this.keepSettings = false
       },
       widenSearch() {
          this.targetPool = ""
