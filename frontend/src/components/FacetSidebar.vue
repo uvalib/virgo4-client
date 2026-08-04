@@ -13,7 +13,7 @@
          <div v-else class="body">
             <div v-if="filterStore.updatingFacets || resultStore.searching" class="dimmer">
                <div class="working">
-                  Filters loading...
+                  Loading filters...
                   <div class="spinner-animation">
                      <div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>
                   </div>
@@ -263,10 +263,9 @@ div.no-facets {
       text-align: center;
       background: white;
       margin: 10% 10px 0 10px;
-      border: 2px solid $uva-grey;
-      border-radius: 0.3rem;
+      border: 1px solid $uva-grey-100;
       padding: 25px;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+
    }
 }
 .facet-sidebar.overlay {
@@ -290,9 +289,9 @@ div.no-facets {
    }
 }
 .spinner-animation {
-  margin: 5px auto;
-  width: 80px;
-  text-align: center;
+   margin: 10px auto 0 auto;
+   width: 80px;
+   text-align: center;
 }
 .spinner-animation > div {
    width: 12px;
