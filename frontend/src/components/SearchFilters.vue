@@ -1,28 +1,23 @@
 <template>
    <div class="filters" aria-live="polite">
-      <div class="working" v-if="filters.updatingFacets" aria-hidden="true">
-         Loading filters...
-      </div>
-      <template v-else>
-         <div class="filters-section">
-            <div class="filters-head">
-               <span class="title">Applied Filters</span>
-               <VirgoButton v-if="hasFilter" @click="clearClicked" label="Clear Applied Filters" severity="secondary" size="small"/>
-            </div>
-            <div class="filter-display" v-if="hasFilter">
-               <template  v-for="filter in appliedFilters" :key="`${filter}-values`">
-                  <button class="remove" @click="removeFilter(filter)" :aria-label="`remove filter ${filter.value}`">
-                     <i class="fas fa-times-circle"></i>
-                     <span v-if="filter.facet_name" aria-hidden="true">{{filter.facet_name}}: {{filter.value}}</span>
-                     <span v-else aria-hidden="true">{{filter.value}}</span>
-                  </button>
-               </template>
-            </div>
-            <div v-else class="no-filter">
-               <span>None</span>
-            </div>
+      <div class="filters-section">
+         <div class="filters-head">
+            <span class="title">Applied Filters</span>
+            <VirgoButton v-if="hasFilter" @click="clearClicked" label="Clear Applied Filters" severity="secondary" size="small"/>
          </div>
-      </template>
+         <div class="filter-display" v-if="hasFilter">
+            <template  v-for="filter in appliedFilters" :key="`${filter}-values`">
+               <button class="remove" @click="removeFilter(filter)" :aria-label="`remove filter ${filter.value}`">
+                  <i class="fas fa-times-circle"></i>
+                  <span v-if="filter.facet_name" aria-hidden="true">{{filter.facet_name}}: {{filter.value}}</span>
+                  <span v-else aria-hidden="true">{{filter.value}}</span>
+               </button>
+            </template>
+         </div>
+         <div v-else class="no-filter">
+            <span>None</span>
+         </div>
+      </div>
    </div>
 </template>
 
