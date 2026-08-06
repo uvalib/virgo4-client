@@ -448,8 +448,11 @@ export const useFilterStore = defineStore('filter', {
          })
 
          // Recreate the query for the target pool, but include a request for ALL facet info
+         // Use this to include the DATE stuff for date filtering, but it will incude the param date_filter
+         // which is not valid. Replace it with date
+         let qStr = query.poolQueryString.replace("date_filter:", "date:")
          let req = {
-            query: query.string,
+            query: qStr,
             pagination: { start: 0, rows: 0 },
             filters: [filterObj]
          }
