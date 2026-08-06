@@ -82,6 +82,7 @@ export function useRouteUtils( router,route ) {
       if ( runSearch == true ) {
          // // resultStore.resetSearchResults()
          queryStore.userSearched = false
+         queryStore.filtersCleared = false
 
          await searchCallback(queryStore.searchSources)
 
@@ -104,9 +105,9 @@ export function useRouteUtils( router,route ) {
    })
 
    // when the user clicks the search or advanced search button, this is an entirely
-   // new search and the resetFilters flag will be set - unless it has been
+   // new search and the newSearch flag will be set - unless it has been
    // requested to preserve prior filters
-   const searchChanged = ( ( resetFilters = false ) => {
+   const searchChanged = ( ( newSearch = false ) => {
       const queryStore = useQueryStore()
       const resultStore = useResultStore()
       const filters = useFilterStore()
@@ -115,9 +116,9 @@ export function useRouteUtils( router,route ) {
 
       let newQ = Object.assign({}, route.query)
 
-      console.log(`SEARCH CHANGED; POOL ${queryStore.targetPool} RESET ${resetFilters} PRESERVE ${queryStore.keepSettings}`)
+      console.log(`SEARCH CHANGED; POOL ${queryStore.targetPool} NEW ${newSearch} PRESERVE ${queryStore.keepSettings}`)
 
-      if ( resetFilters &&  queryStore.keepSettings == false ) {
+      if ( newSearch &&  queryStore.keepSettings == false ) {
          console.log("RESET FILTERS / SORT FOR NEW QUERRY")
          delete newQ.filter
          queryStore.resetAllDateFilters()
@@ -130,7 +131,13 @@ export function useRouteUtils( router,route ) {
             filters.reset()  
          }
       } else {
-         console.log("PRESERVE FILTERS / SORT")
+         console.log("PRESERVE SETTINGS")
+         if ( queryStore.filtersCleared ) {
+            // NOTES: see notes in AppliedFilters.vie for why this is here
+            queryStore.filtersCleared = false
+            delete newQ.page
+            delete newQ.filter
+         }
          if (queryStore.mode == "advanced") {
             newQ.mode = "advanced"                             // ensure mode is in the query params
             sortStore.promotePreSearchSort( poolStore.list )   // set the filters in the query params

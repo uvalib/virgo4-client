@@ -4,6 +4,7 @@ import axios from 'axios'
 export const useQueryStore = defineStore('query', {
 	state: () => ({
       userSearched: false,
+      filtersCleared: false,
       mode: "basic",
       basic: "",
       searchSources: "all",

@@ -16,8 +16,7 @@
             </template>
          </div>
          <div class="date-acts">
-            <VirgoButton label="Apply Date Filter" size="small" @click="applyDateFilterClicked"/>
-            <VirgoButton label="Clear Date Filter" severity="secondary" size="small" @click="clearDateFilterClicked"/>
+            <VirgoButton severity="secondary" :label="dateLabel" size="small" @click="applyDateFilterClicked"/>
          </div>
       </div>
       <div class="error" v-if="dateErr">{{ dateErr }}</div>
@@ -31,6 +30,7 @@ import { useRouteUtils } from '@/composables/routeutils'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useRouter, useRoute } from 'vue-router'
+import { watchDeep } from '@vueuse/core'
 
 const route = useRoute()
 const router = useRouter()
@@ -48,9 +48,18 @@ watch( targetPool, (newVal) => {
    updateDateFilter()
 })
 
+// normal watch doesn't always catch chages to the Map used to hold date filter
 const { poolDateFilters } = storeToRefs(queryStore)
-watch( poolDateFilters, (newVal) => {
+watchDeep( poolDateFilters, () => {
    updateDateFilter()
+})
+
+
+const dateLabel = computed(() => {
+   if ( queryStore.dateFilter ) {
+      return "Update Date Filter"
+   }
+   return "Apply Date Filter"
 })
 
 onMounted( () => {
@@ -75,16 +84,6 @@ const dateTypeChanged = (() => {
    if ( dateType.value != "BETWEEN" ) {
       endDate.value = ""
    }   
-})
-
-const clearDateFilterClicked = (() => {
-   dateType.value = "BETWEEN"
-   startDate.value = ""
-   endDate.value = ""
-   dateErr.value = ""
-   queryStore.removeDateFilter( resultStore.selectedResults.pool.id )
-   queryStore.userSearched = true
-   routeUtils.searchChanged()
 })
 
 const applyDateFilterClicked = (() => {

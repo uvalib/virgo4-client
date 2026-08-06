@@ -33,7 +33,7 @@
             <div v-if="(facets.length == 0 || resultStore.selectedResults.total==0) && filterStore.updatingFacets == false && resultStore.searching == false" class="no-facets">
                Filters are not available for this search
             </div>
-            <template v-else="filterStore.updatingFacets == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
+            <template v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
                <AccordionContent v-if="facetValuesCount(facetInfo) > 0"
                   :id="facetInfo.id" :background=colors.grey200 
                   @accordion-collapsed="filterCollapsed(facetInfo.id)" :expanded="idx < 4"
@@ -102,7 +102,7 @@ const facetsLoaded = computed(()=>{
    return filterStore.poolFacets(resultStore.selectedResults.pool.id).length > 0
 })
 const hasAppliedFilter = computed(()=>{
-   return filterStore.poolFilter(resultStore.selectedResults.pool.id).length > 0
+   return (filterStore.poolFilter(resultStore.selectedResults.pool.id).length > 0 || queryStore.dateFilter)
 })
 const canDateFilter = computed(() => {
    if (resultStore.selectedResults.pool.mode == 'image') return false
@@ -178,7 +178,7 @@ const filterSelected = ((facetID, facetValue) => {
    facetValue.selected = true
    analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facetID}:${facetValue.value}`)
    routeUtils.filterChanged()
-    scrollToItem("results-container", true)
+   scrollToItem("results-container", true)
 })
 </script>
 <style lang="scss" scoped>

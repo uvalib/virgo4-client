@@ -2,6 +2,10 @@
    <div class="filters" aria-live="polite">
       <div class="filters-head">Applied Filters</div>
       <div class="filter-display">
+         <button v-if="queryStore.dateFilter" class="remove" @click="removeDateFilter" :aria-label="`remove date filter`">
+            <i class="fas fa-times-circle"></i>
+            <span aria-hidden="true">{{ dateFilterLabel }}</span>
+         </button>
          <template  v-for="filter in appliedFilters" :key="`${filter}-values`">
             <button class="remove" @click="removeFilter(filter)" :aria-label="`remove filter ${filter.value}`">
                <i class="fas fa-times-circle"></i>
@@ -37,15 +41,45 @@ const appliedFilters = computed(()=>{
    return filters.poolFilter(resultStore.selectedResults.pool.id)
 })
 
+const dateFilterLabel = computed(()=>{
+   let label = "Date Published: "
+   const df = queryStore.dateFilter
+   //{startDate: startDate, comparison: comparison, endDate: endDate} 
+   if ( df.comparison == "EQUAL" ) {
+      label +=  df.startDate
+   } else  if ( df.comparison == "BEFORE" ) {
+       label += `before ${df.startDate}`
+   } else  if ( df.comparison == "AFTER" ) {
+       label += `after ${df.startDate}`
+   } else {
+       label += `${df.startDate} to ${df.endDate}`
+   }
+   return label
+})
+
 function removeFilter( filter ) {
    filters.toggleFilter(resultStore.selectedResults.pool.id, filter.facet_id, filter.value)
    routeUtils.filterChanged()
 }
 
-async function clearClicked() {
+const removeDateFilter = (() => {
+   queryStore.removeDateFilter( resultStore.selectedResults.pool.id )
+   queryStore.userSearched = true
+   routeUtils.searchChanged()
+})
+
+
+function clearClicked() {
    analytics.trigger('Results', 'CLEAR_ALL_FILTERS', queryStore.mode)
+   queryStore.removeDateFilter( resultStore.selectedResults.pool.id )
    filters.resetPoolFilters(resultStore.selectedResults.pool.id)
-   routeUtils.filterChanged()
+
+   // this action changes filters and serach so need to flag both.
+   // the routeUtils will catch this flag and update the URL 
+   // to remove the filters and perform the search correctly
+   queryStore.userSearched = true
+   queryStore.filtersCleared = true
+   routeUtils.searchChanged()
 }
 </script>
 
