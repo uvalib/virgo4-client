@@ -11,7 +11,7 @@
             <div class="no-facets">{{resultStore.selectedResults.pool.name}} does not support filtering</div>
          </div>
          <div v-else class="body">
-            <div v-if="filterStore.updatingFacets || resultStore.searching" class="dimmer">
+            <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
                <div class="working">
                   Loading filters...
                   <div class="spinner-animation">
@@ -19,7 +19,7 @@
                   </div>
                </div>
             </div>
-            <div v-if="(facets.length == 0 || resultStore.selectedResults.total==0) && filterStore.updatingFacets == false" class="no-facets">
+            <div v-if="(facets.length == 0 || resultStore.selectedResults.total==0) && filterStore.updatingFacets == false && resultStore.searching == false" class="no-facets">
                Filters are not available for this search
             </div>
             <template v-else="filterStore.updatingFacets == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
@@ -82,6 +82,10 @@ const expandedFilters = ref([])
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
 })
+const facetsLoaded = computed(()=>{
+   return filterStore.poolFacets(resultStore.selectedResults.pool.id).length > 0
+})
+
 
 const startSidebarExpanded = computed(()=>{
    return width.value > 810
@@ -177,7 +181,7 @@ const filterSelected = ((facetID, facetValue) => {
       margin: 0;
       background: white;
       position: relative;
-      min-height: 150px;
+      min-height: 120px;
       padding: 15px;
       display: flex;
       flex-direction: column;
@@ -262,7 +266,7 @@ div.no-facets {
    .working {
       text-align: center;
       background: white;
-      margin: 10% 10px 0 10px;
+      margin: 10px;
       border: 1px solid $uva-grey-100;
       padding: 25px;
 

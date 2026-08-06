@@ -38,7 +38,7 @@
             <V4Sort :pool="selectedResults.pool" />
             <ExcludePool v-if="canExclude"/>
          </div>
-         <div class="keep-section">
+         <div class="keep-section" v-if="hasFacets">
             <label>
                Keep settings for this session
                <input type="checkbox" v-model="queryStore.keepSettings" />
