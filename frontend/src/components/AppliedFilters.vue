@@ -1,22 +1,15 @@
 <template>
    <div class="filters" aria-live="polite">
-      <div class="filters-section">
-         <div class="filters-head">
-            <span class="title">Applied Filters</span>
-            <VirgoButton v-if="hasFilter" @click="clearClicked" label="Clear Applied Filters" severity="secondary" size="small"/>
-         </div>
-         <div class="filter-display" v-if="hasFilter">
-            <template  v-for="filter in appliedFilters" :key="`${filter}-values`">
-               <button class="remove" @click="removeFilter(filter)" :aria-label="`remove filter ${filter.value}`">
-                  <i class="fas fa-times-circle"></i>
-                  <span v-if="filter.facet_name" aria-hidden="true">{{filter.facet_name}}: {{filter.value}}</span>
-                  <span v-else aria-hidden="true">{{filter.value}}</span>
-               </button>
-            </template>
-         </div>
-         <div v-else class="no-filter">
-            <span>None</span>
-         </div>
+      <div class="filters-head">Applied Filters</div>
+      <div class="filter-display">
+         <template  v-for="filter in appliedFilters" :key="`${filter}-values`">
+            <button class="remove" @click="removeFilter(filter)" :aria-label="`remove filter ${filter.value}`">
+               <i class="fas fa-times-circle"></i>
+               <span v-if="filter.facet_name" aria-hidden="true">{{filter.facet_name}}: {{filter.value}}</span>
+               <span v-else aria-hidden="true">{{filter.value}}</span>
+            </button>
+         </template>
+         <VirgoButton @click="clearClicked" label="Clear Applied Filters" severity="secondary" size="small"/>
       </div>
    </div>
 </template>
@@ -60,52 +53,34 @@ async function clearClicked() {
 .filters {
    background: white;
    color: $uva-text-color-dark;
-   padding: 10px;
-   border-left: 1px solid $uva-grey-100;
-   border-right: 1px solid $uva-grey-100;
-   .working {
-      padding: 10px 20px;
-   }
-}
-.filters-section {
-   padding-bottom: 0px;
-   .filters-head {
-      font-weight: bold;
-      margin: 0 0 10px 0;
-      padding: 0;
-      display: flex;
-      flex-flow: row wrap;
-      align-items: flex-start;
-      justify-content: space-between;
+   padding-bottom: 15px;
+   border-bottom: 1px solid $uva-grey-100;
+   margin-bottom: 5px;
 
-      .title {
-         vertical-align: -webkit-baseline-middle;
-         padding: 5px 10px;
-      }
+   .filters-head {
+      margin-bottom: 10px;
+      padding: 0;
    }
-   .no-filter {
-      margin: 5px 0 5px 30px;
-      display: block;
-   }
+
    .filter-display {
-      margin: 0 0 0 10px;
       display: flex;
-      flex-flow: row wrap;
+      flex-direction: column;
       gap: 5px;
       button.remove {
          border: 1px solid $uva-grey-100;
-         padding: 4px 15px 4px 4px;
+         padding: 6px 8px;
          border-radius: 0.3rem;
          margin: 0px;
          background: white;
          color: $uva-text-color-dark;
          cursor: pointer;
-         span {
-            white-space: nowrap;
-         }
+         text-align: left;
+         font-size: 0.9rem;
+         display: flex;
          i {
-            margin: 1px 10px 0 0;
+            margin: 1px 5px 0 0;
             color: $uva-red;
+            font-size: 1rem;
          }
          &:hover {
             background: $uva-grey-200;

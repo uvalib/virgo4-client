@@ -4,13 +4,24 @@
          :background=colors.brandBlue
          color="white" :expanded="startSidebarExpanded"
          :borderColor=colors.brandBlue
-         :invert="!startSidebarExpanded">
-         <template v-slot:title>{{poolFilterTitle}}</template>
-
+         :invert="!startSidebarExpanded"
+         :hasSettings="true" :showSettings="showSettings" @settingsClicked="showSettings = !showSettings"
+      >
+         <template v-slot:title>Refine your results</template>
+         <template v-slot:settings>
+            <div class="keep-section">
+               <label title="Preserve filter and sort seeings for this session">
+                  <input type="checkbox" v-model="queryStore.keepSettings" />Keep refine settings
+               </label>
+            </div>
+         </template>
          <div v-if="!hasFacets" class="body">
             <div class="no-facets">{{resultStore.selectedResults.pool.name}} does not support filtering</div>
          </div>
          <div v-else class="body">
+            <AppliedFilters v-if="hasAppliedFilter" />
+            <DateFilter v-if="canDateFilter" />
+
             <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
                <div class="working">
                   Loading filters...
@@ -62,12 +73,15 @@ import { computed, ref } from 'vue'
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { usePoolStore } from "@/stores/pool"
+import { useQueryStore } from "@/stores/query"
 import { useRouter, useRoute } from 'vue-router'
 import colors from '@/assets/theme/colors.module.scss'
 import analytics from '@/analytics'
 import { useWindowSize } from '@vueuse/core'
 import { useRouteUtils } from '@/composables/routeutils'
 import { scrollToItem } from '@/utils'
+import AppliedFilters from "@/components/AppliedFilters.vue"
+import DateFilter from "@/components/DateFilter.vue"
 
 const { width } = useWindowSize()
 const route = useRoute()
@@ -76,8 +90,10 @@ const routeUtils = useRouteUtils(router, route)
 const resultStore = useResultStore()
 const filterStore = useFilterStore()
 const poolStore = usePoolStore()
+const queryStore = useQueryStore()
 
 const expandedFilters = ref([])
+const showSettings = ref(false)
 
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
@@ -85,17 +101,19 @@ const hasFacets = computed(()=>{
 const facetsLoaded = computed(()=>{
    return filterStore.poolFacets(resultStore.selectedResults.pool.id).length > 0
 })
-
+const hasAppliedFilter = computed(()=>{
+   return filterStore.poolFilter(resultStore.selectedResults.pool.id).length > 0
+})
+const canDateFilter = computed(() => {
+   if (resultStore.selectedResults.pool.mode == 'image') return false
+   if ( hasFacets.value == false ) return false
+   return true
+})
 
 const startSidebarExpanded = computed(()=>{
    return width.value > 810
 })
-const poolFilterTitle = computed(()=>{
-   if ( !startSidebarExpanded.value ) {
-      return `Filter ${resultStore.selectedResults.pool.name}`
-   }
-   return `Filter ${resultStore.selectedResults.pool.name} By`
-})
+
 const facets = computed(()=>{
    return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true && f.na !== true)
 })
@@ -171,6 +189,20 @@ const filterSelected = ((facetID, facetValue) => {
    display: inline-block;
    height: fit-content;
 
+   :deep(i.settings-icon) {
+      color: white !important;
+   }
+
+   .keep-section {
+      padding: 15px 0 0 0;;
+      text-align: left;
+      input[type="checkbox"] {
+         margin-right: 10px;
+         width: 20px;
+         height: 20px;
+      }
+   }
+
    .pool-filter-header, .filter {
       width: 100%;
    }
@@ -187,6 +219,7 @@ const filterSelected = ((facetID, facetValue) => {
       flex-direction: column;
       gap: 15px;
       position: relative;
+
       button.filter {
          flex-grow: 1;
          background-color: transparent;
