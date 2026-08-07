@@ -9,9 +9,8 @@ export const usePreferencesStore = defineStore('preferences', {
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       searchExclusions: [],
-      filterExclusions: [],
       collapseGroups: false,
-      collapseDetails: false,
+      expandDetails: false,
       aiDebug: false,
       aiFeatures: [],
       aiModel: "default",
@@ -34,14 +33,6 @@ export const usePreferencesStore = defineStore('preferences', {
            return state.searchExclusions.includes(poolID)
          }
       },
-      isFilterExcluded: state => {
-         return (fID) => {
-           return state.filterExclusions.includes(fID)
-         }
-      },
-      expandDetails: state => {
-         return !state.collapseDetails
-      }
    },
 
    actions: {
@@ -49,8 +40,8 @@ export const usePreferencesStore = defineStore('preferences', {
          if (prefsObj.collapseGroups ) {
             this.collapseGroups = prefsObj.collapseGroups
          }
-         if (prefsObj.collapseDetails ) {
-            this.collapseDetails = prefsObj.collapseDetails
+         if (prefsObj.expandDetails ) {
+            this.expandDetails = prefsObj.expandDetails
          }
          if ( prefsObj.trackingOptOut) {
             const { cookies } = useCookies()
@@ -79,7 +70,6 @@ export const usePreferencesStore = defineStore('preferences', {
          }
 
          this.searchExclusions = prefsObj.searchExclusions || []
-         this.filterExclusions = prefsObj.filterExclusions || []
 
          this.aiDebug = prefsObj.aiDebug || false
          this.aiFeatures = prefsObj.aiFeatures || []
@@ -125,20 +115,12 @@ export const usePreferencesStore = defineStore('preferences', {
          }
          await this.save()
       },
-      async toggleFilterExclusion( filterID ) {
-         if (this.filterExclusions.includes(filterID)) {
-            this.filterExclusions = this.filterExclusions.filter( fID => fID != filterID)
-         } else {
-            this.filterExclusions.push(filterID)
-         }
-         await this.save()
-      },
       async toggleCollapseGroups() {
          this.collapseGroups = !this.collapseGroups
          await this.save()
       },
-      async toggleCollapseDetails() {
-         this.collapseDetails = !this.collapseDetails
+      async toggleExpandDetails() {
+         this.expandDetails = !this.expandDetails
          await this.save()
       },
       async updatePickupLibrary( pl ) {
@@ -151,7 +133,7 @@ export const usePreferencesStore = defineStore('preferences', {
             await this.save()
          }
       },
-      async load() { 
+      async load() { // TODO CHECK THOS
          const userStore = useUserStore()
          let url = `/api/users/${userStore.signedInUser}/preferences`
          await axios.get(url).then((response) => {
@@ -168,10 +150,9 @@ export const usePreferencesStore = defineStore('preferences', {
             trackingOptOut: this.trackingOptOut,
             pickupLibrary: this.pickupLibrary,
             collapseGroups: this.collapseGroups,
-            collapseDetails: this.collapseDetails,
+            expandDetails: this.expandDetails,
             searchTemplate: this.searchTemplate,
             searchExclusions: this.searchExclusions,
-            filterExclusions: this.filterExclusions,
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,
             aiModel: this.aiModel,

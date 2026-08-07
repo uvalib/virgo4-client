@@ -16,13 +16,13 @@
       </div>
       <div class="grouping">
          <p>
-            By default, lengthy item details are shown in full. Check the box below to collapse details into a smaller subset of data. 
-            In this case, full details can be viewed by clicking the 'Show more details' button.
+            By default, lengthy item details are truncated and can be viewed in full by clicking a more button or link.
+            Check the box below to show full details.
          </p>
          <div class="check">
             <label>
-               <input id="full-detail-pref" @change="detailToggleClicke" class="choice" :checked="preferences.collapseDetails" type="checkbox"
-                  aria-label="toggle display of full item details"/>Collapse Item Details
+               <input id="full-detail-pref" @change="fullDetailClicked" class="choice" :checked="preferences.expandDetails" type="checkbox"
+                  aria-label="toggle display of full item details"/>Expand Item Details
             </label>
             <Message variant="simple" severity="success" v-if="saved=='expand'" :life="2000" >Saved</Message>
          </div>
@@ -37,22 +37,6 @@
          </div>
          <Message  v-if="saved =='exclude'" :life="2000" variant="simple" severity="success">Saved</Message>
        </div>
-       <div class="grouping">
-         <h4>Catalog Filters</h4>
-         <p>
-            The catalog allows results to be filtered by numerous categories, some of which may not be useful for you. 
-            Use the list below to disable unwanted filters.
-         </p>
-         <div><b>Disabled Filters</b></div>
-         <div v-for="pf in pools.filters('uva_library')" class="check">
-            <label>
-               <input @change="toggleFilter(pf.id)" class="choice" :checked="preferences.isFilterExcluded(pf.id)" type="checkbox"
-                  :aria-label="`toggle availablity of filter ${pf.name }`"/>
-               {{ pf.name }}
-            </label>
-         </div>
-       </div>
-       <Message  v-if="saved =='filter'" :life="2000" variant="simple" severity="success">Saved</Message>
    </div>
 </template>
 
@@ -87,14 +71,8 @@ const toggleSearchExclude = ( async (poolID) => {
    }
 })
 
-const toggleFilter = ( async (filterID) => {
-   await preferences.toggleFilterExclusion(filterID)
-   saved.value = "filter"
-   setTimeout( ()=>{ saved.value = "" }, 2100)
-})
-
-const detailToggleClicke = ( async () => {
-   await preferences.toggleCollapseDetails()
+const fullDetailClicked = ( async () => {
+   await preferences.toggleExpandDetails()
    saved.value = "expand"
    setTimeout( ()=>{ saved.value = "" }, 2100)
 })

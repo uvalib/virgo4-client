@@ -3,7 +3,7 @@
       <div class="working" v-if="loadingDetails" >
          <V4Spinner message="Looking up details..."/>
       </div>
-      <div class="guest-exclusion" v-else-if="excludedPool || item.noAuthorization">
+      <div class="guest-exclusion" v-else-if="excludedPool">
          <div>Details for items from {{ excludedPool }} are not available to guest users.</div>
          <div><VirgoButton link @click="signInClicked" label="Sign in to view details"/></div>
       </div>
@@ -47,15 +47,6 @@ onBeforeRouteUpdate(async (to) => {
 })
 
 const getDetails = ( async (src, id, initialPage) => {
-   // If a user is not signed in check if this pool is one of those that are unavailable to them
-   if (user.isSignedIn == false && preferences.isPoolExcluded(route.params.src)) {
-      console.log(route.params.src+ " is excluded for guest users")
-      excludedPool.value = pools.poolDetails(route.params.src).name
-      console.log(`EXCLUDED [${excludedPool.value}]`)
-      loadingDetails.value = false
-      return
-   } 
-
    // if this was called from an old catalog/id url, the src will get
    // set to legacy. in this case, lookup the cat key and redirect to full detail
    // the redirect will trigger a beforeRouteUpdate and that will get fill item detail.
@@ -127,7 +118,14 @@ function zoteroItemUpdated() {
 }
 
 onMounted(()=>{
-   getDetails(route.params.src, route.params.id, true)
+   if (user.isSignedIn == false && preferences.isPoolExcluded(route.params.src)) {
+      console.log(route.params.src+ " is excluded for guest users")
+      excludedPool.value = pools.poolDetails(route.params.src).name
+      console.log(`EXCLUDED [${excludedPool.value}]`)
+      loadingDetails.value = false
+   } else {
+       getDetails(route.params.src, route.params.id, true)
+   }
 })
 
 onUpdated(()=>{

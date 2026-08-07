@@ -11,9 +11,8 @@ export const useItemStore = defineStore('item', {
       details: {searching: true, source: "", identifier:"", fields:[], related:[] },
       digitalContent: [],
       loadingDigitalContent: false,
-      availability: {searching: true, titleId: "", libraries: [], boundWith: [], error: ""},
-      primaryFields: ["author", "format", "published_date", "subject", "subject_summary"],
-      noAuthorization: false,
+      availability: {searching: true, titleId: "", libraries: [], bound_with: [], error: ""},
+      primaryFields: ["author", "format", "published_date", "subject", "subject_summary"]
    }),
 
    getters: {
@@ -75,7 +74,21 @@ export const useItemStore = defineStore('item', {
          return state.digitalContent.length > 0
       },
       hasBoundWithItems: state => {
-         return state.availability.boundWith && state.availability.boundWith.length > 0
+         return Array.isArray(state.availability.bound_with) && state.availability.bound_with.length > 0
+      },
+      boundIn: state => {
+         if (state.availability && state.availability.bound_with){
+            return state.availability.bound_with.filter(item => item.is_parent == true)
+         }else{
+            return []
+         }
+      },
+      boundWith: state => {
+         if (state.availability && state.availability.bound_with){
+            return state.availability.bound_with.filter(item => item.is_parent == false)
+         }else{
+            return []
+         }
       }
    },
 
@@ -133,7 +146,7 @@ export const useItemStore = defineStore('item', {
          useRequestStore().clearAll()
       },
       clearAvailability() {
-        this.availability = {searching: true, titleId: '', libraries: [], boundWith: [], error: ""}
+        this.availability = {searching: true, titleId: '', libraries: [], bound_with: [], error: ""}
          useRequestStore().clearAll()
       },
       setCatalogKeyDetails(data) {
@@ -254,7 +267,6 @@ export const useItemStore = defineStore('item', {
 
       async getDetails( source, identifier ) {
          this.details.searching = true
-         this.noAuthorization = false
 
          // get source from poolID
          const poolStore = usePoolStore()
@@ -307,9 +319,7 @@ export const useItemStore = defineStore('item', {
             }
             this.details.searching = false
          }).catch( async (error) => {
-            if ( error.response && error.response.status == 401) {
-               this.noAuthorization = true
-            } else if ( error.response && error.response.status == 404) {
+            if ( error.response && error.response.status == 404) {
                console.warn(`Item ID ${identifier} not found in ${source}; try a lookup`)
                await this.lookupCatalogKeyDetail(identifier)
             } else {
@@ -325,20 +335,13 @@ export const useItemStore = defineStore('item', {
          return axios.get(url).then((response) => {
             if (response.data) {
                this.availability.titleId = response.data.title_id
-               this.availability.boundWith = response.data.boundWith
+               this.availability.bound_with = response.data.bound_with
                this.availability.libraries = response.data.libraries
 
                // sort avvailability libraries by name
                this.availability.libraries.sort( (a,b) => {
                   if (a.name > b.name) return 1
                   if (a.name < b.name) return -1
-                  return 0
-               })
-
-                // sort boundwith by call
-               this.availability.boundWith.sort( (a,b) => {
-                  if (a.callNumber > b.callNumber) return 1
-                  if (a.callNumber < b.callNumber) return -1
                   return 0
                })
 

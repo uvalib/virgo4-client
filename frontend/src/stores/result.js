@@ -42,7 +42,7 @@ export const useResultStore = defineStore('result', {
          return state.selectedHitIdx > -1 && this.selectedHit.number > 1
       },
       hasResults: state => {
-         return state.total >= 0
+         return state.searching == false && state.total >= 0
       },
       selectedResults: state => {
          return state.results[state.selectedResultsIdx]
@@ -359,12 +359,10 @@ export const useResultStore = defineStore('result', {
          // NOTE: when clicking a saved search, the target pool is set in ignoreExclusion.
          // This pool filtered out of the exclusion for this search, then reset
          let req = {
-            // use the general search string here and add filters for specific pools in pool_query_addons
-            query: query.string, 
+            query: query.string,
             pagination: { start: 0, rows: this.pageSize },
             filters: filters.allPoolFilters,
-            pool_sorting: sorting.poolSort("all"),
-            pool_query_addons: query.poolQueryAddons,
+            pool_sorting: sorting.pools,
             preferences: {
                exclude_pools: prefs.searchExclusions.filter( e => e != this.ignoreExclusion)
             }
@@ -429,7 +427,7 @@ export const useResultStore = defineStore('result', {
 
          useSuggestorStore().fetch( query.string )
          let filters = filterStore.poolFilter(params.pool.id)
-         let sort = sortStore.poolSort(params.pool.id) 
+         let sort = sortStore.poolSort(params.pool.id)
          let filterObj = { pool_id: params.pool.id, facets: filters }
          let startPage = params.page
          if (!startPage) {
@@ -438,9 +436,7 @@ export const useResultStore = defineStore('result', {
          let pagination = { start: startPage * this.pageSize, rows: this.pageSize }
 
          let req = {
-            // Pool specific queries can contain date filters tagged as 'date_filter'. Search does not
-            // understand this, so convert it to the normal 'date' term
-            query: query.poolQueryString.replaceAll("date_filter", "date"),
+            query: query.string,
             pagination: pagination,
             sort: sort,
             filters: [filterObj],
