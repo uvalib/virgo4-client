@@ -134,10 +134,15 @@ const sourceTabs = computed(()=>{
       }
    })
 
-   // if there is only 1 in the other list, promote it to a top-level tab and set a flag to remove More
-   if (other.length == 1) {
-      tabs.push( other[0])
-      showMore.value = false
+
+   if ( resultStore.results.length == 1) {
+      showMore.value = false   
+   } else {
+      // if there is only 1 in the other list, promote it to a top-level tab and set a flag to remove More
+      if (other.length == 1) {
+         tabs.push( other[0])
+         showMore.value = false
+      }
    }
    return tabs
 })

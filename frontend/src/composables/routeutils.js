@@ -37,7 +37,11 @@ export function useRouteUtils( router,route ) {
          queryStore.setBasicSearch()
       }
 
-      const oldQ = queryStore.string
+      // be sure to set target pool first as the query parsing depends on it being set
+      queryStore.setTargetPool( query.pool )
+
+      // use the poolQuersyString here to ensure any pool-specific addons are included
+      const oldQ = queryStore.poolQueryString  
       if (query.q) {
          queryStore.restoreFromURL(query.q)
          if ( oldQ != query.q) {
@@ -47,8 +51,6 @@ export function useRouteUtils( router,route ) {
       }
 
       if (query.pool) {
-         queryStore.setTargetPool( query.pool )
-
          const oldSortObj = sortStore.poolSort( query.pool )
          const oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
          if (query.sort) {
@@ -78,8 +80,9 @@ export function useRouteUtils( router,route ) {
 
       // only re-run search when query, sort or filtering has changed - or a user has initiated a search with a UI element
       if ( runSearch == true ) {
-         resultStore.resetSearchResults()
+         // // resultStore.resetSearchResults()
          queryStore.userSearched = false
+         queryStore.filtersCleared = false
 
          await searchCallback(queryStore.searchSources)
 
@@ -101,7 +104,10 @@ export function useRouteUtils( router,route ) {
       }
    })
 
-   const searchChanged = ( () => {
+   // when the user clicks the search or advanced search button, this is an entirely
+   // new search and the newSearch flag will be set - unless it has been
+   // requested to preserve prior filters
+   const searchChanged = ( ( newSearch = false ) => {
       const queryStore = useQueryStore()
       const resultStore = useResultStore()
       const filters = useFilterStore()
@@ -109,16 +115,45 @@ export function useRouteUtils( router,route ) {
       const poolStore = usePoolStore()
 
       let newQ = Object.assign({}, route.query)
-      newQ.q = queryStore.string
-      if (queryStore.mode == "advanced") {
-         if ( resultStore.hasResults == false && filters.preSearchFilterApplied ) {
+
+      console.log(`SEARCH CHANGED; POOL ${queryStore.targetPool} NEW ${newSearch} PRESERVE ${queryStore.keepSettings}`)
+
+      if ( newSearch &&  queryStore.keepSettings == false ) {
+         console.log("RESET FILTERS / SORT FOR NEW QUERRY")
+         delete newQ.filter
+         queryStore.resetAllDateFilters()
+         if (queryStore.mode == "advanced") {
+            newQ.mode = "advanced"                             // ensure mode is in the query params
+            newQ.filter = filters.asQueryParam('presearch')    // set the filters in the query params
+            sortStore.promotePreSearchSort( poolStore.list )   // promote presearch filter to all pools that support it 
             filters.promotePreSearchFilters()
-            newQ.filter = filters.asQueryParam('presearch')
+         } else {
+            filters.reset()  
          }
-         sortStore.promotePreSearchSort( poolStore.list )
+      } else {
+         console.log("PRESERVE SETTINGS")
+         if ( queryStore.filtersCleared ) {
+            // NOTES: see notes in AppliedFilters.vie for why this is here
+            queryStore.filtersCleared = false
+            delete newQ.page
+            delete newQ.filter
+         }
+         if (queryStore.mode == "advanced") {
+            newQ.mode = "advanced"                             // ensure mode is in the query params
+            sortStore.promotePreSearchSort( poolStore.list )   // set the filters in the query params
+
+            // if this is a new search with presearch filters picked, add them to query params
+            if ( resultStore.hasResults == false && filters.preSearchFilterApplied ) {
+               newQ.filter = filters.asQueryParam('presearch')
+               filters.promotePreSearchFilters()
+            }
+         }
       }
 
-      filters.setDirty()   // new search entered; flag exisiting facets for refresh
+      // use the poolQuersyString here to ensure any pool-specific addons are included
+      newQ.q = queryStore.poolQueryString 
+
+      filters.setDirty()
       queryStore.userSearched = true
       router.push({path: "/search", query: newQ})
    })
@@ -131,7 +166,8 @@ export function useRouteUtils( router,route ) {
       delete newQ.page
 
       queryStore.setBasicSearch()
-      newQ.q = queryStore.string
+      // use the poolQuersyString here to ensure any pool-specific addons are included
+      newQ.q = queryStore.poolQueryString
       newQ.filter = filters.asQueryParam( "presearch" )
       newQ.pool = queryStore.targetPool
 
@@ -218,6 +254,7 @@ export function useRouteUtils( router,route ) {
          if (resultStore.selectedResults.page > 0) {
             newQ.page = resultStore.selectedResults.page +1
          }
+         newQ.q = queryStore.poolQueryString
       }
       if ( route.query != newQ ) {
          router.push({path: "/search", query: newQ})
