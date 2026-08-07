@@ -18,6 +18,9 @@
          <FormKit label="Pages" type="text" v-model="request.pages" validation="required|length:1,25" help="(ex: 1-15)"/>
          <FormKit label="ISBN/ISSN" type="text" v-model="request.issn"/>
          <FormKit label="OCLC Number" type="text" v-model="request.oclc"/>
+         <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
+            help="(ex: missing from shelf, specific edition needed)"
+         />
          <ILLCopyrightNotice type="research" :wide="true"/>
          <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-research-scan" @canceled="emit('canceled')"/>
       </FormKit>
@@ -50,6 +53,7 @@ const request = ref({
    pages: "",
    issn: "",
    oclc: "",
+   notes: ""
 })
 
 async function submitClicked() {

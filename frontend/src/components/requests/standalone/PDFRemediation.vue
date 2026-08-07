@@ -24,6 +24,9 @@
                accept="application/pdf"
             />
          </label>
+         <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
+            help="(ex: missing from shelf, specific edition needed)"
+         />
          <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-pdf-remediation" @canceled="emit('canceled')"/>
       </FormKit>
    </div>
@@ -42,6 +45,7 @@ const request = ref({
    course: "",
    work: "",
    title: "",
+   notes: ""
 })
 
 const fileuploader = ref()

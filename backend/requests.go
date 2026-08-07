@@ -365,9 +365,10 @@ func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 	work := formData.Value["work"][0]
 	title := formData.Value["title"][0]
 	course := formData.Value["course"][0]
+	notes := formData.Value["notes"][0]
 	formFile := formData.File["file"][0]
 
-	log.Printf("INFO: process pdf remediation request from %s for course %s, work '%s', title '%s", v4Claims.UserID, course, work, title)
+	log.Printf("INFO: process pdf remediation request from %s for course %s, work '%s', title '%s', notes: '%s'", v4Claims.UserID, course, work, title, notes)
 	baseReq := illiadRequest{
 		Username:          v4Claims.UserID,
 		RequestType:       "Article",
@@ -385,7 +386,12 @@ func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 		PhotoArticleTitle: title,
 	}
 
-	transactionNum, illErr := svc.createILLiadTransaction(remediateReq, course)
+	combinedNotes := fmt.Sprintf("Course Information: %s", course)
+	if notes != "" {
+		combinedNotes += fmt.Sprintf(", Notes: %s", notes)
+	}
+
+	transactionNum, illErr := svc.createILLiadTransaction(remediateReq, combinedNotes)
 	if illErr != nil {
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
 		c.String(illErr.StatusCode, IlliadErrorMessage)
@@ -658,7 +664,10 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		scanReq.ProcessType = "DocDel"
 		scanReq.DocumentType = "Instructional"
 		scanReq.TransactionStatus = "No Hold Scan Request"
-		note = req.Course
+		note = fmt.Sprintf("Course Information: %s", req.Course)
+		if req.Notes != "" {
+			note += fmt.Sprintf(", Notes: %s", req.Notes)
+		}
 		if req.AnyLanguage == "true" {
 			scanReq.AcceptNonEnglish = true
 		}
@@ -669,6 +678,7 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		scanReq.ProcessType = "DocDel"
 		scanReq.DocumentType = "Article"
 		scanReq.TransactionStatus = "No Hold Scan Request"
+		note = req.Notes
 
 	case "ARTICLE":
 		scanReq.ProcessType = "Borrowing"

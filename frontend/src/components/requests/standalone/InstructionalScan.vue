@@ -41,6 +41,9 @@
          <FormKit label="Will you accept the item in a language other than English?" type="radio"
             v-model="request.anyLanguage" :options="{'true': 'Yes', 'false': 'No'}"
          />
+         <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
+            help="(ex: missing from shelf, specific edition needed)"
+         />
 
          <ILLCopyrightNotice type="instruction" :wide="true"/>
          <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-scan-instruct" @canceled="emit('canceled')"/>
@@ -74,7 +77,8 @@ const request = ref({
    pages: "",
    issn: "",
    oclc: "",
-   anyLanguage: "true"
+   anyLanguage: "true",
+   notes: ""
 })
 
 const requestStore = useRequestStore()

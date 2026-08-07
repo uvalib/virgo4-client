@@ -210,6 +210,7 @@ export const useRequestStore = defineStore('request', {
          formData.append('course', req.course)
          formData.append('work', req.work)
          formData.append('title', req.title)
+         formData.append('notes', req.notes)
          await axios.post('/api/requests/standalone/remediate', formData, {
             headers: {
                'Content-Type': 'multipart/form-data',
