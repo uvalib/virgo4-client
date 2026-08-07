@@ -18,6 +18,10 @@
          <FormKit label="Pages" type="text" v-model="request.pages" validation="required|length:1,25" help="(ex: 1-15)"/>
          <FormKit label="ISBN/ISSN" type="text" v-model="request.issn"/>
          <FormKit label="OCLC Number" type="text" v-model="request.oclc"/>
+         <FormKit label="Will you accept an alternate edition of this item?" type="radio"
+            v-model="request.alternateEdition" :options="{'true': 'Yes', 'false': 'No'}"
+            help="Checking this box allows Library staff to fulfill your request with a different edition of your requested material. Using an alternate edition is only necessary when the physical copy isn’t available or can’t be remediated to the required standards due to item condition."
+         />
          <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
             help="(ex: missing from shelf, specific edition needed)"
          />
@@ -53,7 +57,8 @@ const request = ref({
    pages: "",
    issn: "",
    oclc: "",
-   notes: ""
+   notes: "",
+   alternateEdition: "true",
 })
 
 async function submitClicked() {

@@ -42,6 +42,7 @@ type illiadScanRequest struct {
 	Location                   string
 	CallNumber                 string
 	AcceptNonEnglish           bool
+	AcceptAlternateEdition     bool
 }
 
 // Extension of basic request to include fields necessary for Loan/Borrow requests
@@ -592,22 +593,23 @@ func (svc *ServiceContext) getStandaloneRequestStats(userID string, profile stri
 // CreateStandaloneScan send a request for a standalone scan to ILLiad
 func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	var req struct {
-		ScanType     string `json:"scanType"` // ARTICLE, INSTRUCTIONAL or RESEARCH
-		DocType      string `json:"doctype"`
-		Course       string `json:"course"`
-		PersonalCopy string `json:"personalCopy"`
-		Title        string `json:"title"`
-		Article      string `json:"article"`
-		Author       string `json:"author"`
-		Volume       string `json:"volume"`
-		Issue        string `json:"issue"`
-		Month        string `json:"month"`
-		Year         string `json:"year"`
-		Pages        string `json:"pages"`
-		ISSN         string `json:"issn"`
-		OCLC         string `json:"oclc"`
-		AnyLanguage  string `json:"anyLanguage"`
-		Notes        string `json:"notes"`
+		ScanType         string `json:"scanType"` // ARTICLE, INSTRUCTIONAL or RESEARCH
+		DocType          string `json:"doctype"`
+		Course           string `json:"course"`
+		PersonalCopy     string `json:"personalCopy"`
+		Title            string `json:"title"`
+		Article          string `json:"article"`
+		Author           string `json:"author"`
+		Volume           string `json:"volume"`
+		Issue            string `json:"issue"`
+		Month            string `json:"month"`
+		Year             string `json:"year"`
+		Pages            string `json:"pages"`
+		ISSN             string `json:"issn"`
+		OCLC             string `json:"oclc"`
+		AnyLanguage      string `json:"anyLanguage"`
+		AlternateEdition string `json:"alternateEdition"`
+		Notes            string `json:"notes"`
 	}
 
 	err := c.ShouldBindJSON(&req)
@@ -668,6 +670,9 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		if req.Notes != "" {
 			note += fmt.Sprintf(", Notes: %s", req.Notes)
 		}
+		if req.AlternateEdition == "true" {
+			scanReq.AcceptAlternateEdition = true
+		}
 		if req.AnyLanguage == "true" {
 			scanReq.AcceptNonEnglish = true
 		}
@@ -678,6 +683,9 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		scanReq.ProcessType = "DocDel"
 		scanReq.DocumentType = "Article"
 		scanReq.TransactionStatus = "No Hold Scan Request"
+		if req.AlternateEdition == "true" {
+			scanReq.AcceptAlternateEdition = true
+		}
 		note = req.Notes
 
 	case "ARTICLE":

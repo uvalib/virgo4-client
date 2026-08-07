@@ -41,6 +41,10 @@
          <FormKit label="Will you accept the item in a language other than English?" type="radio"
             v-model="request.anyLanguage" :options="{'true': 'Yes', 'false': 'No'}"
          />
+         <FormKit label="Will you accept an alternate edition of this item?" type="radio"
+            v-model="request.alternateEdition" :options="{'true': 'Yes', 'false': 'No'}"
+            help="Checking this box allows Library staff to fulfill your request with a different edition of your requested material. Using an alternate edition is only necessary when the physical copy isn’t available or can’t be remediated to the required standards due to item condition."
+         />
          <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
             help="(ex: missing from shelf, specific edition needed)"
          />
@@ -78,7 +82,8 @@ const request = ref({
    issn: "",
    oclc: "",
    anyLanguage: "true",
-   notes: ""
+   alternateEdition: "true",
+   notes: "",
 })
 
 const requestStore = useRequestStore()
