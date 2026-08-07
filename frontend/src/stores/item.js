@@ -12,8 +12,7 @@ export const useItemStore = defineStore('item', {
       digitalContent: [],
       loadingDigitalContent: false,
       availability: {searching: true, titleId: "", libraries: [], bound_with: [], error: ""},
-      primaryFields: ["author", "format", "published_date", "subject", "subject_summary"],
-      noAuthorization: false,
+      primaryFields: ["author", "format", "published_date", "subject", "subject_summary"]
    }),
 
    getters: {
@@ -268,7 +267,6 @@ export const useItemStore = defineStore('item', {
 
       async getDetails( source, identifier ) {
          this.details.searching = true
-         this.noAuthorization = false
 
          // get source from poolID
          const poolStore = usePoolStore()
@@ -321,9 +319,7 @@ export const useItemStore = defineStore('item', {
             }
             this.details.searching = false
          }).catch( async (error) => {
-			if ( error.response && error.response.status == 401) {
-				this.noAuthorization = true
-            } else if ( error.response && error.response.status == 404) {
+            if ( error.response && error.response.status == 404) {
                console.warn(`Item ID ${identifier} not found in ${source}; try a lookup`)
                await this.lookupCatalogKeyDetail(identifier)
             } else {
