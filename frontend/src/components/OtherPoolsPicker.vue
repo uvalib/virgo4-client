@@ -38,8 +38,7 @@ const emit = defineEmits( ['selected' ] )
 
 const { selectedResultsIdx } = storeToRefs(resultStore)
 watch( selectedResultsIdx, (newValue) => {
-   const newPool = resultStore.selectedResults.pool
-   if ( pools.value.findIndex( p => p.pool.id == newPool.id) == -1 ) {
+   if (newValue < systemStore.maxPoolTabs) {
       selectedPoolID.value = ""
    }
 })

@@ -46,6 +46,10 @@ div.v4-sort {
    color :$uva-text-color-base;
    padding: 0;
    margin-top: 0;
+
+   label {
+      font-weight: bold;
+   }
    select {
       margin-left: 10px;
       cursor: pointer;
