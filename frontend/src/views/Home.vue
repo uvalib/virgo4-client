@@ -178,7 +178,9 @@ async function searchClicked() {
    } else {
       analytics.trigger('Search', 'BASIC_SEARCH', "SIGNED_OUT")
    }
-   routeUtils.searchChanged()
+
+   // send a true flag to route utils indicating a new search was initiated
+   routeUtils.searchChanged( true )
 }
 </script>
 

@@ -9,7 +9,6 @@
             </a>
              <img v-else class ="logo" :src="poolStore.log(selectedResults.pool.id)">
          </div>
-         <SearchFilters v-if="hasFacets" />
          <CollectionContext />
          <div class="sort-section">
             <V4Sort :pool="selectedResults.pool" />
@@ -68,11 +67,10 @@
 <script setup>
 import SearchHit from "@/components/SearchHit.vue"
 import ImageSearchHit from "@/components/ImageSearchHit.vue"
-import SearchFilters from "@/components/SearchFilters.vue"
 import V4Sort from "@/components/V4Sort.vue"
 import ExpandSearch from "@/components/ExpandSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
-import { ref,computed } from 'vue'
+import { ref,computed, onMounted, watch } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useResultStore } from "@/stores/result"
 import { usePoolStore } from "@/stores/pool"
@@ -81,13 +79,8 @@ import { usePreferencesStore } from "@/stores/preferences"
 import { useQueryStore } from "@/stores/query"
 import { useRestoreStore } from '@/stores/restore'
 import ExcludePool from "./modals/ExcludePool.vue"
-import { useRouteUtils } from '@/composables/routeutils'
-import { useRouter, useRoute } from 'vue-router'
 import analytics from '@/analytics'
-
-const route = useRoute()
-const router = useRouter()
-const routeUtils = useRouteUtils(router, route)
+import { storeToRefs } from "pinia"
 
 const resultStore = useResultStore()
 const poolStore = usePoolStore()
@@ -99,6 +92,9 @@ const restore = useRestoreStore()
 
 const loadingMore = ref(false)
 
+const hasFilter = computed(()=>{
+   return filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na != true).length > 0
+})
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
 })
@@ -140,6 +136,7 @@ const poolExclusionString = computed( () => {
    })
    return msg
 })
+
 const removeSearchExclusions = (() => {
    preferences.removeSearchExclusions()
    analytics.trigger('Preferences', 'REMOVE_POOL_EXCLUSION', "all")   
@@ -180,26 +177,44 @@ async function loadMoreResults() {
    color: $uva-grey-B;
    background: white;
    border: 1px solid $uva-grey-100;
-   padding: 0 15px 15px 10px;
-   border-top: 0;
+   border-top: 1px solid $uva-grey-200;
+   padding: 10px;
    display: flex;
-   flex-flow: row wrap;
    gap: 10px;
+   label {
+      font-weight: bold;
+   }
+}
+
+.sort-section {
    justify-content: space-between;
    align-items: center;
+   flex-flow: row wrap;
 }
+
 .reminder {
    background: white;
    border: 1px solid $uva-grey-100;
    padding: 15px;
    margin: 20px 0;
 }  
-.desc  {
-   padding: 15px 10px 10px 10px;
-   border-left: 1px solid $uva-brand-blue;
-   border-right: 1px solid $uva-brand-blue;
-   font-size: 0.9em;
+.pool-results {
+   border: 0;
+   position: relative;
 }
+div.pool-header {
+   margin: 0 0 1rem 0;
+   text-align: left;
+   display: flex;
+   flex-direction: column;
+   .desc  {
+      padding: 15px 10px 10px 10px;
+      border-left: 1px solid $uva-brand-blue;
+      border-right: 1px solid $uva-brand-blue;
+      background: $uva-brand-blue;
+      color: white;
+      background: $uva-brand-blue;
+   }
 .desc :deep(a) {
    color: white !important;
    text-decoration: underline !important;
@@ -208,19 +223,11 @@ async function loadMoreResults() {
       font-style: italic !important;
    }
 }
-.pool-results {
-   border: 0;
-   position: relative;
-}
-div.pool-header {
-   color: white;
-   background: $uva-brand-blue;
-   margin: 0 0 1rem 0;
-   text-align: left;
    .source-logo {
       background: white;
       padding: 5px;
       text-align: left;
+      border: 1px solid $uva-grey-100;
       .logo {
          max-height:90px;
          display: inline-block;
