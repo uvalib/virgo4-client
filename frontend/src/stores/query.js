@@ -6,7 +6,7 @@ export const useQueryStore = defineStore('query', {
       userSearched: false,
       filtersCleared: false,
       mode: "basic",
-      basic: "",
+      basic: { field: "keyword", value: ""},
       searchSources: "all",
       advanced: [
          { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
@@ -74,7 +74,7 @@ export const useQueryStore = defineStore('query', {
       },
       queryEntered: state => {
          if (state.mode == "basic") {
-            return state.basic.length > 0
+            return state.basic.value.length > 0
          }
          let found = false
          state.advanced.some(term => {
@@ -115,7 +115,7 @@ export const useQueryStore = defineStore('query', {
          // Fields are joined together with AND or OR based on the fieldOp setting
          let qs = ""
          if (state.mode == "basic") {
-            qs = `keyword: {${state.basic}}`
+            qs = `${state.basic.field}: {${state.basic.value}}`
             return qs
          }
 
@@ -149,7 +149,7 @@ export const useQueryStore = defineStore('query', {
       },
       isKeywordSearch: state => {
          if (state.mode == "basic") {
-            return state.basic.length > 0
+            return state.basic.field == "keyword" && state.basic.value.length > 0
          }
          let activeTerms = state.advanced.filter(t => t.value.length > 0)
          if (activeTerms.length == 0) return false
@@ -226,15 +226,8 @@ export const useQueryStore = defineStore('query', {
       },
       restoreFromURL(queryParams) {
          // Clear out all existing data
-         this.basic = ""
+         this.basic = {field: "keyword", value: ""}
          this.advanced.splice(0, this.advanced.length)
-
-         // queries should be formatted like 'field: {...', but some older queries lack the field and braces
-         // look for these and turn them into a basic keyword seatch
-         if ( !queryParams.match(/^\w+:\s?{/) ) {
-            this.basic = queryParams
-            return
-         }
 
          while (queryParams.length > 0) {
             // A valid query has a field and term surrounded by { }. Find the braces...
@@ -272,10 +265,8 @@ export const useQueryStore = defineStore('query', {
             }
 
             if (this.mode == "basic") {
-               // basic only supports keyword
-               if ( term.field == "keyword" ) {
-                  this.basic = value
-               }
+               this.basic.field = term.field 
+               this.basic.value = value
                continue
             }
 
@@ -304,9 +295,9 @@ export const useQueryStore = defineStore('query', {
 
       setAdvancedSearch() {
          this.mode = "advanced"
-         if ( this.basic != "") {
+         if ( this.basic.value != "") {
             this.advanced.splice(0, this.advanced.length)
-            this.advanced.push({ op: "AND", value: this.basic, field: "keyword", comparison: "EQUAL", endVal: "" })
+            this.advanced.push({ op: "AND", value: this.basic.value, field: this.basic.field, comparison: "EQUAL", endVal: "" })
          }
       },
       setTargetPool(pool) {
@@ -322,7 +313,7 @@ export const useQueryStore = defineStore('query', {
          this.advanced.splice(idx, 1)
       },
       clear() {
-         this.basic = ""
+         this.basic = {field: "keyword", value: ""}
          this.advanced.forEach( a => {
             a.op = "AND"
             a.value = ""

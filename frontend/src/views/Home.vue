@@ -5,9 +5,17 @@
          <template v-if="queryStore.mode=='basic'">
             <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
             <div class="basic-search">
+               <select v-model="queryStore.basic.field">
+                  <option value="keyword">Keyword</option>
+                  <option value="identifier">Identifier</option>
+                  <option value="title">Title</option>
+                  <option value="series">Series</option>
+                  <option value="author">Author</option>
+                  <option value="subject">Subject</option>
+               </select>
                <input class="basic"
                   @keyup.enter="searchClicked"
-                  v-model="queryStore.basic"
+                  v-model="queryStore.basic.value"
                   autocomplete="off"
                   type="text"
                   id="search"
@@ -205,12 +213,18 @@ async function searchClicked() {
       max-width: 800px;
       margin: 0 auto 0 auto;
 
+      select {
+         border-radius: 0.3rem 0 0 0.3rem;
+         font-size: 1rem;
+      }
+
       input[type=text].basic {
          font-size: 1.15em;
          padding: 0.5vw 0.75vw;
          border-right: 0;
+         border-left: 0;
          margin: 0 !important;
-         border-radius: 0.3rem 0 0 0.3rem;
+         border-radius: 0;
          flex: 1 1 auto;
          min-width: 100px;
       }
