@@ -231,7 +231,6 @@ async function searchClicked() {
       .search {
          border-radius: 0 0.3rem 0.3rem 0;
          margin: 0;
-         padding: 0 40px;
       }
    }
    div.advanced {
