@@ -62,6 +62,9 @@
                   </ul>
                </AccordionContent>
             </template>
+            <div v-if="user.isSignedIn" class="note">
+               Available filters can be configured in your <router-link to="/preferences">Search Preferences</router-link>.
+            </div>
          </div>
       </AccordionContent>
    </section>
@@ -74,6 +77,7 @@ import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { usePoolStore } from "@/stores/pool"
 import { useQueryStore } from "@/stores/query"
+import { useUserStore } from "@/stores/user"
 import { useRouter, useRoute } from 'vue-router'
 import colors from '@/assets/theme/colors.module.scss'
 import analytics from '@/analytics'
@@ -91,6 +95,7 @@ const resultStore = useResultStore()
 const filterStore = useFilterStore()
 const poolStore = usePoolStore()
 const queryStore = useQueryStore()
+const user = useUserStore()
 
 const expandedFilters = ref([])
 const showSettings = ref(false)
@@ -282,6 +287,12 @@ const filterSelected = ((facetID, facetValue) => {
          }
       }
    }
+}
+.note {
+   border-radius: 0.3rem;
+   background-color: $uva-blue-alt-400;
+   border: 1px solid $uva-blue-alt-300;
+   padding: 10px 15px;
 }
 div.no-facets {
    text-align: center;

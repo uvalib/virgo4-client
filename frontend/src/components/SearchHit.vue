@@ -56,7 +56,6 @@ const closeGroupTitle = computed(()=>{
 
 <style lang="scss" scoped>
 .inner-hit-wrapper {
-   padding: 2px;
    border: 2px solid $uva-blue-alt-A;
    background: $uva-grey-200;
 

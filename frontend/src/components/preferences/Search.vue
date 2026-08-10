@@ -44,12 +44,14 @@
             Use the list below to disable unwanted filters.
          </p>
          <div><b>Disabled Filters</b></div>
-         <div v-for="pf in pools.filters('uva_library')" class="check">
-            <label>
-               <input @change="toggleFilter(pf.id)" class="choice" :checked="preferences.isFilterExcluded(pf.id)" type="checkbox"
-                  :aria-label="`toggle availablity of filter ${pf.name }`"/>
-               {{ pf.name }}
-            </label>
+         <div class="filters">
+            <div v-for="pf in pools.filters('uva_library')" class="check">
+               <label>
+                  <input @change="toggleFilter(pf.id)" class="choice" :checked="preferences.isFilterExcluded(pf.id)" type="checkbox"
+                     :aria-label="`toggle availablity of filter ${pf.name }`"/>
+                  {{ pf.name }}
+               </label>
+            </div>
          </div>
        </div>
        <Message  v-if="saved =='filter'" :life="2000" variant="simple" severity="success">Saved</Message>
@@ -131,6 +133,21 @@ const detailToggleClicke = ( async () => {
       label, input {
          cursor: pointer;
       }
+   }
+   div.filters {
+      margin-top: 10px;
+   }
+}
+@media only screen and (min-width: 768px) {
+   div.filters {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.filters {
+      display: flex;
+      flex-direction: column;
    }
 }
 </style>
