@@ -216,10 +216,14 @@ export const usePoolStore = defineStore('pool', {
          const system = useSystemStore()
          this.lookingUp = true
          await axios.get( `${system.searchAPI}/api/pools` ).then( response => {
-            this.setPools(response.data)
             this.lookingUp = false
-            if (this.list.length == 0) {
+            if ( !response.data ) {
                system.setFatal("No search sources found")
+            } else {
+               this.setPools(response.data)
+               if (this.list.length == 0) {
+                  system.setFatal("No search sources found")
+               }
             }
          }).catch ( error => {
             system.setFatal(error)

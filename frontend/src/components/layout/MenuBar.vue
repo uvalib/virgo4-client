@@ -98,7 +98,6 @@ const alertClicked =(() => {
 const searchClicked = (() => {
    results.resetSearch()
    query.searchSources = "all"
-   query.keepSettings = false
    query.setBasicSearch()
    router.push("/")
   
