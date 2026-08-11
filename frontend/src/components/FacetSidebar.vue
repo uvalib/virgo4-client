@@ -31,27 +31,34 @@
                   @accordion-collapsed="filterCollapsed(facetInfo.id)" :expanded="idx < 4"
                >
                   <template v-slot:title>{{ facetInfo.name }}</template>
-                  <ul :aria-labelledby="facetInfo.id">
-                     <li class="control" v-if="facetValuesCount(facetInfo) > 1">
-                        <button @click="setFilterSort(facetInfo.id,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
-                        <button @click="setFilterSort(facetInfo.id,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
-                     </li>
-                     <li v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
-                        <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
-                        <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>   
-                     </li>
-                     <template v-if="facetValuesCount(facetInfo) > 5" >
-                        <li v-if="isFilterExpanded(facetInfo.id) == false" class="more">
-                           <VirgoButton severity="secondary" size="small" 
-                              :label="`Show all ${facetValuesCount(facetInfo)} filters`" icon="fal fa-plus" @click="toggleFilterExpand(facetInfo.id)"
-                           />
-                        </li>
-                        <li v-else v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
-                           <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
-                           <span class="cnt">({{$formatNum(fv.count)}})</span>   
-                        </li>
+                  <div class="facet-container">
+                     <template  v-if="facetValuesCount(facetInfo) > 5 || facetInfo.search.length > 0">
+                        <div class="facet-search">
+                           <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search" />
+                        </div>
+                        <div class="facet-sort">
+                           <button @click="setFilterSort(facetInfo.id,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
+                           <button @click="setFilterSort(facetInfo.id,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
+                        </div>
                      </template>
-                  </ul>
+                     <ul :aria-labelledby="facetInfo.id">
+                        <li v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
+                           <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
+                           <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>   
+                        </li>
+                        <template v-if="facetValuesCount(facetInfo) > 5" >
+                           <li v-if="isFilterExpanded(facetInfo.id) == false" class="more">
+                              <VirgoButton severity="secondary" size="small" 
+                                 :label="`Show all ${facetValuesCount(facetInfo)} filters`" icon="fal fa-plus" @click="toggleFilterExpand(facetInfo.id)"
+                              />
+                           </li>
+                           <li v-else v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
+                              <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
+                              <span class="cnt">({{$formatNum(fv.count)}})</span>   
+                           </li>
+                        </template>
+                     </ul>
+                  </div>
                </AccordionContent>
             </template>
             <div v-if="user.isSignedIn" class="note">
@@ -119,9 +126,13 @@ function facetValuesCount(facet) {
    return facet.buckets.filter(b=>b.value && b.selected == false).length
 }
 function facetValues(facet, start, end) {
+   console.log(facet.name+" VALUES")
    if (!facet.buckets) return []
-   let out = facet.buckets.filter(b=> b.value && b.selected == false).slice(start,end)
-   return out
+
+   if (facet.search.length > 0) {
+      return facet.buckets.filter(b=> b.value && b.selected == false && b.value.toLowerCase().indexOf(facet.search.toLowerCase()) == 0 ).slice(start,end)
+   }
+   return facet.buckets.filter(b=> b.value && b.selected == false).slice(start,end)
 }
 function valueKey(idx, facetID) {
    return facetID+"_val_"+idx
@@ -234,35 +245,39 @@ const filterSelected = ((facetID, facetValue) => {
             font-weight: 500;
          }
       }
-      ul  {
-         margin: 0;
-         padding: 10px;
-         border: 1px solid $uva-grey-100;
-         border-top: 0;
-         li {
-            cursor: pointer;
-            font-size: 1em;
+      div.facet-container {
+         div.facet-search, div.facet-sort {
+            border-left: 1px solid $uva-grey-100;
+            border-right: 1px solid $uva-grey-100;
+            border-bottom: 1px solid $uva-grey-100;
+            padding: 5px;
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;
-            padding: 3px 2px;
-            font-weight: normal;
-            gap: 15px;
-            .cnt {
-               font-size: .8em;
-            }
-         }
-         li.control {
-            border-bottom: 1px solid $uva-grey-100;
-            margin-bottom: 5px;
-            padding-bottom: 5px;
             font-size: 0.8em;
+            gap: 5px;
+            input[type=text] {
+               flex-grow: 1;
+               border-radius: 0;
+            }
+            button.search {
+               background-color: $uva-grey-200;
+               border: 1px solid $uva-grey-100;
+               text-align: center;
+               i {
+                  margin-left: 0;
+               }
+            }
             button {
                background-color: transparent;
                border:none;
+               cursor: pointer;
                &:focus {
                   outline: 1px dashed $uva-brand-blue-100;
                   outline-offset: 2px;
+               }
+               &:hover {
+                  text-decoration: underline;
                }
             }
             i {
@@ -270,10 +285,31 @@ const filterSelected = ((facetID, facetValue) => {
                margin-left: 5px;
             }
          }
-         li.more {
-            margin-top: 5px;
-            button {
-               flex-grow: 1;
+         ul  {
+            margin: 0;
+            padding: 10px;
+            border: 1px solid $uva-grey-100;
+            border-top: 0;
+            max-height: 275px;
+            overflow-y: scroll;
+            li {
+               cursor: pointer;
+               font-size: 1em;
+               display: flex;
+               flex-flow: row nowrap;
+               justify-content: space-between;
+               padding: 3px 2px;
+               font-weight: normal;
+               gap: 15px;
+               .cnt {
+                  font-size: .8em;
+               }
+            }
+            li.more {
+               margin-top: 5px;
+               button {
+                  flex-grow: 1;
+               }
             }
          }
       }

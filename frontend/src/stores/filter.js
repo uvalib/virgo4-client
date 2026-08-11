@@ -201,6 +201,8 @@ export const useFilterStore = defineStore('filter', {
                if ( facet.sort == 'count') {
                   facet.order = "desc"   
                }
+               facet.search = ""  // initially, there is no searchstring used to narrow the list of buckes
+
                // if this is in the preserved selected items, select it and remove from saved list
                facet.buckets.forEach( fb => {
                   let idx = selected.findIndex( s => facet.id == s.facet_id && fb.value == s.value )
