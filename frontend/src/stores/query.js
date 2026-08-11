@@ -183,10 +183,6 @@ export const useQueryStore = defineStore('query', {
          })
       },
       setDateFilter( poolID, comparison, startDate, endDate ) {
-         if ( this.mode == "basic" ) {
-            this.setAdvancedSearch()
-         } 
-
          this.poolDateFilters.set(poolID, {startDate: startDate, comparison: comparison, endDate: endDate} )
       },
       removeDateFilter( poolID ) {
