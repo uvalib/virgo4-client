@@ -5,16 +5,8 @@
          color="white" :expanded="startSidebarExpanded"
          :borderColor=colors.brandBlue
          :invert="!startSidebarExpanded"
-         :hasSettings="true" :showSettings="showSettings" @settingsClicked="showSettings = !showSettings"
       >
          <template v-slot:title>Refine your results</template>
-         <template v-slot:settings>
-            <div class="keep-section">
-               <label title="Preserve filter and sort seeings for this session">
-                  <input type="checkbox" v-model="queryStore.keepSettings" />Keep refine settings
-               </label>
-            </div>
-         </template>
          <div v-if="!hasFacets" class="body">
             <div class="no-facets">{{resultStore.selectedResults.pool.name}} does not support filtering</div>
          </div>
@@ -98,7 +90,6 @@ const queryStore = useQueryStore()
 const user = useUserStore()
 
 const expandedFilters = ref([])
-const showSettings = ref(false)
 
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)

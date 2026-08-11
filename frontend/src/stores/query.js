@@ -31,7 +31,7 @@ export const useQueryStore = defineStore('query', {
       ],
       targetPool: "",
       poolDateFilters: new Map(),
-      keepSettings: false
+      keepSettings: true
    }),
    getters: {
       stateObject: state => {
