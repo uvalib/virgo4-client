@@ -37,8 +37,8 @@
                            <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search" />
                         </div>
                         <div class="facet-sort">
-                           <button @click="setFilterSort(facetInfo.id,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
-                           <button @click="setFilterSort(facetInfo.id,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
+                           <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
+                           <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
                         </div>
                      </template>
                      <ul :aria-labelledby="facetInfo.id">
@@ -57,12 +57,27 @@
                               <span class="cnt">({{$formatNum(fv.count)}})</span>   
                            </li>
                         </template>
+                        <li class="more" v-if="user.isSignedIn && resultStore.selectedResults.pool.id != 'articles'">
+                           <VirgoButton severity="secondary" size="small" :label="`Exclude ${facetInfo.name} filter`" 
+                              icon="fal fa-xmark" @click="excludeFilter(facetInfo)"/>
+                        </li>
                      </ul>
                   </div>
                </AccordionContent>
             </template>
-            <div v-if="user.isSignedIn" class="note">
-               Available filters can be configured in your <router-link to="/preferences">Search Preferences</router-link>.
+            <div class="exclusions" v-if="hasFilterExclusions">
+               <AccordionContent id="filter-exclusions" :background=colors.grey200 :expanded="false" >
+                  <template v-slot:title>Excluded Filters</template>
+                  <div class="excluded-list">
+                     <template  v-for="filter in excludedFilters" :key="`${filter}-exclusion`">
+                        <button class="remove" :aria-label="`remove exclusion ${filter.value}`" @click="removeExclusion(filter)">
+                           <i class="fas fa-times-circle"></i>
+                           <span>{{ filter.name }}</span>
+                        </button>
+                     </template>
+                     <VirgoButton label="Remove all exclusions" severity="secondary" size="small" @click="removeAllExclusions()"/>
+                  </div>
+               </AccordionContent>
             </div>
          </div>
       </AccordionContent>
@@ -77,6 +92,7 @@ import { useFilterStore } from "@/stores/filter"
 import { usePoolStore } from "@/stores/pool"
 import { useQueryStore } from "@/stores/query"
 import { useUserStore } from "@/stores/user"
+import { usePreferencesStore } from "@/stores/preferences"
 import { useRouter, useRoute } from 'vue-router'
 import colors from '@/assets/theme/colors.module.scss'
 import analytics from '@/analytics'
@@ -85,6 +101,7 @@ import { useRouteUtils } from '@/composables/routeutils'
 import { scrollToItem } from '@/utils'
 import AppliedFilters from "@/components/AppliedFilters.vue"
 import DateFilter from "@/components/DateFilter.vue"
+import { useConfirm } from "primevue/useconfirm"
 
 const { width } = useWindowSize()
 const route = useRoute()
@@ -95,6 +112,8 @@ const filterStore = useFilterStore()
 const poolStore = usePoolStore()
 const queryStore = useQueryStore()
 const user = useUserStore()
+const preferences = usePreferencesStore()
+const confirm = useConfirm()
 
 const expandedFilters = ref([])
 
@@ -107,6 +126,12 @@ const facetsLoaded = computed(()=>{
 const hasAppliedFilter = computed(()=>{
    return (filterStore.poolFilter(resultStore.selectedResults.pool.id).length > 0 || queryStore.dateFilter)
 })
+const excludedFilters = computed(() =>{
+   return preferences.filterExclusions(resultStore.selectedResults.pool.id)  
+})
+const hasFilterExclusions = computed(()=>{
+   return preferences.filterExclusions(resultStore.selectedResults.pool.id).length > 0
+})
 const canDateFilter = computed(() => {
    if (resultStore.selectedResults.pool.mode == 'image') return false
    if ( hasFacets.value == false ) return false
@@ -118,42 +143,98 @@ const startSidebarExpanded = computed(()=>{
 })
 
 const facets = computed(()=>{
-   return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true && f.na !== true)
+   return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true)
 })
 
-function facetValuesCount(facet) {
+const facetValuesCount = ((facet) => {
    if (!facet.buckets) return 0
    return facet.buckets.filter(b=>b.value && b.selected == false).length
-}
-function facetValues(facet, start, end) {
-   console.log(facet.name+" VALUES")
+})
+
+const facetValues = ((facet, start, end) => {
    if (!facet.buckets) return []
 
    if (facet.search.length > 0) {
       return facet.buckets.filter(b=> b.value && b.selected == false && b.value.toLowerCase().indexOf(facet.search.toLowerCase()) == 0 ).slice(start,end)
    }
    return facet.buckets.filter(b=> b.value && b.selected == false).slice(start,end)
-}
-function valueKey(idx, facetID) {
-   return facetID+"_val_"+idx
-}
+})
 
-const setFilterSort = ((filterID, type) => {
-   let order = "desc"
-   let filter = filterStore.poolFacets(resultStore.selectedResults.pool.id).find(f => f.id == filterID)
-   if (filter ) {
-       if (filter.sort == type ) {
-         if ( filter.order == "desc") {
-            order = "asc"
-         }
-       } else {
-         if ( type == "alpha") {
-            order = "asc"   
+const valueKey = ((idx, facetID) => {
+   return facetID+"_val_"+idx
+})
+
+const removeExclusion = ((facetInfo) => {
+   const poolID = resultStore.selectedResults.pool.id
+   preferences.toggleFilterExclusion(poolID, facetInfo)
+   filterStore.getSelectedResultFacets(true)
+})
+
+const removeAllExclusions = (() => {
+   preferences.resetFilterExclusions( resultStore.selectedResults.pool.id )
+   filterStore.getSelectedResultFacets(true)  
+   scrollToItem("results-container", true)
+})
+
+const excludeFilter = ( (facetInfo) => {
+   confirm.require({
+      message: `Exclude <b>${facetInfo.name}</b> from this and future searches?</br>You can restore it at any time.`,
+      header: 'Confirm Exclude',
+      icon: 'fal fa-exclamation-triangle',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Exclude'
+      },
+      accept: () => {
+         let cleared = false 
+         facetInfo.buckets.forEach( b => {
+            if (b.selected) {
+               b.selected = false 
+               cleared = true
+            }
+         })
+         
+         const poolID = resultStore.selectedResults.pool.id
+         preferences.toggleFilterExclusion(poolID, facetInfo)
+         filterStore.excludePoolFacet(poolID, facetInfo.id)
+         if ( cleared ) {
+            routeUtils.filterChanged()
          }
       }
-      filterStore.setSortOrder(resultStore.selectedResults.pool.id, filterID, type, order)
-   }
+   })
 })
+
+const setFilterSort = ((filter, sortType) => {
+   const poolID = resultStore.selectedResults.pool.id
+   
+   // see if preferences have been saved; this returns an object with fields sort and order
+   let tgtInfo = preferences.filterSort(poolID, filter.id)
+   if (!tgtInfo) {
+      // no preferences set, find the target facet in the pool facet store
+      // this facet also includes fields sort and order so it can be used the same as the 
+      // preferences response
+      tgtInfo = filterStore.poolFacets(poolID).find(f => f.id == filter.id)
+   }
+
+   let order = "desc"
+   if (tgtInfo.sort == sortType) {
+      if (tgtInfo.order == "desc") {
+         order = "asc"
+      }
+   } else {
+      if (sortType == "alpha") {
+         order = "asc"
+      }
+   }
+   if ( user.isSignedIn) {
+      preferences.setFilterSort(poolID, filter, sortType, order)
+   }
+   filterStore.setSortOrder(resultStore.selectedResults.pool.id, filter.id, sortType, order)
+})
+
 const filterSort = ((filterID, type) => {
    let out = "fa-arrow-down-short-wide" // ASCENDING
    let filter = filterStore.poolFacets(resultStore.selectedResults.pool.id).find(f => f.id == filterID)
@@ -195,20 +276,6 @@ const filterSelected = ((facetID, facetValue) => {
    min-width: 200px;
    display: inline-block;
    height: fit-content;
-
-   :deep(i.settings-icon) {
-      color: white !important;
-   }
-
-   .keep-section {
-      padding: 15px 0 0 0;;
-      text-align: left;
-      input[type="checkbox"] {
-         margin-right: 10px;
-         width: 20px;
-         height: 20px;
-      }
-   }
 
    .pool-filter-header, .filter {
       width: 100%;
@@ -285,6 +352,9 @@ const filterSelected = ((facetID, facetValue) => {
                margin-left: 5px;
             }
          }
+         div.facet-search {
+            padding: 10px;
+         }
          ul  {
             margin: 0;
             padding: 10px;
@@ -309,6 +379,40 @@ const filterSelected = ((facetID, facetValue) => {
                margin-top: 5px;
                button {
                   flex-grow: 1;
+               }
+            }
+         }
+      }
+
+      .exclusions {
+         border-top: 1px solid $uva-grey-100;
+         padding-top: 15px;
+         
+         .excluded-list {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid $uva-grey-100;
+            border-top: 0;
+            button.remove {
+               border: 1px solid $uva-grey-100;
+               padding: 6px 8px;
+               border-radius: 0.3rem;
+               margin: 0px;
+               background: white;
+               color: $uva-text-color-dark;
+               cursor: pointer;
+               text-align: left;
+               font-size: 0.9rem;
+               display: flex;
+               i {
+                  margin: 1px 5px 0 0;
+                  color: $uva-red;
+                  font-size: 1rem;
+               }
+               &:hover {
+                  background: $uva-grey-200;
                }
             }
          }

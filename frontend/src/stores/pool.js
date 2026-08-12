@@ -209,7 +209,6 @@ export const usePoolStore = defineStore('pool', {
             
             this.list.push(p)
          })
-         console.log("SET POOLS DONE")
       },
 
       async getPools() {

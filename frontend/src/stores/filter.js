@@ -128,15 +128,13 @@ export const useFilterStore = defineStore('filter', {
          // used to apply filters to any pool before search
          let tgtPFObj = {pool: "presearch", facets: []}
          filters.forEach( f => {
-            if (preferences.filterExclusions.includes(f.id) == false ) {
-               // pre-search filter data format: { id,label,values: [{value,count}] }
-               // POSTsearch filter format:      { id,name,type,sort, buckets: [{value,count,selected}] }
-               let newF = {id: f.id, name: f.label, type: "", sort: "", hidden: f.hidden, buckets: []}
-               f.values.forEach( v => {
-                  newF.buckets.push( {selected: false, value: v.value, count: v.count} )
-               })
-               tgtPFObj.facets.push(newF)
-            }
+            // pre-search filter data format: { id,label,values: [{value,count}] }
+            // POSTsearch filter format:      { id,name,type,sort, buckets: [{value,count,selected}] }
+            let newF = {id: f.id, name: f.label, type: "", sort: "", hidden: f.hidden, buckets: []}
+            f.values.forEach( v => {
+               newF.buckets.push( {selected: false, value: v.value, count: v.count} )
+            })
+            tgtPFObj.facets.push(newF)
          })
          this.facets.push(tgtPFObj)
 
@@ -189,6 +187,7 @@ export const useFilterStore = defineStore('filter', {
             })
          })
 
+         const preferences = usePreferencesStore()
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( facet => {
             // NOTES: since the pool details now includes a date filter, the FilterDate facet is not needed. Skip it
@@ -196,12 +195,20 @@ export const useFilterStore = defineStore('filter', {
                if (facet.id=="PeerReviewedOnly") {
                   facet.name = "Peer Review Status"
                }
-               // add default sort direction; count = desc, alpha = asc
-               facet.order = "asc"
-               if ( facet.sort == 'count') {
-                  facet.order = "desc"   
+
+               const sortPref = preferences.filterSort( data.pool, facet.id)
+               if (sortPref) {
+                  facet.sort = sortPref.sort
+                  facet.order = sortPref.order
+               } else {
+                  // facet.sort comes from the pool config and is either alpha or count.
+                  // add default sort direction; count = desc, alpha = asc
+                  facet.order = "asc"
+                  if ( facet.sort == 'count') {
+                     facet.order = "desc"   
+                  }
                }
-               facet.search = ""  // initially, there is no searchstring used to narrow the list of buckes
+               facet.search = ""  // initially, there is no search string used to narrow the list of buckes
 
                // if this is in the preserved selected items, select it and remove from saved list
                facet.buckets.forEach( fb => {
@@ -214,6 +221,11 @@ export const useFilterStore = defineStore('filter', {
 
                if ( facet.buckets.length > 0) {
                   tgtFacets.push(facet)
+               }
+
+               if (sortPref) {
+                  // if preferences overrode the configured sort, resort to reflect the change
+                  this.setSortOrder(data.pool, facet.id, facet.sort, facet.order )
                }
             }
          })
@@ -253,13 +265,14 @@ export const useFilterStore = defineStore('filter', {
                analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facetID}:${value}`)
             }
          }
-         // if ( bucket.na ) {
-         //    facetInfo.buckets.splice(bIdx,1)
-         //    if ( facetInfo.buckets.length == 0) {
-         //       pfObj.facets.splice(fIdx,1)
-         //    }
-         // }
          this.facets.splice(idx, 1, pfObj)
+      },
+      excludePoolFacet(poolID, facetID) {
+         let poolInfo = this.facets.find(pf => pf.pool == poolID)
+         let fIdx = poolInfo.facets.findIndex(f => f.id === facetID)
+         if (fIdx > -1 ) {
+            poolInfo.facets.splice(fIdx, 1)
+         }
       },
 
       resetPoolFilters(pool) {
@@ -465,11 +478,9 @@ export const useFilterStore = defineStore('filter', {
             return
          }
 
-         if ( pool.id == "uva_library") {
-            const preferences = usePreferencesStore()
-            req.preferences = {
-               exclude_filters: preferences.filterExclusions
-            }
+         const preferences = usePreferencesStore()
+         req.preferences = {
+            exclude_filters: preferences.filterExclusions(pool.id).map( fe => fe.id )
          }
 
          let tgtURL = pool.url+"/api/search/facets"
