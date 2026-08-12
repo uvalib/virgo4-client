@@ -112,7 +112,7 @@ export const usePreferencesStore = defineStore('preferences', {
 
          // original implementation stored filter settings an an array. IGNORE this
          this.filters = {}
-         if ( Array.isArray(prefsObj.filters) == false ) {
+         if ( prefsObj.filters && Array.isArray(prefsObj.filters) == false ) {
             this.filters = prefsObj.filters
          }
 
