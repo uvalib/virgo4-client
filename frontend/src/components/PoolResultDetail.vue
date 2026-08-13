@@ -15,52 +15,50 @@
             <ExcludePool v-if="canExclude"/>
          </div>
       </div>
-      <template v-if="!resultStore.searching">
-         <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
-            <div class="timeout" v-if="selectedResults.statusCode == 408">
-               <span>Search timed out</span>
-               <p class="note">
-                  Sorry, the source providing this data took too long to respond.  You may wish to try your search again, or try a different search.
-                  If the problem persists, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank' aria-describedby="new-window">Ask a Librarian</a> may be able to help.
-               </p>
-               <VirgoButton @click="retrySearch">Retry Search</VirgoButton>
-            </div>
-            <template v-else>
-               <span>No results found</span>
-               <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
-                  {{selectedResults.statusMessage}}
-               </p>
-               <ExpandSearch />
-            </template>
+      <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
+         <div class="timeout" v-if="selectedResults.statusCode == 408">
+            <span>Search timed out</span>
+            <p class="note">
+               Sorry, the source providing this data took too long to respond.  You may wish to try your search again, or try a different search.
+               If the problem persists, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank' aria-describedby="new-window">Ask a Librarian</a> may be able to help.
+            </p>
+            <VirgoButton @click="retrySearch">Retry Search</VirgoButton>
          </div>
-         <div v-else class="hits" role="region" aria-label="search results">
-            <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content" role="list">
-               <li role="listitem" v-for="hit in selectedResults.hits" class="image hit-wrapper" :key="`img-${hit.identifier}`">
-                  <ImageSearchHit :pool="selectedResults.pool.id" :hit="hit"/>
-               </li>
-            </ul>
-            <div v-else class="hits-content" role="list">
-               <div role="listitem" v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.number}-${hit.identifier}`">
-                  <SearchHit :pool="selectedResults.pool.id" :count="hit.number" :hit="hit"/>
-               </div>
+         <template v-else>
+            <span>No results found</span>
+            <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
+               {{selectedResults.statusMessage}}
+            </p>
+            <ExpandSearch />
+         </template>
+      </div>
+      <div v-else class="hits" role="region" aria-label="search results">
+         <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content" role="list">
+            <li role="listitem" v-for="hit in selectedResults.hits" class="image hit-wrapper" :key="`img-${hit.identifier}`">
+               <ImageSearchHit :pool="selectedResults.pool.id" :hit="hit"/>
+            </li>
+         </ul>
+         <div v-else class="hits-content" role="list">
+            <div role="listitem" v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.number}-${hit.identifier}`">
+               <SearchHit :pool="selectedResults.pool.id" :count="hit.number" :hit="hit"/>
             </div>
          </div>
-         <span role="toolbar"  v-if="selectedResults.hits.length > 0">
-            <ExpandSearch class="expand-panel" />
-               <div v-if="signInRequired" class="reminder">
-                  <div>Results from {{ poolExclusionString }} are turned off for guest users.</div>
-                  <div><VirgoButton link @click="signInClicked" label="Sign in to see all results"/></div>
-               </div>
-               <div v-else-if="user.isSignedIn && queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
-                  <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
-                  <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
-               </div>
-            <VirgoButton v-if="resultStore.hasMoreHits" @click="loadMoreResults">
-               <V4Spinner v-if="loadingMore" color="white"/>
-               <span v-else>Load More Results</span>
-            </VirgoButton>
-         </span>
-      </template>
+      </div>
+      <span role="toolbar"  v-if="selectedResults.hits.length > 0">
+         <ExpandSearch class="expand-panel" />
+            <div v-if="signInRequired" class="reminder">
+               <div>Results from {{ poolExclusionString }} are turned off for guest users.</div>
+               <div><VirgoButton link @click="signInClicked" label="Sign in to see all results"/></div>
+            </div>
+            <div v-else-if="user.isSignedIn && queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
+               <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
+               <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
+            </div>
+         <VirgoButton v-if="resultStore.hasMoreHits" @click="loadMoreResults">
+            <V4Spinner v-if="loadingMore" color="white"/>
+            <span v-else>Load More Results</span>
+         </VirgoButton>
+      </span>
    </div>
 </template>
 
