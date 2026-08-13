@@ -5,8 +5,12 @@
          color="white" :expanded="startSidebarExpanded"
          :borderColor=colors.brandBlue
          :invert="!startSidebarExpanded"
+         :hasSettings="true" :showSettings="filterPrefsOpen" @settingsClicked="filterPrefsOpen = !filterPrefsOpen"
       >
          <template v-slot:title>Refine your results</template>
+         <template v-slot:settings>
+            <FacetOrder :facets="facets" @apply="setFacetOrder"/>
+         </template>
          <div v-if="!hasFacets" class="body">
             <div class="no-facets">{{resultStore.selectedResults.pool.name}} does not support filtering</div>
          </div>
@@ -102,6 +106,8 @@ import { scrollToItem } from '@/utils'
 import AppliedFilters from "@/components/AppliedFilters.vue"
 import DateFilter from "@/components/DateFilter.vue"
 import { useConfirm } from "primevue/useconfirm"
+import Dialog from 'primevue/dialog'
+import FacetOrder from "@/components/modals/FacetOrder.vue"
 
 const { width } = useWindowSize()
 const route = useRoute()
@@ -116,6 +122,7 @@ const preferences = usePreferencesStore()
 const confirm = useConfirm()
 
 const expandedFilters = ref([])
+const filterPrefsOpen = ref(false)
 
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
@@ -142,6 +149,7 @@ const startSidebarExpanded = computed(()=>{
    return width.value > 810
 })
 
+// TODO maybe sort?
 const facets = computed(()=>{
    return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true)
 })
@@ -205,6 +213,11 @@ const excludeFilter = ( (facetInfo) => {
          }
       }
    })
+})
+
+const setFacetOrder = ( async (sequenced ) => {
+   await preferences.setFilterSequence(resultStore.selectedResults.pool.id, sequenced)
+   filterStore.setPoolFilterSequence(resultStore.selectedResults.pool.id, sequenced )
 })
 
 const setFilterSort = ((filter, sortType) => {
@@ -276,6 +289,10 @@ const filterSelected = ((facetID, facetValue) => {
    min-width: 200px;
    display: inline-block;
    height: fit-content;
+
+   :deep(i.settings-icon) {
+      color: white !important;
+   }
 
    .pool-filter-header, .filter {
       width: 100%;

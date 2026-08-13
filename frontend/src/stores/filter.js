@@ -166,6 +166,26 @@ export const useFilterStore = defineStore('filter', {
          })
       },
 
+      setPoolFilterSequence(poolID, sequencedFacets ) {
+         let tgtPFObj = this.facets.find(pf => pf.pool == poolID)
+         if ( !tgtPFObj ) return
+
+         tgtPFObj.facets.forEach( f => {
+            // sequencedFacets is an orderd list of facet id / name
+            let sequence = sequencedFacets.findIndex( sf => sf.id == f.id)
+            if ( sequence > -1) {
+               f.sequence = sequence
+            } 
+         })
+
+         tgtPFObj.facets = tgtPFObj.facets.sort( (a,b) => {
+            if (a.sequence > b.sequence) return 1
+            if (a.sequence < b.sequence) return -1
+            return 0
+         })
+         console.log(tgtPFObj.facets)
+      },
+
       setPoolFacets(data) {
          // Get currently selected facets (both valid and N/A), then clear everything out
          // repopulate with data from API call, and restore prior selected state
@@ -188,27 +208,45 @@ export const useFilterStore = defineStore('filter', {
          })
 
          const preferences = usePreferencesStore()
+         const sequencedFacets = preferences.filterSequence(data.pool)
+         let maxSeq = 0
+         sequencedFacets.forEach( sf =>{
+            if ( sf.sequence > maxSeq) {
+               maxSeq = sf.sequence
+            }
+         } )
+      
          tgtFacets.splice(0, tgtFacets.length)
-         data.facets.forEach( facet => {
+         data.facets.forEach( (facet,idx) => {
             // NOTES: since the pool details now includes a date filter, the FilterDate facet is not needed. Skip it
             if (facet.id != "FilterDate" && facet.id != "PublicationYear" ) {
+               delete facet.type
                if (facet.id=="PeerReviewedOnly") {
                   facet.name = "Peer Review Status"
                }
 
+               facet.sequence = (idx+1+maxSeq)
+               let sf = sequencedFacets.find( sf => sf.id == facet.id)
+               if (sf) {
+                  facet.sequence = sf.sequence
+               }
+
+               // facet.sort comes from the pool config and is either alpha or count.
+               // add default sort direction; count = desc, alpha = asc
+               facet.order = "asc"
+               if ( facet.sort == 'count') {
+                  facet.order = "desc"   
+               }
+
+               // override default sort with preferences
                const sortPref = preferences.filterSort( data.pool, facet.id)
-               if (sortPref) {
+               if (sortPref && sortPref.sort && sortPref.order) {
                   facet.sort = sortPref.sort
                   facet.order = sortPref.order
-               } else {
-                  // facet.sort comes from the pool config and is either alpha or count.
-                  // add default sort direction; count = desc, alpha = asc
-                  facet.order = "asc"
-                  if ( facet.sort == 'count') {
-                     facet.order = "desc"   
-                  }
-               }
-               facet.search = ""  // initially, there is no search string used to narrow the list of buckes
+               } 
+
+               // initially, there is no search string used to narrow the list of buckes
+               facet.search = ""  
 
                // if this is in the preserved selected items, select it and remove from saved list
                facet.buckets.forEach( fb => {
@@ -241,6 +279,12 @@ export const useFilterStore = defineStore('filter', {
             }
             naf.buckets.push({value: s.value, selected: true, na: true})
             tgtFacets.splice(nafIdx, 1, naf)
+         })
+
+         tgtFacets = tgtFacets.sort( (a,b) => {
+               if (a.sequence > b.sequence) return 1
+               if (a.sequence < b.sequence) return -1
+               return 0
          })
       },
 

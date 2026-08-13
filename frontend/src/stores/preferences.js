@@ -59,6 +59,13 @@ export const usePreferencesStore = defineStore('preferences', {
             return exclusions
          }
       },
+      filterSequence: state => {
+         return (poolID) => {
+            let filterPrefs = state.filters[poolID]
+            if (!filterPrefs) return []
+            return filterPrefs.map( f => ({id: f.id, sequence: f.sequence}))
+         }
+      },
       isFilterExcluded: state => {
          return (poolID, fID) => {
             let filterPrefs = state.filters[poolID]
@@ -158,6 +165,27 @@ export const usePreferencesStore = defineStore('preferences', {
          } else {
             this.searchExclusions.push(poolID)
          }
+         await this.save()
+      },
+      async setFilterSequence( poolID, sequencedFilters ) {
+         // see if any filter preferences exist for this pool. 
+         let filterPrefs = this.filters[poolID]
+         if ( !filterPrefs) {
+            // none exist; create empty array
+            filterPrefs = []
+         }
+         sequencedFilters.forEach( (fSeq,idx) => {
+            let tgtF = filterPrefs.find(f => f.id == fSeq.id)
+            if (tgtF) {
+               tgtF.sequence = (idx+1)
+            } else {
+               let newF = {id: fSeq.id, name: fSeq.name, excluded: false, sequence: (idx+1)} 
+               filterPrefs.push(newF)    
+            }    
+         })
+
+         // update the pool filter preferences with the updated array and save changes
+         this.filters[poolID] = filterPrefs
          await this.save()
       },
       async setFilterSort(poolID, filter, sortType, order) {
