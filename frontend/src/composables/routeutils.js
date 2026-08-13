@@ -80,11 +80,10 @@ export function useRouteUtils( router,route ) {
 
       // only re-run search when query, sort or filtering has changed - or a user has initiated a search with a UI element
       if ( runSearch == true ) {
-         // // resultStore.resetSearchResults()
          queryStore.userSearched = false
          queryStore.filtersCleared = false
 
-         await searchCallback(queryStore.searchSources)
+         await searchCallback()
 
          if (query.sort === undefined || query.pool === undefined) {
             // Ensure pool and sort are always part of the URL. This will re-trigger queryParamsChanged.
@@ -174,54 +173,6 @@ export function useRouteUtils( router,route ) {
       router.push({path: "/search", query: newQ })
    })
 
-   const scopeChanged = ( () => {
-      const queryStore = useQueryStore()
-      const resultStore = useResultStore()
-      const filters = useFilterStore()
-      const sortStore = useSortStore()
-
-      // If a single pool was the prior scope, results would be length 1.
-      // Any more than that means scope was everything
-      const wasEverythingSearched = (resultStore.results.length > 1)
-
-      // NOTES: The scope radio buttons directly update queryStore.searchSources. This means that
-      // in the logic below, queryStore will have the newly selected scope and newQ/route.query will have the original
-      let newQ = Object.assign({}, route.query)
-      delete newQ.page
-      delete newQ.filter
-      delete newQ.sort
-      delete newQ.pool
-
-      // If the previous scope was everything, the only way this logic can be called is if
-      // a single pool was selected for the scope
-      if ( wasEverythingSearched ) {
-         // scope narrowed to a single pool; drop all other results. No need to trigger a new search with userSearched=true
-         console.log("NARROW SCOPE ALL TO "+queryStore.searchSources)
-         resultStore.dropOtherResults(queryStore.searchSources)
-      } else {
-         // Two causes to be here:
-         //    1. single pool scope changed to a different pool
-         //    2. single pool scope widened to everything
-         // In either case, any previous results have been lost and a re-search needs to be triggerred
-         console.log(`SCOPE CHANGED FROM: ${route.query.pool} TO ${queryStore.searchSources}`)
-         queryStore.userSearched = true
-      }
-
-      if ( queryStore.searchSources != "all") {
-         newQ.pool = queryStore.searchSources
-
-         // restore any previously defined sort and filter for the new scope
-         const selectedSortObj = sortStore.poolSort( queryStore.searchSources )
-         newQ.sort = `${selectedSortObj.sort_id}_${selectedSortObj.order}`
-         const selectedFilter = filters.asQueryParam( queryStore.searchSources )
-         if (selectedFilter != '{}') {
-            newQ.filter = selectedFilter
-         }
-      }
-
-      router.push({path: "/search", query: newQ })
-   })
-
    const sortChanged = (() => {
       const sortStore = useSortStore()
 
@@ -279,6 +230,6 @@ export function useRouteUtils( router,route ) {
 
    return {
       queryParamsChanged, searchChanged, poolChanged,
-      scopeChanged, sortChanged, filterChanged, collectionSearchChanged
+      sortChanged, filterChanged, collectionSearchChanged
    }
 }

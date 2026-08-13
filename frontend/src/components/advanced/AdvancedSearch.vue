@@ -35,14 +35,12 @@
             <div class="form-acts">
                <FormKit type="button" @click="addClicked">Add criteria</FormKit>
                <FormKit v-if="resultStore.hasResults==false && resultStore.searching == false" type="button" @click="saveSearchForm">Save form</FormKit>
-               <SourceSelector v-else :help="false"/>
             </div>
             <PreSearchFilters v-if="resultStore.hasResults==false"/>
             <div class="controls" v-if="resultStore.hasResults==false && resultStore.searching == false">
                <FormKit v-if="resultStore.hasResults==false && resultStore.searching == false" type="select" label="Sort by" v-model="sortStore.preSearchSort"
                   outer-class="$reset sort" inner-class="$reset sort"
                   :options="sortOptions" @change="sortChanged()" />
-               <SourceSelector v-if="resultStore.hasResults==false"  :help="false"/>
             </div>
             <V4FormActions :hasCancel="false" submitLabel="Search" submitID="do-advanced-request" />
          </FormKit>
@@ -52,7 +50,6 @@
 
 <script setup>
 import AdvancedFacets from "@/components/advanced/AdvancedFacets.vue"
-import SourceSelector from "@/components/SourceSelector.vue"
 import PreSearchFilters from "@/components/advanced/PreSearchFilters.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import analytics from '@/analytics'

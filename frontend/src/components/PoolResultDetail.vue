@@ -29,7 +29,6 @@
             <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
                {{selectedResults.statusMessage}}
             </p>
-            <ExpandSearch />
          </template>
       </div>
       <div v-else class="hits" role="region" aria-label="search results">
@@ -45,15 +44,14 @@
          </div>
       </div>
       <span role="toolbar"  v-if="selectedResults.hits.length > 0">
-         <ExpandSearch class="expand-panel" />
-            <div v-if="signInRequired" class="reminder">
-               <div>Results from {{ poolExclusionString }} are turned off for guest users.</div>
-               <div><VirgoButton link @click="signInClicked" label="Sign in to see all results"/></div>
-            </div>
-            <div v-else-if="user.isSignedIn && queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
-               <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
-               <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
-            </div>
+         <div v-if="signInRequired" class="reminder">
+            <div>Results from {{ poolExclusionString }} are turned off for guest users.</div>
+            <div><VirgoButton link @click="signInClicked" label="Sign in to see all results"/></div>
+         </div>
+         <div v-else-if="user.isSignedIn && queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
+            <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
+            <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
+         </div>
          <VirgoButton v-if="resultStore.hasMoreHits" @click="loadMoreResults">
             <V4Spinner v-if="loadingMore" color="white"/>
             <span v-else>Load More Results</span>
@@ -66,7 +64,6 @@
 import SearchHit from "@/components/SearchHit.vue"
 import ImageSearchHit from "@/components/ImageSearchHit.vue"
 import V4Sort from "@/components/V4Sort.vue"
-import ExpandSearch from "@/components/ExpandSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
 import { ref,computed, onMounted, watch } from 'vue'
 import { useUserStore } from "@/stores/user"

@@ -23,21 +23,19 @@
                >
                <VirgoButton @click="searchClicked" class="search">Search</VirgoButton>
             </div>
-            <div class="controls-wrapper">
-               <SourceSelector mode="basic"/>
-               <SearchTips />
-            </div>
             <div class="search-mode">
                <router-link tabindex="0" to="/search?mode=advanced">Advanced Search</router-link>
                <template v-if="userStore.isSignedIn">
                   <span>|</span>
                   <router-link tabindex="0" to="/preferences">Search Preferences</router-link>
                </template>
+               <span>|</span>
+               <SearchTips />
             </div>
          </template>
          <AdvancedSearch v-else/>
       </div>
-      <Welcome  v-if="isHomePage && resultStore.hasResults==false && queryStore.mode=='basic'" />
+      <Welcome  v-if="resultStore.hasResults==false && queryStore.mode=='basic'" />
       <SearchResults v-if="resultStore.hasResults" />
    </div>
 </template>
@@ -47,7 +45,6 @@ import SearchTips from "@/components/modals/SearchTips.vue"
 import SearchResults from "@/components/SearchResults.vue"
 import AdvancedSearch from "@/components/advanced/AdvancedSearch.vue"
 import Welcome from "@/components/Welcome.vue"
-import SourceSelector from "@/components/SourceSelector.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import { scrollToItem } from '@/utils'
 import analytics from '@/analytics'
@@ -138,13 +135,11 @@ onBeforeMount( async () => {
 })
 
 const handleQueryParamChange = ( async( ) => {
-   routeUtils.queryParamsChanged(async (pool) => {
+   routeUtils.queryParamsChanged(async () => {
       assertive(`search in progress`)
-      if (pool == "all") {
-         await resultStore.searchAllPools()
-      } else {
-         await resultStore.searchPool({pool: poolStore.poolDetails(pool)})
-      }
+
+      await resultStore.searchAllPools()
+      
       if ( restore.pendingBookmark ) {
          handlePendingBookmark()
          restore.clear()
@@ -252,7 +247,7 @@ async function searchClicked() {
    }
    .search-mode {
       text-align: center;
-      margin: 10px 0 5px 0;
+      margin: 20px 0 10px 0;
       display: flex;
       flex-flow: row wrap;
       justify-content: center;
