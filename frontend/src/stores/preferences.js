@@ -281,6 +281,13 @@ export const usePreferencesStore = defineStore('preferences', {
       },
       async save() {
          const userStore = useUserStore()
+
+         // don't attempt any saves if user is not signed in
+         if (userStore.isSignedIn == false ) {
+            console.log("Non-authenticated users cannto save preferences")
+            return
+         }
+
          let url = `/api/users/${userStore.signedInUser}/preferences`
          let data = {
             trackingOptOut: this.trackingOptOut,
