@@ -1,6 +1,6 @@
 <template>
    <div class="filters" aria-live="polite">
-      <div class="filters-head">Applied Filters</div>
+      <div class="filters-head">Active Filters</div>
       <div class="filter-display">
          <button v-if="queryStore.dateFilter" class="remove" @click="removeDateFilter" :aria-label="`remove date filter`">
             <i class="fas fa-times-circle"></i>
@@ -13,7 +13,7 @@
                <span v-else aria-hidden="true">{{filter.value}}</span>
             </button>
          </template>
-         <VirgoButton @click="clearClicked" label="Clear Applied Filters" severity="secondary" size="small"/>
+         <VirgoButton @click="clearClicked" label="Clear Active Filters" severity="secondary" size="small"/>
       </div>
    </div>
 </template>

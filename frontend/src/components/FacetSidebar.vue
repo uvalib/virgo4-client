@@ -16,7 +16,7 @@
          </div>
          <div v-else class="body">
             <AppliedFilters v-if="hasAppliedFilter" />
-            <DateFilter v-if="canDateFilter" />
+            <DateFilter v-if="canDateFilter && filtersUnavailable == false" />
 
             <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
                <div class="working">
@@ -26,10 +26,7 @@
                   </div>
                </div>
             </div>
-            <div v-if="(facets.length == 0 || resultStore.selectedResults.total==0) && filterStore.updatingFacets == false && resultStore.searching == false" class="no-facets">
-               Filters are not available for this search
-            </div>
-            <template v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
+            <template v-if="filtersUnavailable == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
                <AccordionContent v-if="facetValuesCount(facetInfo) > 0"
                   :id="facetInfo.id" :background=colors.grey200 
                   @accordion-collapsed="filterCollapsed(facetInfo.id)" :expanded="idx < 4"
@@ -69,7 +66,7 @@
                   </div>
                </AccordionContent>
             </template>
-            <div class="exclusions" v-if="hasFilterExclusions">
+            <div class="exclusions" v-if="hasFilterExclusions && filtersUnavailable == false">
                <AccordionContent id="filter-exclusions" :background=colors.grey200 :expanded="false" >
                   <template v-slot:title>Excluded Filters</template>
                   <div class="excluded-list">
@@ -124,6 +121,12 @@ const confirm = useConfirm()
 const expandedFilters = ref([])
 const filterPrefsOpen = ref(false)
 
+const facets = computed(()=>{
+   return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true)
+})
+const filtersUnavailable = computed(() => {
+   return (facets.value.length == 0 || resultStore.selectedResults.total==0) && filterStore.updatingFacets == false && resultStore.searching == false
+})
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
 })
@@ -147,11 +150,6 @@ const canDateFilter = computed(() => {
 
 const startSidebarExpanded = computed(()=>{
    return width.value > 810
-})
-
-// TODO maybe sort?
-const facets = computed(()=>{
-   return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true)
 })
 
 const facetValuesCount = ((facet) => {

@@ -16,19 +16,28 @@
          </div>
       </div>
       <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
-         <div class="timeout" v-if="selectedResults.statusCode == 408">
+         <template v-if="selectedResults.statusCode == 408">
             <span>Search timed out</span>
             <p class="note">
                Sorry, the source providing this data took too long to respond.  You may wish to try your search again, or try a different search.
                If the problem persists, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank' aria-describedby="new-window">Ask a Librarian</a> may be able to help.
             </p>
             <VirgoButton @click="retrySearch">Retry Search</VirgoButton>
-         </div>
+         </template>
          <template v-else>
             <span>No results found</span>
             <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
                {{selectedResults.statusMessage}}
             </p>
+            <div v-else>
+               <p class="note">Suggestions</p>
+               <ul >
+                  <li>Check your spelling.</li>
+                  <li>Use more generic search terms.</li>
+                  <li v-if="queryStore.mode=='basic'">Use <router-link to="/search?mode=advanced">Advanced Search</router-link> to create a more targeted search.</li>
+                  <li>Clear any active filters.</li>
+               </ul>
+            </div>
          </template>
       </div>
       <div v-else class="hits" role="region" aria-label="search results">
@@ -255,11 +264,16 @@ div.pool-header {
 }
 .hit-wrapper.none {
    background: white;
-   padding:35px;
+   padding: 25px;
    margin-bottom: 1rem;
+   text-align: left;
+   border: 1px solid #ccc;
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
 
    span {
-      font-size: 1.5em;
+      font-size: 1.25em;
       font-weight: 500;
    }
 
@@ -274,6 +288,9 @@ div.pool-header {
    font-size: 0.75em;
    font-weight: normal;
    color: $uva-red;
+}
+.no-results {
+   text-align: left;
 }
 @media only screen and (max-width: 600px) {
    .hit-wrapper {
