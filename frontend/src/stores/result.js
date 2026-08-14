@@ -366,7 +366,8 @@ export const useResultStore = defineStore('result', {
             pool_sorting: sorting.poolSort("all"),
             pool_query_addons: query.poolQueryAddons,
             preferences: {
-               exclude_pools: prefs.searchExclusions.filter( e => e != this.ignoreExclusion)
+               exclude_pools: prefs.searchExclusions.filter( e => e != this.ignoreExclusion),
+               filter_join: prefs.facetMode
             }
          }
          this.ignoreExclusion = ""

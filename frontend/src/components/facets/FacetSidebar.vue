@@ -9,7 +9,10 @@
       >
          <template v-slot:title>Refine your results</template>
          <template v-slot:settings>
-            <FacetOrder :facets="facets" @apply="setFacetOrder"/>
+            <div class="settings">
+               <FacetMode v-if="resultStore.selectedResults.pool.id != 'articles'" />
+               <FacetOrder :facets="facets" @apply="setFacetOrder"/>
+            </div>
          </template>
          <div v-if="!hasFacets" class="body">
             <div class="no-facets">{{resultStore.selectedResults.pool.name}} does not support filtering</div>
@@ -100,11 +103,12 @@ import analytics from '@/analytics'
 import { useWindowSize } from '@vueuse/core'
 import { useRouteUtils } from '@/composables/routeutils'
 import { scrollToItem } from '@/utils'
-import AppliedFilters from "@/components/AppliedFilters.vue"
-import DateFilter from "@/components/DateFilter.vue"
+import AppliedFilters from "@/components/facets/AppliedFilters.vue"
+import DateFilter from "@/components/facets/DateFilter.vue"
 import { useConfirm } from "primevue/useconfirm"
 import Dialog from 'primevue/dialog'
-import FacetOrder from "@/components/modals/FacetOrder.vue"
+import FacetOrder from "@/components/facets/FacetOrder.vue"
+import FacetMode from "@/components/facets/FacetMode.vue"
 
 const { width } = useWindowSize()
 const route = useRoute()
@@ -290,6 +294,14 @@ const filterSelected = ((facetID, facetValue) => {
 
    :deep(i.settings-icon) {
       color: white !important;
+   }
+   .settings {
+      text-align: left;
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
    }
 
    .pool-filter-header, .filter {

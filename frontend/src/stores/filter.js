@@ -524,7 +524,8 @@ export const useFilterStore = defineStore('filter', {
 
          const preferences = usePreferencesStore()
          req.preferences = {
-            exclude_filters: preferences.filterExclusions(pool.id).map( fe => fe.id )
+            exclude_filters: preferences.filterExclusions(pool.id).map( fe => fe.id ),
+            filter_join: preferences.facetMode
          }
 
          let tgtURL = pool.url+"/api/search/facets"

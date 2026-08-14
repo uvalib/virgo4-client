@@ -244,8 +244,10 @@ function onAfterLeave(el) {
 
    .accordion-settings {
       padding: 0 10px 10px 10px;
-      background: $uva-grey-200;
+      background: white;
       border: 1px solid $uva-grey-100;
+      border-top: 0;
+      border-bottom-width: 3px;
       text-align: right;
    }
 

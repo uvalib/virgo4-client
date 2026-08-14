@@ -9,7 +9,8 @@ export const usePreferencesStore = defineStore('preferences', {
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       searchExclusions: [],
-      filters: {}, // key is poolID, value [{id, sortType, sortOrder, excluded, sequence}] NEED NAME TOO?
+      filters: {},         // key is poolID, value [{id, sortType, sortOrder, excluded, sequence}]
+      facetMode: "OR",     // boolean operation for combining facet values. OR was the original mode, so set it as default
       collapseGroups: false,
       collapseDetails: false,
       aiDebug: false,
@@ -122,6 +123,7 @@ export const usePreferencesStore = defineStore('preferences', {
          if ( prefsObj.filters && Array.isArray(prefsObj.filters) == false ) {
             this.filters = prefsObj.filters
          }
+         this.facetMode = prefsObj.facetMode || "OR"
 
          this.aiDebug = prefsObj.aiDebug || false
          this.aiFeatures = prefsObj.aiFeatures || []
@@ -237,6 +239,9 @@ export const usePreferencesStore = defineStore('preferences', {
          this.filters[poolID] = filterPrefs
          await this.save()
       },
+      async updateFacetJoinMode() {
+         await this.save()
+      },
       async resetFilterExclusions(poolID) {
          let filterPrefs = this.filters[poolID]
          if (!filterPrefs) return 
@@ -285,6 +290,7 @@ export const usePreferencesStore = defineStore('preferences', {
             searchTemplate: this.searchTemplate,
             searchExclusions: this.searchExclusions,
             filters: this.filters,
+            facetMode: this.facetMode,
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,
             aiModel: this.aiModel,

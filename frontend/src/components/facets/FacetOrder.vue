@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton style="margin-top: 10px"  severity="secondary" size="small" label="Set filter order" @click="showDialog = true" />
+   <VirgoButton severity="secondary" size="small" label="Set filter order" @click="showDialog = true" />
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Set Filter Order"  @show="opened">
       <div class="help">Select a facet or facets and use the<br/>arrow buttons to change ordering.</div>
       <OrderList v-model="workingFacets" dataKey="id">
