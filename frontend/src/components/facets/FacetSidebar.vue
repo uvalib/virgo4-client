@@ -7,7 +7,10 @@
          :invert="!startSidebarExpanded"
          :hasSettings="true" :showSettings="filterPrefsOpen" @settingsClicked="filterPrefsOpen = !filterPrefsOpen"
       >
-         <template v-slot:title>Refine your results</template>
+         <template v-slot:title>
+            Filters
+            <span class="filter-count" v-if="appliedFiltersCount>0">({{ appliedFiltersCount }} active)</span>
+         </template>
          <template v-slot:settings>
             <div class="settings">
                <FacetMode v-if="resultStore.selectedResults.pool.id != 'articles'" />
@@ -18,7 +21,7 @@
             <div class="no-facets">{{resultStore.selectedResults.pool.name}} does not support filtering</div>
          </div>
          <div v-else class="body">
-            <AppliedFilters v-if="hasAppliedFilter" />
+            <AppliedFilters v-if="appliedFiltersCount > 0" />
             <DateFilter v-if="canDateFilter && filtersUnavailable == false" />
 
             <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
@@ -46,26 +49,15 @@
                         </div>
                      </template>
                      <ul :aria-labelledby="facetInfo.id">
-                        <li v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
+                        <li v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.id)">
                            <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
                            <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>   
                         </li>
-                        <template v-if="facetValuesCount(facetInfo) > 5" >
-                           <li v-if="isFilterExpanded(facetInfo.id) == false" class="more">
-                              <VirgoButton severity="secondary" size="small" 
-                                 :label="`Show all ${facetValuesCount(facetInfo)} filters`" icon="fal fa-plus" @click="toggleFilterExpand(facetInfo.id)"
-                              />
-                           </li>
-                           <li v-else v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
-                              <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
-                              <span class="cnt">({{$formatNum(fv.count)}})</span>   
-                           </li>
-                        </template>
-                        <li class="more" v-if="user.isSignedIn && resultStore.selectedResults.pool.id != 'articles'">
+                     </ul>
+                     <div class="more" v-if="user.isSignedIn && resultStore.selectedResults.pool.id != 'articles'">
                            <VirgoButton severity="secondary" size="small" :label="`Exclude ${facetInfo.name} filter`" 
                               icon="fal fa-xmark" @click="excludeFilter(facetInfo)"/>
-                        </li>
-                     </ul>
+                     </div>
                   </div>
                </AccordionContent>
             </template>
@@ -79,7 +71,7 @@
                            <span>{{ filter.name }}</span>
                         </button>
                      </template>
-                     <VirgoButton label="Remove all exclusions" severity="secondary" size="small" @click="removeAllExclusions()"/>
+                     <VirgoButton label="Restore All" severity="secondary" size="small" @click="removeAllExclusions()"/>
                   </div>
                </AccordionContent>
             </div>
@@ -137,8 +129,12 @@ const hasFacets = computed(()=>{
 const facetsLoaded = computed(()=>{
    return filterStore.poolFacets(resultStore.selectedResults.pool.id).length > 0
 })
-const hasAppliedFilter = computed(()=>{
-   return (filterStore.poolFilter(resultStore.selectedResults.pool.id).length > 0 || queryStore.dateFilter)
+const appliedFiltersCount = computed(()=>{
+   let cnt = filterStore.poolFilter(resultStore.selectedResults.pool.id).length
+   if (queryStore.dateFilter) {
+      cnt++
+   }
+   return cnt
 })
 const excludedFilters = computed(() =>{
    return preferences.filterExclusions(resultStore.selectedResults.pool.id)  
@@ -161,13 +157,13 @@ const facetValuesCount = ((facet) => {
    return facet.buckets.filter(b=>b.value && b.selected == false).length
 })
 
-const facetValues = ((facet, start, end) => {
+const facetValues = ((facet) => {
    if (!facet.buckets) return []
 
    if (facet.search.length > 0) {
-      return facet.buckets.filter(b=> b.value && b.selected == false && b.value.toLowerCase().indexOf(facet.search.toLowerCase()) == 0 ).slice(start,end)
+      return facet.buckets.filter(b=> b.value && b.selected == false && b.value.toLowerCase().indexOf(facet.search.toLowerCase()) == 0 )
    }
-   return facet.buckets.filter(b=> b.value && b.selected == false).slice(start,end)
+   return facet.buckets.filter(b=> b.value && b.selected == false)
 })
 
 const valueKey = ((idx, facetID) => {
@@ -292,6 +288,11 @@ const filterSelected = ((facetID, facetValue) => {
    display: inline-block;
    height: fit-content;
 
+   .filter-count {
+      display: inline-block;
+      margin-left: 5px;
+   }
+
    :deep(i.settings-icon) {
       color: white !important;
    }
@@ -402,11 +403,11 @@ const filterSelected = ((facetID, facetValue) => {
                   font-size: .8em;
                }
             }
-            li.more {
-               margin-top: 5px;
-               button {
-                  flex-grow: 1;
-               }
+         }
+         .more {
+            margin-top: 5px;
+            button {
+               width: 100%;
             }
          }
       }
