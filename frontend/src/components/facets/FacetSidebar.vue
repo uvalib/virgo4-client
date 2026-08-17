@@ -36,6 +36,7 @@
                <AccordionContent v-if="facetValuesCount(facetInfo) > 0"
                   :id="facetInfo.id" :background=colors.grey200 
                   @accordion-collapsed="filterCollapsed(facetInfo.id)" :expanded="idx < 4"
+                  :closeButton="true" @close="excludeFilter(facetInfo)"
                >
                   <template v-slot:title>{{ facetInfo.name }}</template>
                   <div class="facet-container">
@@ -54,10 +55,6 @@
                            <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>   
                         </li>
                      </ul>
-                     <div class="more" v-if="user.isSignedIn && resultStore.selectedResults.pool.id != 'articles'">
-                           <VirgoButton severity="secondary" size="small" :label="`Exclude ${facetInfo.name} filter`" 
-                              icon="fal fa-xmark" @click="excludeFilter(facetInfo)"/>
-                     </div>
                   </div>
                </AccordionContent>
             </template>
