@@ -1,5 +1,5 @@
 <template>
-   <section class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
+   <section v-if="hasFacets" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
       <AccordionContent id="pool-filter" class="filter"
          :background=colors.brandBlue
          color="white" :expanded="startSidebarExpanded"
@@ -17,10 +17,7 @@
                <FacetOrder :facets="facets" @apply="setFacetOrder"/>
             </div>
          </template>
-         <div v-if="!hasFacets" class="body">
-            <div class="no-facets">{{resultStore.selectedResults.pool.name}} does not support filtering</div>
-         </div>
-         <div v-else class="body">
+         <div class="body">
             <AppliedFilters v-if="appliedFiltersCount > 0" />
             <DateFilter v-if="canDateFilter && filtersUnavailable == false" />
 

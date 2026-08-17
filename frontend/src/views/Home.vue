@@ -24,7 +24,7 @@
                <VirgoButton @click="searchClicked" class="search">Search</VirgoButton>
             </div>
             <div class="search-mode">
-               <router-link tabindex="0" to="/search?mode=advanced">Advanced Search</router-link>
+               <router-link @click="resultStore.resetSearch()" to="/search?mode=advanced">Advanced Search</router-link>
                <template v-if="userStore.isSignedIn">
                   <span>|</span>
                   <router-link tabindex="0" to="/preferences">Search Preferences</router-link>
