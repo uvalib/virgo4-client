@@ -1,6 +1,6 @@
 <template>
    <section v-if="hasFacets && filterStore.closed==false" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
-      <AccordionContent id="pool-filter" class="filter" :closeButton="true" @close="filterStore.closed = true"
+      <AccordionContent id="pool-filter" class="filter" :closeButton="true" @close="sidebarClosed"
          :collapseButton="false"
          :background=colors.brandBlue
          color="white" :expanded="true"
@@ -150,6 +150,11 @@ const startSidebarExpanded = computed(()=>{
    return width.value > 810
 })
 
+const sidebarClosed = (() => {
+   filterStore.closed = true
+   analytics.trigger('Filters', 'SIDEBAR_CLOSED', "")
+})
+
 const facetValuesCount = ((facet) => {
    if (!facet.buckets) return 0
    return facet.buckets.filter(b=>b.value && b.selected == false).length
@@ -172,11 +177,13 @@ const removeExclusion = ((facetInfo) => {
    const poolID = resultStore.selectedResults.pool.id
    preferences.toggleFilterExclusion(poolID, facetInfo)
    filterStore.getSelectedResultFacets(true)
+   analytics.trigger('Filters', 'EXCLUSION_REMOVED', facetInfo.id)
 })
 
 const removeAllExclusions = (() => {
    preferences.resetFilterExclusions( resultStore.selectedResults.pool.id )
    filterStore.getSelectedResultFacets(true)  
+   analytics.trigger('Filters', 'EXCLUSIONS_RESET', "")
    scrollToItem("results-container", true)
 })
 
@@ -204,6 +211,7 @@ const excludeFilter = ( (facetInfo) => {
          const poolID = resultStore.selectedResults.pool.id
          preferences.toggleFilterExclusion(poolID, facetInfo)
          filterStore.excludePoolFacet(poolID, facetInfo.id)
+         analytics.trigger('Filters', 'FILTER_EXCLUDED', facetInfo.id)
          if ( cleared ) {
             routeUtils.filterChanged()
          }
@@ -214,6 +222,8 @@ const excludeFilter = ( (facetInfo) => {
 const setFacetOrder = ( async (sequenced ) => {
    await preferences.setFilterSequence(resultStore.selectedResults.pool.id, sequenced)
    filterStore.setPoolFilterSequence(resultStore.selectedResults.pool.id, sequenced )
+   analytics.trigger('Filters', 'SEQUENCE_CHANGED', "")
+   
 })
 
 const setFilterSort = ((filter, sortType) => {
@@ -242,6 +252,7 @@ const setFilterSort = ((filter, sortType) => {
       preferences.setFilterSort(poolID, filter, sortType, order)
    }
    filterStore.setSortOrder(resultStore.selectedResults.pool.id, filter.id, sortType, order)
+   analytics.trigger('Filters', 'FILTER_SORT_CHANGED', `${filter.id}:${sortType}_${order}`)
 })
 
 const filterSort = ((filterID, type) => {
@@ -259,16 +270,6 @@ const filterSort = ((filterID, type) => {
 
 const filterCollapsed = ((filterID) => {
    expandedFilters.value = expandedFilters.value.filter(fID => fID != filterID)
-})
-const isFilterExpanded = ((filterID) => {
-   return expandedFilters.value.includes(filterID)
-})
-const toggleFilterExpand = ((filterID) => {
-   if ( isFilterExpanded(filterID) ) {
-         
-   }  else {
-      expandedFilters.value.push(filterID)
-   }
 })
 
 const filterSelected = ((facetID, facetValue) => {

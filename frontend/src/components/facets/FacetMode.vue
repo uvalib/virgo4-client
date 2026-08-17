@@ -16,6 +16,7 @@ import { usePreferencesStore } from "@/stores/preferences"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { useUserStore } from "@/stores/user"
+import analytics from '@/analytics'
 
 const user = useUserStore()
 const filters = useFilterStore()
@@ -23,10 +24,10 @@ const resultStore = useResultStore()
 const preferences = usePreferencesStore()
 
 const modeChanged = (async () => {
-   console.log(preferences.facetMode)
    if ( user.isSignedIn ) {
       preferences.updateFacetJoinMode()
    }
+   analytics.trigger('Filters', 'FILTER_JOIN_CHANGED', preferences.facetMode)
    if (resultStore.hasResults) {
       filters.setDirty()
       await resultStore.searchAllPools()

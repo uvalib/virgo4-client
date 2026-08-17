@@ -9,7 +9,7 @@
          </div>
          <span class="buttons" role="toolbar">
             <VirgoButton severity="secondary"  @click="resetSearch" >Reset Search</VirgoButton>
-            <VirgoButton @click="filters.closed=false" label="Filters" icon="fa-solid fa-filter" :disabled="filters.closed==false"/>
+            <VirgoButton @click="sidebarOpened()" label="Filters" icon="fa-solid fa-filter" :disabled="filters.closed==false"/>
             <VirgoButton v-if="canUseSuggestor" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
             <SaveSearch />
             <VirgoButton v-if="showPrintButton" @click="printResults">Print Results</VirgoButton>
@@ -198,6 +198,11 @@ const poolSelected = (( poolID ) => {
       queryStore.targetPool = newPoolID
       routeUtils.poolChanged()
    }
+})
+
+const sidebarOpened = (() => {
+   filters.closed=false
+   analytics.trigger('Filters', 'SIDEBAR_OPENED', "")
 })
 </script>
 

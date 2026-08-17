@@ -31,6 +31,7 @@ import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useRouter, useRoute } from 'vue-router'
 import { watchDeep } from '@vueuse/core'
+import analytics from '@/analytics'
 
 const route = useRoute()
 const router = useRouter()
@@ -93,6 +94,8 @@ const applyDateFilterClicked = (() => {
       dateErr.value = "Please enter all dates as a four digit year"
       return
    }
+
+   let dateTxt = dateType.value
    if ( dateType.value == "BETWEEN") {
       var year2 = parseInt(endDate.value, 10)
       if ( (""+year2) !=  endDate.value || endDate.value.length != 4) {
@@ -102,8 +105,13 @@ const applyDateFilterClicked = (() => {
       if (year2 <= year1) {
          dateErr.value = "End date must be greater than the start date"
          return   
-      }  
-   }
+      } 
+      dateTxt = `${year1} TO ${year2}` 
+   } else {
+       dateTxt += ` ${year1}`   
+   } 
+
+   analytics.trigger('Filters', 'DATE_FILTER_ADDED', dateTxt)
    queryStore.setDateFilter( resultStore.selectedResults.pool.id, dateType.value, startDate.value, endDate.value )
    queryStore.userSearched = true
    routeUtils.searchChanged()
