@@ -13,7 +13,7 @@
          </template>
          <template v-slot:settings>
             <div class="settings">
-               <FacetMode v-if="resultStore.selectedResults.pool.id != 'articles'" />
+               <FacetMode/>
                <FacetOrder :facets="facets" @apply="setFacetOrder"/>
             </div>
          </template>

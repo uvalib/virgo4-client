@@ -2,7 +2,8 @@
    <div class="mode-wrapper">
       <label>
          Filter join mode:
-         <select v-model="preferences.facetMode" @change="modeChanged">
+         <span class="mode" v-if="resultStore.selectedResults.pool.id == 'articles'">OR</span>
+         <select v-else v-model="preferences.facetMode" @change="modeChanged" >
             <option value="AND">AND</option>
             <option value="OR">OR</option>
          </select>
@@ -39,6 +40,11 @@ const modeChanged = (async () => {
    font-size: 0.9em;
    display: flex;
    flex-flow: row nowrap;
+   .mode {
+      display: inline-block;
+      margin-left: 5px;
+      font-weight: bold;
+   }
    select {
       margin-left: 3px;
       padding:5px;
