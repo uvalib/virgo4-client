@@ -9,8 +9,9 @@ export const usePreferencesStore = defineStore('preferences', {
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       searchExclusions: [],
-      filters: {},         // key is poolID, value [{id, sortType, sortOrder, excluded, sequence}]
-      facetMode: "OR",     // boolean operation for combining facet values. OR was the original mode, so set it as default
+      filters: {},      // key is poolID, value [{id, sortType, sortOrder, excluded, sequence}]
+      facetMode: "OR",  // boolean operation for combining facet values. OR was the original mode, so set it as default
+      sort: {},         // default sort order for each pool; ket is poolID, value is sort order (ex: SortRelevance_desc)
       collapseGroups: false,
       collapseDetails: false,
       aiDebug: false,
@@ -33,6 +34,11 @@ export const usePreferencesStore = defineStore('preferences', {
       isPoolExcluded: state => {
          return (poolID) => {
            return state.searchExclusions.includes(poolID)
+         }
+      },
+      poolSort:  state => {
+         return (poolID) => {
+            return state.sort[poolID]
          }
       },
       filterSort: state => {
@@ -124,6 +130,7 @@ export const usePreferencesStore = defineStore('preferences', {
             this.filters = prefsObj.filters
          }
          this.facetMode = prefsObj.facetMode || "OR"
+         this.sort =  prefsObj.sort || {}
 
          this.aiDebug = prefsObj.aiDebug || false
          this.aiFeatures = prefsObj.aiFeatures || []
@@ -167,6 +174,10 @@ export const usePreferencesStore = defineStore('preferences', {
          } else {
             this.searchExclusions.push(poolID)
          }
+         await this.save()
+      },
+      async setPoolSort( poolID, sortStr ) {
+         this.sort[poolID] = sortStr
          await this.save()
       },
       async setFilterSequence( poolID, sequencedFilters ) {
@@ -298,6 +309,7 @@ export const usePreferencesStore = defineStore('preferences', {
             searchExclusions: this.searchExclusions,
             filters: this.filters,
             facetMode: this.facetMode,
+            sort: this.sort,
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,
             aiModel: this.aiModel,

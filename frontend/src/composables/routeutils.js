@@ -89,6 +89,7 @@ export function useRouteUtils( router,route ) {
             // Ensure pool and sort are always part of the URL. This will re-trigger queryParamsChanged.
             let newQ = Object.assign({}, query)
             newQ.pool = resultStore.selectedResults.pool.id
+            sortStore.setActivePool(resultStore.selectedResults.pool.id)
             newQ.sort = sortStore.activeSort
             router.replace({path: "/search", query: newQ})
          } else {
@@ -175,9 +176,11 @@ export function useRouteUtils( router,route ) {
 
    const sortChanged = (() => {
       const sortStore = useSortStore()
+      const queryStore = useQueryStore()
 
       let newQ = Object.assign({}, route.query)
       newQ.sort = sortStore.activeSort
+      queryStore.userSearched = true
       router.push({path: "/search", query: newQ})
    })
 

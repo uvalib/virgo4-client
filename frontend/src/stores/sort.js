@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia'
+import { usePreferencesStore } from "@/stores/preferences"
 
 const DefaultSort = "SortRelevance_desc"
 
 export const useSortStore = defineStore('sort', {
 	state: () => ({
+      // this is a map with key=poolID and value is {sort_id, order}
       pools: new Map(),
 
       // activeSort is used to drive the sort dropdown on the search
@@ -21,12 +23,28 @@ export const useSortStore = defineStore('sort', {
             if ( poolID == "all") {
                let out = []
                state.pools.forEach( (val,key) => {
-                  out.push( {poolID: key, sort: val} )
+                  const prefs = usePreferencesStore() 
+                  const sortPref = prefs.poolSort(poolID)
+                  if (sortPref) {
+                     const bits = sortPref.split("_")
+                     out.push( {poolID: key, sort: {sort_id: bits[0], order: bits[1]} } )
+                  } else {
+                     out.push( {poolID: key, sort: val} )
+                  }
                })
                return out
             } 
 
             if ( state.pools.has(poolID) ) {
+               const prefs = usePreferencesStore() 
+               const sortPref = prefs.poolSort(poolID)
+               if (sortPref) {
+                  console.log("GOT SORT PREF "+sortPref)
+                  return  {
+                     sort_id: sortPref.split("_")[0],
+                     order: sortPref.split("_")[1]
+                  }
+               }
                return state.pools.get(poolID)
             }
             return  {
@@ -40,6 +58,11 @@ export const useSortStore = defineStore('sort', {
    actions: {
       setActivePool(poolID) {
          if ( this.pools.has(poolID) ) {
+            const prefs = usePreferencesStore() 
+            const sortPref = prefs.poolSort(poolID)
+            if (sortPref) {
+               this.activeSort = sortPref
+            }
             const ps = this.pools.get(poolID)
             this.activeSort = `${ps.sort_id}_${ps.order}`
          } else {
