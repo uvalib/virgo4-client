@@ -9,6 +9,7 @@
          </div>
          <span class="buttons" role="toolbar">
             <VirgoButton severity="secondary"  @click="resetSearch" >Reset Search</VirgoButton>
+            <VirgoButton @click="filters.closed=false" label="Filters" icon="fa-solid fa-filter" :disabled="filters.closed==false"/>
             <VirgoButton v-if="canUseSuggestor" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
             <SaveSearch />
             <VirgoButton v-if="showPrintButton" @click="printResults">Print Results</VirgoButton>
@@ -51,6 +52,7 @@ import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useSuggestorStore } from "@/stores/suggestor"
 import { useUserStore } from "@/stores/user"
+import { useFilterStore } from "@/stores/filter"
 import { scrollToItem } from '@/utils'
 import { useRouteUtils } from '@/composables/routeutils'
 
@@ -62,6 +64,7 @@ const resultStore = useResultStore()
 const systemStore = useSystemStore()
 const suggestor = useSuggestorStore()
 const user = useUserStore()
+const filters = useFilterStore()
 
 const printStyle = `
 <style type="text/css">

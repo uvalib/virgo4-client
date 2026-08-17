@@ -1,15 +1,18 @@
 <template>
-   <section v-if="hasFacets" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
-      <AccordionContent id="pool-filter" class="filter"
+   <section v-if="hasFacets && filterStore.closed==false" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
+      <AccordionContent id="pool-filter" class="filter" :closeButton="true" @close="filterStore.closed = true"
+         :collapseButton="false"
          :background=colors.brandBlue
-         color="white" :expanded="startSidebarExpanded"
+         color="white" :expanded="true"
          :borderColor=colors.brandBlue
-         :invert="!startSidebarExpanded"
+         
          :hasSettings="true" :showSettings="filterPrefsOpen" @settingsClicked="filterPrefsOpen = !filterPrefsOpen"
       >
          <template v-slot:title>
-            Filters
-            <span class="filter-count" v-if="appliedFiltersCount>0">({{ appliedFiltersCount }} active)</span>
+            <div>
+               <span>Filters</span>
+               <span class="filter-count" v-if="appliedFiltersCount>0">({{ appliedFiltersCount }} active)</span>
+            </div>
          </template>
          <template v-slot:settings>
             <div class="settings">
@@ -146,6 +149,7 @@ const canDateFilter = computed(() => {
 })
 
 const startSidebarExpanded = computed(()=>{
+   filterStore.closed = width.value < 810
    return width.value > 810
 })
 
@@ -288,10 +292,6 @@ const filterSelected = ((facetID, facetValue) => {
    .filter-count {
       display: inline-block;
       margin-left: 5px;
-   }
-
-   :deep(i.settings-icon) {
-      color: white !important;
    }
    .settings {
       text-align: left;

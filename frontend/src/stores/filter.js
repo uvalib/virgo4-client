@@ -13,6 +13,7 @@ export const useFilterStore = defineStore('filter', {
       facets: [],
       updatingFacets: false,
       getPresearchFacets: false,
+      closed: false,
    }),
 
    getters: {
