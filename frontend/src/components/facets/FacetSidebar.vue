@@ -1,5 +1,5 @@
 <template>
-   <section v-if="hasFacets && filterStore.closed==false" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
+   <section v-if="showSidebar" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
       <AccordionContent id="pool-filter" class="filter" :closeButton="true" @close="sidebarClosed"
          :collapseButton="false"
          :background=colors.brandBlue
@@ -121,6 +121,9 @@ const confirm = useConfirm()
 const expandedFilters = ref([])
 const filterPrefsOpen = ref(false)
 
+const showSidebar = computed(() => {
+   return (hasFacets.value && filterStore.closed==false && resultStore.selectedResults.statusCode == 200)
+})
 const facets = computed(()=>{
    return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true)
 })

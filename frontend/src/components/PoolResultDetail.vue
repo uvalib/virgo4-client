@@ -270,6 +270,7 @@ div.pool-header {
    border: 1px solid #ccc;
    display: flex;
    flex-direction: column;
+   align-items: flex-start;
    gap: 10px;
 
    span {
