@@ -79,18 +79,20 @@ export function useRouteUtils( router,route ) {
           }
       }
 
+      // Use the filter mode from the query params to determine filter behavior
+      // If this code is the result of the user interacting with the UI (as opposed 
+      // to clicking a link), the query param will match the preference
+      let queryFilterMode = query.filtermode
+      if ( !queryFilterMode ) {
+         // Older searches will not have the filtermode param. They always 
+         // used OR as the facet join mode
+         queryFilterMode = "OR"   
+      }
+
       // only re-run search when query, sort or filtering has changed - or a user has initiated a search with a UI element
       if ( runSearch == true ) {
          queryStore.userSearched = false
          queryStore.filtersCleared = false
-
-         // Use the filter mode from the query params to determine filter behavior
-         let queryFilterMode = query.filtermode
-         if ( !queryFilterMode ) {
-            // Older searches will not have the filtermode param. They always 
-            // used OR as teh facet join mode
-            queryFilterMode = "OR"   
-         }
  
          await searchCallback( queryFilterMode )
 
