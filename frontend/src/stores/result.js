@@ -346,7 +346,7 @@ export const useResultStore = defineStore('result', {
 
       // Search ALL configured pools. This is the initial search call using only the basic or
       // advanced search parameters and will always start at page 1.
-      async searchAllPools() {
+      async searchAllPools(filterModeOverride = "") {
          const system = useSystemStore()
          const query = useQueryStore()
          const filters = useFilterStore()
@@ -355,6 +355,13 @@ export const useResultStore = defineStore('result', {
          const prefs = usePreferencesStore()
 
          system.clearMessage()
+
+         // Older saved searchs or links depend on facets joining with OR. The user may have set their
+         // preferred mode to AND. In this case, if an OR is present in the URL (or no mode is present) override the preference
+         let filterMode = prefs.facetMode
+         if (filterModeOverride != "") {
+            filterMode = filterModeOverride    
+         }
 
          // NOTE: when clicking a saved search, the target pool is set in ignoreExclusion.
          // This pool filtered out of the exclusion for this search, then reset
@@ -367,7 +374,7 @@ export const useResultStore = defineStore('result', {
             pool_query_addons: query.poolQueryAddons,
             preferences: {
                exclude_pools: prefs.searchExclusions.filter( e => e != this.ignoreExclusion),
-               filter_join: prefs.facetMode
+               filter_join: filterMode
             }
          }
          this.ignoreExclusion = ""
@@ -415,9 +422,11 @@ export const useResultStore = defineStore('result', {
          })
       },
 
+      // FIXME This call breaks the pools UI
+      //
       // searchPool wil search only the pool specified. It can be used to filter, sort and page
       // existing results or as a standalone query to a single pool
-      async searchPool(params) {
+      async searchPool(params, filterModeOverride = "") {
          const system = useSystemStore()
          const query = useQueryStore()
          const filterStore = useFilterStore()

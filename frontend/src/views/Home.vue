@@ -134,11 +134,11 @@ onBeforeMount( async () => {
    }
 })
 
-const handleQueryParamChange = ( async( ) => {
-   routeUtils.queryParamsChanged(async () => {
+const handleQueryParamChange = ( async() => {
+   routeUtils.queryParamsChanged(async (filterModeOverride) => {
       assertive(`search in progress`)
 
-      await resultStore.searchAllPools()
+      await resultStore.searchAllPools( filterModeOverride )
       
       if ( restore.pendingBookmark ) {
          handlePendingBookmark()

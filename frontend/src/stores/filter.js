@@ -454,7 +454,7 @@ export const useFilterStore = defineStore('filter', {
       // This is called from 3 different places: when all pools are searched, when a specific pool
       // is searched and when a new pool is selected. The first 2 should ALWAYS request new facets
       // as the query has changed. The pool select should only change of there are no facets yet.
-      getSelectedResultFacets(paramsChanged) {
+      getSelectedResultFacets(paramsChanged, modeOverride = "") {
          const resultStore = useResultStore()
          const query = useQueryStore()
          const collectionStore = useCollectionStore()
@@ -523,10 +523,16 @@ export const useFilterStore = defineStore('filter', {
             return
          }
 
+         // Older saved searchs or links depend on facets joining with OR. The user may have set their
+         // preferred mode to AND. In this case, if an OR is present in the URL (or no mode is present) override the preference
          const preferences = usePreferencesStore()
+         let facetMode = preferences.facetMode
+         if ( modeOverride != "" ) {
+            facetMode = modeOverride
+         }
          req.preferences = {
             exclude_filters: preferences.filterExclusions(pool.id).map( fe => fe.id ),
-            filter_join: preferences.facetMode
+            filter_join: facetMode
          }
 
          let tgtURL = pool.url+"/api/search/facets"

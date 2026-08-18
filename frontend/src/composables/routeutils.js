@@ -3,6 +3,7 @@ import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { useSortStore } from "@/stores/sort"
 import { usePoolStore } from "@/stores/pool"
+import { usePreferencesStore } from "@/stores/preferences"
 
 function isEmpty(obj) {
    for (const prop in obj) {
@@ -83,7 +84,15 @@ export function useRouteUtils( router,route ) {
          queryStore.userSearched = false
          queryStore.filtersCleared = false
 
-         await searchCallback()
+         // Use the filter mode from the query params to determine filter behavior
+         let queryFilterMode = query.filtermode
+         if ( !queryFilterMode ) {
+            // Older searches will not have the filtermode param. They always 
+            // used OR as teh facet join mode
+            queryFilterMode = "OR"   
+         }
+ 
+         await searchCallback( queryFilterMode )
 
          if (query.sort === undefined || query.pool === undefined) {
             // Ensure pool and sort are always part of the URL. This will re-trigger queryParamsChanged.
@@ -95,11 +104,13 @@ export function useRouteUtils( router,route ) {
          } else {
             // only request facets if the URL isn't replaced above since the URL replacement
             // will trigger another pass thru queryParamsChanged and the facets will be requesed below
-            filters.getSelectedResultFacets(refreshFacets)
+            // Send the filtermode query param. It will override preferences
+            filters.getSelectedResultFacets(refreshFacets, queryFilterMode)
          }
       } else {
          // just a pool change, don't force a reload - but facets will reload if marked dirty, or none have previously been loaded
-         filters.getSelectedResultFacets(false)
+         // Send the filtermode query param. It will override preferences
+         filters.getSelectedResultFacets(false, queryFilterMode)
          resultStore.ignoreExclusion = "" // reset any temporary overrides to avoid unexpected behavior
       }
    })
@@ -189,6 +200,7 @@ export function useRouteUtils( router,route ) {
       const filters = useFilterStore()
       const resultStore = useResultStore()
       const queryStore = useQueryStore()
+      const prefs = usePreferencesStore()
 
       let newQ = Object.assign({}, route.query)
       delete newQ.pool
@@ -201,6 +213,7 @@ export function useRouteUtils( router,route ) {
          let fqp = filters.asQueryParam( queryStore.targetPool )
          if (fqp != "{}") {
             newQ.filter = fqp
+            newQ.filtermode = prefs.facetMode
          }
          if (sortStore.activeSort.length > 0) {
             newQ.sort = sortStore.activeSort
@@ -219,6 +232,7 @@ export function useRouteUtils( router,route ) {
       const filters = useFilterStore()
       const queryStore = useQueryStore()
       const resultStore = useResultStore()
+      const prefs = usePreferencesStore()
 
       let newQ = Object.assign({}, route.query)
       delete newQ.page
@@ -226,6 +240,7 @@ export function useRouteUtils( router,route ) {
       let fqp = filters.asQueryParam( resultStore.selectedResults.pool.id )
       if (fqp != "{}") {
          newQ.filter = fqp
+         newQ.filtermode = prefs.facetMode
       }
       queryStore.userSearched = true
       router.push({path: "/search", query: newQ})
