@@ -18,6 +18,11 @@
             <div class="settings">
                <FacetMode/>
                <FacetOrder :facets="facets" @apply="setFacetOrder"/>
+               <p class="note">
+                  When used to refine a search, filter values can be combined with a boolean AND or OR. 
+                  The setting above determines which is used. In general, using AND will narrow your results 
+                  while OR can expand them as more filters are added.
+               </p>
             </div>
          </template>
          <div class="body">
@@ -443,10 +448,10 @@ const filterSelected = ((facetID, facetValue) => {
    }
 }
 .note {
-   border-radius: 0.3rem;
-   background-color: $uva-blue-alt-400;
-   border: 1px solid $uva-blue-alt-300;
-   padding: 10px 15px;
+   border-top: 1px solid $uva-grey-100;
+   font-size: 0.9em;
+   padding: 10px 5px 0px 5px;
+   margin: 10px 0 0 0;
 }
 div.no-facets {
    text-align: center;
