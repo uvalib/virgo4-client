@@ -19,9 +19,11 @@
                <FacetMode/>
                <FacetOrder :facets="facets" @apply="setFacetOrder"/>
                <p class="note">
-                  When used to refine a search, filter values can be combined with a boolean AND or OR. 
-                  The setting above determines which is used. In general, using AND will narrow your results 
-                  while OR can expand them as more filters are added.
+                  Within a category, filter values can be combined with AND or OR. For example, selecting "English" and "French" under Language:
+                  <ul>
+                     <li>AND returns materials in both English and French.</li>
+                     <li>OR returns materials in either English or French.</li>
+                  </ul>
                </p>
             </div>
          </template>
@@ -452,6 +454,10 @@ const filterSelected = ((facetID, facetValue) => {
    font-size: 0.9em;
    padding: 10px 5px 0px 5px;
    margin: 10px 0 0 0;
+   ul {
+      margin: 5px 0 0 0;
+      padding-left: 35px;
+   }
 }
 div.no-facets {
    text-align: center;
