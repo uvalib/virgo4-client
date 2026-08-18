@@ -2,7 +2,6 @@
    <div class="home">
       <V4Spinner  v-if="resultStore.searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
       <div class="search-panel">
-         <div>SEARCH SRC TEST: {{ queryStore.searchSources }}</div>
          <template v-if="queryStore.mode=='basic'">
             <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
             <div class="basic-search">

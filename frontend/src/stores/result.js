@@ -468,14 +468,14 @@ export const useResultStore = defineStore('result', {
 
          let url = params.pool.url + "/api/search"
          await axios.post(url, req).then( response => {
-            if ( startPage == 0 ) {
-               // when single pool seach is called to start a search, pool is required in response. Reset the results
-               // to an empty array so the default empty result is not present in the results
-               let pool = poolStore.list.find( p => p.id == params.pool.id)
-               response.data.pool = pool
-               this.total = -1
-               this.results = []
-            }
+            // if ( startPage == 0 ) {
+            //    // when single pool seach is called to start a search, pool is required in response. Reset the results
+            //    // to an empty array so the default empty result is not present in the results
+            //    let pool = poolStore.list.find( p => p.id == params.pool.id)
+            //    response.data.pool = pool
+            //    this.total = -1
+            //    this.results = []
+            // }
 
             // Note: for pagination, filtering, etc, the existing pool results will be appended.
             // if this is a direct single pool search, there will be no existing results. This call
