@@ -422,8 +422,6 @@ export const useResultStore = defineStore('result', {
          })
       },
 
-      // FIXME This call breaks the pools UI
-      //
       // searchPool wil search only the pool specified. It can be used to filter, sort and page
       // existing results or as a standalone query to a single pool
       async searchPool(params, filterModeOverride = "") {
@@ -436,6 +434,13 @@ export const useResultStore = defineStore('result', {
 
          useCollectionStore().clearCollectionDetails()
          this.setSearching(true)
+         
+         // Older saved searchs or links depend on facets joining with OR. The user may have set their
+         // preferred mode to AND. In this case, if an OR is present in the URL (or no mode is present) override the preference
+         let filterMode = prefs.facetMode
+         if (filterModeOverride != "") {
+            filterMode = filterModeOverride    
+         }
 
          useSuggestorStore().fetch( query.string )
          let filters = filterStore.poolFilter(params.pool.id)

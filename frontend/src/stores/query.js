@@ -38,7 +38,6 @@ export const useQueryStore = defineStore('query', {
          return {
             mode: state.mode,
             basic: state.basic,
-            searchSources: state.searchSources,
             advanced: state.advanced,
             advancedFields: state.advancedFields,
             targetPool: state.targetPool,

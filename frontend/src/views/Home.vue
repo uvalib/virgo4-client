@@ -112,7 +112,6 @@ onBeforeMount( async () => {
          } else {
             // This will trigger the route watcher which will do the interpretation of the params and initiate search
             const tgtPool =  parseQuery(response.data.url ).pool
-            queryStore.searchSources = tgtPool
             resultStore.ignoreExclusion = tgtPool
             router.replace( response.data.url ) 
          }
@@ -122,7 +121,6 @@ onBeforeMount( async () => {
    } else {
       if ( route.query.pool ) {
          // if a pool is set on initial page load, narrow the search to just that pool and temporarily ignore exclusions
-         queryStore.searchSources = route.query.pool
          resultStore.ignoreExclusion = route.query.pool
       }
       handleQueryParamChange()
