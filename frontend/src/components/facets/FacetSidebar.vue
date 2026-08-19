@@ -122,7 +122,7 @@ const expandedFilters = ref([])
 const filterPrefsOpen = ref(false)
 
 const showSidebar = computed(() => {
-   return (hasFacets.value && filterStore.closed==false && resultStore.selectedResults.statusCode == 200)
+   return (hasFacets.value && filterStore.closed==false && resultStore.selectedResults.statusCode == 200 && resultStore.selectedResults.total > 0)
 })
 const facets = computed(()=>{
    return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true)
