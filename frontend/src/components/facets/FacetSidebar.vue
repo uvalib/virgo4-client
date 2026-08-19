@@ -43,7 +43,7 @@
                <AccordionContent v-if="facetValuesCount(facetInfo) > 0"
                   :id="facetInfo.id" :background=colors.grey200 
                   @accordion-collapsed="filterCollapsed(facetInfo.id)" :expanded="idx < 4"
-                  :closeButton="true" @close="excludeFilter(facetInfo)"
+                  :closeButton="resultStore.selectedResults.pool.id != 'articles'" @close="excludeFilter(facetInfo)"
                >
                   <template v-slot:title>{{ facetInfo.name }}</template>
                   <div class="facet-container">
