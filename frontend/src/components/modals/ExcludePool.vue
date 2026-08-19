@@ -71,7 +71,6 @@ const rerunSearch = (() => {
    // reset this to the catalog, widen scope to all and rerun the search
    console.log("pool excluded; rerun search with scope=all and target pool=catalog")
    queryStore.userSearched = true
-   queryStore.searchSources = "all"
    resultStore.selectPoolResults(0) // catalog is always 0
    queryStore.targetPool = resultStore.results[0].pool.id
    routeUtils.poolChanged()

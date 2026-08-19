@@ -53,11 +53,11 @@
          </div>
       </div>
       <span role="toolbar"  v-if="selectedResults.hits.length > 0">
-         <div v-if="signInRequired" class="reminder">
+         <div v-if="user.isSignedIn == false" class="reminder">
             <div>Results from {{ poolExclusionString }} are turned off for guest users.</div>
             <div><VirgoButton link @click="signInClicked" label="Sign in to see all results"/></div>
          </div>
-         <div v-else-if="user.isSignedIn && queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
+         <div v-else-if="user.isSignedIn && preferences.searchExclusions.length > 0" class="reminder">
             <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
             <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
          </div>
@@ -111,9 +111,6 @@ const hasURL = computed(()=>{
 const selectedResults = computed(()=>{
    return resultStore.selectedResults
 })
-const signInRequired = computed(()=>{
-   return (user.isSignedIn == false && queryStore.searchSources == "all" )
-})
 
 const canExclude = computed(() => {
    if ( !resultStore.selectedResults ) return false
@@ -145,7 +142,6 @@ const removeSearchExclusions = (() => {
    preferences.removeSearchExclusions()
    analytics.trigger('Preferences', 'REMOVE_POOL_EXCLUSION', "all")   
    queryStore.userSearched = true
-   queryStore.searchSources = "all"
    resultStore.searchAllPools()
 })
 

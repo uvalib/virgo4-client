@@ -127,9 +127,10 @@ export function useRouteUtils( router,route ) {
       const sortStore = useSortStore()
       const poolStore = usePoolStore()
 
-      let newQ = Object.assign({}, route.query)
+      // changing the search string applied to all pools ensure flag is clear
+      queryStore.searchTargetOnly = false
 
-      console.log(`SEARCH CHANGED; POOL ${queryStore.targetPool} NEW ${newSearch} PRESERVE ${queryStore.keepSettings}`)
+      let newQ = Object.assign({}, route.query)
 
       if ( newSearch &&  queryStore.keepSettings == false ) {
          console.log("RESET FILTERS / SORT FOR NEW QUERRY")
@@ -178,7 +179,10 @@ export function useRouteUtils( router,route ) {
       let newQ = Object.assign({}, route.query)
       delete newQ.page
 
+      queryStore.userSearched = true
+      queryStore.searchTargetOnly = true
       queryStore.setBasicSearch()
+
       // use the poolQuersyString here to ensure any pool-specific addons are included
       newQ.q = queryStore.poolQueryString
       newQ.filter = filters.asQueryParam( "presearch" )
@@ -193,6 +197,7 @@ export function useRouteUtils( router,route ) {
 
       let newQ = Object.assign({}, route.query)
       newQ.sort = sortStore.activeSort
+      queryStore.searchTargetOnly = true
       queryStore.userSearched = true
       router.push({path: "/search", query: newQ})
    })
@@ -210,24 +215,21 @@ export function useRouteUtils( router,route ) {
       delete newQ.sort
       delete newQ.page
 
-      if ( queryStore.targetPool != "" ) {
-         newQ.pool = queryStore.targetPool
-         let fqp = filters.asQueryParam( queryStore.targetPool )
-         if (fqp != "{}") {
-            newQ.filter = fqp
-            newQ.filtermode = prefs.facetMode
-         }
-         if (sortStore.activeSort.length > 0) {
-            newQ.sort = sortStore.activeSort
-         }
-         if (resultStore.selectedResults.page > 0) {
-            newQ.page = resultStore.selectedResults.page +1
-         }
-         newQ.q = queryStore.poolQueryString
+      newQ.pool = queryStore.targetPool
+      let fqp = filters.asQueryParam( queryStore.targetPool )
+      if (fqp != "{}") {
+         newQ.filter = fqp
+         newQ.filtermode = prefs.facetMode
       }
-      if ( route.query != newQ ) {
-         router.push({path: "/search", query: newQ})
+      if (sortStore.activeSort.length > 0) {
+         newQ.sort = sortStore.activeSort
       }
+      if (resultStore.selectedResults.page > 0) {
+         newQ.page = resultStore.selectedResults.page +1
+      }
+      newQ.q = queryStore.poolQueryString
+
+      router.push({path: "/search", query: newQ})
    })
 
    const filterChanged = (() => {
@@ -244,6 +246,7 @@ export function useRouteUtils( router,route ) {
          newQ.filter = fqp
          newQ.filtermode = prefs.facetMode
       }
+      queryStore.searchTargetOnly = true
       queryStore.userSearched = true
       router.push({path: "/search", query: newQ})
    })

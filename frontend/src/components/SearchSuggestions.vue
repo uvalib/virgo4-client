@@ -139,11 +139,9 @@ const displayReason = (( event, reason) => {
    }
 })
 const suggestionClick = ((suggType, val) => {
-   queryStore.userSearched = true
    if (suggType == 'author') {
       analytics.trigger('Results', 'AUTHOR_SUGGEST_CLICKED', val)
    } else if (suggType == 'book') {
-      queryStore.widenSearch()   // soem of the book suggestions are in WC, HathiTrust or JRML. Expand search to enclude everything
       analytics.trigger('Results', 'BOOK_SUGGEST_CLICKED', val)
    } else if (suggType == 'image') {
       analytics.trigger('Results', 'IMAGE_SUGGEST_CLICKED', val)

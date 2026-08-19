@@ -178,7 +178,6 @@ const printResults = (() => {
 
 const resetSearch = ( async () => {
    resultStore.resetSearch()
-   queryStore.searchSources = "all"
    if ( queryStore.mode == "basic") {
       analytics.trigger('Results', 'RESET_SEARCH', "basic")
       router.push("/")

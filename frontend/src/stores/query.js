@@ -7,7 +7,6 @@ export const useQueryStore = defineStore('query', {
       filtersCleared: false,
       mode: "basic",
       basic: { field: "keyword", value: ""},
-      searchSources: "all",
       advanced: [
          { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" },
@@ -30,6 +29,7 @@ export const useQueryStore = defineStore('query', {
          { value: "published", label: "Publisher/Place of Publication", type: "text"}
       ],
       targetPool: "",
+      searchTargetOnly: false,
       poolDateFilters: new Map(),
       keepSettings: true
    }),
@@ -319,10 +319,6 @@ export const useQueryStore = defineStore('query', {
          })
          this.targetPool = ""
          this.poolDateFilters = new Map()
-      },
-      widenSearch() {
-         this.targetPool = ""
-         this.searchSources = "all"
       },
    }
 })

@@ -136,7 +136,16 @@ const handleQueryParamChange = ( async() => {
    routeUtils.queryParamsChanged(async (filterModeOverride) => {
       assertive(`search in progress`)
 
-      await resultStore.searchAllPools( filterModeOverride )
+      if ( queryStore.searchTargetOnly ) {
+         console.log("SEARCH ONLY "+queryStore.targetPool)
+         await resultStore.searchPool({pool: poolStore.poolDetails(queryStore.targetPool)}, filterModeOverride)
+      } else {
+      console.log("SEARCH ALL POOLS")
+         await resultStore.searchAllPools( filterModeOverride )
+      }
+
+      console.log("CLEAR TARGTE ONLY")
+      queryStore.searchTargetOnly = false
       
       if ( restore.pendingBookmark ) {
          handlePendingBookmark()

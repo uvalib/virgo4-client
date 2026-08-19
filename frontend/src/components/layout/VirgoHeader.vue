@@ -29,7 +29,6 @@ const query = useQueryStore()
 
 const homeClicked = (() => {
    query.setBasicSearch()
-   query.searchSources = "all"
    results.resetSearch()
 })
 </script>

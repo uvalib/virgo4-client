@@ -63,7 +63,6 @@ const toggleSearchExclude = ( async (poolID) => {
    await preferences.toggleSearchExclusion(poolID)
    saved.value = "exclude"
    setTimeout( ()=>{ saved.value = "" }, 2100)
-   queryStore.searchSources  = "all"
    if (preferences.isPoolExcluded(poolID)) {
       analytics.trigger('Preferences', 'ADD_POOL_EXCLUSION', poolID)
    } else {
