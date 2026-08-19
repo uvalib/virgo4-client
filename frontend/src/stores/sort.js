@@ -20,33 +20,40 @@ export const useSortStore = defineStore('sort', {
    getters: {
       poolSort: (state) => {
          return (poolID) => {
+            const prefs = usePreferencesStore() 
             if ( poolID == "all") {
                let out = []
-               state.pools.forEach( (val,key) => {
-                  const prefs = usePreferencesStore() 
-                  const sortPref = prefs.poolSort(poolID)
-                  if (sortPref) {
-                     const bits = sortPref.split("_")
-                     out.push( {poolID: key, sort: {sort_id: bits[0], order: bits[1]} } )
-                  } else {
-                     out.push( {poolID: key, sort: val} )
+               if (state.pools.size > 0) {
+                  state.pools.forEach( (val,key) => {
+                     const sortPref = prefs.poolSort(val)
+                     if (sortPref) {
+                        const bits = sortPref.split("_")
+                        out.push( {poolID: key, sort: {sort_id: bits[0], order: bits[1]} } )
+                     } else {
+                        out.push( {poolID: key, sort: val} )
+                     }
+                  })
+               } else {
+                  for (const [poolID, poolSort] of Object.entries(prefs.sort)) {
+                     const bits = poolSort.split("_")
+                     out.push( {poolID: poolID, sort: {sort_id: bits[0], order: bits[1]} } )
                   }
-               })
+               }
                return out
             } 
 
-            if ( state.pools.has(poolID) ) {
-               const prefs = usePreferencesStore() 
-               const sortPref = prefs.poolSort(poolID)
-               if (sortPref) {
-                  console.log("GOT SORT PREF "+sortPref)
-                  return  {
-                     sort_id: sortPref.split("_")[0],
-                     order: sortPref.split("_")[1]
-                  }
+            const sortPref = prefs.poolSort(poolID)
+            if (sortPref) {
+               return  {
+                  sort_id: sortPref.split("_")[0],
+                  order: sortPref.split("_")[1]
                }
+            }
+
+            if ( state.pools.has(poolID) ) {
                return state.pools.get(poolID)
             }
+
             return  {
                sort_id: DefaultSort.split("_")[0],
                order: DefaultSort.split("_")[1]
@@ -57,12 +64,14 @@ export const useSortStore = defineStore('sort', {
 
    actions: {
       setActivePool(poolID) {
+         const prefs = usePreferencesStore() 
+         const sortPref = prefs.poolSort(poolID)
+         if (sortPref) {
+            this.activeSort = sortPref
+            return
+         }
+
          if ( this.pools.has(poolID) ) {
-            const prefs = usePreferencesStore() 
-            const sortPref = prefs.poolSort(poolID)
-            if (sortPref) {
-               this.activeSort = sortPref
-            }
             const ps = this.pools.get(poolID)
             this.activeSort = `${ps.sort_id}_${ps.order}`
          } else {
