@@ -12,7 +12,7 @@
          <CollectionContext />
          <div class="actions-section">
             <div class="left-acts">
-               <VirgoButton v-if="selectedResults.hits.length > 0 && hasFacets" @click="filtersClicked()" label="Filters" icon="fa-light fa-sliders" severity="secondary" />
+               <VirgoButton v-if="selectedResults.hits.length > 0 && hasFacets" @click="filtersClicked()" :label="filterLabel" icon="fa-light fa-sliders" severity="secondary" />
                <SaveSearch />
                <VirgoButton v-if="showPrintButton" severity="secondary" @click="printResults" label="Print Results" icon="fa-light fa-print"/>
                <VirgoButton v-if="canUseSuggestor" severity="secondary" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
@@ -112,6 +112,16 @@ const loadingMore = ref(false)
 
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
+})
+const filterLabel = computed(()=>{
+   let cnt = filters.poolFilter(resultStore.selectedResults.pool.id).length
+   if (queryStore.dateFilter) {
+      cnt++
+   }
+   if ( cnt == 0 ) {
+      return "Filters"
+   }
+   return `Filters (${cnt})`
 })
 const hasLogo = computed(()=>{
    return poolStore.logo(resultStore.selectedResults.pool.id) != ""
