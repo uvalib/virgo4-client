@@ -76,6 +76,7 @@
          </div>
       </AccordionContent>
    </section>
+   <div v-else class="padding"></div>
 </template>
 
 <script setup>
@@ -283,6 +284,9 @@ const filterSelected = ((facetID, facetValue) => {
 })
 </script>
 <style lang="scss" scoped>
+.padding {
+   width: 15px;
+}
 .facet-sidebar {
    margin: 0px 0px 15px 0px;
    flex: 1 1 25%;
