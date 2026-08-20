@@ -10,8 +10,12 @@
              <img v-else class ="logo" :src="poolStore.log(selectedResults.pool.id)">
          </div>
          <CollectionContext />
-         <div class="sort-section">
-            <VirgoButton v-if="selectedResults.hits.length > 0 && hasFacets" @click="filtersClicked()" label="Filters" icon="fa-light fa-sliders" severity="secondary" />
+         <div class="actions-section">
+            <div class="left-acts">
+               <VirgoButton v-if="selectedResults.hits.length > 0 && hasFacets" @click="filtersClicked()" label="Filters" icon="fa-light fa-sliders" severity="secondary" />
+               <SaveSearch />
+               <VirgoButton v-if="showPrintButton" severity="secondary" @click="printResults">Print Results</VirgoButton>
+            </div>
             <V4Sort :pool="selectedResults.pool" />
          </div>
       </div>
@@ -76,17 +80,20 @@
 import SearchHit from "@/components/SearchHit.vue"
 import ImageSearchHit from "@/components/ImageSearchHit.vue"
 import V4Sort from "@/components/V4Sort.vue"
+import SaveSearch from "@/components/modals/SaveSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
-import { ref,computed } from 'vue'
+import { ref,computed, nextTick } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useResultStore } from "@/stores/result"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useQueryStore } from "@/stores/query"
+import { useSystemStore } from "@/stores/system"
 import analytics from '@/analytics'
 import FacetSidebar from "./facets/FacetSidebar.vue"
 
+const systemStore = useSystemStore()
 const resultStore = useResultStore()
 const poolStore = usePoolStore()
 const filters = useFilterStore()
@@ -107,6 +114,9 @@ const hasURL = computed(()=>{
 })
 const selectedResults = computed(()=>{
    return resultStore.selectedResults
+})
+const showPrintButton = computed(()=>{
+   return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
 })
 
 
@@ -142,6 +152,62 @@ const signInClicked = (() => {
    router.push("/signin")
 })
 
+const printResults = (() => {
+   systemStore.printing = true
+   analytics.trigger('Results', 'PRINT_RESULTS', queryStore.mode)
+   const printStyle = `
+      <style type="text/css">
+      #print-results {
+         background: white;
+         text-align: left;
+         margin-left: 10px;
+      }
+      .hit-wrapper {
+         margin-bottom: 15px;
+         padding-bottom: 15px;
+         border-bottom: 2px solid black;
+      }
+      .hit-wrapper.group {
+         border-bottom: 0;
+         margin: 15px 0 0 0;
+         padding: 15px 0 0 0;
+         border-top: 2px solid black;
+      }
+      .hit-title {
+         font-weight: bold;
+      }
+      .number {
+         margin-right: 5px;
+         font-weight: normal;
+      }
+      .author {
+         margin-left: 10px;
+      }
+      .fields {
+         font-size: 0.85em;
+         margin: 5px 0 0 5px;
+      }
+      .label {
+         font-weight: bold;
+         margin-right: 5px;
+         text-align: right;
+         padding-right: 5px;
+      }
+      </style>`
+
+   nextTick( () => {
+      // Setting systemStore.printing = true renders a simplified list in a hidden div. nextTick is
+      // needed to allow time for the content to be rendered. After that,
+      // get the conntent and set that as the innerHTML for the iframe embeddded on the results page.
+      // Print from the iframe and remove content
+      let contents = document.getElementById("print-results").innerHTML
+      window.frames["printFrame"].document.body.innerHTML = (printStyle+contents)
+      window.frames["printFrame"].print()
+      window.frames["printFrame"].document.body.innerHTML = ""
+      systemStore.printing = false
+   })
+})
+
 const filtersClicked = (() => {
    filters.closed = !filters.closed 
    if (filters.closed ) {
@@ -174,7 +240,7 @@ async function loadMoreResults() {
 }
 </script>
 <style lang="scss" scoped>
-.sort-section {
+.actions-section {
    color: $uva-grey-B;
    background: white;
    border: 1px solid $uva-grey-100;
@@ -182,15 +248,17 @@ async function loadMoreResults() {
    padding: 10px;
    display: flex;
    gap: 10px;
-   label {
-      font-weight: bold;
-   }
-}
-
-.sort-section {
    justify-content: space-between;
    align-items: center;
    flex-flow: row wrap;
+   .left-acts {
+      display: flex;
+      flex-flow: row wrap;  
+      gap: 5px;
+   }
+   label {
+      font-weight: bold;
+   }
 }
 
 .reminder {
@@ -243,6 +311,9 @@ div.pool-header {
          display: inline-block;
       }
    }
+}
+.hits {
+   flex-grow: 1;
 }
 .hits-content {
    text-align: left;

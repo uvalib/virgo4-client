@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton @click="openSaveClicked">Save Search</VirgoButton>
+   <VirgoButton severity="secondary" @click="openSaveClicked">Save Search</VirgoButton>
    <Dialog v-model:visible="searches.showSaveDialog" :modal="true" position="top" header="Save Search" @show="opened" :draggable="false">
       <div class="save-panel">
          <template v-if="showSignInMessage">

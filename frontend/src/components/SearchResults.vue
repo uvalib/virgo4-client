@@ -8,10 +8,7 @@
             <div class="qs">{{queryString}}</div>
          </div>
          <span class="buttons" role="toolbar">
-            <VirgoButton severity="secondary"  @click="resetSearch" >Reset Search</VirgoButton>
             <VirgoButton v-if="canUseSuggestor" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
-            <SaveSearch />
-            <VirgoButton v-if="showPrintButton" @click="printResults">Print Results</VirgoButton>
          </span>
       </div>
 
@@ -43,11 +40,10 @@
 import OtherPoolsPicker from "@/components/OtherPoolsPicker.vue"
 import PoolResultDetail from "@/components/PoolResultDetail.vue"
 import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
-import SaveSearch from "@/components/modals/SaveSearch.vue"
 import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -69,46 +65,6 @@ const suggestor = useSuggestorStore()
 const user = useUserStore()
 const preferences = usePreferencesStore()
 
-const printStyle = `
-<style type="text/css">
-#print-results {
-   background: white;
-   text-align: left;
-   margin-left: 10px;
-}
-.hit-wrapper {
-   margin-bottom: 15px;
-   padding-bottom: 15px;
-   border-bottom: 2px solid black;
-}
-.hit-wrapper.group {
-   border-bottom: 0;
-   margin: 15px 0 0 0;
-   padding: 15px 0 0 0;
-   border-top: 2px solid black;
-}
-.hit-title {
-   font-weight: bold;
-}
-.number {
-   margin-right: 5px;
-   font-weight: normal;
-}
-.author {
-   margin-left: 10px;
-}
-.fields {
-   font-size: 0.85em;
-   margin: 5px 0 0 5px;
-}
-.label {
-   font-weight: bold;
-   margin-right: 5px;
-   text-align: right;
-   padding-right: 5px;
-}
-</style>`
-
 const showMore = ref(resultStore.results.length > systemStore.maxPoolTabs)
 
 const canExclude = ((poolID) => {
@@ -126,9 +82,7 @@ const canUseSuggestor = computed(() => {
    if ( user.isExperimental == false ) return false 
    return queryStore.isKeywordSearch
 })
-const showPrintButton = computed(()=>{
-   return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
-})
+
 const queryString = computed(()=>{
    return queryStore.string.replace(/\{|\}/g, "")
 })
@@ -187,34 +141,6 @@ const excludePoolClicked = ( (pool) => {
          routeUtils.poolChanged()
       }
    })
-})
-
-const printResults = (() => {
-   systemStore.printing = true
-   analytics.trigger('Results', 'PRINT_RESULTS', queryStore.mode)
-
-   nextTick( () => {
-      // Setting systemStore.printing = true renders a simplified list in a hidden div. nextTick is
-      // needed to allow time for the content to be rendered. After that,
-      // get the conntent and set that as the innerHTML for the iframe embeddded on the results page.
-      // Print from the iframe and remove content
-      let contents = document.getElementById("print-results").innerHTML
-      window.frames["printFrame"].document.body.innerHTML = (printStyle+contents)
-      window.frames["printFrame"].print()
-      window.frames["printFrame"].document.body.innerHTML = ""
-      systemStore.printing = false
-   })
-})
-
-const resetSearch = ( async () => {
-   resultStore.resetSearch()
-   if ( queryStore.mode == "basic") {
-      analytics.trigger('Results', 'RESET_SEARCH', "basic")
-      router.push("/")
-   } else {
-      analytics.trigger('Results', 'RESET_SEARCH', "advanced")
-      router.push('/search?mode=advanced')
-   }
 })
 
 const poolSelected = (( poolID ) => {
