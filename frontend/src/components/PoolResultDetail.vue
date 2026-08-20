@@ -15,7 +15,7 @@
                <VirgoButton v-if="selectedResults.hits.length > 0 && hasFacets" @click="filtersClicked()" :label="filterLabel" icon="fa-light fa-sliders" severity="secondary" />
                <SaveSearch />
                <VirgoButton v-if="showPrintButton" severity="secondary" @click="printResults" label="Print Results" icon="fa-light fa-print"/>
-               <VirgoButton v-if="canUseSuggestor" severity="secondary" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
+               <VirgoButton v-if="canUseSuggestor" severity="secondary" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb"/>
             </div>
             <V4Sort :pool="selectedResults.pool" />
          </div>
@@ -114,6 +114,7 @@ const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
 })
 const filterLabel = computed(()=>{
+   if ( filters.closed==false) return "Filters"
    let cnt = filters.poolFilter(resultStore.selectedResults.pool.id).length
    if (queryStore.dateFilter) {
       cnt++
