@@ -14,7 +14,8 @@
             <div class="left-acts">
                <VirgoButton v-if="selectedResults.hits.length > 0 && hasFacets" @click="filtersClicked()" label="Filters" icon="fa-light fa-sliders" severity="secondary" />
                <SaveSearch />
-               <VirgoButton v-if="showPrintButton" severity="secondary" @click="printResults">Print Results</VirgoButton>
+               <VirgoButton v-if="showPrintButton" severity="secondary" @click="printResults" label="Print Results" icon="fa-light fa-print"/>
+               <VirgoButton v-if="canUseSuggestor" severity="secondary" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
             </div>
             <V4Sort :pool="selectedResults.pool" />
          </div>
@@ -47,6 +48,9 @@
       <div v-else class="detail-content">
          <FacetSidebar />
          <div class="hits" role="region" aria-label="search results">
+            
+            <SearchSuggestions v-if="canUseSuggestor" />
+
             <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content" role="list">
                <li role="listitem" v-for="hit in selectedResults.hits" class="image hit-wrapper" :key="`img-${hit.identifier}`">
                   <ImageSearchHit :pool="selectedResults.pool.id" :hit="hit"/>
@@ -90,8 +94,10 @@ import { useFilterStore } from "@/stores/filter"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useQueryStore } from "@/stores/query"
 import { useSystemStore } from "@/stores/system"
+import { useSuggestorStore } from "@/stores/suggestor"
 import analytics from '@/analytics'
-import FacetSidebar from "./facets/FacetSidebar.vue"
+import FacetSidebar from "@/components/facets/FacetSidebar.vue"
+import SearchSuggestions from "@/components/SearchSuggestions.vue"
 
 const systemStore = useSystemStore()
 const resultStore = useResultStore()
@@ -100,6 +106,7 @@ const filters = useFilterStore()
 const preferences = usePreferencesStore()
 const queryStore = useQueryStore()
 const user = useUserStore()
+const suggestor = useSuggestorStore()
 
 const loadingMore = ref(false)
 
@@ -117,6 +124,15 @@ const selectedResults = computed(()=>{
 })
 const showPrintButton = computed(()=>{
    return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
+})
+const canUseSuggestor = computed(() => {
+   // If there is no suggestor configured, never show it. If configured,
+   // suggestor is only available for keyword searches issued 
+   // by signed in users that are part of the experimental group
+   if ( systemStore.useSuggestor == false ) return false
+   if ( user.isSignedIn == false ) return false 
+   if ( user.isExperimental == false ) return false 
+   return queryStore.isKeywordSearch
 })
 
 

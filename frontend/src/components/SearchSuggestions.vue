@@ -172,15 +172,16 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .header {
+   margin-top: 15px;
    display: flex;
    justify-content: space-between;
    align-items: baseline;
    padding: 5px 10px;
-   background-color: $uva-brand-blue;
-   color: white;
-   border-radius: 0.3rem 0.3rem 0 0;
+   background-color: $uva-grey-200;
+   border: 1px solid $uva-grey-100;
+   color: $uva-grey-B;
    .p-button {
-      color: white;
+      color:  $uva-grey-B;
       font-weight: bold;
       &:hover {
          background: white;
@@ -192,7 +193,7 @@ onMounted(() => {
    padding: 1rem;
    background-color: white;
    border: 1px solid $uva-grey-100;
-   border-radius: 0.3rem;
+   border-top: none;
    display: flex;
    flex-direction: column;
    text-align: left;

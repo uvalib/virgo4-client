@@ -1,15 +1,12 @@
 <template>
    <PrintedSearchResults  v-if="systemStore.printing"/>
    <div tabindex="-1" id="results-container" class="search-results" aria-describedby="search-summary">
-      <SearchSuggestions v-if="canUseSuggestor" />
+      
       <div class="results-header" role="heading" aria-level="2">
          <div id="search-summary" class="summary">
             <div class="query">Showing {{$formatNum(resultStore.total)}} results for:</div>
             <div class="qs">{{queryString}}</div>
          </div>
-         <span class="buttons" role="toolbar">
-            <VirgoButton v-if="canUseSuggestor" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
-         </span>
       </div>
 
       <div class="results-wrapper" >
@@ -40,14 +37,12 @@
 import OtherPoolsPicker from "@/components/OtherPoolsPicker.vue"
 import PoolResultDetail from "@/components/PoolResultDetail.vue"
 import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
-import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
-import { useSuggestorStore } from "@/stores/suggestor"
 import { useUserStore } from "@/stores/user"
 import { usePreferencesStore } from "@/stores/preferences"
 import { scrollToItem } from '@/utils'
@@ -61,7 +56,6 @@ const routeUtils = useRouteUtils(router, route)
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
-const suggestor = useSuggestorStore()
 const user = useUserStore()
 const preferences = usePreferencesStore()
 
@@ -73,15 +67,7 @@ const canExclude = ((poolID) => {
    return ( poolID != 'uva_library')
 })
 
-const canUseSuggestor = computed(() => {
-   // If there is no suggestor configured, never show it. If configured,
-   // suggestor is only available for keyword searches issued 
-   // by signed in users that are part of the experimental group
-   if ( systemStore.useSuggestor == false ) return false
-   if ( user.isSignedIn == false ) return false 
-   if ( user.isExperimental == false ) return false 
-   return queryStore.isKeywordSearch
-})
+
 
 const queryString = computed(()=>{
    return queryStore.string.replace(/\{|\}/g, "")
@@ -169,20 +155,17 @@ const poolSelected = (( poolID ) => {
    align-content: center;
    align-items: center;
    justify-content: space-between;
-   padding-top: 15px;
    margin-bottom: 10px;
    .summary {
       margin: 0 0 0.2vw 0;
       font-weight: 500;
       text-align: left;
-      .qs {
-         margin-left:15px;
-         font-style: italic;
-         font-weight: 100;
-      }
-      span {
-         font-size: 0.85em;
-      }
+      display: flex;
+      flex-flow: row wrap;
+      gap: 10px; 
+      justify-content: flex-start;
+      align-items: center;
+
       .subtotal {
          display: block;
          margin: 2px 0 2px 15px;
@@ -191,7 +174,6 @@ const poolSelected = (( poolID ) => {
          text-align: left;
          margin: 0 0 0.2vw 0;
          font-weight: bold;
-         font-size: 1.1em;
       }
    }
 }
