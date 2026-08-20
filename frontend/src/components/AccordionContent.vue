@@ -300,7 +300,7 @@ function onAfterLeave(el) {
          font-size: 1.25em;
          transform: rotate(0deg);
          transition-duration: 250ms;
-         margin: 0 5px 0 10px;
+         margin: 0 0 0 10px;
          display: inline-block;
          margin-left: auto;
          border-radius: 20px;;

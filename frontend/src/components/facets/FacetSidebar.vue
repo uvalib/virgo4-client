@@ -2,18 +2,12 @@
    <section v-if="showSidebar" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
       <AccordionContent id="pool-filter" class="filter" :closeButton="true" @close="sidebarClosed"
          :collapseButton="false"
-         :background=colors.brandBlue
-         color="white" :expanded="true"
-         :borderColor=colors.brandBlue
-         
+         :expanded="true"
+         :background=colors.grey200 
+         :borderColor=colors.grey100 
          :hasSettings="true" :showSettings="filterPrefsOpen" @settingsClicked="filterPrefsOpen = !filterPrefsOpen"
       >
-         <template v-slot:title>
-            <div>
-               <span>Filters</span>
-               <span class="filter-count" v-if="appliedFiltersCount>0">({{ appliedFiltersCount }} active)</span>
-            </div>
-         </template>
+         <template v-slot:title>Refine your results</template>
          <template v-slot:settings>
             <div class="settings">
                <FacetMode/>
@@ -102,7 +96,6 @@ import { scrollToItem } from '@/utils'
 import AppliedFilters from "@/components/facets/AppliedFilters.vue"
 import DateFilter from "@/components/facets/DateFilter.vue"
 import { useConfirm } from "primevue/useconfirm"
-import Dialog from 'primevue/dialog'
 import FacetOrder from "@/components/facets/FacetOrder.vue"
 import FacetMode from "@/components/facets/FacetMode.vue"
 
@@ -293,9 +286,16 @@ const filterSelected = ((facetID, facetValue) => {
 .facet-sidebar {
    margin: 0px 0px 15px 0px;
    flex: 1 1 25%;
-   min-width: 200px;
-   display: inline-block;
-   height: fit-content;
+   min-width: 370px;
+   
+   position: relative;
+   top: -1px;
+   left: -1px;
+   :deep(.accordion) {
+      h3 {
+         padding: 5px;
+      }
+   }
 
    .filter-count {
       display: inline-block;

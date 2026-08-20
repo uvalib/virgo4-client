@@ -11,8 +11,9 @@
          </div>
          <CollectionContext />
          <div class="sort-section">
-            <V4Sort :pool="selectedResults.pool" />
+            <VirgoButton v-if="selectedResults.hits.length > 0 && hasFacets" @click="filtersClicked()" label="Filters" icon="fa-light fa-sliders" severity="secondary" />
             <ExcludePool v-if="canExclude"/>
+            <V4Sort :pool="selectedResults.pool" />
          </div>
       </div>
       <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
@@ -40,15 +41,18 @@
             </div>
          </template>
       </div>
-      <div v-else class="hits" role="region" aria-label="search results">
-         <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content" role="list">
-            <li role="listitem" v-for="hit in selectedResults.hits" class="image hit-wrapper" :key="`img-${hit.identifier}`">
-               <ImageSearchHit :pool="selectedResults.pool.id" :hit="hit"/>
-            </li>
-         </ul>
-         <div v-else class="hits-content" role="list">
-            <div role="listitem" v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.number}-${hit.identifier}`">
-               <SearchHit :pool="selectedResults.pool.id" :count="hit.number" :hit="hit"/>
+      <div v-else class="detail-content">
+         <FacetSidebar />
+         <div class="hits" role="region" aria-label="search results">
+            <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content" role="list">
+               <li role="listitem" v-for="hit in selectedResults.hits" class="image hit-wrapper" :key="`img-${hit.identifier}`">
+                  <ImageSearchHit :pool="selectedResults.pool.id" :hit="hit"/>
+               </li>
+            </ul>
+            <div v-else class="hits-content" role="list">
+               <div role="listitem" v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.number}-${hit.identifier}`">
+                  <SearchHit :pool="selectedResults.pool.id" :count="hit.number" :hit="hit"/>
+               </div>
             </div>
          </div>
       </div>
@@ -74,17 +78,16 @@ import SearchHit from "@/components/SearchHit.vue"
 import ImageSearchHit from "@/components/ImageSearchHit.vue"
 import V4Sort from "@/components/V4Sort.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
-import { ref,computed, onMounted, watch } from 'vue'
+import { ref,computed } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useResultStore } from "@/stores/result"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useQueryStore } from "@/stores/query"
-import { useRestoreStore } from '@/stores/restore'
 import ExcludePool from "./modals/ExcludePool.vue"
 import analytics from '@/analytics'
-import { storeToRefs } from "pinia"
+import FacetSidebar from "./facets/FacetSidebar.vue"
 
 const resultStore = useResultStore()
 const poolStore = usePoolStore()
@@ -92,13 +95,9 @@ const filters = useFilterStore()
 const preferences = usePreferencesStore()
 const queryStore = useQueryStore()
 const user = useUserStore()
-const restore = useRestoreStore()
 
 const loadingMore = ref(false)
 
-const hasFilter = computed(()=>{
-   return filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na != true).length > 0
-})
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
 })
@@ -146,8 +145,16 @@ const removeSearchExclusions = (() => {
 })
 
 const signInClicked = (() => {
-   // restore.setRestoreSaveSearch()
    router.push("/signin")
+})
+
+const filtersClicked = (() => {
+   filters.closed = !filters.closed 
+   if (filters.closed ) {
+      analytics.trigger('Filters', 'SIDEBAR_CLOSED', "")
+   } else {
+      analytics.trigger('Filters', 'SIDEBAR_OPENED', "")   
+   }
 })
 
 async function retrySearch() {
@@ -201,9 +208,18 @@ async function loadMoreResults() {
 .pool-results {
    border: 0;
    position: relative;
+   .detail-content {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 15px;
+      border: 1px solid $uva-grey-100;
+      border-top: 0;
+      padding-right: 15px;
+      background: #fafafa;
+   }
 }
 div.pool-header {
-   margin: 0 0 1rem 0;
+   margin: 0 0 0 0;
    text-align: left;
    display: flex;
    flex-direction: column;
@@ -290,20 +306,21 @@ div.pool-header {
    text-align: left;
 }
 @media only screen and (max-width: 600px) {
-   .hit-wrapper {
-     max-width: 94vw;
-     margin: 0 0px 20px 0px;
+   .hits-content {
+      margin: 10px 0 0 0;
+      gap: 10px;
    }
    .image.hits-content {
       margin: 0 0 20px 0;
       grid-gap: .5rem;
    }
-   div.pool-header {
-      margin: 0 0 1rem 0;
-   }
    .sort-section {
       justify-content: flex-start;
       padding-bottom: 10px;
+   }
+   div.detail-content {
+      border: none !important;
+      padding-right: 0 !important;
    }
 }
 .expand-panel {

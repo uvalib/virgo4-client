@@ -9,7 +9,6 @@
          </div>
          <span class="buttons" role="toolbar">
             <VirgoButton severity="secondary"  @click="resetSearch" >Reset Search</VirgoButton>
-            <VirgoButton @click="sidebarOpened()" label="Filters" icon="fa-solid fa-filter" :disabled="filters.closed==false"/>
             <VirgoButton v-if="canUseSuggestor" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
             <SaveSearch />
             <VirgoButton v-if="showPrintButton" @click="printResults">Print Results</VirgoButton>
@@ -17,7 +16,6 @@
       </div>
 
       <div class="results-wrapper" >
-         <FacetSidebar />
          <div class="results-main">
             <div class="pool-tabs">
                <button v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
@@ -198,18 +196,13 @@ const poolSelected = (( poolID ) => {
       routeUtils.poolChanged()
    }
 })
-
-const sidebarOpened = (() => {
-   filters.closed=false
-   analytics.trigger('Filters', 'SIDEBAR_OPENED', "")
-})
 </script>
 
 <style scoped lang="scss">
 .search-results  {
    box-sizing: border-box;
    outline: 0;
-   background-color: #fafafa;
+   background-color:white;
 }
 
 .results-header {
@@ -297,7 +290,7 @@ const sidebarOpened = (() => {
 @media only screen and (min-width: 768px) {
    div.search-results {
       margin: 0;
-      padding: 0 5vw 20px 5vw;
+      padding: 0 4vw 20px 4vw;
       .buttons {
          display: flex;
          flex-flow: row nowrap;
