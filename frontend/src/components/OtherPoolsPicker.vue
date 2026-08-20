@@ -5,8 +5,15 @@
    >
       <template #value>
          <div v-if="selectedPoolID" class="more-selection">
-            <div class="poolname">{{ selection.pool.name }}</div>
-            <div class="total">({{  selection.total }})</div>
+            <button :aria-label="`exclude ${selection.pool.name}`" :title="`exclude ${selection.pool.name}`" 
+               class="exclude" @click="excludePoolClicked($event, selection.pool)"
+            >
+               <i  class="fal fa-xmark"></i>
+            </button>
+            <div class="identity">
+               <div class="poolname">{{ selection.pool.name }}</div>
+               <div class="total">({{  selection.total }})</div>
+            </div>
          </div>
          <div v-else class="more">More</div>
       </template>
@@ -23,21 +30,30 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
+import { usePreferencesStore } from "@/stores/preferences"
+import { useQueryStore } from "@/stores/query"
 import Select from 'primevue/select'
 import { storeToRefs } from "pinia"
 import * as utils from '../utils'
+import { useConfirm } from "primevue/useconfirm"
+import { useRouter, useRoute } from 'vue-router'
+import { useRouteUtils } from '@/composables/routeutils'
 
+const router = useRouter()
+const route = useRoute()
+const confirm = useConfirm()
+const routeUtils = useRouteUtils(router, route)
 const resultStore = useResultStore()
-const systemStore = useSystemStore()
+const preferences = usePreferencesStore()
+const queryStore = useQueryStore()
 
 const selectedPoolID = ref("")
 
 const emit = defineEmits( ['selected' ] )
 
 const { selectedResultsIdx } = storeToRefs(resultStore)
-watch( selectedResultsIdx, (newValue) => {
+watch( selectedResultsIdx, () => {
    const newPool = resultStore.selectedResults.pool
    if ( pools.value.findIndex( p => p.pool.id == newPool.id) == -1 ) {
       selectedPoolID.value = ""
@@ -74,6 +90,31 @@ const pools = computed(()=>{
 
 const selection = computed (() => {
    return resultStore.results.find( r => r.pool.id == selectedPoolID.value)
+})
+
+const excludePoolClicked = ( (event, pool) => {
+   event.stopPropagation()
+   event.preventDefault()
+   
+   confirm.require({
+      message: `Exclude <b>${pool.name}</b> from this and future searches?</br>You can restore it at any time using your account preferences.`,
+      header: 'Confirm Exclude',
+      icon: 'fal fa-exclamation-triangle',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Exclude'
+      },
+      accept: ( ) => {
+         preferences.toggleSearchExclusion(pool.id)
+         queryStore.userSearched = true
+         resultStore.selectPoolResults(0) // catalog is always 0
+         queryStore.targetPool = resultStore.results[0].pool.id
+         routeUtils.poolChanged()
+      }
+   })
 })
 
 const poolFailed = ((p) => {
@@ -115,6 +156,28 @@ const poolSkipped = ((p) => {
    border: 1px solid $uva-brand-blue;
    :deep(.p-select-dropdown) {
       color: white;
+   }
+}
+.more-selection {
+   display: flex;
+   flex-flow: row nowrap;
+   gap: 10px;
+   .exclude {
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0;
+      border-radius: 25px;
+      background: none;
+      border: 2px dotted transparent;
+      &:focus, &:hover {
+         border-color: white;
+         outline: none;
+      }
+   }
+   .identity {
+      display: flex;
+      flex-direction: column;
    }
 }
 .more-opt {

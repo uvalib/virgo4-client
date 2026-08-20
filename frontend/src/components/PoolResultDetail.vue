@@ -12,7 +12,6 @@
          <CollectionContext />
          <div class="sort-section">
             <VirgoButton v-if="selectedResults.hits.length > 0 && hasFacets" @click="filtersClicked()" label="Filters" icon="fa-light fa-sliders" severity="secondary" />
-            <ExcludePool v-if="canExclude"/>
             <V4Sort :pool="selectedResults.pool" />
          </div>
       </div>
@@ -85,7 +84,6 @@ import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useQueryStore } from "@/stores/query"
-import ExcludePool from "./modals/ExcludePool.vue"
 import analytics from '@/analytics'
 import FacetSidebar from "./facets/FacetSidebar.vue"
 
@@ -111,11 +109,7 @@ const selectedResults = computed(()=>{
    return resultStore.selectedResults
 })
 
-const canExclude = computed(() => {
-   if ( !resultStore.selectedResults ) return false
-   if ( user.isSignedIn == false ) return false
-   return ( resultStore.selectedResults.pool.id != 'uva_library' &&  resultStore.selectedResults.pool.id != 'images')
-})
+
 const poolExclusionString = computed( () => {
    let msg = ""
    // NOTES: if a pool has been set as excluded in preferences and that pool

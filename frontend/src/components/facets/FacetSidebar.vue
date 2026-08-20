@@ -287,6 +287,7 @@ const filterSelected = ((facetID, facetValue) => {
    margin: 0px 0px 15px 0px;
    flex: 1 1 25%;
    min-width: 370px;
+   max-width: 400px;
    
    position: relative;
    top: -1px;

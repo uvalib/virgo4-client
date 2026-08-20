@@ -18,14 +18,18 @@
       <div class="results-wrapper" >
          <div class="results-main">
             <div class="pool-tabs">
-               <button v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
-                  @click="poolSelected(r.pool.id)"
-               >
-                  <span>
-                     <div class="pool">{{r.pool.name}}</div>
-                     <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
-                  </span>
-               </button>
+               <div class="tab" v-for="(r,idx) in sourceTabs" :key="idx" :class="{showing: idx == resultStore.selectedResultsIdx}">
+                  <button v-if="canExclude(r.pool.id)" :aria-label="`exclude ${r.pool.name}`" :title="`exclude ${r.pool.name}`" 
+                     class="exclude" @click="excludePoolClicked(r.pool)">
+                     <i  class="fal fa-xmark"></i>
+                  </button>
+                  <button class="pool" @click="poolSelected(r.pool.id)" :class="{padded: canExclude(r.pool.id)==false}">
+                     <span>
+                        <div class="name">{{r.pool.name}}</div>
+                        <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
+                     </span>
+                  </button>
+               </div>
                <OtherPoolsPicker v-if="showMore" @selected="poolSelected" />
             </div>
             <PoolResultDetail />
@@ -39,7 +43,6 @@
 import OtherPoolsPicker from "@/components/OtherPoolsPicker.vue"
 import PoolResultDetail from "@/components/PoolResultDetail.vue"
 import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
-import FacetSidebar from "@/components/facets/FacetSidebar.vue"
 import SaveSearch from "@/components/modals/SaveSearch.vue"
 import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import analytics from '@/analytics'
@@ -50,19 +53,21 @@ import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useSuggestorStore } from "@/stores/suggestor"
 import { useUserStore } from "@/stores/user"
-import { useFilterStore } from "@/stores/filter"
+import { usePreferencesStore } from "@/stores/preferences"
 import { scrollToItem } from '@/utils'
 import { useRouteUtils } from '@/composables/routeutils'
+import { useConfirm } from "primevue/useconfirm"
 
 const router = useRouter()
 const route = useRoute()
+const confirm = useConfirm()
 const routeUtils = useRouteUtils(router, route)
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
 const suggestor = useSuggestorStore()
 const user = useUserStore()
-const filters = useFilterStore()
+const preferences = usePreferencesStore()
 
 const printStyle = `
 <style type="text/css">
@@ -106,6 +111,11 @@ const printStyle = `
 
 const showMore = ref(resultStore.results.length > systemStore.maxPoolTabs)
 
+const canExclude = ((poolID) => {
+   if ( !resultStore.selectedResults ) return false
+   if ( user.isSignedIn == false ) return false
+   return ( poolID != 'uva_library')
+})
 
 const canUseSuggestor = computed(() => {
    // If there is no suggestor configured, never show it. If configured,
@@ -155,6 +165,28 @@ onMounted( () => {
       // return search results to currently selected item
       scrollToItem(resultStore.selectedHit.identifier, false, true)
    }
+})
+
+const excludePoolClicked = ( (pool) => {
+   confirm.require({
+      message: `Exclude <b>${pool.name}</b> from this and future searches?</br>You can restore it at any time using your account preferences.`,
+      header: 'Confirm Exclude',
+      icon: 'fal fa-exclamation-triangle',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Exclude'
+      },
+      accept: ( ) => {
+         preferences.toggleSearchExclusion(pool.id)
+         queryStore.userSearched = true
+         resultStore.selectPoolResults(0) // catalog is always 0
+         queryStore.targetPool = resultStore.results[0].pool.id
+         routeUtils.poolChanged()
+      }
+   })
 })
 
 const printResults = (() => {
@@ -256,32 +288,52 @@ const poolSelected = (( poolID ) => {
          flex-flow: row wrap;
          justify-content: flex-start;
 
-         button.pool {
-            padding: 8px 8px 10px 8px;
+         .tab {
             border-radius: 0.3rem 0.3rem 0 0;
             border: 1px solid $uva-grey-100;
             text-align: left;
             flex: 1 1 auto;
             background: #FFF;
-            .total {
-               font-size: 0.75em;
-               margin: 0;
-               font-weight: normal;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            .exclude {
+               font-size: 1.2rem;
+               cursor: pointer;
+               padding: 0;
+               border-radius: 25px;
+               background: none;
+               border: none;
+               height: 40px;
+               width: 40px;
+               &:focus, &:hover {
+                  outline: 2px dotted $uva-brand-blue-100;
+               }
             }
-
-            &:focus {
-               z-index: 1;
+            .pool {
+               padding: 8px 8px 10px 0;
+               background: transparent;
+               border: none;
+               flex-grow: 1;
+               text-align: left;
+               .total {
+                  font-size: 0.9em;
+                  margin: 0;
+                  font-weight: normal;
+               }
             }
-            &:hover {
-               background: #f6f6f6;
+            .pool.padded {
+               padding-left: 12px;
             }
          }
-
-         button.pool.showing {
+         .tab.showing {
             background-color: $uva-brand-blue;
             color: #fff;
             border: 1px solid $uva-brand-blue;
             cursor: default;
+            .pool,.exclude {
+               color:white;
+            }
          }
       }
    }
