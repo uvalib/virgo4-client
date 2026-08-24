@@ -65,11 +65,20 @@ export function useRouteUtils( router,route ) {
          const oldFilterParam = filters.asQueryParam( query.pool )
          if (query.filter) {
             filters.restoreFromURL(query.filter,  query.pool )
+            const newFilterParam = filters.asQueryParam( query.pool )
+            if (oldFilterParam != newFilterParam) {
+               runSearch = true
+               refreshFacets = true
+            }
+         } else {
+            // no query param for filter. if there are some in the store, remove and research
+            if (oldFilterParam != "{}") {
+               filters.resetPoolFilters(query.pool)
+               runSearch = true
+               refreshFacets = true    
+            }
          }
-         if (oldFilterParam != filters.asQueryParam( query.pool )) {
-            runSearch = true
-            refreshFacets = true
-         }
+         
       } else {
           if (query.filter) {
             // if filters are specified but no pool, apply the filter to all pools
