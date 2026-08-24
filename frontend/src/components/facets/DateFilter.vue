@@ -3,16 +3,16 @@
       <div class="date-section">
          <label>Date Published</label>
          <div class="date-entry">
-            <select v-model="dateType" name="date-type" @change="dateTypeChanged">
+            <select v-model="dateType" name="date-type" @change="dateTypeChanged" aria-label="date range type">
                <option value="AFTER">AFTER</option>
                <option value="BEFORE">BEFORE</option>
                <option value="BETWEEN">BETWEEN</option>
                <option value="EQUAL">IN</option>
             </select>
-            <input v-model="startDate" placeholder="YYYY"/>
+            <input v-model="startDate" placeholder="YYYY" aria-label="start data"/>
             <template v-if="dateType == 'BETWEEN'">
                <span>and</span>
-               <input v-model="endDate" placeholder="YYYY"/>
+               <input v-model="endDate" placeholder="YYYY"  aria-label="end data"/>
             </template>
          </div>
          <div class="date-acts">

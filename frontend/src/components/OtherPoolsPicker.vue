@@ -2,6 +2,7 @@
    <Select v-model="selectedPoolID" :class="{active: selectedPoolID}"
       :options="pools" optionLabel="pool.name" optionValue="pool.id"
       @change="emit('selected', selectedPoolID)"
+      aria-label="view other results"
    >
       <template #value>
          <div v-if="selectedPoolID" class="more-selection">

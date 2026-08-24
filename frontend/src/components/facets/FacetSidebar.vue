@@ -41,7 +41,7 @@
                   <div class="facet-container">
                      <template  v-if="facetValuesCount(facetInfo) > 5">
                         <div class="facet-search">
-                           <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search" />
+                           <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search"  aria-label="search filter values"/>/>
                         </div>
                         <div class="facet-sort">
                            <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>

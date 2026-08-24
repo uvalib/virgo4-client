@@ -16,7 +16,9 @@
             <i v-if="props.collapseButton" class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
          </button>
          <div class="extras">
-            <button v-if="props.closeButton" :style="{color: props.color}" @click="emit('close')">
+            <button v-if="props.closeButton" :style="{color: props.color}" @click="emit('close')"
+               aria-label="close accordion"
+            >
                <i class="accordion-icon fal fa-xmark"></i>
             </button>
             <button v-if="hasSettings" aria-label="folder settings" class="settings-btn"
