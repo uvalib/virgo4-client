@@ -24,7 +24,6 @@
          <div class="body">
             <AppliedFilters v-if="appliedFiltersCount > 0" />
             <DateFilter v-if="canDateFilter && filtersUnavailable == false && filterStore.updatingFacets == false" />
-
             <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
                <div class="working">
                   Loading filters...
@@ -35,13 +34,12 @@
             </div>
             <template v-if="filtersUnavailable == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
                <AccordionContent v-if="facetValuesCount(facetInfo) > 0"
-                  :id="facetInfo.id" :background=colors.grey200 
-                  @accordion-collapsed="filterCollapsed(facetInfo.id)" :expanded="idx < 4"
+                  :id="facetInfo.id" :background=colors.grey200 :expanded="idx < 4"
                   :closeButton="resultStore.selectedResults.pool.id != 'articles'" @close="excludeFilter(facetInfo)"
                >
                   <template v-slot:title>{{ facetInfo.name }}</template>
                   <div class="facet-container">
-                     <template  v-if="facetValuesCount(facetInfo) > 5 || facetInfo.search.length > 0">
+                     <template  v-if="facetValuesCount(facetInfo) > 5">
                         <div class="facet-search">
                            <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search" />
                         </div>
@@ -49,11 +47,26 @@
                            <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
                            <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
                         </div>
+                        <div class="apply-controls" v-if="orFilters.length > 0  && targetFacetID == facetInfo.id">
+                           <button class="cancel" @click="cancelOrFilter()">Cancel</button> 
+                           <button class="apply" @click="applyOrFilter()">Apply {{ orFilters.length }} filters</button> 
+                        </div>
                      </template>
                      <ul :aria-labelledby="facetInfo.id">
                         <li v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.id)">
-                           <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
-                           <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>   
+                           <template v-if="preferences.facetMode == 'AND'">
+                              <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
+                              <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>   
+                           </template>
+                           <template v-else>
+                              <label class="filter-check">
+                                 <input type="checkbox" @change="orFilterToggled(facetInfo.id, fv)" 
+                                    :checked="orFilters.includes(fv)" :disabled="isFacetDisabled(facetInfo.id)"
+                                 />
+                                 <span :class="{dim: isFacetDisabled(facetInfo.id)}">{{ fv.value }}</span>
+                              </label>
+                              <span :class="{dim: isFacetDisabled(facetInfo.id)}" class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>     
+                           </template>
                         </li>
                      </ul>
                   </div>
@@ -110,8 +123,9 @@ const user = useUserStore()
 const preferences = usePreferencesStore()
 const confirm = useConfirm()
 
-const expandedFilters = ref([])
 const filterPrefsOpen = ref(false)
+const targetFacetID = ref("")
+const orFilters = ref([])
 
 const showSidebar = computed(() => {
    return (hasFacets.value && filterStore.closed==false && resultStore.selectedResults.statusCode == 200 && resultStore.selectedResults.total > 0)
@@ -173,6 +187,37 @@ const facetValues = ((facet) => {
 
 const valueKey = ((idx, facetID) => {
    return facetID+"_val_"+idx
+})
+
+const isFacetDisabled = ( (facetID)  => {
+   if (targetFacetID.value == "") return false 
+   return ( targetFacetID.value != facetID)
+})
+const cancelOrFilter = (() => {
+   targetFacetID.value = ""    
+   orFilters.value = []
+})
+
+const applyOrFilter = ( () => {
+   orFilters.value.forEach( f => {
+      f.selected = true    
+      analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${ targetFacetID.value}:${f.value}`)
+   })
+   routeUtils.filterChanged()
+   scrollToItem("results-container", true)
+   cancelOrFilter()
+})
+
+const orFilterToggled = ( (facetID, filter) => {
+   const idx = orFilters.value.findIndex( f => f.value == filter.value)
+   if ( idx == -1 ) {
+      orFilters.value.push( filter )   
+   } else {
+      orFilters.value.splice(idx,1)
+   }
+   if (orFilters.value.length > 0 ) {
+      targetFacetID.value = facetID
+   }
 })
 
 const removeExclusion = ((facetInfo) => {
@@ -270,10 +315,6 @@ const filterSort = ((filterID, type) => {
    return out
 })
 
-const filterCollapsed = ((filterID) => {
-   expandedFilters.value = expandedFilters.value.filter(fID => fID != filterID)
-})
-
 const filterSelected = ((facetID, facetValue) => {
    facetValue.selected = true
    analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facetID}:${facetValue.value}`)
@@ -333,6 +374,10 @@ const filterSelected = ((facetID, facetValue) => {
       flex-direction: column;
       gap: 15px;
 
+      .dim {
+         opacity: 0.5;
+      }
+
       button.filter {
          flex-grow: 1;
          background-color: transparent;
@@ -352,7 +397,7 @@ const filterSelected = ((facetID, facetValue) => {
          }
       }
       div.facet-container {
-         div.facet-search, div.facet-sort {
+         div.facet-search, div.facet-sort, div.apply-controls {
             border-left: 1px solid $uva-grey-100;
             border-right: 1px solid $uva-grey-100;
             border-bottom: 1px solid $uva-grey-100;
@@ -366,13 +411,18 @@ const filterSelected = ((facetID, facetValue) => {
                flex-grow: 1;
                border-radius: 0;
             }
-            button.search {
+            button.apply {
+               background-color: $uva-brand-blue-100;
+               color: white;
+               border: 1px solid $uva-brand-blue;
+               text-align: center;
+               padding: 4px 8px;
+            }
+            button.cancel {
                background-color: $uva-grey-200;
                border: 1px solid $uva-grey-100;
                text-align: center;
-               i {
-                  margin-left: 0;
-               }
+               padding: 4px 8px;
             }
             button {
                background-color: transparent;
@@ -390,6 +440,9 @@ const filterSelected = ((facetID, facetValue) => {
                display: inline-block;
                margin-left: 5px;
             }
+         }
+         div.apply-controls {
+            border: 2px solid $uva-brand-blue-100;
          }
          div.facet-search {
             padding: 10px;
@@ -412,6 +465,16 @@ const filterSelected = ((facetID, facetValue) => {
                gap: 15px;
                .cnt {
                   font-size: .8em;
+               }
+            }
+            label.filter-check {
+               display: flex;
+               flex-flow: row nowrap;
+               gap: 5px;
+               align-items: center;
+               input[type=checkbox] {
+                  width: 20px;
+                  height: 20px;
                }
             }
          }
