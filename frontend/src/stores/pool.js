@@ -10,7 +10,7 @@ export const usePoolStore = defineStore('pool', {
 
    getters: {
       canExcludeList: state => {
-         return state.list.filter( p => p.id != 'uva_library' && p.id != 'images').sort( (a, b)=> {
+         return state.list.filter( p => p.id != 'uva_library').sort( (a, b)=> {
             if (a.name < b.name) return -1
             if (a.name > b.name) return 1
             return 0   
