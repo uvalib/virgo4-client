@@ -48,8 +48,8 @@
                            <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
                         </div>
                         <div class="apply-controls" v-if="orFilters.length > 0  && targetFacetID == facetInfo.id">
-                           <button class="cancel" @click="cancelOrFilter()">Cancel</button> 
-                           <button class="apply" @click="applyOrFilter()">Apply {{ orFilters.length }} filters</button> 
+                           <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
+                           <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ orFilters.length }} filters</button> 
                         </div>
                      </template>
                      <ul :aria-labelledby="facetInfo.id">
@@ -416,18 +416,22 @@ const filterSelected = ((facetID, facetValue) => {
                color: white;
                border: 1px solid $uva-brand-blue;
                text-align: center;
-               padding: 4px 8px;
+               padding: 4px 8px 4px 0px;
             }
             button.cancel {
                background-color: $uva-grey-200;
                border: 1px solid $uva-grey-100;
                text-align: center;
-               padding: 4px 8px;
+               padding: 4px 8px 4px 0px;
             }
             button {
                background-color: transparent;
                border:none;
                cursor: pointer;
+               i {
+                  display: inline-block;
+                  margin-right: 5px;
+               }
                &:focus {
                   outline: 1px dashed $uva-brand-blue-100;
                   outline-offset: 2px;
