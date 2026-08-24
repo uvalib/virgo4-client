@@ -23,7 +23,7 @@
          </template>
          <div class="body">
             <AppliedFilters v-if="appliedFiltersCount > 0" />
-            <DateFilter v-if="canDateFilter && filtersUnavailable == false" />
+            <DateFilter v-if="canDateFilter && filtersUnavailable == false && filterStore.updatingFacets == false" />
 
             <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
                <div class="working">
@@ -59,12 +59,11 @@
                   </div>
                </AccordionContent>
             </template>
-            <div class="exclusions" v-if="hasFilterExclusions && filtersUnavailable == false">
-               <AccordionContent id="filter-exclusions" :background=colors.grey200 :expanded="false" >
+               <AccordionContent v-if="hasFilterExclusions" id="filter-exclusions" :background=colors.grey200 :expanded="false" >
                   <template v-slot:title>Excluded Filters</template>
                   <div class="excluded-list">
                      <template  v-for="filter in excludedFilters" :key="`${filter}-exclusion`">
-                        <button class="remove" :aria-label="`remove exclusion ${filter.value}`" @click="removeExclusion(filter)">
+                        <button class="remove" :aria-label="`Restore ${filter.value} filter`" @click="removeExclusion(filter)" :title="`Restore ${filter.name} filter`">
                            <i class="fas fa-times-circle"></i>
                            <span>{{ filter.name }}</span>
                         </button>
@@ -72,7 +71,6 @@
                      <VirgoButton label="Restore All" severity="secondary" size="small" @click="removeAllExclusions()"/>
                   </div>
                </AccordionContent>
-            </div>
          </div>
       </AccordionContent>
    </section>
@@ -284,8 +282,15 @@ const filterSelected = ((facetID, facetValue) => {
 })
 </script>
 <style lang="scss" scoped>
-.padding {
-   width: 15px;
+@media only screen and (min-width: 768px) {
+   .padding {
+      width: 5px;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .padding {
+      display: none;
+   }
 }
 .facet-sidebar {
    margin: 0px 0px 15px 0px;
@@ -298,7 +303,7 @@ const filterSelected = ((facetID, facetValue) => {
    left: -1px;
    :deep(.accordion) {
       h3 {
-         padding: 5px;
+         padding: 5px 0 5px 5px;
       }
    }
 
@@ -315,9 +320,6 @@ const filterSelected = ((facetID, facetValue) => {
       padding-top: 10px;
    }
 
-   .pool-filter-header, .filter {
-      width: 100%;
-   }
    .body {
       border: 1px solid $uva-grey-100;
       border-top: 0;
@@ -330,7 +332,6 @@ const filterSelected = ((facetID, facetValue) => {
       display: flex;
       flex-direction: column;
       gap: 15px;
-      position: relative;
 
       button.filter {
          flex-grow: 1;
@@ -414,44 +415,33 @@ const filterSelected = ((facetID, facetValue) => {
                }
             }
          }
-         .more {
-            margin-top: 5px;
-            button {
-               width: 100%;
-            }
-         }
       }
 
-      .exclusions {
-         border-top: 1px solid $uva-grey-100;
-         padding-top: 15px;
-         
-         .excluded-list {
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+      .excluded-list {
+         padding: 15px;
+         display: flex;
+         flex-direction: column;
+         gap: 10px;
+         border: 1px solid $uva-grey-100;
+         border-top: 0;
+         button.remove {
             border: 1px solid $uva-grey-100;
-            border-top: 0;
-            button.remove {
-               border: 1px solid $uva-grey-100;
-               padding: 6px 8px;
-               border-radius: 0.3rem;
-               margin: 0px;
-               background: white;
-               color: $uva-text-color-dark;
-               cursor: pointer;
-               text-align: left;
-               font-size: 0.9rem;
-               display: flex;
-               i {
-                  margin: 1px 5px 0 0;
-                  color: $uva-red;
-                  font-size: 1rem;
-               }
-               &:hover {
-                  background: $uva-grey-200;
-               }
+            padding: 6px 8px;
+            border-radius: 0.3rem;
+            margin: 0px;
+            background: white;
+            color: $uva-text-color-dark;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.9rem;
+            display: flex;
+            i {
+               margin: 1px 5px 0 0;
+               color: $uva-red;
+               font-size: 1rem;
+            }
+            &:hover {
+               background: $uva-grey-200;
             }
          }
       }
@@ -466,11 +456,6 @@ const filterSelected = ((facetID, facetValue) => {
       margin: 5px 0 0 0;
       padding-left: 35px;
    }
-}
-div.no-facets {
-   text-align: center;
-   margin:25px 5px;
-   font-size: 1.25em;
 }
 .dimmer {
    position: absolute;
@@ -493,19 +478,13 @@ div.no-facets {
    position: fixed;
    left: 0px;
    right: 0px;
-   z-index: 5000;
+   top: 200px;
    bottom: 0px;
    padding: 0;
    margin: 0;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: flex-end;
-   justify-content: space-between;
-   margin: 0;
-   flex: 1 1 auto;
-
+   z-index: 5000;
    .body {
-      max-height: 450px;
+      max-height: 570px;
       overflow: scroll;
    }
 }
