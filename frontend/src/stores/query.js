@@ -182,9 +182,9 @@ export const useQueryStore = defineStore('query', {
          })
       },
       setDateFilter( poolID, comparison, startDate, endDate ) {
-         if ( this.mode == "basic" ) {
-            this.setAdvancedSearch()
-         } 
+         // if ( this.mode == "basic" ) {
+         //    this.setAdvancedSearch()
+         // } 
 
          this.poolDateFilters.set(poolID, {startDate: startDate, comparison: comparison, endDate: endDate} )
       },
@@ -263,7 +263,7 @@ export const useQueryStore = defineStore('query', {
                continue
             }
 
-            if (this.mode == "basic") {
+            if (this.mode == "basic" && term.field != "date_filter") {
                this.basic.field = term.field 
                this.basic.value = value
                continue

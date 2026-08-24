@@ -197,7 +197,7 @@ const poolSelected = (( poolID ) => {
          justify-content: flex-start;
 
          .tab {
-            border-radius: 0.3rem 0.3rem 0 0;
+            border-radius: 0.5rem 0.5rem 0 0;
             border: 1px solid $uva-grey-100;
             text-align: left;
             flex: 1 1 auto;
