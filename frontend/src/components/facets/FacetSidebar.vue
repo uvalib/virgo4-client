@@ -47,11 +47,11 @@
                            <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
                            <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
                         </div>
-                        <div class="apply-controls" v-if="orFilters.length > 0  && targetFacetID == facetInfo.id">
-                           <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
-                           <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ orFilters.length }} filters</button> 
-                        </div>
                      </template>
+                     <div class="apply-controls" v-if="orFilters.length > 0  && targetFacetID == facetInfo.id">
+                        <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
+                        <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ orFilters.length }} filters</button> 
+                     </div>
                      <ul :aria-labelledby="facetInfo.id">
                         <li v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.id)">
                            <template v-if="preferences.facetMode == 'AND'">

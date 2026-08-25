@@ -121,11 +121,9 @@ const excludePoolClicked = ( (pool) => {
       },
       accept: ( ) => {
          preferences.toggleSearchExclusion(pool.id)
-         // queryStore.userSearched = true
          resultStore.selectPoolResults(0) // catalog is always 0
          queryStore.targetPool = resultStore.results[0].pool.id
          resultStore.dropResults( pool.id )
-         // routeUtils.poolChanged()
       }
    })
 })
