@@ -318,12 +318,12 @@ function onAfterLeave(el) {
       padding: 0;
    }
    .accordion-content {
-      overflow: hidden;
       transition: all 250ms ease-out;
       margin:0;
       padding:0;
       text-align: left;
       background: white;
+      position: relative;
    }
 }
 </style>
