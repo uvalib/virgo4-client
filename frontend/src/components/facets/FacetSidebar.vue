@@ -12,13 +12,13 @@
             <div class="settings">
                <FacetMode/>
                <FacetOrder :facets="facets" @apply="setFacetOrder"/>
-               <p class="note">
+               <div class="note">
                   Within a category, filter values can be combined with AND or OR. For example, selecting "English" and "French" under Language:
                   <ul>
                      <li>AND returns materials in both English and French.</li>
                      <li>OR returns materials in either English or French.</li>
                   </ul>
-               </p>
+               </div>
             </div>
          </template>
          <div class="body">
