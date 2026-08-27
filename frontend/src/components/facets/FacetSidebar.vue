@@ -22,6 +22,10 @@
             </div>
          </template>
          <div class="body">
+            <div class="apply-controls floating" v-if="orFilterMode != 'SINGLE' && orFilters.length > 0">
+               <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
+               <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ orFilters.length }} filters</button> 
+            </div>
             <AppliedFilters v-if="appliedFiltersCount > 0" />
             <DateFilter v-if="canDateFilter && filtersUnavailable == false && filterStore.updatingFacets == false" />
             <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
@@ -41,14 +45,14 @@
                   <div class="facet-container">
                      <template  v-if="facetValuesCount(facetInfo) > 5">
                         <div class="facet-search">
-                           <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search"  aria-label="search filter values"/>/>
+                           <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search"  aria-label="search filter values"/>
                         </div>
                         <div class="facet-sort">
                            <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
                            <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
                         </div>
                      </template>
-                     <div class="apply-controls" v-if="orFilters.length > 0  && targetFacetID == facetInfo.id">
+                     <div class="apply-controls" v-if="orFilterMode == 'SINGLE' && orFilters.length > 0  && targetFacetID == facetInfo.id">
                         <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
                         <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ orFilters.length }} filters</button> 
                      </div>
@@ -127,8 +131,20 @@ const filterPrefsOpen = ref(false)
 const targetFacetID = ref("")
 const orFilters = ref([])
 
+// NOTES: All logic is in place to support adding filter values across all filter categories
+// Switch the comment below to change how it works.
+//const orFilterMode = "ALL"
+const orFilterMode = "SINGLE"
+
 const showSidebar = computed(() => {
-   return (hasFacets.value && filterStore.closed==false && resultStore.selectedResults.statusCode == 200 && resultStore.selectedResults.total > 0)
+   // main reasons not to show: if no facet support, user closed the sidebar or an error
+   if ( resultStore.selectedResults.statusCode != 200  || filterStore.closed == true || hasFacets.value == false ) return false
+   
+   // if the above are ok, show the sidebar if there are results
+   if (resultStore.selectedResults.total > 0) return true
+   
+   // there are no results, but there may be applied filters that caused this. Need to show so user can cancel
+   return ( appliedFiltersCount.value > 0)
 })
 const facets = computed(()=>{
    return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true)
@@ -190,6 +206,7 @@ const valueKey = ((idx, facetID) => {
 })
 
 const isFacetDisabled = ( (facetID)  => {
+   if ( orFilterMode != 'SINGLE' ) return false
    if (targetFacetID.value == "") return false 
    return ( targetFacetID.value != facetID)
 })
@@ -201,11 +218,19 @@ const cancelOrFilter = (() => {
 const applyOrFilter = ( () => {
    orFilters.value.forEach( f => {
       f.selected = true    
-      analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${ targetFacetID.value}:${f.value}`)
+      analytics.trigger('Filters', 'SEARCH_FILTER_SET', f.value)
    })
    routeUtils.filterChanged()
    scrollToItem("results-container", true)
    cancelOrFilter()
+   autoCloseSidebar()
+})
+
+const autoCloseSidebar = (() => {
+   if (width.value < 810) {
+      // sidebar covers results, so close the panel after applying the filter
+      filterStore.closed = true
+   }
 })
 
 const orFilterToggled = ( (facetID, filter) => {
@@ -215,7 +240,7 @@ const orFilterToggled = ( (facetID, filter) => {
    } else {
       orFilters.value.splice(idx,1)
    }
-   if (orFilters.value.length > 0 ) {
+   if (orFilters.value.length > 0 && orFilterMode == 'SINGLE' ) {
       targetFacetID.value = facetID
    }
 })
@@ -320,6 +345,7 @@ const filterSelected = ((facetID, facetValue) => {
    analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facetID}:${facetValue.value}`)
    routeUtils.filterChanged()
    scrollToItem("results-container", true)
+   autoCloseSidebar()
 })
 </script>
 <style lang="scss" scoped>
@@ -327,11 +353,17 @@ const filterSelected = ((facetID, facetValue) => {
    .padding {
       width: 5px;
    }
+   .apply-controls.floating {
+      width: 30%;
+    }
 }
 @media only screen and (max-width: 768px) {
    .padding {
       display: none;
    }
+    .apply-controls.floating {
+      width: 95%;
+    }
 }
 .facet-sidebar {
    margin: 0px 0px 15px 0px;
@@ -376,6 +408,36 @@ const filterSelected = ((facetID, facetValue) => {
 
       .dim {
          opacity: 0.5;
+      }
+
+      .apply-controls.floating {
+         position: fixed;
+         bottom: 15px;
+         left: 15px;
+         display: flex;
+         z-index: 100;
+         flex-flow: row nowrap;
+         justify-content: space-between;
+         padding: 10px;
+         border: 2px solid $uva-teal-B;
+         background: $uva-teal-200;
+         box-shadow: 2px 2px 10px 0px $uva-grey-A;
+         border-radius: 0.5rem;
+         button {
+            text-align: center;
+            padding: 4px 8px 4px 4px;
+            border-radius: 0.3rem;
+            font-size: 1em;
+         }
+         button.apply {
+            background-color: $uva-brand-blue-100;
+            color: white;
+            border: 1px solid $uva-brand-blue;
+         }
+         button.cancel {
+            background-color: $uva-grey-200;
+            border: 1px solid $uva-grey;
+         }
       }
 
       button.filter {
@@ -545,14 +607,17 @@ const filterSelected = ((facetID, facetValue) => {
    position: fixed;
    left: 0px;
    right: 0px;
-   top: 200px;
+   top: 0px;
    bottom: 0px;
-   padding: 0;
+   padding: 0px;
    margin: 0;
    z-index: 5000;
+   background-color: white;
    .body {
-      max-height: 570px;
+      max-height: calc(100vh - 40px); // max height is height of screen
       overflow: scroll;
+      padding-left: 20px;
+      padding-right: 20px;
    }
 }
 .spinner-animation {

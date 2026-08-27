@@ -12,7 +12,7 @@
          <CollectionContext />
          <div class="actions-section">
             <div class="left-acts">
-               <VirgoButton v-if="selectedResults.hits.length > 0 && hasFacets" @click="filtersClicked()" :label="filterLabel" icon="fa-light fa-sliders" severity="secondary" />
+               <VirgoButton v-if="hasFacets && selectedResults.statusCode != 408"" @click="filtersClicked()" :label="filterLabel" icon="fa-light fa-sliders" severity="secondary" />
                <SaveSearch />
                <VirgoButton v-if="showPrintButton" severity="secondary" @click="printResults" label="Print Results" icon="fa-light fa-print"/>
                <VirgoButton v-if="canUseSuggestor" severity="secondary" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb"/>
@@ -20,35 +20,34 @@
             <V4Sort :pool="selectedResults.pool" />
          </div>
       </div>
-      <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
-         <template v-if="selectedResults.statusCode == 408">
-            <span>Search timed out</span>
-            <p class="note">
-               Sorry, the source providing this data took too long to respond.  You may wish to try your search again, or try a different search.
-               If the problem persists, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank' aria-describedby="new-window">Ask a Librarian</a> may be able to help.
-            </p>
-            <VirgoButton @click="retrySearch">Retry Search</VirgoButton>
-         </template>
-         <template v-else>
-            <span>No results found</span>
-            <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
-               {{selectedResults.statusMessage}}
-            </p>
-            <div v-else>
-               <p class="note">Suggestions</p>
-               <ul >
-                  <li>Check your spelling.</li>
-                  <li>Use more generic search terms.</li>
-                  <li v-if="queryStore.mode=='basic'">Use <router-link to="/search?mode=advanced">Advanced Search</router-link> to create a more targeted search.</li>
-                  <li>Clear any active filters.</li>
-               </ul>
-            </div>
-         </template>
-      </div>
-      <div v-else class="detail-content">
+      <div class="detail-content">
          <FacetSidebar />
-         <div class="hits" role="region" aria-label="search results">
-            
+         <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
+            <template v-if="selectedResults.statusCode == 408">
+               <span>Search timed out</span>
+               <p class="note">
+                  Sorry, the source providing this data took too long to respond.  You may wish to try your search again, or try a different search.
+                  If the problem persists, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank' aria-describedby="new-window">Ask a Librarian</a> may be able to help.
+               </p>
+               <VirgoButton @click="retrySearch">Retry Search</VirgoButton>
+            </template>
+            <template v-else>
+               <span>No results found</span>
+               <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
+                  {{selectedResults.statusMessage}}
+               </p>
+               <div v-else>
+                  <p class="note">Suggestions</p>
+                  <ul >
+                     <li>Check your spelling.</li>
+                     <li>Use more generic search terms.</li>
+                     <li v-if="queryStore.mode=='basic'">Use <router-link to="/search?mode=advanced">Advanced Search</router-link> to create a more targeted search.</li>
+                     <li>Clear any active filters.</li>
+                  </ul>
+               </div>
+            </template>
+         </div> 
+         <div v-else class="hits" role="region" aria-label="search results">
             <SearchSuggestions v-if="canUseSuggestor" />
 
             <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content" role="list">
@@ -369,13 +368,14 @@ div.pool-header {
 .hit-wrapper.none {
    background: white;
    padding: 25px;
-   margin-bottom: 1rem;
+   margin: 15px 0 1rem 0;
    text-align: left;
    border: 1px solid #ccc;
    display: flex;
    flex-direction: column;
    align-items: flex-start;
    gap: 10px;
+   flex-grow: 1;
 
    span {
       font-size: 1.25em;

@@ -26,7 +26,9 @@ import { useFilterStore } from "@/stores/filter"
 import { useQueryStore } from "@/stores/query"
 import analytics from '@/analytics'
 import { useRouteUtils } from '@/composables/routeutils'
+import { useWindowSize } from '@vueuse/core'
 
+const { width } = useWindowSize()
 const route = useRoute()
 const router = useRouter()
 const routeUtils = useRouteUtils(router, route)
@@ -34,9 +36,6 @@ const resultStore = useResultStore()
 const filters = useFilterStore()
 const queryStore = useQueryStore()
 
-const hasFilter = computed(()=>{
-   return filters.poolFilter(resultStore.selectedResults.pool.id).length > 0
-})
 const appliedFilters = computed(()=>{
    return filters.poolFilter(resultStore.selectedResults.pool.id)
 })
@@ -60,19 +59,28 @@ const dateFilterLabel = computed(()=>{
 function removeFilter( filter ) {
    filters.toggleFilter(resultStore.selectedResults.pool.id, filter.facet_id, filter.value)
    routeUtils.filterChanged()
+   autoCloseSidebar()
 }
 
 const removeDateFilter = (() => {
    queryStore.removeDateFilter( resultStore.selectedResults.pool.id )
    queryStore.userSearched = true
    routeUtils.searchChanged()
+   autoCloseSidebar()
 })
 
+const autoCloseSidebar = (() => {
+   if (width.value < 810) {
+      // sidebar covers results, so close the panel after applying the filter
+      filters.closed = true
+   }
+})
 
 function clearClicked() {
    analytics.trigger('Results', 'CLEAR_ALL_FILTERS', queryStore.mode)
    queryStore.removeDateFilter( resultStore.selectedResults.pool.id )
    filters.resetPoolFilters(resultStore.selectedResults.pool.id)
+   autoCloseSidebar()
 
    // this action changes filters and serach so need to flag both.
    // the routeUtils will catch this flag and update the URL 

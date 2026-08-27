@@ -29,15 +29,19 @@ import { storeToRefs } from "pinia"
 import { useRouteUtils } from '@/composables/routeutils'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
+import { useFilterStore } from "@/stores/filter"
 import { useRouter, useRoute } from 'vue-router'
 import { watchDeep } from '@vueuse/core'
 import analytics from '@/analytics'
+import { useWindowSize } from '@vueuse/core'
 
+const { width } = useWindowSize()
 const route = useRoute()
 const router = useRouter()
 const routeUtils = useRouteUtils(router, route)
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
+const filters = useFilterStore()
 
 const dateType = ref("BETWEEN")
 const startDate = ref("")
@@ -45,7 +49,7 @@ const endDate = ref("")
 const dateErr = ref("")
 
 const { targetPool } = storeToRefs(queryStore)
-watch( targetPool, (newVal) => {
+watch( targetPool, () => {
    updateDateFilter()
 })
 
@@ -54,7 +58,6 @@ const { poolDateFilters } = storeToRefs(queryStore)
 watchDeep( poolDateFilters, () => {
    updateDateFilter()
 })
-
 
 const dateLabel = computed(() => {
    if ( queryStore.dateFilter ) {
@@ -65,6 +68,13 @@ const dateLabel = computed(() => {
 
 onMounted( () => {
    updateDateFilter()
+})
+
+const autoCloseSidebar = (() => {
+   if (width.value < 810) {
+      // sidebar covers results, so close the panel after applying the filter
+      filters.closed = true
+   }
 })
 
 const updateDateFilter = (() => {
@@ -115,6 +125,7 @@ const applyDateFilterClicked = (() => {
    queryStore.setDateFilter( resultStore.selectedResults.pool.id, dateType.value, startDate.value, endDate.value )
    queryStore.userSearched = true
    routeUtils.searchChanged()
+   autoCloseSidebar()
 })
 
 </script>
