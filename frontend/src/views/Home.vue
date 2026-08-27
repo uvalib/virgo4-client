@@ -56,7 +56,6 @@ import { useRestoreStore } from "@/stores/restore"
 import { useSystemStore } from "@/stores/system"
 import { useSearchStore } from "@/stores/search"
 import { useUserStore } from "@/stores/user"
-import { usePreferencesStore } from "@/stores/preferences"
 import { usePoolStore } from "@/stores/pool"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { watchDeep } from '@vueuse/core'
@@ -73,14 +72,8 @@ const systemStore = useSystemStore()
 const searchStore = useSearchStore()
 const userStore = useUserStore()
 const poolStore = usePoolStore()
-const preferences = usePreferencesStore()
 
 const { polite, assertive } = useAnnouncer()
-
-
-const isHomePage = computed(()=>{
-   return (route.path == "/")
-})
 
 function setPageTitle() {
    systemStore.pageTitle = "Search"
@@ -273,6 +266,9 @@ async function searchClicked() {
       width: 95%;
       padding: 20px 0;
       margin-top:30%;
+  }
+  div.search-mode {
+   gap: 10px !important;
   }
   ::-webkit-input-placeholder {
     color:transparent;
