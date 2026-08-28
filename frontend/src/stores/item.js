@@ -14,6 +14,7 @@ export const useItemStore = defineStore('item', {
       availability: {searching: true, titleId: "", libraries: [], boundWith: [], error: ""},
       primaryFields: ["author", "format", "published_date", "subject", "subject_summary"],
       noAuthorization: false,
+      notFound: false,
    }),
 
    getters: {
@@ -255,6 +256,7 @@ export const useItemStore = defineStore('item', {
       async getDetails( source, identifier ) {
          this.details.searching = true
          this.noAuthorization = false
+         this.notFound = false
 
          // get source from poolID
          const poolStore = usePoolStore()
@@ -307,14 +309,15 @@ export const useItemStore = defineStore('item', {
             }
             this.details.searching = false
          }).catch( async (error) => {
+            console.log("ITEM LOOKUP FAILED")
+            console.log(error)
             if ( error.response && error.response.status == 401) {
                this.noAuthorization = true
-            } else if ( error.response && error.response.status == 404) {
-               console.warn(`Item ID ${identifier} not found in ${source}; try a lookup`)
-               await this.lookupCatalogKeyDetail(identifier)
+               this.details.searching = false
             } else {
                this.details.searching = false
-               useSystemStore().setError(error)
+               this.notFound = true
+               console.log(error)
             }
          })
       },
@@ -360,43 +363,6 @@ export const useItemStore = defineStore('item', {
          })
       },
 
-      // This is used to lookup a catalog key without a source. end result of this action is a redirect
-      async lookupCatalogKeyDetail(catalogKey) {
-         this.clearDetails()
-         this.clearAvailability()
-
-         // strip punctuation that may be lingeraing at end of key from a bad cut/paste
-         catalogKey = cleanIdentifier(catalogKey)
-
-         let req = {
-            query: `identifier: {${catalogKey}}`,
-            pagination: { start: 0, rows: 1 },
-         }
-
-         try {
-            const system = useSystemStore()
-            let response = await axios.post(`${system.searchAPI}/api/search`, req)
-            if (response.data.total_hits == 1 ) {
-               this.setCatalogKeyDetails(response.data)
-               // NOTE:  the result above only contains basic fields. the redirect below
-               // will trigger a full record get
-               let redirect = `/sources/${this.details.source}/items/${this.details.identifier}`
-               await this.router.replace(redirect)
-            } else {
-               this.clearDetails()
-               let q = `identifier: {${catalogKey}}`
-               await this.router.replace(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
-            }
-         } catch(error) {
-            this.details.searching = false
-            this.clearDetails()
-            if ( error.response && error.response.status == 404) {
-               console.warn(`Catalog Key ${catalogKey} not found`)
-               this.router.push(`/not_found`)
-            }
-         }
-      },
-
       async getCitations({format, itemURL}) {
          const system = useSystemStore()
          let url = `${system.citationsURL}/format/${format}?item=${encodeURI(itemURL)}`
@@ -404,10 +370,3 @@ export const useItemStore = defineStore('item', {
       },
    }
 })
-
-function cleanIdentifier(identifier) {
-   // strip spaces and punctuation that may be attached to an identifier that was cut and pasted
-   let clean = identifier.trim()
-   clean = clean.replace(/(:|;|,|-|"|!|'|\?|\.|\]|\))+$/, '')
-   return clean
-}

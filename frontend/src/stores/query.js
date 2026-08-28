@@ -66,11 +66,6 @@ export const useQueryStore = defineStore('query', {
          })
          return out
       },
-      idQuery: () => {
-         return (id) => {
-            return `identifier: {${id}}`
-         }
-      },
       queryEntered: state => {
          if (state.mode == "basic") {
             return state.basic.value.length > 0

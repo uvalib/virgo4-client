@@ -7,6 +7,15 @@
          <div>Details for items from {{ excludedPool }} are not available to guest users.</div>
          <div><VirgoButton link @click="signInClicked" label="Sign in to view details"/></div>
       </div>
+      <div class="not-found" v-else-if="item.notFound">
+         <h1>Item not found</h1>
+          <div>
+            We're sorry, but we are unable to find details for this item. There may be a typo in the address or perhaps an outdated link led you to the wrong place.
+         </div>
+          <div>
+            You're always welcome to <a href="http://www.library.virginia.edu/askalibrarian/" target="_blank" aria-describedby="new-window">Ask a Librarian</a> for help!
+          </div>
+      </div>
       <template v-else>
          <FullPageCollectionView v-if="collection.isFullPage && item.isCollection && collection.isAvailable" />
          <ItemView v-else />
@@ -54,18 +63,14 @@ const getDetails = ( async (src, id, initialPage) => {
       console.log(`EXCLUDED [${excludedPool.value}]`)
       loadingDetails.value = false
       return
-   } 
-
-   // if this was called from an old catalog/id url, the src will get
-   // set to legacy. in this case, lookup the cat key and redirect to full detail
-   // the redirect will trigger a beforeRouteUpdate and that will get fill item detail.
-   loadingDetails.value = true
-   if ( src == "legacy" ) {
-      await item.lookupCatalogKeyDetail(id )
-      return
    }
 
    await item.getDetails( src, id )
+   if (item.notFound) {
+      loadingDetails.value = false
+      return
+
+   }
    analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
    if (item.details && item.details.header) {
       document.title = item.details.header.title
@@ -151,26 +156,22 @@ onUpdated(()=>{
       margin: 30px 0;
    }
 }
-.guest-exclusion {
+.guest-exclusion, .not-found {
    margin: 0 auto;
-   min-height: 400px;
-   position: relative;
    text-align: center;
-   padding-top: 5%;
    div {
       margin-bottom: 20px;
       font-size: 1.25rem;
-      font-weight: bold;
    }
 }
 @media only screen and (min-width: 768px) {
-   div.guest-exclusion  {
-       width: 70%;
+   .guest-exclusion, .not-found  {
+       width: 50%;
    }
 }
 @media only screen and (max-width: 768px) {
-   div.guest-exclusion  {
-       width: 95%;
+   .guest-exclusion, .not-found  {
+       width: 75%;
    }
 }
 </style>
