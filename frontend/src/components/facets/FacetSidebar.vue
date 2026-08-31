@@ -1,110 +1,112 @@
 <template>
-   <section v-if="showSidebar" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
-      <AccordionContent id="pool-filter" class="filter" :closeButton="true" @close="sidebarClosed"
-         :collapseButton="false"
-         :expanded="true"
-         :background=colors.grey200 
-         :borderColor=colors.grey100 
-         :hasSettings="true" :showSettings="filterPrefsOpen" @settingsClicked="filterPrefsOpen = !filterPrefsOpen"
-      >
-         <template v-slot:title>Refine your result</template>
-         <template v-slot:settings>
-            <div class="settings">
-               <FacetMode/>
-               <FacetOrder :facets="facets" @apply="setFacetOrder"/>
-               <div class="note">
-                  Within a category, filter values can be combined with AND or OR. For example, selecting "English" and "French" under Language:
-                  <ul>
-                     <li>AND returns materials in both English and French.</li>
-                     <li>OR returns materials in either English or French.</li>
+   <div v-if="showSidebar" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
+      <div class="header">
+         <span class="title">Refine your results</span>
+         <span class="controls">
+            <button aria-label="filter settings" @click="showSettings = !showSettings">
+               <i class="fa-cog" :class="{fal: !showSettings, fas: showSettings}"></i>
+            </button>
+            <button @click="sidebarClosed" aria-label="close filters">
+               <i class="fal fa-xmark"></i>
+            </button>
+         </span>
+      </div>
+
+      <div v-if="showSettings" class="settings">
+         <FacetMode/>
+         <FacetOrder :facets="facets" @apply="setFacetOrder"/>
+         <div class="note">
+            Within a category, filter values can be combined with AND or OR. For example, selecting "English" and "French" under Language:
+            <ul>
+               <li>AND returns materials in both English and French.</li>
+               <li>OR returns materials in either English or French.</li>
+            </ul>
+         </div>
+         <div class="note">
+            <label>
+               OR Filter application mode:
+               <select v-model="prefs.orFilterMode"  @change="prefs.save()">
+                  <option value="SINGLE">Single</option>
+                  <option value="ALL">All</option>
+               </select>
+               <p>
+               In Single mode, filter values are applied for one filter at a time. <br/>
+               In All mode, filters values from all filters can be applied at once.
+               </p>
+            </label>
+         </div>
+      </div>
+
+      <div class="body">
+         <div class="apply-controls floating" v-if="showGlobalFilterControls">
+            <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
+            <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters</button> 
+         </div>
+         <AppliedFilters v-if="appliedFiltersCount > 0 && showGlobalFilterControls == false" />
+         <DateFilter v-if="canDateFilter && filtersUnavailable == false && filterStore.updatingFacets == false" />
+         <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
+            <div class="working">
+               Loading filters...
+               <div class="spinner-animation">
+                  <div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>
+               </div>
+            </div>
+         </div>
+         <template v-if="filtersUnavailable == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
+            <AccordionContent v-if="facetValuesCount(facetInfo) > 0"
+               :id="facetInfo.id" :background=colors.grey200 :expanded="idx < 4"
+               :closeButton="resultStore.selectedResults.pool.id != 'articles'" @close="excludeFilter(facetInfo)"
+            >
+               <template v-slot:title>{{ facetInfo.name }}</template>
+               <div class="facet-container">
+                  <template  v-if="facetValuesCount(facetInfo) > 5">
+                     <div class="facet-search">
+                        <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search"  aria-label="search filter values"/>
+                     </div>
+                     <div class="facet-sort">
+                        <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
+                        <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
+                     </div>
+                  </template>
+                  <div class="apply-controls" v-if="prefs.orFilterMode == 'SINGLE' && filterStore.hasPendingChanges(currPoolID) && targetFacetID == facetInfo.id">
+                     <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
+                     <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters</button> 
+                  </div>
+                  <ul :aria-labelledby="facetInfo.id">
+                     <li v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.id)">
+                        <template v-if="prefs.facetMode == 'AND'">
+                           <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
+                           <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>   
+                        </template>
+                        <template v-else>
+                           <label class="filter-check">
+                              <!-- FIXME -->
+                              <input type="checkbox" @change="orFilterToggled(facetInfo.id, fv)"  
+                                 :checked="fv.selected || fv.pending == 'add'" :disabled="isFacetDisabled(facetInfo.id)"
+                              />
+                              <span :class="{dim: isFacetDisabled(facetInfo.id)}">{{ fv.value }}</span>
+                           </label>
+                           <span :class="{dim: isFacetDisabled(facetInfo.id)}" class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>     
+                        </template>
+                     </li>
                   </ul>
                </div>
-               <div class="note">
-                  <label>
-                     OR Filter application mode:
-                     <select v-model="prefs.orFilterMode"  @change="prefs.save()">
-                        <option value="SINGLE">Single</option>
-                        <option value="ALL">All</option>
-                     </select>
-                     <p>
-                     In Single mode, filter values are applied for one filter at a time. <br/>
-                     In All mode, filters values from all filters can be applied at once.
-                     </p>
-                  </label>
-               </div>
-            </div>
+            </AccordionContent>
          </template>
-         <div class="body">
-            <div class="apply-controls floating" v-if="showGlobalFilterControls">
-               <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
-               <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters</button> 
-            </div>
-            <AppliedFilters v-if="appliedFiltersCount > 0 && showGlobalFilterControls == false" />
-            <DateFilter v-if="canDateFilter && filtersUnavailable == false && filterStore.updatingFacets == false" />
-            <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
-               <div class="working">
-                  Loading filters...
-                  <div class="spinner-animation">
-                     <div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>
-                  </div>
+            <AccordionContent v-if="hasFilterExclusions" id="filter-exclusions" :background=colors.grey200 :expanded="false" >
+               <template v-slot:title>Excluded Filters</template>
+               <div class="excluded-list">
+                  <template  v-for="filter in excludedFilters" :key="`${filter}-exclusion`">
+                     <button class="remove" :aria-label="`Restore ${filter.value} filter`" @click="removeExclusion(filter)" :title="`Restore ${filter.name} filter`">
+                        <i class="fas fa-times-circle"></i>
+                        <span>{{ filter.name }}</span>
+                     </button>
+                  </template>
+                  <VirgoButton label="Restore All" severity="secondary" size="small" @click="removeAllExclusions()"/>
                </div>
-            </div>
-            <template v-if="filtersUnavailable == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
-               <AccordionContent v-if="facetValuesCount(facetInfo) > 0"
-                  :id="facetInfo.id" :background=colors.grey200 :expanded="idx < 4"
-                  :closeButton="resultStore.selectedResults.pool.id != 'articles'" @close="excludeFilter(facetInfo)"
-               >
-                  <template v-slot:title>{{ facetInfo.name }}</template>
-                  <div class="facet-container">
-                     <template  v-if="facetValuesCount(facetInfo) > 5">
-                        <div class="facet-search">
-                           <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search"  aria-label="search filter values"/>
-                        </div>
-                        <div class="facet-sort">
-                           <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
-                           <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
-                        </div>
-                     </template>
-                     <div class="apply-controls" v-if="prefs.orFilterMode == 'SINGLE' && filterStore.hasPendingChanges(currPoolID) && targetFacetID == facetInfo.id">
-                        <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
-                        <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters</button> 
-                     </div>
-                     <ul :aria-labelledby="facetInfo.id">
-                        <li v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.id)">
-                           <template v-if="prefs.facetMode == 'AND'">
-                              <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
-                              <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>   
-                           </template>
-                           <template v-else>
-                              <label class="filter-check">
-                                 <!-- FIXME -->
-                                 <input type="checkbox" @change="orFilterToggled(facetInfo.id, fv)"  
-                                    :checked="fv.selected || fv.pending == 'add'" :disabled="isFacetDisabled(facetInfo.id)"
-                                 />
-                                 <span :class="{dim: isFacetDisabled(facetInfo.id)}">{{ fv.value }}</span>
-                              </label>
-                              <span :class="{dim: isFacetDisabled(facetInfo.id)}" class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>     
-                           </template>
-                        </li>
-                     </ul>
-                  </div>
-               </AccordionContent>
-            </template>
-               <AccordionContent v-if="hasFilterExclusions" id="filter-exclusions" :background=colors.grey200 :expanded="false" >
-                  <template v-slot:title>Excluded Filters</template>
-                  <div class="excluded-list">
-                     <template  v-for="filter in excludedFilters" :key="`${filter}-exclusion`">
-                        <button class="remove" :aria-label="`Restore ${filter.value} filter`" @click="removeExclusion(filter)" :title="`Restore ${filter.name} filter`">
-                           <i class="fas fa-times-circle"></i>
-                           <span>{{ filter.name }}</span>
-                        </button>
-                     </template>
-                     <VirgoButton label="Restore All" severity="secondary" size="small" @click="removeAllExclusions()"/>
-                  </div>
-               </AccordionContent>
-         </div>
-      </AccordionContent>
-   </section>
+            </AccordionContent>
+      </div>
+   </div>
    <div v-else class="padding"></div>
 </template>
 
@@ -141,7 +143,7 @@ const user = useUserStore()
 const prefs = usePreferencesStore()
 const confirm = useConfirm()
 
-const filterPrefsOpen = ref(false)
+const showSettings = ref(false)
 const targetFacetID = ref("")
 
 const showSidebar = computed(() => {
@@ -382,16 +384,43 @@ const filterSelected = ((facetID, facetValue) => {
 }
 .facet-sidebar {
    margin: 0px 0px 15px 0px;
-   flex: 1 1 25%;
-   min-width: 370px;
-   max-width: 400px;
-   
+   min-width: 400px;   
+   max-width: 400px;    
    position: relative;
    top: -1px;
    left: -1px;
-   :deep(.accordion) {
-      h3 {
-         padding: 5px 0 5px 5px;
+
+   .header {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      align-items: center;
+      background: $uva-grey-200;
+      border: 1px solid $uva-grey-100;
+      padding: 10px 10px 8px 10px;
+      .controls {
+         display: flex;
+         flex-flow: row nowrap;  
+         justify-content: flex-end;
+         gap: 5px;
+         button {
+            cursor: pointer;
+            border-radius: 20px;
+            border: 1px dotted transparent;
+            padding: 2px;
+            &:hover {
+               border-color: $uva-grey;
+               background-color: white;
+            }
+            &:focus {
+               outline: 2px dotted $uva-brand-blue-100;
+               outline-offset: 3px;
+            }
+            i {
+               font-size: 1.4em;  
+               padding: 0; 
+            }
+         }
       }
    }
 
@@ -405,7 +434,11 @@ const filterSelected = ((facetID, facetValue) => {
       flex-flow: row wrap;
       justify-content: space-between;
       align-items: center;
-      padding-top: 10px;
+      border: 1px solid $uva-grey-100;
+      border-top: 0;
+      border-bottom-width: 3px;
+      padding: 10px;
+      background-color: white;
    }
 
    .body {

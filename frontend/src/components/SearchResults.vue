@@ -13,15 +13,15 @@
          <div class="results-main">
             <div class="pool-tabs">
                <div class="tab" v-for="(r,idx) in sourceTabs" :key="idx" :class="{showing: idx == resultStore.selectedResultsIdx}">
-                  <button v-if="canExclude(r.pool.id)" :aria-label="`exclude ${r.pool.name}`" :title="`exclude ${r.pool.name}`" 
-                     class="exclude" @click="excludePoolClicked(r.pool)">
-                     <i  class="fal fa-xmark"></i>
-                  </button>
-                  <button class="pool" @click="poolSelected(r.pool.id)" :class="{padded: canExclude(r.pool.id)==false}">
+                  <button class="pool" @click="poolSelected(r.pool.id)">
                      <span>
                         <div class="name">{{r.pool.name}}</div>
                         <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
                      </span>
+                  </button>
+                  <button v-if="canExclude(r.pool.id)" :aria-label="`exclude ${r.pool.name}`" :title="`exclude ${r.pool.name}`" 
+                     class="exclude" @click="excludePoolClicked(r.pool)">
+                     <i  class="fal fa-xmark"></i>
                   </button>
                </div>
                <OtherPoolsPicker v-if="showMore" @selected="poolSelected" />
@@ -124,6 +124,8 @@ const excludePoolClicked = ( (pool) => {
          resultStore.selectPoolResults(0) // catalog is always 0
          queryStore.targetPool = resultStore.results[0].pool.id
          resultStore.dropResults( pool.id )
+         queryStore.targetPool = "uva_library"
+         routeUtils.poolChanged()
       }
    })
 })
@@ -218,7 +220,7 @@ const poolSelected = (( poolID ) => {
                }
             }
             .pool {
-               padding: 8px 8px 10px 0;
+               padding: 8px 8px 10px 12px;
                background: transparent;
                border: none;
                flex-grow: 1;
@@ -228,9 +230,6 @@ const poolSelected = (( poolID ) => {
                   margin: 0;
                   font-weight: normal;
                }
-            }
-            .pool.padded {
-               padding-left: 12px;
             }
          }
          .tab.showing {

@@ -6,15 +6,15 @@
    >
       <template #value>
          <div v-if="selectedPoolID" class="more-selection">
+            <div class="identity">
+               <div class="poolname">{{ selection.pool.name }}</div>
+               <div class="total">({{  selection.total }})</div>
+            </div>
             <button :aria-label="`exclude ${selection.pool.name}`" :title="`exclude ${selection.pool.name}`" 
                class="exclude" @click="excludePoolClicked($event, selection.pool)"
             >
                <i  class="fal fa-xmark"></i>
             </button>
-            <div class="identity">
-               <div class="poolname">{{ selection.pool.name }}</div>
-               <div class="total">({{  selection.total }})</div>
-            </div>
          </div>
          <div v-else class="more">More</div>
       </template>
@@ -113,6 +113,8 @@ const excludePoolClicked = ( (event, pool) => {
          resultStore.selectPoolResults(0) // catalog is always 0
          queryStore.targetPool = resultStore.results[0].pool.id
          resultStore.dropResults( pool.id )
+         queryStore.targetPool = "uva_library"
+         routeUtils.poolChanged()
       }
    })
 })
@@ -161,7 +163,7 @@ const poolSkipped = ((p) => {
 .more-selection {
    display: flex;
    flex-flow: row nowrap;
-   gap: 10px;
+   justify-content: space-between;
    .exclude {
       color: white;
       font-size: 1.2rem;
@@ -170,6 +172,7 @@ const poolSkipped = ((p) => {
       border-radius: 25px;
       background: none;
       border: 2px dotted transparent;
+      margin-right:5px;
       &:focus, &:hover {
          border-color: white;
          outline: none;
