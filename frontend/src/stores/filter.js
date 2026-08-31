@@ -44,6 +44,39 @@ export const useFilterStore = defineStore('filter', {
          }
       },
 
+      hasPendingChanges: (state) => {
+         return (poolID) => {
+            let pfObj = state.facets.find( pf => pf.pool == poolID)
+            if (!pfObj) return false
+            let pending = false 
+            pfObj.facets.some( f => {
+               f.buckets.some( bucket => {
+                  if ( bucket.pending == "add" || bucket.pending == "remove" ) {
+                     pending = true
+                  }
+                  return pending == true
+               })
+               return pending == true
+            })
+            return pending
+         }   
+      },
+      pendingChangeCount: (state) => {
+         return (poolID) => {
+            let pfObj = state.facets.find( pf => pf.pool == poolID)
+            if (!pfObj) return 0
+            let pending = 0 
+            pfObj.facets.forEach( f => {
+               f.buckets.forEach( bucket => {
+                  if ( bucket.pending == "add" || bucket.pending == "remove" ) {
+                     pending++
+                  }
+               })
+            })
+            return pending
+         }   
+      },
+
       poolFilter: (state) => {
          return (poolID) => {
             let pfObj = state.facets.find( pf => pf.pool == poolID)
@@ -251,6 +284,7 @@ export const useFilterStore = defineStore('filter', {
 
                // if this is in the preserved selected items, select it and remove from saved list
                facet.buckets.forEach( fb => {
+                  fb.pending = ""
                   let idx = selected.findIndex( s => facet.id == s.facet_id && fb.value == s.value )
                   if ( idx > -1) {
                      fb.selected  = true
@@ -269,23 +303,57 @@ export const useFilterStore = defineStore('filter', {
             }
          })
 
-         selected.forEach( s => {
-            let nafIdx = tgtFacets.findIndex( f => f.id == s.facet_id)
-            let naf = null
-            if ( nafIdx == -1) {
-               naf = {id: s.facet_id, na: true, buckets: []}
-               nafIdx = tgtFacets.length
-            } else {
-               naf = tgtFacets[nafIdx]
-            }
-            naf.buckets.push({value: s.value, selected: true, na: true})
-            tgtFacets.splice(nafIdx, 1, naf)
-         })
-
          tgtFacets = tgtFacets.sort( (a,b) => {
                if (a.sequence > b.sequence) return 1
                if (a.sequence < b.sequence) return -1
                return 0
+         })
+      },
+
+      // In OR mode, selected filters are not immediately applied. Depending upon current selected
+      // status, flag a bucket (filter) as pending add or remove. When the changes are applied, the 
+      // pending status will be conted into selected or not selected
+      togglePendingOrFilter(pool, facetID, facetValue) {
+         let pfObj = this.facets.find(pf => pf.pool == pool)
+         let facetInfo = pfObj.facets.find(f => f.id === facetID)
+         let bucket = facetInfo.buckets.find( b=> b.value == facetValue.value )
+         if (bucket.selected) {
+            if (bucket.pending == "") {
+               bucket.pending = "remove"
+            } else {
+               bucket.pending = ""
+            }
+         } else {
+             if (bucket.pending == "") {
+               bucket.pending = "add"
+            } else {
+               bucket.pending = ""
+            } 
+         }
+      },
+      cancelPendingChanges(pool) {
+         let pfObj = this.facets.find(pf => pf.pool == pool)
+         if ( !pfObj) return 
+         pfObj.facets.forEach( f => {
+            f.buckets.forEach( bucket => {
+               bucket.pending = ""
+            })
+         })
+      },
+      applyPendingChanges(pool) {
+         let pfObj = this.facets.find(pf => pf.pool == pool)
+         if ( !pfObj) return 
+         pfObj.facets.forEach( facet => {
+            facet.buckets.forEach( bucket => {
+               if (bucket.pending == "add") {
+                  analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facet.id}:${bucket.value}`)
+                  bucket.selected = true
+               } else if (bucket.pending == "remove") {
+                  bucket.selected = false
+                  analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facet.id}:${bucket.value}`)
+               }
+               bucket.pending = ""
+            })
          })
       },
 

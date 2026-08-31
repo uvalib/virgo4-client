@@ -35,11 +35,11 @@
             </div>
          </template>
          <div class="body">
-            <div class="apply-controls floating" v-if="prefs.orFilterMode != 'SINGLE' && orFilters.length > 0">
+            <div class="apply-controls floating" v-if="showGlobalFilterControls">
                <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
-               <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ orFilters.length }} filters</button> 
+               <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters</button> 
             </div>
-            <AppliedFilters v-if="appliedFiltersCount > 0" />
+            <AppliedFilters v-if="appliedFiltersCount > 0 && showGlobalFilterControls == false" />
             <DateFilter v-if="canDateFilter && filtersUnavailable == false && filterStore.updatingFacets == false" />
             <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
                <div class="working">
@@ -65,9 +65,9 @@
                            <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
                         </div>
                      </template>
-                     <div class="apply-controls" v-if="prefs.orFilterMode == 'SINGLE' && orFilters.length > 0  && targetFacetID == facetInfo.id">
+                     <div class="apply-controls" v-if="prefs.orFilterMode == 'SINGLE' && filterStore.hasPendingChanges(currPoolID) && targetFacetID == facetInfo.id">
                         <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
-                        <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ orFilters.length }} filters</button> 
+                        <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters</button> 
                      </div>
                      <ul :aria-labelledby="facetInfo.id">
                         <li v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.id)">
@@ -77,8 +77,9 @@
                            </template>
                            <template v-else>
                               <label class="filter-check">
-                                 <input type="checkbox" @change="orFilterToggled(facetInfo.id, fv)" 
-                                    :checked="orFilters.includes(fv)" :disabled="isFacetDisabled(facetInfo.id)"
+                                 <!-- FIXME -->
+                                 <input type="checkbox" @change="orFilterToggled(facetInfo.id, fv)"  
+                                    :checked="fv.selected || fv.pending == 'add'" :disabled="isFacetDisabled(facetInfo.id)"
                                  />
                                  <span :class="{dim: isFacetDisabled(facetInfo.id)}">{{ fv.value }}</span>
                               </label>
@@ -142,7 +143,6 @@ const confirm = useConfirm()
 
 const filterPrefsOpen = ref(false)
 const targetFacetID = ref("")
-const orFilters = ref([])
 
 const showSidebar = computed(() => {
    // main reasons not to show: if no facet support, user closed the sidebar or an error
@@ -153,6 +153,12 @@ const showSidebar = computed(() => {
    
    // there are no results, but there may be applied filters that caused this. Need to show so user can cancel
    return ( appliedFiltersCount.value > 0)
+})
+const showGlobalFilterControls = computed(() => {
+   return prefs.orFilterMode != 'SINGLE' && filterStore.hasPendingChanges(currPoolID.value)
+})
+const currPoolID = computed(()=>{
+   return resultStore.selectedResults.pool.id
 })
 const facets = computed(()=>{
    return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true)
@@ -203,11 +209,19 @@ const facetValuesCount = ((facet) => {
 const facetValues = ((facet) => {
    if (!facet.buckets) return []
 
-   // if a search is applied exclude values that do not match
-   if (facet.search.length > 0) {
-      return facet.buckets.filter(b=> b.value && b.selected == false && b.value.toLowerCase().indexOf(facet.search.toLowerCase()) == 0 )
+   if ( prefs.facetMode == "AND") {
+      // if a search is applied exclude values that do not match
+      if (facet.search.length > 0) {
+         return facet.buckets.filter(b=> b.value && b.selected == false && b.value.toLowerCase().indexOf(facet.search.toLowerCase()) == 0 )
+      }
+      return facet.buckets.filter(b=> b.value && b.selected == false)
    }
-   return facet.buckets.filter(b=> b.value && b.selected == false)
+
+   // in OR mode, there are checkboxes next to values. Leave the selected values in the list whith a check
+   if (facet.search.length > 0) {
+      return facet.buckets.filter(b=> b.value && b.value.toLowerCase().indexOf(facet.search.toLowerCase()) == 0 )
+   }
+   return facet.buckets.filter(b=> b.value)
 })
 
 const valueKey = ((idx, facetID) => {
@@ -221,14 +235,11 @@ const isFacetDisabled = ( (facetID)  => {
 })
 const cancelOrFilter = (() => {
    targetFacetID.value = ""    
-   orFilters.value = []
+   filterStore.cancelPendingChanges(resultStore.selectedResults.pool.id)
 })
 
 const applyOrFilter = ( () => {
-   orFilters.value.forEach( f => {
-      f.selected = true    
-      analytics.trigger('Filters', 'SEARCH_FILTER_SET', f.value)
-   })
+   filterStore.applyPendingChanges(resultStore.selectedResults.pool.id)
    routeUtils.filterChanged()
    scrollToItem("results-container", true)
    cancelOrFilter()
@@ -243,13 +254,8 @@ const autoCloseSidebar = (() => {
 })
 
 const orFilterToggled = ( (facetID, filter) => {
-   const idx = orFilters.value.findIndex( f => f.value == filter.value)
-   if ( idx == -1 ) {
-      orFilters.value.push( filter )   
-   } else {
-      orFilters.value.splice(idx,1)
-   }
-   if (orFilters.value.length > 0 && prefs.orFilterMode == 'SINGLE' ) {
+   filterStore.togglePendingOrFilter(resultStore.selectedResults.pool.id, facetID, filter)
+   if (prefs.orFilterMode == 'SINGLE' ) {
       targetFacetID.value = facetID
    }
 })
