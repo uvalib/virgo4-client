@@ -9,9 +9,10 @@ export const usePreferencesStore = defineStore('preferences', {
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       searchExclusions: [],
-      filters: {},      // key is poolID, value [{id, sortType, sortOrder, excluded, sequence}]
-      facetMode: "OR",  // boolean operation for combining facet values. OR was the original mode, so set it as default
-      sort: {},         // default sort order for each pool; ket is poolID, value is sort order (ex: SortRelevance_desc)
+      filters: {},            // key is poolID, value [{id, sortType, sortOrder, excluded, sequence}]
+      facetMode: "OR",        // boolean operation for combining facet values. OR was the original mode, so set it as default
+      orFilterMode: "SINGLE", // apply values for one filter at a time (SINGLE) of any (ALL)
+      sort: {},               // default sort order for each pool; ket is poolID, value is sort order (ex: SortRelevance_desc)
       collapseGroups: false,
       collapseDetails: false,
       aiDebug: false,
@@ -130,6 +131,7 @@ export const usePreferencesStore = defineStore('preferences', {
             this.filters = prefsObj.filters
          }
          this.facetMode = prefsObj.facetMode || "OR"
+         this.orFilterMode = prefsObj.orFilterMode || "SINGLE"
          this.sort =  prefsObj.sort || {}
 
          this.aiDebug = prefsObj.aiDebug || false
@@ -309,6 +311,7 @@ export const usePreferencesStore = defineStore('preferences', {
             searchExclusions: this.searchExclusions,
             filters: this.filters,
             facetMode: this.facetMode,
+            orFilterMode: this.orFilterMode,
             sort: this.sort,
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,

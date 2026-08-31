@@ -7,7 +7,7 @@
          :borderColor=colors.grey100 
          :hasSettings="true" :showSettings="filterPrefsOpen" @settingsClicked="filterPrefsOpen = !filterPrefsOpen"
       >
-         <template v-slot:title>Refine your results</template>
+         <template v-slot:title>Refine your result</template>
          <template v-slot:settings>
             <div class="settings">
                <FacetMode/>
@@ -19,10 +19,23 @@
                      <li>OR returns materials in either English or French.</li>
                   </ul>
                </div>
+               <div class="note">
+                  <label>
+                     OR Filter application mode:
+                     <select v-model="prefs.orFilterMode"  @change="prefs.save()">
+                        <option value="SINGLE">Single</option>
+                        <option value="ALL">All</option>
+                     </select>
+                     <p>
+                     In Single mode, filter values are applied for one filter at a time. <br/>
+                     In All mode, filters values from all filters can be applied at once.
+                     </p>
+                  </label>
+               </div>
             </div>
          </template>
          <div class="body">
-            <div class="apply-controls floating" v-if="orFilterMode != 'SINGLE' && orFilters.length > 0">
+            <div class="apply-controls floating" v-if="prefs.orFilterMode != 'SINGLE' && orFilters.length > 0">
                <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
                <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ orFilters.length }} filters</button> 
             </div>
@@ -52,13 +65,13 @@
                            <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
                         </div>
                      </template>
-                     <div class="apply-controls" v-if="orFilterMode == 'SINGLE' && orFilters.length > 0  && targetFacetID == facetInfo.id">
+                     <div class="apply-controls" v-if="prefs.orFilterMode == 'SINGLE' && orFilters.length > 0  && targetFacetID == facetInfo.id">
                         <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
                         <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ orFilters.length }} filters</button> 
                      </div>
                      <ul :aria-labelledby="facetInfo.id">
                         <li v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.id)">
-                           <template v-if="preferences.facetMode == 'AND'">
+                           <template v-if="prefs.facetMode == 'AND'">
                               <button class="filter" @click="filterSelected(facetInfo.id, fv)">{{fv.value}}</button>
                               <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>   
                            </template>
@@ -124,17 +137,12 @@ const filterStore = useFilterStore()
 const poolStore = usePoolStore()
 const queryStore = useQueryStore()
 const user = useUserStore()
-const preferences = usePreferencesStore()
+const prefs = usePreferencesStore()
 const confirm = useConfirm()
 
 const filterPrefsOpen = ref(false)
 const targetFacetID = ref("")
 const orFilters = ref([])
-
-// NOTES: All logic is in place to support adding filter values across all filter categories
-// Switch the comment below to change how it works.
-//const orFilterMode = "ALL"
-const orFilterMode = "SINGLE"
 
 const showSidebar = computed(() => {
    // main reasons not to show: if no facet support, user closed the sidebar or an error
@@ -166,10 +174,10 @@ const appliedFiltersCount = computed(()=>{
    return cnt
 })
 const excludedFilters = computed(() =>{
-   return preferences.filterExclusions(resultStore.selectedResults.pool.id)  
+   return prefs.filterExclusions(resultStore.selectedResults.pool.id)  
 })
 const hasFilterExclusions = computed(()=>{
-   return preferences.filterExclusions(resultStore.selectedResults.pool.id).length > 0
+   return prefs.filterExclusions(resultStore.selectedResults.pool.id).length > 0
 })
 const canDateFilter = computed(() => {
    if (resultStore.selectedResults.pool.mode == 'image') return false
@@ -195,6 +203,7 @@ const facetValuesCount = ((facet) => {
 const facetValues = ((facet) => {
    if (!facet.buckets) return []
 
+   // if a search is applied exclude values that do not match
    if (facet.search.length > 0) {
       return facet.buckets.filter(b=> b.value && b.selected == false && b.value.toLowerCase().indexOf(facet.search.toLowerCase()) == 0 )
    }
@@ -206,8 +215,8 @@ const valueKey = ((idx, facetID) => {
 })
 
 const isFacetDisabled = ( (facetID)  => {
-   if ( orFilterMode != 'SINGLE' ) return false
-   if (targetFacetID.value == "") return false 
+   if ( prefs.orFilterMode != 'SINGLE' ) return false
+   if ( targetFacetID.value == "" ) return false 
    return ( targetFacetID.value != facetID)
 })
 const cancelOrFilter = (() => {
@@ -240,20 +249,20 @@ const orFilterToggled = ( (facetID, filter) => {
    } else {
       orFilters.value.splice(idx,1)
    }
-   if (orFilters.value.length > 0 && orFilterMode == 'SINGLE' ) {
+   if (orFilters.value.length > 0 && prefs.orFilterMode == 'SINGLE' ) {
       targetFacetID.value = facetID
    }
 })
 
 const removeExclusion = ((facetInfo) => {
    const poolID = resultStore.selectedResults.pool.id
-   preferences.toggleFilterExclusion(poolID, facetInfo)
+   prefs.toggleFilterExclusion(poolID, facetInfo)
    filterStore.getSelectedResultFacets(true)
    analytics.trigger('Filters', 'EXCLUSION_REMOVED', facetInfo.id)
 })
 
 const removeAllExclusions = (() => {
-   preferences.resetFilterExclusions( resultStore.selectedResults.pool.id )
+   prefs.resetFilterExclusions( resultStore.selectedResults.pool.id )
    filterStore.getSelectedResultFacets(true)  
    analytics.trigger('Filters', 'EXCLUSIONS_RESET', "")
    scrollToItem("results-container", true)
@@ -281,7 +290,7 @@ const excludeFilter = ( (facetInfo) => {
          })
          
          const poolID = resultStore.selectedResults.pool.id
-         preferences.toggleFilterExclusion(poolID, facetInfo)
+         prefs.toggleFilterExclusion(poolID, facetInfo)
          filterStore.excludePoolFacet(poolID, facetInfo.id)
          analytics.trigger('Filters', 'FILTER_EXCLUDED', facetInfo.id)
          if ( cleared ) {
@@ -292,7 +301,7 @@ const excludeFilter = ( (facetInfo) => {
 })
 
 const setFacetOrder = ( async (sequenced ) => {
-   await preferences.setFilterSequence(resultStore.selectedResults.pool.id, sequenced)
+   await prefs.setFilterSequence(resultStore.selectedResults.pool.id, sequenced)
    filterStore.setPoolFilterSequence(resultStore.selectedResults.pool.id, sequenced )
    analytics.trigger('Filters', 'SEQUENCE_CHANGED', "")
    
@@ -301,12 +310,12 @@ const setFacetOrder = ( async (sequenced ) => {
 const setFilterSort = ((filter, sortType) => {
    const poolID = resultStore.selectedResults.pool.id
    
-   // see if preferences have been saved; this returns an object with fields sort and order
-   let tgtInfo = preferences.filterSort(poolID, filter.id)
+   // see if prefs have been saved; this returns an object with fields sort and order
+   let tgtInfo = prefs.filterSort(poolID, filter.id)
    if (!tgtInfo) {
-      // no preferences set, find the target facet in the pool facet store
+      // no prefs set, find the target facet in the pool facet store
       // this facet also includes fields sort and order so it can be used the same as the 
-      // preferences response
+      // prefs response
       tgtInfo = filterStore.poolFacets(poolID).find(f => f.id == filter.id)
    }
 
@@ -321,7 +330,7 @@ const setFilterSort = ((filter, sortType) => {
       }
    }
    if ( user.isSignedIn) {
-      preferences.setFilterSort(poolID, filter, sortType, order)
+      prefs.setFilterSort(poolID, filter, sortType, order)
    }
    filterStore.setSortOrder(resultStore.selectedResults.pool.id, filter.id, sortType, order)
    analytics.trigger('Filters', 'FILTER_SORT_CHANGED', `${filter.id}:${sortType}_${order}`)

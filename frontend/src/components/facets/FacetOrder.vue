@@ -10,7 +10,7 @@
          </template>
       </OrderList>
       <template #footer>
-         <VirgoButton severity="secondary" @click="showDialog = true" label="Cancel"/>
+         <VirgoButton severity="secondary" @click="showDialog = false" label="Cancel"/>
          <VirgoButton @click="applyClicked" label="Apply"/>
       </template>
    </Dialog>
