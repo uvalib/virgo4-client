@@ -233,7 +233,8 @@ const valueKey = ((idx, facetID) => {
 const isFacetDisabled = ( (facetID)  => {
    if ( prefs.orFilterMode != 'SINGLE' ) return false
    if ( targetFacetID.value == "" ) return false 
-   return ( targetFacetID.value != facetID)
+   if ( targetFacetID.value == facetID) return false
+   return filterStore.hasPendingChanges(resultStore.selectedResults.pool.id)
 })
 const cancelOrFilter = (() => {
    targetFacetID.value = ""    
