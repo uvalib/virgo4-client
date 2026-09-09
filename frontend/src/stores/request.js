@@ -211,7 +211,7 @@ export const useRequestStore = defineStore('request', {
          formData.append('file', file)
          formData.append('userID', user.signedInUser)
          formData.append('userName', user.accountInfo.displayName)
-         formData.append('email', user.email)
+         formData.append('email', user.accountInfo.email)
          formData.append('course', req.course)
          formData.append('work', req.work)
          formData.append('title', req.title)
