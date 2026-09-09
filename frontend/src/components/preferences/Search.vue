@@ -16,13 +16,13 @@
       </div>
       <div class="grouping">
          <p>
-            By default, lengthy item details are truncated and can be viewed in full by clicking a more button or link.
-            Check the box below to show full details.
+            By default, lengthy item details are shown in full. Check the box below to collapse details into a smaller subset of data. 
+            In this case, full details can be viewed by clicking the 'Show more details' button.
          </p>
          <div class="check">
             <label>
-               <input id="full-detail-pref" @change="fullDetailClicked" class="choice" :checked="preferences.expandDetails" type="checkbox"
-                  aria-label="toggle display of full item details"/>Expand Item Details
+               <input id="full-detail-pref" @change="detailToggleClicke" class="choice" :checked="preferences.collapseDetails" type="checkbox"
+                  aria-label="toggle display of full item details"/>Collapse Item Details
             </label>
             <Message variant="simple" severity="success" v-if="saved=='expand'" :life="2000" >Saved</Message>
          </div>
@@ -36,7 +36,7 @@
             </label>
          </div>
          <Message  v-if="saved =='exclude'" :life="2000" variant="simple" severity="success">Saved</Message>
-       </div>
+      </div>
    </div>
 </template>
 
@@ -63,7 +63,6 @@ const toggleSearchExclude = ( async (poolID) => {
    await preferences.toggleSearchExclusion(poolID)
    saved.value = "exclude"
    setTimeout( ()=>{ saved.value = "" }, 2100)
-   queryStore.searchSources  = "all"
    if (preferences.isPoolExcluded(poolID)) {
       analytics.trigger('Preferences', 'ADD_POOL_EXCLUSION', poolID)
    } else {
@@ -71,8 +70,8 @@ const toggleSearchExclude = ( async (poolID) => {
    }
 })
 
-const fullDetailClicked = ( async () => {
-   await preferences.toggleExpandDetails()
+const detailToggleClicke = ( async () => {
+   await preferences.toggleCollapseDetails()
    saved.value = "expand"
    setTimeout( ()=>{ saved.value = "" }, 2100)
 })
@@ -109,6 +108,21 @@ const fullDetailClicked = ( async () => {
       label, input {
          cursor: pointer;
       }
+   }
+   div.filters {
+      margin-top: 10px;
+   }
+}
+@media only screen and (min-width: 768px) {
+   div.filters {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.filters {
+      display: flex;
+      flex-direction: column;
    }
 }
 </style>

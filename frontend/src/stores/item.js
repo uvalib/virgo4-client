@@ -11,8 +11,10 @@ export const useItemStore = defineStore('item', {
       details: {searching: true, source: "", identifier:"", fields:[], related:[] },
       digitalContent: [],
       loadingDigitalContent: false,
-      availability: {searching: true, titleId: "", libraries: [], bound_with: [], error: ""},
-      primaryFields: ["author", "format", "published_date", "subject", "subject_summary"]
+      availability: {searching: true, titleId: "", libraries: [], boundWith: [], error: ""},
+      primaryFields: ["author", "format", "published_date", "subject", "subject_summary"],
+      noAuthorization: false,
+      notFound: false,
    }),
 
    getters: {
@@ -74,21 +76,7 @@ export const useItemStore = defineStore('item', {
          return state.digitalContent.length > 0
       },
       hasBoundWithItems: state => {
-         return Array.isArray(state.availability.bound_with) && state.availability.bound_with.length > 0
-      },
-      boundIn: state => {
-         if (state.availability && state.availability.bound_with){
-            return state.availability.bound_with.filter(item => item.is_parent == true)
-         }else{
-            return []
-         }
-      },
-      boundWith: state => {
-         if (state.availability && state.availability.bound_with){
-            return state.availability.bound_with.filter(item => item.is_parent == false)
-         }else{
-            return []
-         }
+         return state.availability.boundWith && state.availability.boundWith.length > 0
       }
    },
 
@@ -146,7 +134,7 @@ export const useItemStore = defineStore('item', {
          useRequestStore().clearAll()
       },
       clearAvailability() {
-        this.availability = {searching: true, titleId: '', libraries: [], bound_with: [], error: ""}
+        this.availability = {searching: true, titleId: '', libraries: [], boundWith: [], error: ""}
          useRequestStore().clearAll()
       },
       setCatalogKeyDetails(data) {
@@ -267,6 +255,8 @@ export const useItemStore = defineStore('item', {
 
       async getDetails( source, identifier ) {
          this.details.searching = true
+         this.noAuthorization = false
+         this.notFound = false
 
          // get source from poolID
          const poolStore = usePoolStore()
@@ -319,12 +309,15 @@ export const useItemStore = defineStore('item', {
             }
             this.details.searching = false
          }).catch( async (error) => {
-            if ( error.response && error.response.status == 404) {
-               console.warn(`Item ID ${identifier} not found in ${source}; try a lookup`)
-               await this.lookupCatalogKeyDetail(identifier)
+            console.log("ITEM LOOKUP FAILED")
+            console.log(error)
+            if ( error.response && error.response.status == 401) {
+               this.noAuthorization = true
+               this.details.searching = false
             } else {
                this.details.searching = false
-               useSystemStore().setError(error)
+               this.notFound = true
+               console.log(error)
             }
          })
       },
@@ -335,13 +328,20 @@ export const useItemStore = defineStore('item', {
          return axios.get(url).then((response) => {
             if (response.data) {
                this.availability.titleId = response.data.title_id
-               this.availability.bound_with = response.data.bound_with
+               this.availability.boundWith = response.data.boundWith
                this.availability.libraries = response.data.libraries
 
                // sort avvailability libraries by name
                this.availability.libraries.sort( (a,b) => {
                   if (a.name > b.name) return 1
                   if (a.name < b.name) return -1
+                  return 0
+               })
+
+                // sort boundwith by call
+               this.availability.boundWith.sort( (a,b) => {
+                  if (a.callNumber > b.callNumber) return 1
+                  if (a.callNumber < b.callNumber) return -1
                   return 0
                })
 
@@ -363,43 +363,6 @@ export const useItemStore = defineStore('item', {
          })
       },
 
-      // This is used to lookup a catalog key without a source. end result of this action is a redirect
-      async lookupCatalogKeyDetail(catalogKey) {
-         this.clearDetails()
-         this.clearAvailability()
-
-         // strip punctuation that may be lingeraing at end of key from a bad cut/paste
-         catalogKey = cleanIdentifier(catalogKey)
-
-         let req = {
-            query: `identifier: {${catalogKey}}`,
-            pagination: { start: 0, rows: 1 },
-         }
-
-         try {
-            const system = useSystemStore()
-            let response = await axios.post(`${system.searchAPI}/api/search`, req)
-            if (response.data.total_hits == 1 ) {
-               this.setCatalogKeyDetails(response.data)
-               // NOTE:  the result above only contains basic fields. the redirect below
-               // will trigger a full record get
-               let redirect = `/sources/${this.details.source}/items/${this.details.identifier}`
-               await this.router.replace(redirect)
-            } else {
-               this.clearDetails()
-               let q = `identifier: {${catalogKey}}`
-               await this.router.replace(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
-            }
-         } catch(error) {
-            this.details.searching = false
-            this.clearDetails()
-            if ( error.response && error.response.status == 404) {
-               console.warn(`Catalog Key ${catalogKey} not found`)
-               this.router.push(`/not_found`)
-            }
-         }
-      },
-
       async getCitations({format, itemURL}) {
          const system = useSystemStore()
          let url = `${system.citationsURL}/format/${format}?item=${encodeURI(itemURL)}`
@@ -407,10 +370,3 @@ export const useItemStore = defineStore('item', {
       },
    }
 })
-
-function cleanIdentifier(identifier) {
-   // strip spaces and punctuation that may be attached to an identifier that was cut and pasted
-   let clean = identifier.trim()
-   clean = clean.replace(/(:|;|,|-|"|!|'|\?|\.|\]|\))+$/, '')
-   return clean
-}

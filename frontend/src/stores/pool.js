@@ -10,7 +10,7 @@ export const usePoolStore = defineStore('pool', {
 
    getters: {
       canExcludeList: state => {
-         return state.list.filter( p => p.id != 'uva_library' && p.id != 'images').sort( (a, b)=> {
+         return state.list.filter( p => p.id != 'uva_library').sort( (a, b)=> {
             if (a.name < b.name) return -1
             if (a.name > b.name) return 1
             return 0   
@@ -88,6 +88,13 @@ export const usePoolStore = defineStore('pool', {
             return attr.supported
          }
       },
+      filters: state => {
+         return (id) => {
+            let pool = state.list.find( p => p.id == id)
+            if (!pool) return []
+            return pool.filters
+         }
+      },
       sortOptions: state => {
          return (id) => {
             let pool = state.list.find( p => p.id == id)
@@ -155,7 +162,7 @@ export const usePoolStore = defineStore('pool', {
 
    actions: {
       setPools(data) {
-         // Copy old items to preserve providers lists for each, then wipe out list
+         // Copy old items to preserve providers/filters lists for each, then wipe out list
          let old = this.list.slice()
          this.list.splice(0, this.list.length)
 
@@ -165,7 +172,7 @@ export const usePoolStore = defineStore('pool', {
 
             // no providers in new data?
             if ( !(p.providers && p.providers.length > 0) ) {
-               if (prior) {
+               if ( prior && prior.providers ) {
                   p.providers = prior.providers.slice()
                } else {
                   p.providers = []
@@ -180,10 +187,26 @@ export const usePoolStore = defineStore('pool', {
                })
             }
 
+            // no filters in new data?
+            if ( !(p.filters && p.filters.length > 0) ) {
+               if (prior && prior.filters) {
+                  p.filters = prior.filters.slice()
+               }   
+            }
+
             if (!p.sort_options) {
                p.sort_options=[]
             }
             p.primary = (p.id == "uva_library" || p.id=="images" || p.id == "articles" )
+
+            if (p.filters) {
+               p.filters = p.filters.sort( (a,b) => {
+                  if (a.name > b.name) return 1
+                  if (a.name < b.name) return -1
+                  return 0
+               })
+            }
+            
             this.list.push(p)
          })
       },
@@ -192,10 +215,14 @@ export const usePoolStore = defineStore('pool', {
          const system = useSystemStore()
          this.lookingUp = true
          await axios.get( `${system.searchAPI}/api/pools` ).then( response => {
-            this.setPools(response.data)
             this.lookingUp = false
-            if (this.list.length == 0) {
+            if ( !response.data ) {
                system.setFatal("No search sources found")
+            } else {
+               this.setPools(response.data)
+               if (this.list.length == 0) {
+                  system.setFatal("No search sources found")
+               }
             }
          }).catch ( error => {
             system.setFatal(error)

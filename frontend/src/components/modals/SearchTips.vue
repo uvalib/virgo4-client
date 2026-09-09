@@ -1,6 +1,6 @@
 <template>
    <div id="search-tips">
-      <VirgoButton severity="secondary" variant="outlined" @click="showDialog = true" label="Help me search"/>
+      <VirgoButton severity="secondary" variant="link" style="padding:0" @click="showDialog = true" label="Help me search"/>
       <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Help me search" :draggable="false" @show="tipsOpened">
          <div class="tips">
             <div class="section">How to search</div>

@@ -161,8 +161,9 @@ const dialogOpened = (() => {
          }
       }
 
-      let pubDate = item.details.fields.find( f=>f.name=="published_date")
-      if (pubDate) {
+      let pubDate = item.details.fields.find( f=>f.name == "published_date")
+      if (pubDate && pubDate.value.trim().length == 4) {
+         // only pre-popuate year-like data
          scan.value.year = pubDate.value
       }
    }

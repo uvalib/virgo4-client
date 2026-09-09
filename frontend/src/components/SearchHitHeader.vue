@@ -112,12 +112,12 @@ const detailClicked = (() => {
       flex-flow: row nowrap;
       margin-top: 2px;
       margin-right: 5px;
-      align-items: baseline;
+      align-items: center;
 
       .count {
          display: inline-block;
          font-size: 0.7em;
-         color: $uva-grey;
+         color: $uva-grey-B !important;
       }
    }
 }

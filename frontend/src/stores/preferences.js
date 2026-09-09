@@ -9,8 +9,12 @@ export const usePreferencesStore = defineStore('preferences', {
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       searchExclusions: [],
+      filters: {},            // key is poolID, value [{id, sortType, sortOrder, excluded, sequence}]
+      facetMode: "OR",        // boolean operation for combining facet values. OR was the original mode, so set it as default
+      orFilterMode: "SINGLE", // apply values for one filter at a time (SINGLE) of any (ALL)
+      sort: {},               // default sort order for each pool; ket is poolID, value is sort order (ex: SortRelevance_desc)
       collapseGroups: false,
-      expandDetails: false,
+      collapseDetails: false,
       aiDebug: false,
       aiFeatures: [],
       aiModel: "default",
@@ -33,6 +37,56 @@ export const usePreferencesStore = defineStore('preferences', {
            return state.searchExclusions.includes(poolID)
          }
       },
+      poolSort:  state => {
+         return (poolID) => {
+            return state.sort[poolID]
+         }
+      },
+      filterSort: state => {
+         return (poolID, fID) => {
+            let filterPrefs = state.filters[poolID]
+            if (!filterPrefs) return null
+
+            const tgt = filterPrefs.find(f => f.id == fID)
+            if (tgt ) {
+               return { sort: tgt.sortType, order: tgt.sortOrder}
+            }
+            return null
+         }
+      },
+      filterExclusions: state => {
+         return (poolID) => {
+            let filterPrefs = state.filters[poolID]
+            if (!filterPrefs) return []
+            let exclusions = []
+            filterPrefs.forEach( fp => {
+               if (fp.excluded) {
+                  exclusions.push({id:fp.id, name:fp.name})
+               }
+            })
+            return exclusions
+         }
+      },
+      filterSequence: state => {
+         return (poolID) => {
+            let filterPrefs = state.filters[poolID]
+            if (!filterPrefs) return []
+            return filterPrefs.map( f => ({id: f.id, sequence: f.sequence}))
+         }
+      },
+      isFilterExcluded: state => {
+         return (poolID, fID) => {
+            let filterPrefs = state.filters[poolID]
+            if (!filterPrefs) return false
+
+            const tgt = filterPrefs.find(f => f.id == fID)
+            if (!tgt) return false
+            return tgt.excluded
+         }
+      },
+      expandDetails: state => {
+         return !state.collapseDetails
+      }
    },
 
    actions: {
@@ -40,8 +94,8 @@ export const usePreferencesStore = defineStore('preferences', {
          if (prefsObj.collapseGroups ) {
             this.collapseGroups = prefsObj.collapseGroups
          }
-         if (prefsObj.expandDetails ) {
-            this.expandDetails = prefsObj.expandDetails
+         if (prefsObj.collapseDetails ) {
+            this.collapseDetails = prefsObj.collapseDetails
          }
          if ( prefsObj.trackingOptOut) {
             const { cookies } = useCookies()
@@ -70,6 +124,15 @@ export const usePreferencesStore = defineStore('preferences', {
          }
 
          this.searchExclusions = prefsObj.searchExclusions || []
+
+         // original implementation stored filter settings an an array. IGNORE this
+         this.filters = {}
+         if ( prefsObj.filters && Array.isArray(prefsObj.filters) == false ) {
+            this.filters = prefsObj.filters
+         }
+         this.facetMode = prefsObj.facetMode || "OR"
+         this.orFilterMode = prefsObj.orFilterMode || "SINGLE"
+         this.sort =  prefsObj.sort || {}
 
          this.aiDebug = prefsObj.aiDebug || false
          this.aiFeatures = prefsObj.aiFeatures || []
@@ -115,12 +178,98 @@ export const usePreferencesStore = defineStore('preferences', {
          }
          await this.save()
       },
+      async setPoolSort( poolID, sortStr ) {
+         this.sort[poolID] = sortStr
+         await this.save()
+      },
+      async setFilterSequence( poolID, sequencedFilters ) {
+         // see if any filter preferences exist for this pool. 
+         let filterPrefs = this.filters[poolID]
+         if ( !filterPrefs) {
+            // none exist; create empty array
+            filterPrefs = []
+         }
+         sequencedFilters.forEach( (fSeq,idx) => {
+            let tgtF = filterPrefs.find(f => f.id == fSeq.id)
+            if (tgtF) {
+               tgtF.sequence = (idx+1)
+            } else {
+               let newF = {id: fSeq.id, name: fSeq.name, excluded: false, sequence: (idx+1)} 
+               filterPrefs.push(newF)    
+            }    
+         })
+
+         // update the pool filter preferences with the updated array and save changes
+         this.filters[poolID] = filterPrefs
+         await this.save()
+      },
+      async setFilterSort(poolID, filter, sortType, order) {
+         // see if any filter preferences exist for this pool. 
+         let filterPrefs = this.filters[poolID]
+         if ( !filterPrefs) {
+            // none exist; create empty array
+            filterPrefs = []
+         }
+
+         // see if the target filter has preferences aeady
+         let tgtF = filterPrefs.find(f => f.id == filter.id)
+         if (tgtF) {
+            // already set; just update
+            tgtF.sortType = sortType 
+            tgtF.sortOrder = order
+            tgtF.name = filter.name
+         } else {
+            // create a new setting and add it to the array of opreferences
+            let newF = {id: filter.id, name: filter.name, excluded: false, sortType: sortType, sortOrder: order} 
+            filterPrefs.push(newF)  
+         }
+
+         // update the pool filter preferences with the updated array and save changes
+         this.filters[poolID] = filterPrefs
+         await this.save()
+      },
+      async toggleFilterExclusion( poolID, filter ) {
+         // see if any filter preferences exist for this pool. 
+         let filterPrefs = this.filters[poolID]
+         if ( !filterPrefs ) {
+            // none exist; create empty array
+            filterPrefs = []
+         }
+
+         // see if preferences exis for the target filter
+         let tgtF = filterPrefs.find(f => f.id == filter.id)
+         if (tgtF) {
+            // toggle existing preference
+            tgtF.excluded = !tgtF.excluded
+            tgtF.name = filter.name
+         } else {
+            // add a new exclusion to the settings
+            let newF = {id: filter.id, name: filter.name, excluded: true} 
+            filterPrefs.push(newF)
+         }
+
+         // update the pool filter preferences with the updated array and save changes
+         this.filters[poolID] = filterPrefs
+         await this.save()
+      },
+      async updateFacetJoinMode() {
+         await this.save()
+      },
+      async resetFilterExclusions(poolID) {
+         let filterPrefs = this.filters[poolID]
+         if (!filterPrefs) return 
+         filterPrefs.forEach( f => {
+            f.excluded = false
+         })
+         this.filters[poolID] = filterPrefs
+         await this.save()
+      },
       async toggleCollapseGroups() {
          this.collapseGroups = !this.collapseGroups
          await this.save()
       },
-      async toggleExpandDetails() {
-         this.expandDetails = !this.expandDetails
+      async toggleCollapseDetails() {
+         this.collapseDetails = !this.collapseDetails
          await this.save()
       },
       async updatePickupLibrary( pl ) {
@@ -133,7 +282,7 @@ export const usePreferencesStore = defineStore('preferences', {
             await this.save()
          }
       },
-      async load() { // TODO CHECK THOS
+      async load() { 
          const userStore = useUserStore()
          let url = `/api/users/${userStore.signedInUser}/preferences`
          await axios.get(url).then((response) => {
@@ -145,14 +294,25 @@ export const usePreferencesStore = defineStore('preferences', {
       },
       async save() {
          const userStore = useUserStore()
+
+         // don't attempt any saves if user is not signed in
+         if (userStore.isSignedIn == false ) {
+            console.log("Non-authenticated users cannto save preferences")
+            return
+         }
+
          let url = `/api/users/${userStore.signedInUser}/preferences`
          let data = {
             trackingOptOut: this.trackingOptOut,
             pickupLibrary: this.pickupLibrary,
             collapseGroups: this.collapseGroups,
-            expandDetails: this.expandDetails,
+            collapseDetails: this.collapseDetails,
             searchTemplate: this.searchTemplate,
             searchExclusions: this.searchExclusions,
+            filters: this.filters,
+            facetMode: this.facetMode,
+            orFilterMode: this.orFilterMode,
+            sort: this.sort,
             aiDebug: this.aiDebug,
             aiFeatures: this.aiFeatures,
             aiModel: this.aiModel,

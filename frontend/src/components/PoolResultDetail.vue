@@ -9,32 +9,47 @@
             </a>
              <img v-else class ="logo" :src="poolStore.log(selectedResults.pool.id)">
          </div>
-         <SearchFilters v-if="hasFacets" />
          <CollectionContext />
-         <div class="sort-section">
+         <div class="actions-section">
+            <div class="left-acts">
+               <VirgoButton v-if="hasFacets && selectedResults.statusCode != 408"" @click="filtersClicked()" :label="filterLabel" icon="fa-light fa-sliders" severity="secondary" />
+               <SaveSearch />
+               <VirgoButton v-if="showPrintButton" severity="secondary" @click="printResults" label="Print Results" icon="fa-light fa-print"/>
+               <VirgoButton v-if="canUseSuggestor" severity="secondary" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb"/>
+            </div>
             <V4Sort :pool="selectedResults.pool" />
-            <ExcludePool v-if="canExclude"/>
          </div>
       </div>
-      <template v-if="!resultStore.searching">
+      <div class="detail-content">
+         <FacetSidebar />
          <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
-            <div class="timeout" v-if="selectedResults.statusCode == 408">
+            <template v-if="selectedResults.statusCode == 408">
                <span>Search timed out</span>
                <p class="note">
                   Sorry, the source providing this data took too long to respond.  You may wish to try your search again, or try a different search.
                   If the problem persists, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank' aria-describedby="new-window">Ask a Librarian</a> may be able to help.
                </p>
                <VirgoButton @click="retrySearch">Retry Search</VirgoButton>
-            </div>
+            </template>
             <template v-else>
                <span>No results found</span>
                <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
                   {{selectedResults.statusMessage}}
                </p>
-               <ExpandSearch />
+               <div v-else>
+                  <p class="note">Suggestions</p>
+                  <ul >
+                     <li>Check your spelling.</li>
+                     <li>Use more generic search terms.</li>
+                     <li v-if="queryStore.mode=='basic'">Use <router-link to="/search?mode=advanced">Advanced Search</router-link> to create a more targeted search.</li>
+                     <li>Clear any active filters.</li>
+                  </ul>
+               </div>
             </template>
-         </div>
+         </div> 
          <div v-else class="hits" role="region" aria-label="search results">
+            <SearchSuggestions v-if="canUseSuggestor" />
+
             <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content" role="list">
                <li role="listitem" v-for="hit in selectedResults.hits" class="image hit-wrapper" :key="`img-${hit.identifier}`">
                   <ImageSearchHit :pool="selectedResults.pool.id" :hit="hit"/>
@@ -46,61 +61,67 @@
                </div>
             </div>
          </div>
-         <span role="toolbar"  v-if="selectedResults.hits.length > 0">
-            <ExpandSearch class="expand-panel" />
-               <div v-if="signInRequired" class="reminder">
-                  <div>Results from {{ poolExclusionString }} are turned off for guest users.</div>
-                  <div><VirgoButton link @click="signInClicked" label="Sign in to see all results"/></div>
-               </div>
-               <div v-else-if="user.isSignedIn && queryStore.searchSources == 'all' && preferences.searchExclusions.length > 0" class="reminder">
-                  <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
-                  <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
-               </div>
-            <VirgoButton v-if="resultStore.hasMoreHits" @click="loadMoreResults">
-               <V4Spinner v-if="loadingMore" color="white"/>
-               <span v-else>Load More Results</span>
-            </VirgoButton>
-         </span>
-      </template>
+      </div>
+      <span role="toolbar"  v-if="selectedResults.hits.length > 0">
+         <div v-if="user.isSignedIn == false" class="reminder">
+            <div>Results from {{ poolExclusionString }} are turned off for guest users.</div>
+            <div><VirgoButton link @click="signInClicked" label="Sign in to see all results"/></div>
+         </div>
+         <div v-else-if="user.isSignedIn && preferences.searchExclusions.length > 0" class="reminder">
+            <div>Results from {{ poolExclusionString }} are turned off. You may see more results by turning them on.</div>
+            <div><VirgoButton text @click="removeSearchExclusions">Click to here turn on all results.</VirgoButton></div>
+         </div>
+         <VirgoButton v-if="resultStore.hasMoreHits" @click="loadMoreResults">
+            <V4Spinner v-if="loadingMore" color="white"/>
+            <span v-else>Load More Results</span>
+         </VirgoButton>
+      </span>
    </div>
 </template>
 
 <script setup>
 import SearchHit from "@/components/SearchHit.vue"
 import ImageSearchHit from "@/components/ImageSearchHit.vue"
-import SearchFilters from "@/components/SearchFilters.vue"
 import V4Sort from "@/components/V4Sort.vue"
-import ExpandSearch from "@/components/ExpandSearch.vue"
+import SaveSearch from "@/components/modals/SaveSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
-import { ref,computed } from 'vue'
+import { ref,computed, nextTick } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useResultStore } from "@/stores/result"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useQueryStore } from "@/stores/query"
-import { useRestoreStore } from '@/stores/restore'
-import ExcludePool from "./modals/ExcludePool.vue"
-import { useRouteUtils } from '@/composables/routeutils'
-import { useRouter, useRoute } from 'vue-router'
+import { useSystemStore } from "@/stores/system"
+import { useSuggestorStore } from "@/stores/suggestor"
 import analytics from '@/analytics'
+import FacetSidebar from "@/components/facets/FacetSidebar.vue"
+import SearchSuggestions from "@/components/SearchSuggestions.vue"
 
-const route = useRoute()
-const router = useRouter()
-const routeUtils = useRouteUtils(router, route)
-
+const systemStore = useSystemStore()
 const resultStore = useResultStore()
 const poolStore = usePoolStore()
 const filters = useFilterStore()
 const preferences = usePreferencesStore()
 const queryStore = useQueryStore()
 const user = useUserStore()
-const restore = useRestoreStore()
+const suggestor = useSuggestorStore()
 
 const loadingMore = ref(false)
 
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
+})
+const filterLabel = computed(()=>{
+   if ( filters.closed==false) return "Filters"
+   let cnt = filters.poolFilter(resultStore.selectedResults.pool.id).length
+   if (queryStore.dateFilter) {
+      cnt++
+   }
+   if ( cnt == 0 ) {
+      return "Filters"
+   }
+   return `Filters (${cnt})`
 })
 const hasLogo = computed(()=>{
    return poolStore.logo(resultStore.selectedResults.pool.id) != ""
@@ -111,15 +132,20 @@ const hasURL = computed(()=>{
 const selectedResults = computed(()=>{
    return resultStore.selectedResults
 })
-const signInRequired = computed(()=>{
-   return (user.isSignedIn == false && queryStore.searchSources == "all" )
+const showPrintButton = computed(()=>{
+   return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
+})
+const canUseSuggestor = computed(() => {
+   // If there is no suggestor configured, never show it. If configured,
+   // suggestor is only available for keyword searches issued 
+   // by signed in users that are part of the experimental group
+   if ( systemStore.useSuggestor == false ) return false
+   if ( user.isSignedIn == false ) return false 
+   if ( user.isExperimental == false ) return false 
+   return queryStore.isKeywordSearch
 })
 
-const canExclude = computed(() => {
-   if ( !resultStore.selectedResults ) return false
-   if ( user.isSignedIn == false ) return false
-   return ( resultStore.selectedResults.pool.id != 'uva_library' &&  resultStore.selectedResults.pool.id != 'images')
-})
+
 const poolExclusionString = computed( () => {
    let msg = ""
    // NOTES: if a pool has been set as excluded in preferences and that pool
@@ -140,17 +166,81 @@ const poolExclusionString = computed( () => {
    })
    return msg
 })
+
 const removeSearchExclusions = (() => {
    preferences.removeSearchExclusions()
    analytics.trigger('Preferences', 'REMOVE_POOL_EXCLUSION', "all")   
    queryStore.userSearched = true
-   queryStore.searchSources = "all"
    resultStore.searchAllPools()
 })
 
 const signInClicked = (() => {
-   // restore.setRestoreSaveSearch()
    router.push("/signin")
+})
+
+const printResults = (() => {
+   systemStore.printing = true
+   analytics.trigger('Results', 'PRINT_RESULTS', queryStore.mode)
+   const printStyle = `
+      <style type="text/css">
+      #print-results {
+         background: white;
+         text-align: left;
+         margin-left: 10px;
+      }
+      .hit-wrapper {
+         margin-bottom: 15px;
+         padding-bottom: 15px;
+         border-bottom: 2px solid black;
+      }
+      .hit-wrapper.group {
+         border-bottom: 0;
+         margin: 15px 0 0 0;
+         padding: 15px 0 0 0;
+         border-top: 2px solid black;
+      }
+      .hit-title {
+         font-weight: bold;
+      }
+      .number {
+         margin-right: 5px;
+         font-weight: normal;
+      }
+      .author {
+         margin-left: 10px;
+      }
+      .fields {
+         font-size: 0.85em;
+         margin: 5px 0 0 5px;
+      }
+      .label {
+         font-weight: bold;
+         margin-right: 5px;
+         text-align: right;
+         padding-right: 5px;
+      }
+      </style>`
+
+   nextTick( () => {
+      // Setting systemStore.printing = true renders a simplified list in a hidden div. nextTick is
+      // needed to allow time for the content to be rendered. After that,
+      // get the conntent and set that as the innerHTML for the iframe embeddded on the results page.
+      // Print from the iframe and remove content
+      let contents = document.getElementById("print-results").innerHTML
+      window.frames["printFrame"].document.body.innerHTML = (printStyle+contents)
+      window.frames["printFrame"].print()
+      window.frames["printFrame"].document.body.innerHTML = ""
+      systemStore.printing = false
+   })
+})
+
+const filtersClicked = (() => {
+   filters.closed = !filters.closed 
+   if (filters.closed ) {
+      analytics.trigger('Filters', 'SIDEBAR_CLOSED', "")
+   } else {
+      analytics.trigger('Filters', 'SIDEBAR_OPENED', "")   
+   }
 })
 
 async function retrySearch() {
@@ -176,30 +266,59 @@ async function loadMoreResults() {
 }
 </script>
 <style lang="scss" scoped>
-.sort-section {
+.actions-section {
    color: $uva-grey-B;
    background: white;
    border: 1px solid $uva-grey-100;
-   padding: 0 15px 15px 10px;
-   border-top: 0;
+   border-top: 1px solid $uva-grey-200;
+   padding: 10px;
    display: flex;
-   flex-flow: row wrap;
    gap: 10px;
    justify-content: space-between;
    align-items: center;
+   flex-flow: row wrap;
+   .left-acts {
+      display: flex;
+      flex-flow: row wrap;  
+      gap: 5px;
+   }
+   label {
+      font-weight: bold;
+   }
 }
+
 .reminder {
    background: white;
    border: 1px solid $uva-grey-100;
    padding: 15px;
    margin: 20px 0;
 }  
-.desc  {
-   padding: 15px 10px 10px 10px;
-   border-left: 1px solid $uva-brand-blue;
-   border-right: 1px solid $uva-brand-blue;
-   font-size: 0.9em;
+.pool-results {
+   border: 0;
+   position: relative;
+   .detail-content {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 15px;
+      border: 1px solid $uva-grey-100;
+      border-top: 0;
+      padding-right: 15px;
+      background: #fafafa;
+   }
 }
+div.pool-header {
+   margin: 0 0 0 0;
+   text-align: left;
+   display: flex;
+   flex-direction: column;
+   .desc  {
+      padding: 15px 10px 10px 10px;
+      border-left: 1px solid $uva-brand-blue;
+      border-right: 1px solid $uva-brand-blue;
+      background: $uva-brand-blue;
+      color: white;
+      background: $uva-brand-blue;
+   }
 .desc :deep(a) {
    color: white !important;
    text-decoration: underline !important;
@@ -208,24 +327,19 @@ async function loadMoreResults() {
       font-style: italic !important;
    }
 }
-.pool-results {
-   border: 0;
-   position: relative;
-}
-div.pool-header {
-   color: white;
-   background: $uva-brand-blue;
-   margin: 0 0 1rem 0;
-   text-align: left;
    .source-logo {
       background: white;
       padding: 5px;
       text-align: left;
+      border: 1px solid $uva-grey-100;
       .logo {
          max-height:90px;
          display: inline-block;
       }
    }
+}
+.hits {
+   flex-grow: 1;
 }
 .hits-content {
    text-align: left;
@@ -253,11 +367,18 @@ div.pool-header {
 }
 .hit-wrapper.none {
    background: white;
-   padding:35px;
-   margin-bottom: 1rem;
+   padding: 25px;
+   margin: 15px 0 1rem 0;
+   text-align: left;
+   border: 1px solid #ccc;
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
+   gap: 10px;
+   flex-grow: 1;
 
    span {
-      font-size: 1.5em;
+      font-size: 1.25em;
       font-weight: 500;
    }
 
@@ -273,21 +394,25 @@ div.pool-header {
    font-weight: normal;
    color: $uva-red;
 }
+.no-results {
+   text-align: left;
+}
 @media only screen and (max-width: 600px) {
-   .hit-wrapper {
-     max-width: 94vw;
-     margin: 0 0px 20px 0px;
+   .hits-content {
+      margin: 10px 0 0 0;
+      gap: 10px;
    }
    .image.hits-content {
       margin: 0 0 20px 0;
       grid-gap: .5rem;
    }
-   div.pool-header {
-      margin: 0 0 1rem 0;
-   }
    .sort-section {
       justify-content: flex-start;
       padding-bottom: 10px;
+   }
+   div.detail-content {
+      border: none !important;
+      padding-right: 0 !important;
    }
 }
 .expand-panel {

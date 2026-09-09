@@ -6,12 +6,14 @@ import { usePoolStore } from "@/stores/pool"
 import { useResultStore } from "@/stores/result"
 import { useQueryStore } from "@/stores/query"
 import { useCollectionStore } from "@/stores/collection"
+import { usePreferencesStore } from "@/stores/preferences"
 
 export const useFilterStore = defineStore('filter', {
 	state: () => ({
       facets: [],
       updatingFacets: false,
       getPresearchFacets: false,
+      closed: false,
    }),
 
    getters: {
@@ -42,6 +44,39 @@ export const useFilterStore = defineStore('filter', {
          }
       },
 
+      hasPendingChanges: (state) => {
+         return (poolID) => {
+            let pfObj = state.facets.find( pf => pf.pool == poolID)
+            if (!pfObj) return false
+            let pending = false 
+            pfObj.facets.some( f => {
+               f.buckets.some( bucket => {
+                  if ( bucket.pending == "add" || bucket.pending == "remove" ) {
+                     pending = true
+                  }
+                  return pending == true
+               })
+               return pending == true
+            })
+            return pending
+         }   
+      },
+      pendingChangeCount: (state) => {
+         return (poolID) => {
+            let pfObj = state.facets.find( pf => pf.pool == poolID)
+            if (!pfObj) return 0
+            let pending = 0 
+            pfObj.facets.forEach( f => {
+               f.buckets.forEach( bucket => {
+                  if ( bucket.pending == "add" || bucket.pending == "remove" ) {
+                     pending++
+                  }
+               })
+            })
+            return pending
+         }   
+      },
+
       poolFilter: (state) => {
          return (poolID) => {
             let pfObj = state.facets.find( pf => pf.pool == poolID)
@@ -52,8 +87,8 @@ export const useFilterStore = defineStore('filter', {
             pfObj.facets.forEach( f => {
                f.buckets.forEach( bucket => {
                   if (bucket.selected == true ) {
-                     let na = (bucket.na === true)
-                     filter.push( {facet_id: f.id, facet_name: f.name, value: bucket.value, na: na})
+                     // let na = (bucket.na === true)
+                     filter.push( {facet_id: f.id, facet_name: f.name, value: bucket.value})//, na: na})
                   }
                })
             })
@@ -113,13 +148,15 @@ export const useFilterStore = defineStore('filter', {
             }
          })
       },
-      setPreSearchFilters(filters) {
+      setPreSearchFilters(filters) {      
          // Clear out PRESEARCH filter only. Leave others alone because they
          // may have been restored from query params
          let psfIdx = this.facets.findIndex( pf => pf.pool == "presearch")
          if ( psfIdx > -1) {
             this.facets.splice(psfIdx, 1)
          }
+
+         const preferences = usePreferencesStore()
 
          // Place all of this data into a transient 'presearch' pool that can be
          // used to apply filters to any pool before search
@@ -135,6 +172,52 @@ export const useFilterStore = defineStore('filter', {
          })
          this.facets.push(tgtPFObj)
 
+      },
+
+      setSortOrder(poolID, filterID, sortBy, sortOrder ) {
+         let tgtPFObj = this.facets.find(pf => pf.pool == poolID)
+         if ( !tgtPFObj ) return 
+         let tgtF = tgtPFObj.facets.find(f => f.id == filterID )
+         if (!tgtF ) return
+
+         tgtF.sort = sortBy   
+         tgtF.order = sortOrder
+         let dir = 1
+         if (sortOrder == 'asc') {
+            dir = -1
+         }
+
+         tgtF.buckets = tgtF.buckets.sort( (a,b) => {
+            if (tgtF.sort == 'alpha') {
+               if (a.value > b.value) return -1*dir
+               if (a.value < b.value) return dir
+               return 0
+            } else {
+               if (a.count > b.count) return -1*dir
+               if (a.count < b.count) return dir
+               return 0    
+            }   
+         })
+      },
+
+      setPoolFilterSequence(poolID, sequencedFacets ) {
+         let tgtPFObj = this.facets.find(pf => pf.pool == poolID)
+         if ( !tgtPFObj ) return
+
+         tgtPFObj.facets.forEach( f => {
+            // sequencedFacets is an orderd list of facet id / name
+            let sequence = sequencedFacets.findIndex( sf => sf.id == f.id)
+            if ( sequence > -1) {
+               f.sequence = sequence
+            } 
+         })
+
+         tgtPFObj.facets = tgtPFObj.facets.sort( (a,b) => {
+            if (a.sequence > b.sequence) return 1
+            if (a.sequence < b.sequence) return -1
+            return 0
+         })
+         console.log(tgtPFObj.facets)
       },
 
       setPoolFacets(data) {
@@ -158,33 +241,119 @@ export const useFilterStore = defineStore('filter', {
             })
          })
 
+         const preferences = usePreferencesStore()
+         const sequencedFacets = preferences.filterSequence(data.pool)
+         let maxSeq = 0
+         sequencedFacets.forEach( sf =>{
+            if ( sf.sequence > maxSeq) {
+               maxSeq = sf.sequence
+            }
+         } )
+      
          tgtFacets.splice(0, tgtFacets.length)
-         data.facets.forEach( facet => {
-            // if this is in the preserved selected items, select it and remove from saved list
-            facet.buckets.forEach( fb => {
-               let idx = selected.findIndex( s => facet.id == s.facet_id && fb.value == s.value )
-               if ( idx > -1) {
-                  fb.selected  = true
-                  selected.splice(idx,1)
+         data.facets.forEach( (facet,idx) => {
+            // NOTES: since the pool details now includes a date filter, the FilterDate facet is not needed. Skip it
+            if (facet.id != "FilterDate" && facet.id != "PublicationYear" ) {
+               delete facet.type
+               if (facet.id=="PeerReviewedOnly") {
+                  facet.name = "Peer Review Status"
                }
-            })
 
-            if ( facet.buckets.length > 0) {
-               tgtFacets.push(facet)
+               facet.sequence = (idx+1+maxSeq)
+               let sf = sequencedFacets.find( sf => sf.id == facet.id)
+               if (sf) {
+                  facet.sequence = sf.sequence
+               }
+
+               // facet.sort comes from the pool config and is either alpha or count.
+               // add default sort direction; count = desc, alpha = asc
+               facet.order = "asc"
+               if ( facet.sort == 'count') {
+                  facet.order = "desc"   
+               }
+
+               // override default sort with preferences
+               const sortPref = preferences.filterSort( data.pool, facet.id)
+               if (sortPref && sortPref.sort && sortPref.order) {
+                  facet.sort = sortPref.sort
+                  facet.order = sortPref.order
+               } 
+
+               // initially, there is no search string used to narrow the list of buckes
+               facet.search = ""  
+
+               // if this is in the preserved selected items, select it and remove from saved list
+               facet.buckets.forEach( fb => {
+                  fb.pending = ""
+                  let idx = selected.findIndex( s => facet.id == s.facet_id && fb.value == s.value )
+                  if ( idx > -1) {
+                     fb.selected  = true
+                     selected.splice(idx,1)
+                  }
+               })
+
+               if ( facet.buckets.length > 0) {
+                  tgtFacets.push(facet)
+               }
+
+               if (sortPref) {
+                  // if preferences overrode the configured sort, resort to reflect the change
+                  this.setSortOrder(data.pool, facet.id, facet.sort, facet.order )
+               }
             }
          })
 
-         selected.forEach( s => {
-            let nafIdx = tgtFacets.findIndex( f => f.id == s.facet_id)
-            let naf = null
-            if ( nafIdx == -1) {
-               naf = {id: s.facet_id, na: true, buckets: []}
-               nafIdx = tgtFacets.length
+         tgtFacets = tgtFacets.sort( (a,b) => {
+               if (a.sequence > b.sequence) return 1
+               if (a.sequence < b.sequence) return -1
+               return 0
+         })
+      },
+
+      // In OR mode, selected filters are not immediately applied. Depending upon current selected
+      // status, flag a bucket (filter) as pending add or remove. When the changes are applied, the 
+      // pending status will be conted into selected or not selected
+      togglePendingOrFilter(pool, facetID, facetValue) {
+         let pfObj = this.facets.find(pf => pf.pool == pool)
+         let facetInfo = pfObj.facets.find(f => f.id === facetID)
+         let bucket = facetInfo.buckets.find( b=> b.value == facetValue.value )
+         if (bucket.selected) {
+            if (bucket.pending == "") {
+               bucket.pending = "remove"
             } else {
-               naf = tgtFacets[nafIdx]
+               bucket.pending = ""
             }
-            naf.buckets.push({value: s.value, selected: true, na: true})
-            tgtFacets.splice(nafIdx, 1, naf)
+         } else {
+             if (bucket.pending == "") {
+               bucket.pending = "add"
+            } else {
+               bucket.pending = ""
+            } 
+         }
+      },
+      cancelPendingChanges(pool) {
+         let pfObj = this.facets.find(pf => pf.pool == pool)
+         if ( !pfObj) return 
+         pfObj.facets.forEach( f => {
+            f.buckets.forEach( bucket => {
+               bucket.pending = ""
+            })
+         })
+      },
+      applyPendingChanges(pool) {
+         let pfObj = this.facets.find(pf => pf.pool == pool)
+         if ( !pfObj) return 
+         pfObj.facets.forEach( facet => {
+            facet.buckets.forEach( bucket => {
+               if (bucket.pending == "add") {
+                  analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facet.id}:${bucket.value}`)
+                  bucket.selected = true
+               } else if (bucket.pending == "remove") {
+                  bucket.selected = false
+                  analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facet.id}:${bucket.value}`)
+               }
+               bucket.pending = ""
+            })
          })
       },
 
@@ -209,13 +378,14 @@ export const useFilterStore = defineStore('filter', {
                analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facetID}:${value}`)
             }
          }
-         if ( bucket.na ) {
-            facetInfo.buckets.splice(bIdx,1)
-            if ( facetInfo.buckets.length == 0) {
-               pfObj.facets.splice(fIdx,1)
-            }
-         }
          this.facets.splice(idx, 1, pfObj)
+      },
+      excludePoolFacet(poolID, facetID) {
+         let poolInfo = this.facets.find(pf => pf.pool == poolID)
+         let fIdx = poolInfo.facets.findIndex(f => f.id === facetID)
+         if (fIdx > -1 ) {
+            poolInfo.facets.splice(fIdx, 1)
+         }
       },
 
       resetPoolFilters(pool) {
@@ -229,6 +399,19 @@ export const useFilterStore = defineStore('filter', {
                }
             })
          }
+      },
+
+      resetPresearchFilters() {
+         let pre = this.facets.find( pf => pf.pool=="presearch")
+         if (pre) {
+            // if presearch filters exist, just flag them all as unselected instead of removing
+            // this is because they are only requested once at initial search page load
+            pre.facets.forEach( f => {
+               f.buckets.forEach(b => {
+                  b.selected = false
+               })
+            })
+         }  
       },
 
       reset() {
@@ -295,25 +478,31 @@ export const useFilterStore = defineStore('filter', {
       promotePreSearchFilters() {
          const pools = usePoolStore()
          let psf = this.facets.find( pf => pf.pool == "presearch")
+
+         // apply any presearch filters to all pools that support facets
          pools.list.forEach( pool => {
-            let tgtPFObj = this.facets.find( pf => pf.pool == pool.id)
-            if ( !tgtPFObj ) {
-               tgtPFObj = {pool: pool.id, facets: [], placeholder: true}
-               this.facets.push(tgtPFObj)
-            }
-            psf.facets.forEach( pf => {
-               pf.buckets.forEach( b => {
-                  if (b.selected) {
-                     let tgtFacet = tgtPFObj.facets.find( tf => tf.id == pf.id)
-                     if ( !tgtFacet ) {
-                        tgtFacet = {id: pf.id, name: pf.name, sort: pf.sort, type: pf.type, buckets: []}
-                        tgtPFObj.facets.push(tgtFacet)
+            if ( pools.facetSupport( pool.id ) ) {
+               this.resetPoolFilters(pool.id)
+               let tgtPFObj = this.facets.find( pf => pf.pool == pool.id)
+               if ( !tgtPFObj ) {
+                  tgtPFObj = {pool: pool.id, facets: [], placeholder: true}
+                  this.facets.push(tgtPFObj)
+               }
+               psf.facets.forEach( pf => {
+                  pf.buckets.forEach( b => {
+                     if (b.selected) {
+                        let tgtFacet = tgtPFObj.facets.find( tf => tf.id == pf.id)
+                        if ( !tgtFacet ) {
+                           tgtFacet = {id: pf.id, name: pf.name, sort: pf.sort, type: pf.type, buckets: []}
+                           tgtPFObj.facets.push(tgtFacet)
+                        }
+                        tgtFacet.buckets.push({value: b.value, selected: true})
                      }
-                     tgtFacet.buckets.push({value: b.value, selected: true})
-                  }
+                  })
                })
-            })
+            }
          })
+         this.resetPresearchFilters()
       },
 
       async getPreSearchFilters() {
@@ -333,7 +522,7 @@ export const useFilterStore = defineStore('filter', {
       // This is called from 3 different places: when all pools are searched, when a specific pool
       // is searched and when a new pool is selected. The first 2 should ALWAYS request new facets
       // as the query has changed. The pool select should only change of there are no facets yet.
-      getSelectedResultFacets(paramsChanged) {
+      getSelectedResultFacets(paramsChanged, modeOverride = "") {
          const resultStore = useResultStore()
          const query = useQueryStore()
          const collectionStore = useCollectionStore()
@@ -387,8 +576,11 @@ export const useFilterStore = defineStore('filter', {
          })
 
          // Recreate the query for the target pool, but include a request for ALL facet info
+         // Use this to include the DATE stuff for date filtering, but it will incude the param date_filter
+         // which is not valid. Replace it with date
+         let qStr = query.poolQueryString.replace("date_filter:", "date:")
          let req = {
-            query: query.string,
+            query: qStr,
             pagination: { start: 0, rows: 0 },
             filters: [filterObj]
          }
@@ -399,9 +591,25 @@ export const useFilterStore = defineStore('filter', {
             return
          }
 
+         // Older saved searchs or links depend on facets joining with OR. The user may have set their
+         // preferred mode to AND. In this case, if an OR is present in the URL (or no mode is present) override the preference
+         const preferences = usePreferencesStore()
+         let facetMode = preferences.facetMode
+         if ( modeOverride != "" ) {
+            facetMode = modeOverride
+         }
+         req.preferences = {
+            exclude_filters: preferences.filterExclusions(pool.id).map( fe => fe.id ),
+            filter_join: facetMode
+         }
+
          let tgtURL = pool.url+"/api/search/facets"
          this.updatingFacets = true
+         let startTime = new Date()
          axios.post(tgtURL, req).then((response) => {
+            let endTime = new Date();
+            var timeDiff = endTime - startTime; 
+            console.log("TIME TO GET FACETS "+timeDiff+" MS")
             let facets = response.data.facet_list
             if (!facets) {
                facets = []

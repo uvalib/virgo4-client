@@ -1,32 +1,29 @@
 <template>
    <PrintedSearchResults  v-if="systemStore.printing"/>
    <div tabindex="-1" id="results-container" class="search-results" aria-describedby="search-summary">
-      <SearchSuggestions v-if="canUseSuggestor" />
+      
       <div class="results-header" role="heading" aria-level="2">
          <div id="search-summary" class="summary">
             <div class="query">Showing {{$formatNum(resultStore.total)}} results for:</div>
             <div class="qs">{{queryString}}</div>
          </div>
-         <span class="buttons" role="toolbar">
-            <VirgoButton severity="secondary"  @click="resetSearch" >Reset Search</VirgoButton>
-            <VirgoButton v-if="canUseSuggestor" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb" :disabled="suggestor.open"/>
-            <SaveSearch />
-            <VirgoButton v-if="showPrintButton" @click="printResults">Print Results</VirgoButton>
-         </span>
       </div>
 
       <div class="results-wrapper" >
-         <FacetSidebar />
          <div class="results-main">
             <div class="pool-tabs">
-               <button v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
-                  @click="poolSelected(r.pool.id)"
-               >
-                  <span>
-                     <div class="pool">{{r.pool.name}}</div>
-                     <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
-                  </span>
-               </button>
+               <div class="tab" v-for="(r,idx) in sourceTabs" :key="idx" :class="{showing: idx == resultStore.selectedResultsIdx}">
+                  <button class="pool" @click="poolSelected(r.pool.id)">
+                     <span>
+                        <div class="name">{{r.pool.name}}</div>
+                        <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
+                     </span>
+                  </button>
+                  <button v-if="canExclude(r.pool.id)" :aria-label="`exclude ${r.pool.name}`" :title="`exclude ${r.pool.name}`" 
+                     class="exclude" @click="excludePoolClicked(r.pool)">
+                     <i  class="fal fa-xmark"></i>
+                  </button>
+               </div>
                <OtherPoolsPicker v-if="showMore" @selected="poolSelected" />
             </div>
             <PoolResultDetail />
@@ -40,84 +37,38 @@
 import OtherPoolsPicker from "@/components/OtherPoolsPicker.vue"
 import PoolResultDetail from "@/components/PoolResultDetail.vue"
 import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
-import FacetSidebar from "@/components/FacetSidebar.vue"
-import SaveSearch from "@/components/modals/SaveSearch.vue"
-import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
-import { useSuggestorStore } from "@/stores/suggestor"
 import { useUserStore } from "@/stores/user"
+import { usePreferencesStore } from "@/stores/preferences"
 import { scrollToItem } from '@/utils'
 import { useRouteUtils } from '@/composables/routeutils'
+import { useConfirm } from "primevue/useconfirm"
 
 const router = useRouter()
 const route = useRoute()
+const confirm = useConfirm()
 const routeUtils = useRouteUtils(router, route)
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
-const suggestor = useSuggestorStore()
 const user = useUserStore()
-
-const printStyle = `
-<style type="text/css">
-#print-results {
-   background: white;
-   text-align: left;
-   margin-left: 10px;
-}
-.hit-wrapper {
-   margin-bottom: 15px;
-   padding-bottom: 15px;
-   border-bottom: 2px solid black;
-}
-.hit-wrapper.group {
-   border-bottom: 0;
-   margin: 15px 0 0 0;
-   padding: 15px 0 0 0;
-   border-top: 2px solid black;
-}
-.hit-title {
-   font-weight: bold;
-}
-.number {
-   margin-right: 5px;
-   font-weight: normal;
-}
-.author {
-   margin-left: 10px;
-}
-.fields {
-   font-size: 0.85em;
-   margin: 5px 0 0 5px;
-}
-.label {
-   font-weight: bold;
-   margin-right: 5px;
-   text-align: right;
-   padding-right: 5px;
-}
-</style>`
+const preferences = usePreferencesStore()
 
 const showMore = ref(resultStore.results.length > systemStore.maxPoolTabs)
 
+const canExclude = ((poolID) => {
+   if ( !resultStore.selectedResults ) return false
+   if ( user.isSignedIn == false ) return false
+   return ( poolID != 'uva_library')
+})
 
-const canUseSuggestor = computed(() => {
-   // If there is no suggestor configured, never show it. If configured,
-   // suggestor is only available for keyword searches issued 
-   // by signed in users that are part of the experimental group
-   if ( systemStore.useSuggestor == false ) return false
-   if ( user.isSignedIn == false ) return false 
-   if ( user.isExperimental == false ) return false 
-   return queryStore.isKeywordSearch
-})
-const showPrintButton = computed(()=>{
-   return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
-})
+
+
 const queryString = computed(()=>{
    return queryStore.string.replace(/\{|\}/g, "")
 })
@@ -134,10 +85,15 @@ const sourceTabs = computed(()=>{
       }
    })
 
-   // if there is only 1 in the other list, promote it to a top-level tab and set a flag to remove More
-   if (other.length == 1) {
-      tabs.push( other[0])
-      showMore.value = false
+
+   if ( resultStore.results.length == 1) {
+      showMore.value = false   
+   } else {
+      // if there is only 1 in the other list, promote it to a top-level tab and set a flag to remove More
+      if (other.length == 1) {
+         tabs.push( other[0])
+         showMore.value = false
+      }
    }
    return tabs
 })
@@ -151,33 +107,27 @@ onMounted( () => {
    }
 })
 
-const printResults = (() => {
-   systemStore.printing = true
-   analytics.trigger('Results', 'PRINT_RESULTS', queryStore.mode)
-
-   nextTick( () => {
-      // Setting systemStore.printing = true renders a simplified list in a hidden div. nextTick is
-      // needed to allow time for the content to be rendered. After that,
-      // get the conntent and set that as the innerHTML for the iframe embeddded on the results page.
-      // Print from the iframe and remove content
-      let contents = document.getElementById("print-results").innerHTML
-      window.frames["printFrame"].document.body.innerHTML = (printStyle+contents)
-      window.frames["printFrame"].print()
-      window.frames["printFrame"].document.body.innerHTML = ""
-      systemStore.printing = false
+const excludePoolClicked = ( (pool) => {
+   confirm.require({
+      message: `Exclude <b>${pool.name}</b> from this and future searches?</br>You can restore it at any time using your account preferences.`,
+      header: 'Confirm Exclude',
+      icon: 'fal fa-exclamation-triangle',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Exclude'
+      },
+      accept: ( ) => {
+         preferences.toggleSearchExclusion(pool.id)
+         resultStore.selectPoolResults(0) // catalog is always 0
+         queryStore.targetPool = resultStore.results[0].pool.id
+         resultStore.dropResults( pool.id )
+         queryStore.targetPool = "uva_library"
+         routeUtils.poolChanged()
+      }
    })
-})
-
-const resetSearch = ( async () => {
-   resultStore.resetSearch()
-   queryStore.searchSources = "all"
-   if ( queryStore.mode == "basic") {
-      analytics.trigger('Results', 'RESET_SEARCH', "basic")
-      router.push("/")
-   } else {
-      analytics.trigger('Results', 'RESET_SEARCH', "advanced")
-      router.push('/search?mode=advanced')
-   }
 })
 
 const poolSelected = (( poolID ) => {
@@ -197,7 +147,7 @@ const poolSelected = (( poolID ) => {
 .search-results  {
    box-sizing: border-box;
    outline: 0;
-   background-color: #fafafa;
+   background-color:white;
 }
 
 .results-header {
@@ -206,20 +156,17 @@ const poolSelected = (( poolID ) => {
    align-content: center;
    align-items: center;
    justify-content: space-between;
-   padding-top: 15px;
    margin-bottom: 10px;
    .summary {
       margin: 0 0 0.2vw 0;
       font-weight: 500;
       text-align: left;
-      .qs {
-         margin-left:15px;
-         font-style: italic;
-         font-weight: 100;
-      }
-      span {
-         font-size: 0.85em;
-      }
+      display: flex;
+      flex-flow: row wrap;
+      gap: 10px; 
+      justify-content: flex-start;
+      align-items: center;
+
       .subtotal {
          display: block;
          margin: 2px 0 2px 15px;
@@ -228,7 +175,6 @@ const poolSelected = (( poolID ) => {
          text-align: left;
          margin: 0 0 0.2vw 0;
          font-weight: bold;
-         font-size: 1.1em;
       }
    }
 }
@@ -251,32 +197,49 @@ const poolSelected = (( poolID ) => {
          flex-flow: row wrap;
          justify-content: flex-start;
 
-         button.pool {
-            padding: 8px 8px 10px 8px;
-            border-radius: 0.3rem 0.3rem 0 0;
+         .tab {
+            border-radius: 0.5rem 0.5rem 0 0;
             border: 1px solid $uva-grey-100;
             text-align: left;
             flex: 1 1 auto;
             background: #FFF;
-            .total {
-               font-size: 0.75em;
-               margin: 0;
-               font-weight: normal;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            .exclude {
+               font-size: 1.2rem;
+               cursor: pointer;
+               padding: 0;
+               border-radius: 25px;
+               background: none;
+               border: none;
+               height: 40px;
+               width: 40px;
+               &:focus, &:hover {
+                  outline: 2px dotted $uva-brand-blue-100;
+               }
             }
-
-            &:focus {
-               z-index: 1;
-            }
-            &:hover {
-               background: #f6f6f6;
+            .pool {
+               padding: 8px 8px 10px 12px;
+               background: transparent;
+               border: none;
+               flex-grow: 1;
+               text-align: left;
+               .total {
+                  font-size: 0.9em;
+                  margin: 0;
+                  font-weight: normal;
+               }
             }
          }
-
-         button.pool.showing {
+         .tab.showing {
             background-color: $uva-brand-blue;
             color: #fff;
             border: 1px solid $uva-brand-blue;
             cursor: default;
+            .pool,.exclude {
+               color:white;
+            }
          }
       }
    }
@@ -285,7 +248,7 @@ const poolSelected = (( poolID ) => {
 @media only screen and (min-width: 768px) {
    div.search-results {
       margin: 0;
-      padding: 0 5vw 20px 5vw;
+      padding: 0 4vw 20px 4vw;
       .buttons {
          display: flex;
          flex-flow: row nowrap;

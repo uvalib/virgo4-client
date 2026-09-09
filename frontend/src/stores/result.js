@@ -42,7 +42,7 @@ export const useResultStore = defineStore('result', {
          return state.selectedHitIdx > -1 && this.selectedHit.number > 1
       },
       hasResults: state => {
-         return state.searching == false && state.total >= 0
+         return state.total >= 0
       },
       selectedResults: state => {
          return state.results[state.selectedResultsIdx]
@@ -127,30 +127,26 @@ export const useResultStore = defineStore('result', {
       },
 
       addPoolSearchResults(poolResults) {
-         let tgtPool = this.results[this.selectedResultsIdx]
-         if ( !tgtPool) {
-            let result = {
-               pool: poolResults.pool,
-               sort: poolResults.sort,
-               total: poolResults.pagination.total,
-               page: 0,
-               timeMS: poolResults.elapsed_ms,
-               hits: [],
-               statusCode: poolResults.status_code, statusMessage: poolResults.status_msg
+         // Single pool searh is only called AFTER an all pools search so the results will always be present
+         let tgtResultsIdx = -1 
+         this.results.forEach( (res,idx) => {
+            if (res.pool.id == poolResults.pool.id) {
+               tgtResultsIdx = idx
             }
-            this.results.push(result)
-            this.selectedResultsIdx = 0
-            this.total = poolResults.pagination.total
-            tgtPool = this.results[0]
-         } else {
-            // Update total
-            tgtPool.total = poolResults.pagination.total
-            // Only update overall total when paging if searching 1 pool.
-            if(this.results.length == 1){
-               this.total = poolResults.pagination.total
-            }
+         })
+         let tgtPoolResults =  this.results[tgtResultsIdx]
+
+         if ( poolResults.pagination.start == 0 ) {
+            // if this is a request for the first page, clear out any existing results for this pool
+            // this happens when sort order is changed. Also remove the original pool total from
+            // the collective pool hits total
+            this.total -= tgtPoolResults.total
+            tgtPoolResults.hits = []
          }
-         let lastHit = tgtPool.hits[tgtPool.hits.length-1]
+         tgtPoolResults.total = poolResults.pagination.total
+         this.total += poolResults.pagination.total
+         
+         let lastHit = tgtPoolResults.hits[tgtPoolResults.hits.length-1]
 
          // When a facet is applied, the results are cleared and there is no last hit
          let hitNumber = 1
@@ -161,36 +157,33 @@ export const useResultStore = defineStore('result', {
             }
          }
 
-         tgtPool.timeMS = poolResults.elapsed_ms
-         tgtPool.statusCode = 200
-         tgtPool.statusMessage = ""
-         if (tgtPool.total == 0) {
-            // if pool total is zero add the new results total to overall
-            tgtPool.total = poolResults.pagination.total
-            this.total += poolResults.pagination.total
-         }
-
+         tgtPoolResults.timeMS = poolResults.elapsed_ms
+         tgtPoolResults.statusCode = 200
+         tgtPoolResults.statusMessage = ""
+         tgtPoolResults.total = poolResults.pagination.total
+         
          if (poolResults.group_list) {
             poolResults.group_list.forEach(group => {
-               utils.preProcessHitFields(tgtPool.pool.url, group.record_list)
+               utils.preProcessHitFields(tgtPoolResults.pool.url, group.record_list)
                if (group.count == 1) {
                   let hit = group.record_list[0]
                   hit.grouped = false
                   hit.count = 1
                   hit.number = hitNumber
-                  tgtPool.hits.push(hit)
+                  tgtPoolResults.hits.push(hit)
                   hitNumber++
                } else {
                   let hit = { grouped: true, count: group.count, number: hitNumber, group: group.record_list }
                   utils.getGroupHitMetadata(group, hit)
-                  tgtPool.hits.push(hit)
+                  tgtPoolResults.hits.push(hit)
                   hitNumber+=group.count
                }
             })
          }
+         this.results[tgtResultsIdx] = tgtPoolResults
       },
 
-      setSearchResults(data, tgtPool, poolExclusions) {
+      setSearchResults(data, tgtPool) {
          // this is called from top level search; resets results from all pools
          const pools = usePoolStore()
          this.total = -1
@@ -346,7 +339,7 @@ export const useResultStore = defineStore('result', {
 
       // Search ALL configured pools. This is the initial search call using only the basic or
       // advanced search parameters and will always start at page 1.
-      async searchAllPools() {
+      async searchAllPools(filterModeOverride = "") {
          const system = useSystemStore()
          const query = useQueryStore()
          const filters = useFilterStore()
@@ -356,15 +349,25 @@ export const useResultStore = defineStore('result', {
 
          system.clearMessage()
 
+         // Older saved searchs or links depend on facets joining with OR. The user may have set their
+         // preferred mode to AND. In this case, if an OR is present in the URL (or no mode is present) override the preference
+         let filterMode = prefs.facetMode
+         if (filterModeOverride != "") {
+            filterMode = filterModeOverride    
+         }
+
          // NOTE: when clicking a saved search, the target pool is set in ignoreExclusion.
          // This pool filtered out of the exclusion for this search, then reset
          let req = {
-            query: query.string,
+            // use the general search string here and add filters for specific pools in pool_query_addons
+            query: query.string, 
             pagination: { start: 0, rows: this.pageSize },
             filters: filters.allPoolFilters,
-            pool_sorting: sorting.pools,
+            pool_sorting: sorting.poolSort("all"),
+            pool_query_addons: query.poolQueryAddons,
             preferences: {
-               exclude_pools: prefs.searchExclusions.filter( e => e != this.ignoreExclusion)
+               exclude_pools: prefs.searchExclusions.filter( e => e != this.ignoreExclusion),
+               filter_join: filterMode
             }
          }
          this.ignoreExclusion = ""
@@ -384,7 +387,7 @@ export const useResultStore = defineStore('result', {
          // POST the search query and wait for the response
          await axios.post(`${system.searchAPI}/api/search`, req).then((response) => {
             poolStore.setPools(response.data.pools)
-            this.setSearchResults( response.data, query.targetPool,  prefs.searchExclusions)
+            this.setSearchResults( response.data, query.targetPool)
             sorting.setActivePool( this.results[this.selectedResultsIdx].pool.id )
             this.setSearching(false)
             if ( response.data.total_hits == 0) {
@@ -412,22 +415,27 @@ export const useResultStore = defineStore('result', {
          })
       },
 
-      // searchPool wil search only the pool specified. It can be used to filter, sort and page
-      // existing results or as a standalone query to a single pool
-      async searchPool(params) {
+      // searchPool will search only the pool specified. It is called in respponse to changesfilter, sort and pagination
+      async searchPool(params, filterModeOverride = "") {
          const system = useSystemStore()
          const query = useQueryStore()
          const filterStore = useFilterStore()
-         const poolStore = usePoolStore()
          const sortStore = useSortStore()
          const prefs = usePreferencesStore()
 
          useCollectionStore().clearCollectionDetails()
          this.setSearching(true)
+         
+         // Older saved searchs or links depend on facets joining with OR. The user may have set their
+         // preferred mode to AND. In this case, if an OR is present in the URL (or no mode is present) override the preference
+         let filterMode = prefs.facetMode
+         if (filterModeOverride != "") {
+            filterMode = filterModeOverride    
+         }
 
          useSuggestorStore().fetch( query.string )
          let filters = filterStore.poolFilter(params.pool.id)
-         let sort = sortStore.poolSort(params.pool.id)
+         let sort = sortStore.poolSort(params.pool.id) 
          let filterObj = { pool_id: params.pool.id, facets: filters }
          let startPage = params.page
          if (!startPage) {
@@ -436,10 +444,15 @@ export const useResultStore = defineStore('result', {
          let pagination = { start: startPage * this.pageSize, rows: this.pageSize }
 
          let req = {
-            query: query.string,
+            // Pool specific queries can contain date filters tagged as 'date_filter'. Search does not
+            // understand this, so convert it to the normal 'date' term
+            query: query.poolQueryString.replaceAll("date_filter", "date"),
             pagination: pagination,
             sort: sort,
             filters: [filterObj],
+            preferences: {
+               filter_join: filterMode
+            }
          }
 
          if (req.query == "") {
@@ -449,23 +462,11 @@ export const useResultStore = defineStore('result', {
 
          let url = params.pool.url + "/api/search"
          await axios.post(url, req).then( response => {
-            if ( startPage == 0 ) {
-               // when single pool seach is called to start a search, pool is required in response. Reset the results
-               // to an empty array so the default empty result is not present in the results
-               let pool = poolStore.list.find( p => p.id == params.pool.id)
-               response.data.pool = pool
-               this.total = -1
-               this.results = []
-            }
-
-            // Note: for pagination, filtering, etc, the existing pool results will be appended.
-            // if this is a direct single pool search, there will be no existing results. This call
-            // will create them.
+            response.data.pool = params.pool
             this.addPoolSearchResults(response.data)
             if ( response.data.pagination.total == 0 ) {
                analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.value.fullPath)
             }
-
             this.setSearching(false)
          }).catch((error) => {
             console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
@@ -492,11 +493,8 @@ export const useResultStore = defineStore('result', {
          })
       },
 
-      dropOtherResults( keepPoolID ) {
-         this.searching = true
-         this.results = this.results.filter( r => r.pool.id == keepPoolID)
-         this.selectPoolResults(0)
-         this.searching = false
+      dropResults( poolID ) {
+         this.results = this.results.filter( r => r.pool.id != poolID)
       },
 
       // Select pool results and get all facet info for the result
