@@ -7,7 +7,7 @@
          </div>
          <VirgoButton severity="secondary" @click="emit('canceled')" label="Cancel"/>
       </div>
-      <FormKit v-else type="form" id="pdf-remediation" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
+      <FormKit v-else type="form" ref="pdfform" id="pdf-remediation" :actions="false" @submit="doSubmit">
          <FormKit label="Course Information" type="textarea" :rows="2" v-model="request.course" id="course"
             validation="required" help="Please supply the Course Instructor, Course Name, Number, Section and Semester"
          />
@@ -18,16 +18,20 @@
          <label>
             <FileUpload name="file" chooseLabel="Select a PDF to upload for remeditaion"
                :customUpload="true" mode="basic"
-               @uploader="startUpload($event)"
+               @uploader="startUpload($event)" @select="pdfSelected($event)"
                :withCredentials="true" ref="fileuploader"
                :showUploadButton="false" :showCancelButton="false"
                accept="application/pdf"
             />
          </label>
+         <p class="error" v-if="pdfMissing"><i class="fas fa-exclamation-triangle"></i>A PDF file is required</p>
          <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
             help="(ex: missing from shelf, specific edition needed)"
          />
-         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-pdf-remediation" @canceled="emit('canceled')"/>
+         <div class="form-controls">
+            <VirgoButton severity="secondary" label="Cancel" @click="emit('canceled')" />
+            <VirgoButton label="Submit" @click="submitClicked()" :disabled="requestStore.working" :loading="requestStore.working" />
+         </div>
       </FormKit>
    </div>
 </template>
@@ -47,8 +51,11 @@ const request = ref({
    title: "",
    notes: ""
 })
+const selectedPDF = ref("")
+const pdfMissing = ref(false)
 
 const fileuploader = ref()
+const pdfform = ref()
 
 const requestStore = useRequestStore()
 
@@ -58,7 +65,23 @@ const startUpload = ( async (event) => {
    emit('submitted')
 })
 
+const pdfSelected = ( (event) => {
+   selectedPDF.value = event.files[0].name
+   pdfMissing.value = false
+})
+
 const submitClicked = (async () => {
+   // the fileuploader is not part of formkit so validate it first and abort 
+   // if a pdf has not been selected
+   pdfMissing.value = (selectedPDF.value == "" )
+   if (pdfMissing.value)  return
+
+   // next kick pf formkit validate and submit process.
+   // if there are any errors, doSubmit below will not be called
+   pdfform.value.node.submit()
+})
+
+const doSubmit = (() => {
    fileuploader.value.upload()
 })
 
@@ -80,6 +103,14 @@ onMounted(()=>{
       color: $uva-text-color-dark;
       background-color: $uva-red-100;
       margin: 0 0 10px 0;
+   }
+}
+.error {
+   margin: 0;
+   color: $uva-red-A;
+   i {
+      display: inline-block;
+      margin-right: 5px;
    }
 }
 </style>
