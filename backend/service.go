@@ -512,12 +512,13 @@ func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *
 }
 
 type emailRequest struct {
-	Subject string
-	To      []string
-	ReplyTo string
-	CC      string
-	From    string
-	Body    string
+	Subject    string
+	To         []string
+	ReplyTo    string
+	CC         string
+	From       string
+	Body       string
+	Attachment string
 }
 
 // SendEmail will and send an email to the specified recipients
@@ -535,6 +536,10 @@ func (svc *ServiceContext) SendEmail(request *emailRequest) error {
 		mail.SetHeader("Cc", request.CC)
 	}
 	mail.SetBody("text/plain", request.Body)
+	if request.Attachment != "" {
+		log.Printf("INFO: add attachmet %s to email '%s' with recipients %v", request.Attachment, request.Subject, request.To)
+		mail.Attach(request.Attachment)
+	}
 
 	if svc.Dev.FakeSMTP {
 		log.Printf("Email is in dev mode. Logging message instead of sending")

@@ -205,8 +205,13 @@ export const useRequestStore = defineStore('request', {
          this.working = true
          this.failed = false
 
+         const user = useUserStore()
+
          let formData = new FormData()
          formData.append('file', file)
+         formData.append('userID', user.signedInUser)
+         formData.append('userName', user.accountInfo.displayName)
+         formData.append('email', user.email)
          formData.append('course', req.course)
          formData.append('work', req.work)
          formData.append('title', req.title)

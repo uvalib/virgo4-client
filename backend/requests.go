@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"os"
 	"path"
@@ -333,7 +332,8 @@ func (svc *ServiceContext) CreateOpenURLRequest(c *gin.Context) {
 	c.String(http.StatusOK, fmt.Sprintf("%d", transactionNum))
 }
 
-// PDFRemediationRequest generates am illiad request for pdf remediation and uploads the target PDF
+// PDFRemediationRequest generates am illiad request for pdf remediation and emails
+// the uploaded PDF to mailto:lib-leo@virginia.edu
 func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 	formData, err := c.MultipartForm()
 	if err != nil {
@@ -342,14 +342,19 @@ func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 		return
 	}
 
-	// this has already been thru auth middleware so JWT/claims will exist
-	v4Claims, _ := getJWTClaims(c)
-	jwtIface, _ := c.Get("jwt")
-	jwt, _ := jwtIface.(string)
+	// pull required data from form fields
+	userID := formData.Value["userID"][0]
+	userName := formData.Value["userName"][0]
+	email := formData.Value["email"][0]
+	work := formData.Value["work"][0]
+	title := formData.Value["title"][0]
+	course := formData.Value["course"][0]
+	notes := formData.Value["notes"][0]
+	formFile := formData.File["file"][0]
 
 	// Check and enforce request limits
-	log.Printf("INFO: get pdf remediation request counts for %s", v4Claims.UserID)
-	remediateInfo, cntErr := svc.getPDFRequestStats(v4Claims.UserID)
+	log.Printf("INFO: get pdf remediation request counts for %s", userID)
+	remediateInfo, cntErr := svc.getPDFRequestStats(userID)
 	if cntErr != nil {
 		log.Printf("ERROR: unable to check pdf remediation request count: %s", cntErr.Message)
 		c.String(http.StatusInternalServerError, cntErr.Message)
@@ -357,21 +362,14 @@ func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 	}
 	if remediateInfo.RequestCount >= remediateInfo.RequestLimit {
 		log.Printf("INFO: %s requests pdf remediation with %d outstanding reuests with limit %d; rejected",
-			v4Claims.UserID, remediateInfo.RequestCount, remediateInfo.RequestLimit)
+			userID, remediateInfo.RequestCount, remediateInfo.RequestLimit)
 		c.String(http.StatusBadRequest, fmt.Sprintf("you have exceeded the request limit (%d)", remediateInfo.RequestLimit))
 		return
 	}
 
-	// pull required data from form fields
-	work := formData.Value["work"][0]
-	title := formData.Value["title"][0]
-	course := formData.Value["course"][0]
-	notes := formData.Value["notes"][0]
-	formFile := formData.File["file"][0]
-
-	log.Printf("INFO: process pdf remediation request from %s for course %s, work '%s', title '%s', notes: '%s'", v4Claims.UserID, course, work, title, notes)
+	log.Printf("INFO: process pdf remediation request from %s for course %s, work '%s', title '%s', notes: '%s'", email, course, work, title, notes)
 	baseReq := illiadRequest{
-		Username:          v4Claims.UserID,
+		Username:          userID,
 		RequestType:       "Article",
 		TransactionStatus: "Remediation Request",
 		ProcessType:       "DocDel",
@@ -422,43 +420,26 @@ func (svc *ServiceContext) pdfRemediationRequest(c *gin.Context) {
 		return
 	}
 
-	log.Printf("INFO: create new multipart-form with the received file")
-	dlFile, oErr := os.Open(destFile)
-	if oErr != nil {
-		log.Printf("ERROR: unable to open %s so it can be added to a new multipart form: %s", destFile, oErr.Error())
-		c.String(http.StatusInternalServerError, oErr.Error())
-		return
+	log.Printf("INFO: email with %s as an attachment", formFile.Filename)
+	leoEmail := []string{"lib-leo@virginia.edu"}
+	body := fmt.Sprintf("PDF remediation request from %s (%s) with attached document %s",
+		userName, userID, formFile.Filename)
+	eRequest := emailRequest{
+		Subject:    fmt.Sprintf("PDF Remediation Request %d", transactionNum),
+		To:         leoEmail,
+		ReplyTo:    leoEmail[0],
+		From:       email,
+		Body:       body,
+		Attachment: destFile,
 	}
-	defer dlFile.Close()
-
-	formBuff := &bytes.Buffer{}
-	formWriter := multipart.NewWriter(formBuff)
-	// append the transaction number to the filename sent to the uploader
-	fileW, cErr := formWriter.CreateFormFile("file", fmt.Sprintf("%d_%s", transactionNum, formFile.Filename))
-	if cErr != nil {
-		log.Printf("ERROR: unable to create form file: %s", cErr.Error())
-		c.String(http.StatusInternalServerError, cErr.Error())
-		return
-	}
-
-	_, cpErr := io.Copy(fileW, dlFile)
-	if cpErr != nil {
-		log.Printf("ERROR: unable to add %s to upload form: %s", formFile.Filename, cpErr.Error())
-		c.String(http.StatusInternalServerError, cpErr.Error())
-		return
+	sendErr := svc.SendEmail(&eRequest)
+	if sendErr != nil {
+		log.Printf("ERROR: Unable to send remediation email for transaction %d with attached file %s: %s",
+			transactionNum, formFile.Filename, sendErr.Error())
 	}
 
-	formWriter.Close() // gotta do this to to get multipart form terminating boundary
-
-	log.Printf("INFO: send form with file to illiad upload service")
-	req, _ := http.NewRequest("POST", svc.Illiad.UploadURL, formBuff)
-	req.Header.Set("Content-Type", formWriter.FormDataContentType())
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwt))
-	_, reqErr := svc.SlowHTTPClient.Do(req) // 30 sec timeout. Hopefully big enough
-	if reqErr != nil {
-		log.Printf("ERROR: upload failed: %s", reqErr.Error())
-		return
-	}
+	log.Printf("INFO: clean up temp file %s", destFile)
+	os.Remove(destFile)
 
 	remediateInfo.RequestCount++
 	resp := struct {

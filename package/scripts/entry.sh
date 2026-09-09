@@ -35,7 +35,6 @@ cd bin; ./v4srv \
    -dbpass ${DBPASS} \
    -illiad ${V4_ILLIAD_API} \
    -illiadkey ${V4_ILLIAD_KEY} \
-   -illiadupload ${V4_ILLIAD_UPLOAD_SERVICE} \
    -jwtkey ${V4_JWT_KEY} \
    -hsilliad ${V4_HSL_ILLIAD_URL} \
    -shelf ${V4_SHELF_BROWSE} \
