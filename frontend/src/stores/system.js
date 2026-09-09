@@ -124,6 +124,7 @@ export const useSystemStore = defineStore('system', {
       },
       setFatal(err) {
          this.fatal = err
+         this.reportError(this.fatal)
          this.router.push( "/error" )
       },
       setToast(title, message, life = 5000) {

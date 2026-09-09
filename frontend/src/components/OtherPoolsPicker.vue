@@ -2,19 +2,11 @@
    <Select v-model="selectedPoolID" :class="{active: selectedPoolID}"
       :options="pools" optionLabel="pool.name" optionValue="pool.id"
       @change="emit('selected', selectedPoolID)"
-      aria-label="view other results"
    >
       <template #value>
          <div v-if="selectedPoolID" class="more-selection">
-            <div class="identity">
-               <div class="poolname">{{ selection.pool.name }}</div>
-               <div class="total">({{  selection.total }})</div>
-            </div>
-            <button :aria-label="`exclude ${selection.pool.name}`" :title="`exclude ${selection.pool.name}`" 
-               class="exclude" @click="excludePoolClicked($event, selection.pool)"
-            >
-               <i  class="fal fa-xmark"></i>
-            </button>
+            <div class="poolname">{{ selection.pool.name }}</div>
+            <div class="total">({{  selection.total }})</div>
          </div>
          <div v-else class="more">More</div>
       </template>
@@ -31,32 +23,22 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
-import { usePreferencesStore } from "@/stores/preferences"
-import { useQueryStore } from "@/stores/query"
 import Select from 'primevue/select'
 import { storeToRefs } from "pinia"
 import * as utils from '../utils'
-import { useConfirm } from "primevue/useconfirm"
-import { useRouter, useRoute } from 'vue-router'
-import { useRouteUtils } from '@/composables/routeutils'
 
-const router = useRouter()
-const route = useRoute()
-const confirm = useConfirm()
-const routeUtils = useRouteUtils(router, route)
 const resultStore = useResultStore()
-const preferences = usePreferencesStore()
-const queryStore = useQueryStore()
+const systemStore = useSystemStore()
 
 const selectedPoolID = ref("")
 
 const emit = defineEmits( ['selected' ] )
 
 const { selectedResultsIdx } = storeToRefs(resultStore)
-watch( selectedResultsIdx, () => {
-   const newPool = resultStore.selectedResults.pool
-   if ( pools.value.findIndex( p => p.pool.id == newPool.id) == -1 ) {
+watch( selectedResultsIdx, (newValue) => {
+   if (newValue < systemStore.maxPoolTabs) {
       selectedPoolID.value = ""
    }
 })
@@ -93,32 +75,6 @@ const selection = computed (() => {
    return resultStore.results.find( r => r.pool.id == selectedPoolID.value)
 })
 
-const excludePoolClicked = ( (event, pool) => {
-   event.stopPropagation()
-   event.preventDefault()
-   
-   confirm.require({
-      message: `Exclude <b>${pool.name}</b> from this and future searches?</br>You can restore it at any time using your account preferences.`,
-      header: 'Confirm Exclude',
-      icon: 'fal fa-exclamation-triangle',
-      rejectProps: {
-         label: 'Cancel',
-         severity: 'secondary'
-      },
-      acceptProps: {
-         label: 'Exclude'
-      },
-      accept: ( ) => {
-         preferences.toggleSearchExclusion(pool.id)
-         resultStore.selectPoolResults(0) // catalog is always 0
-         queryStore.targetPool = resultStore.results[0].pool.id
-         resultStore.dropResults( pool.id )
-         queryStore.targetPool = "uva_library"
-         routeUtils.poolChanged()
-      }
-   })
-})
-
 const poolFailed = ((p) => {
    return (p.statusCode != 408 && p.total == 0 && p.statusCode != 200)
 })
@@ -134,7 +90,7 @@ const poolSkipped = ((p) => {
    text-align: left;
    flex: 1 1 auto;
    padding: 8px 8px 10px 8px;
-   border-radius: 0.5rem 0.5rem 0 0;
+   border-radius: 0.3rem 0.3rem 0 0;
    :deep(span.p-select-label) {
       font-size: .85em;
       font-weight: normal;
@@ -158,29 +114,6 @@ const poolSkipped = ((p) => {
    border: 1px solid $uva-brand-blue;
    :deep(.p-select-dropdown) {
       color: white;
-   }
-}
-.more-selection {
-   display: flex;
-   flex-flow: row nowrap;
-   justify-content: space-between;
-   .exclude {
-      color: white;
-      font-size: 1.2rem;
-      cursor: pointer;
-      padding: 0;
-      border-radius: 25px;
-      background: none;
-      border: 2px dotted transparent;
-      margin-right:5px;
-      &:focus, &:hover {
-         border-color: white;
-         outline: none;
-      }
-   }
-   .identity {
-      display: flex;
-      flex-direction: column;
    }
 }
 .more-opt {

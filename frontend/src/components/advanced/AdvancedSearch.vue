@@ -3,7 +3,7 @@
       <AdvancedFacets />
       <div class="advanced-wrap">
          <FormKit type="form" id="advanced-search" :actions="false" @submit="doAdvancedSearch">
-            <div v-for="(term,idx) in queryStore.advanced" :key="idx" class="search-term">
+            <div v-for="(term,idx) in advancedTerms" :key="idx" class="search-term">
                <div class="controls-wrapper">
                   <div class="options">
                      <FormKit v-if="idx > 0" type="select" label="" v-model="term.op" :options="['AND', 'OR', 'NOT']" outer-class="$reset op" />
@@ -35,12 +35,14 @@
             <div class="form-acts">
                <FormKit type="button" @click="addClicked">Add criteria</FormKit>
                <FormKit v-if="resultStore.hasResults==false && resultStore.searching == false" type="button" @click="saveSearchForm">Save form</FormKit>
+               <SourceSelector v-else :help="false"/>
             </div>
             <PreSearchFilters v-if="resultStore.hasResults==false"/>
             <div class="controls" v-if="resultStore.hasResults==false && resultStore.searching == false">
                <FormKit v-if="resultStore.hasResults==false && resultStore.searching == false" type="select" label="Sort by" v-model="sortStore.preSearchSort"
                   outer-class="$reset sort" inner-class="$reset sort"
                   :options="sortOptions" @change="sortChanged()" />
+               <SourceSelector v-if="resultStore.hasResults==false"  :help="false"/>
             </div>
             <V4FormActions :hasCancel="false" submitLabel="Search" submitID="do-advanced-request" />
          </FormKit>
@@ -50,6 +52,7 @@
 
 <script setup>
 import AdvancedFacets from "@/components/advanced/AdvancedFacets.vue"
+import SourceSelector from "@/components/SourceSelector.vue"
 import PreSearchFilters from "@/components/advanced/PreSearchFilters.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import analytics from '@/analytics'
@@ -82,6 +85,9 @@ const dateValidator = [ ['matches', /^\d{4}$|^\d{4}-(0[1-9]|1[012])$|^\d{4}-(0[1
 
 const canDeleteCriteria = computed(()=>{
    return queryStore.advanced.length > 1
+})
+const advancedTerms = computed(()=>{
+   return queryStore.advanced.filter( t => t.field != "filter")
 })
 const sortOptions = computed(()=>{
    let out = []
@@ -131,8 +137,7 @@ async function doAdvancedSearch() {
       }
    }
 
-   // send a true flag to route utils indicating a new search was initiated
-   routeUtils.searchChanged( true )
+   routeUtils.searchChanged()
 }
 
 function addClicked() {

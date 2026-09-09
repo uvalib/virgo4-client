@@ -209,29 +209,12 @@ a:hover+.fdl-gov {
 
 @media only screen and (max-width: 768px) {
    .footer-container {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      padding: 10px;
-      h3 {
-         margin: 10px 0;
-      }
-      ul {
-         margin: 0;
-         li {
-            padding-bottom: 8px;
-         }
-      }
-      .footer-bucket {
-         text-align: center;
-      }
+      padding: 0 40px;
+      grid-template-columns: 1fr;
    }
 
    .footer-post-container {
-      padding: 20px;
-      svg {
-         display: none;
-      }
+      padding-left: 60px;
    }
 
    .fdl-gov {

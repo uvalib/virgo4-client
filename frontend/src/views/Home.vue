@@ -5,17 +5,9 @@
          <template v-if="queryStore.mode=='basic'">
             <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
             <div class="basic-search">
-               <!-- <select v-model="queryStore.basic.field">
-                  <option value="keyword">Keyword</option>
-                  <option value="identifier">Identifier</option>
-                  <option value="title">Title</option>
-                  <option value="series">Series</option>
-                  <option value="author">Author</option>
-                  <option value="subject">Subject</option>
-               </select> -->
                <input class="basic"
                   @keyup.enter="searchClicked"
-                  v-model="queryStore.basic.value"
+                  v-model="queryStore.basic"
                   autocomplete="off"
                   type="text"
                   id="search"
@@ -23,19 +15,21 @@
                >
                <VirgoButton @click="searchClicked" class="search">Search</VirgoButton>
             </div>
+            <div class="controls-wrapper">
+               <SourceSelector mode="basic"/>
+               <SearchTips />
+            </div>
             <div class="search-mode">
-               <router-link @click="resultStore.resetSearch()" to="/search?mode=advanced">Advanced Search</router-link>
+               <router-link tabindex="0" to="/search?mode=advanced">Advanced Search</router-link>
                <template v-if="userStore.isSignedIn">
                   <span>|</span>
                   <router-link tabindex="0" to="/preferences">Search Preferences</router-link>
                </template>
-               <span>|</span>
-               <SearchTips />
             </div>
          </template>
          <AdvancedSearch v-else/>
       </div>
-      <Welcome  v-if="resultStore.hasResults==false && queryStore.mode=='basic'" />
+      <Welcome  v-if="isHomePage && resultStore.hasResults==false && queryStore.mode=='basic'" />
       <SearchResults v-if="resultStore.hasResults" />
    </div>
 </template>
@@ -45,6 +39,7 @@ import SearchTips from "@/components/modals/SearchTips.vue"
 import SearchResults from "@/components/SearchResults.vue"
 import AdvancedSearch from "@/components/advanced/AdvancedSearch.vue"
 import Welcome from "@/components/Welcome.vue"
+import SourceSelector from "@/components/SourceSelector.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import { scrollToItem } from '@/utils'
 import analytics from '@/analytics'
@@ -56,6 +51,7 @@ import { useRestoreStore } from "@/stores/restore"
 import { useSystemStore } from "@/stores/system"
 import { useSearchStore } from "@/stores/search"
 import { useUserStore } from "@/stores/user"
+import { usePreferencesStore } from "@/stores/preferences"
 import { usePoolStore } from "@/stores/pool"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { watchDeep } from '@vueuse/core'
@@ -72,8 +68,14 @@ const systemStore = useSystemStore()
 const searchStore = useSearchStore()
 const userStore = useUserStore()
 const poolStore = usePoolStore()
+const preferences = usePreferencesStore()
 
 const { polite, assertive } = useAnnouncer()
+
+
+const isHomePage = computed(()=>{
+   return (route.path == "/")
+})
 
 function setPageTitle() {
    systemStore.pageTitle = "Search"
@@ -105,6 +107,7 @@ onBeforeMount( async () => {
          } else {
             // This will trigger the route watcher which will do the interpretation of the params and initiate search
             const tgtPool =  parseQuery(response.data.url ).pool
+            queryStore.searchSources = tgtPool
             resultStore.ignoreExclusion = tgtPool
             router.replace( response.data.url ) 
          }
@@ -114,6 +117,7 @@ onBeforeMount( async () => {
    } else {
       if ( route.query.pool ) {
          // if a pool is set on initial page load, narrow the search to just that pool and temporarily ignore exclusions
+         queryStore.searchSources = route.query.pool
          resultStore.ignoreExclusion = route.query.pool
       }
       handleQueryParamChange()
@@ -125,21 +129,14 @@ onBeforeMount( async () => {
    }
 })
 
-const handleQueryParamChange = ( async() => {
-   routeUtils.queryParamsChanged(async (filterModeOverride) => {
+const handleQueryParamChange = ( async( ) => {
+   routeUtils.queryParamsChanged(async (pool) => {
       assertive(`search in progress`)
-
-      if ( queryStore.searchTargetOnly ) {
-         console.log("SEARCH ONLY "+queryStore.targetPool)
-         await resultStore.searchPool({pool: poolStore.poolDetails(queryStore.targetPool)}, filterModeOverride)
+      if (pool == "all") {
+         await resultStore.searchAllPools()
       } else {
-      console.log("SEARCH ALL POOLS")
-         await resultStore.searchAllPools( filterModeOverride )
+         await resultStore.searchPool({pool: poolStore.poolDetails(pool)})
       }
-
-      console.log("CLEAR TARGTE ONLY")
-      queryStore.searchTargetOnly = false
-      
       if ( restore.pendingBookmark ) {
          handlePendingBookmark()
          restore.clear()
@@ -181,9 +178,7 @@ async function searchClicked() {
    } else {
       analytics.trigger('Search', 'BASIC_SEARCH', "SIGNED_OUT")
    }
-
-   // send a true flag to route utils indicating a new search was initiated
-   routeUtils.searchChanged( true )
+   routeUtils.searchChanged()
 }
 </script>
 
@@ -208,16 +203,10 @@ async function searchClicked() {
       max-width: 800px;
       margin: 0 auto 0 auto;
 
-      select {
-         border-radius: 0.3rem 0 0 0.3rem;
-         font-size: 1rem;
-      }
-
       input[type=text].basic {
          font-size: 1.15em;
          padding: 0.5vw 0.75vw;
          border-right: 0;
-         //border-left: 0;
          margin: 0 !important;
          border-radius: 0.3rem 0 0 0.3rem;
          flex: 1 1 auto;
@@ -226,6 +215,7 @@ async function searchClicked() {
       .search {
          border-radius: 0 0.3rem 0.3rem 0;
          margin: 0;
+         padding: 0 40px;
       }
    }
    div.advanced {
@@ -247,7 +237,7 @@ async function searchClicked() {
    }
    .search-mode {
       text-align: center;
-      margin: 20px 0 10px 0;
+      margin: 10px 0 5px 0;
       display: flex;
       flex-flow: row wrap;
       justify-content: center;
@@ -266,9 +256,6 @@ async function searchClicked() {
       width: 95%;
       padding: 20px 0;
       margin-top:30%;
-  }
-  div.search-mode {
-   gap: 10px !important;
   }
   ::-webkit-input-placeholder {
     color:transparent;

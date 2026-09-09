@@ -34,9 +34,6 @@ const systemStore = useSystemStore()
 @media only screen and (max-width: 768px) {
    .welcome {
       width: 90%;
-      h2.borders {
-         font-size: 1em !important;
-      }
    }
 }
 

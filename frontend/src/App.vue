@@ -443,12 +443,6 @@ a {
    }
 }
 @media only screen and (max-width: 768px) {
-   #app {
-      h1 {
-         font-size: 1.3em;
-         padding: 1.5rem 0 1.25rem 0;
-      }
-   }
    div.error-message {
       max-width: 95%;
    }

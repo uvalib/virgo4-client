@@ -4,9 +4,9 @@ import axios from 'axios'
 export const useQueryStore = defineStore('query', {
 	state: () => ({
       userSearched: false,
-      filtersCleared: false,
       mode: "basic",
-      basic: { field: "keyword", value: ""},
+      basic: "",
+      searchSources: "all",
       advanced: [
          { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" },
@@ -28,35 +28,18 @@ export const useQueryStore = defineStore('query', {
          { value: "date", label: "Date", type: "date" },
          { value: "published", label: "Publisher/Place of Publication", type: "text"}
       ],
-      targetPool: "",
-      searchTargetOnly: false,
-      poolDateFilters: new Map(),
-      keepSettings: true
+      targetPool: ""
    }),
    getters: {
       stateObject: state => {
          return {
             mode: state.mode,
             basic: state.basic,
+            searchSources: state.searchSources,
             advanced: state.advanced,
             advancedFields: state.advancedFields,
             targetPool: state.targetPool,
          }
-      },
-      poolQueryAddons: state => {
-         let out = []
-         state.poolDateFilters.forEach( (filter, poolID) => {
-            let extraQ = ""
-            if (filter.comparison == "BETWEEN") {
-               extraQ = `date: {${filter.startDate} TO ${filter.endDate}}`
-            } else if (filter.comparison == "EQUAL") {
-               extraQ = `date: {${filter.startDate}}`
-            } else {
-               extraQ = `date: {${filter.comparison} ${filter.startDate}}`
-            }
-            out.push({poolID: poolID, query: extraQ})
-         })
-         return out
       },
       advancedSearchTemplate: state => {
          let out = { fields: []}
@@ -66,9 +49,20 @@ export const useQueryStore = defineStore('query', {
          })
          return out
       },
+      idQuery: () => {
+         return (id) => {
+            return `identifier: {${id}}`
+         }
+      },
+      // NOTE: in order to access the string getter, arrow notaion cannot be used
+      queryURLParams(state) {
+         let qs = `mode=${state.mode}`
+         qs += `&q=${encodeURIComponent(this.string)}`
+         return qs
+      },
       queryEntered: state => {
          if (state.mode == "basic") {
-            return state.basic.value.length > 0
+            return state.basic.length > 0
          }
          let found = false
          state.advanced.some(term => {
@@ -80,28 +74,6 @@ export const useQueryStore = defineStore('query', {
          }
          return found
       },
-      // This gets the pool-specific query string including date filers flagged as date_filter so they can properly be 
-      // restored bt the restoreFromURL action
-      poolQueryString: state => {
-         // get the general string used for all pools
-         let generalString = state.string
-
-         // if there is a pool date filter for the target pool, add it to the string
-         if ( state.poolDateFilters.has(state.targetPool) ) {
-            if (generalString.length > 0) {
-               generalString += " AND "
-            }
-            const df = state.poolDateFilters.get( state.targetPool )
-            if (df.comparison == "BETWEEN") {
-               generalString += `date_filter: {${df.startDate} TO ${df.endDate}}`
-            } else if (df.comparison == "EQUAL") {
-               generalString += `date_filter: {${df.startDate}}`
-            } else {
-               generalString += `date_filter: {${df.comparison} ${df.startDate}}`
-            }
-         }
-         return generalString
-      },
       string: state => {
          // convert into the standard v4 search string format. Ex:
          //     ( calico OR "tortoise shell" ) AND cats =>
@@ -109,7 +81,7 @@ export const useQueryStore = defineStore('query', {
          // Fields are joined together with AND or OR based on the fieldOp setting
          let qs = ""
          if (state.mode == "basic") {
-            qs = `${state.basic.field}: {${state.basic.value}}`
+            qs = `keyword: {${state.basic}}`
             return qs
          }
 
@@ -123,11 +95,11 @@ export const useQueryStore = defineStore('query', {
                if (term.field == "date") {
                   // special handling for date as it can include a range and a type
                   if (term.comparison == "BETWEEN") {
-                     qs += `${term.field}: {${term.value} TO ${term.endVal}}`
+                     qs += `date: {${term.value} TO ${term.endVal}}`
                   } else if (term.comparison == "EQUAL") {
-                     qs += `${term.field}: {${term.value}}`
+                     qs += `date: {${term.value}}`
                   } else {
-                     qs += `${term.field}: {${term.comparison} ${term.value}}`
+                     qs += `date: {${term.comparison} ${term.value}}`
                   }
                } else {
                   qs += `${term.field}: {${term.value}}`
@@ -143,21 +115,14 @@ export const useQueryStore = defineStore('query', {
       },
       isKeywordSearch: state => {
          if (state.mode == "basic") {
-            return state.basic.field == "keyword" && state.basic.value.length > 0
+            return state.basic.length > 0
          }
          let activeTerms = state.advanced.filter(t => t.value.length > 0)
          if (activeTerms.length == 0) return false
          return activeTerms.every(t => t.field == "keyword")
-      },
-      dateFilter: state => {
-         if ( state.poolDateFilters.has(state.targetPool) ) {
-            return state.poolDateFilters.get( state.targetPool )
-         }
-         return null
-      },
+      }
    },
    actions: {
-      // TODO is this needed? validate dates instead and flag error?
       fixDateSearches() {
          this.advanced.filter( f => f.field == "date" && f.comparison == "BETWEEN").forEach( df => {
             if ( df.value == "" && df.endVal != "") {
@@ -175,19 +140,6 @@ export const useQueryStore = defineStore('query', {
                }
             }
          })
-      },
-      setDateFilter( poolID, comparison, startDate, endDate ) {
-         // if ( this.mode == "basic" ) {
-         //    this.setAdvancedSearch()
-         // } 
-
-         this.poolDateFilters.set(poolID, {startDate: startDate, comparison: comparison, endDate: endDate} )
-      },
-      removeDateFilter( poolID ) {
-         this.poolDateFilters.delete( poolID )
-      },
-      resetAllDateFilters() {
-         this.poolDateFilters = new Map()
       },
       resetAdvancedForm() {
          this.advanced.splice(0, this.advanced.length)
@@ -220,8 +172,15 @@ export const useQueryStore = defineStore('query', {
       },
       restoreFromURL(queryParams) {
          // Clear out all existing data
-         this.basic = {field: "keyword", value: ""}
+         this.basic = ""
          this.advanced.splice(0, this.advanced.length)
+
+         // queries should be formatted like 'field: {...', but some older queries lack the field and braces
+         // look for these and turn them into a basic keyword seatch
+         if ( !queryParams.match(/^\w+:\s?{/) ) {
+            this.basic = queryParams
+            return
+         }
 
          while (queryParams.length > 0) {
             // A valid query has a field and term surrounded by { }. Find the braces...
@@ -258,13 +217,15 @@ export const useQueryStore = defineStore('query', {
                continue
             }
 
-            if (this.mode == "basic" && term.field != "date_filter") {
-               this.basic.field = term.field 
-               this.basic.value = value
+            if (this.mode == "basic") {
+               // basic only supports keyword
+               if ( term.field == "keyword" ) {
+                  this.basic = value
+               }
                continue
             }
 
-            if ( term.field == "date" || term.field == "date_filter" ) {
+            if ( term.field == "date" ) {
                // date values have 4 formats: {1988} {AFTER 1988} {BEFORE 1988} {1970 TO 2000}
                if ( value.includes("AFTER") || value.includes("after")  ) {
                   term.comparison = "AFTER"
@@ -278,20 +239,15 @@ export const useQueryStore = defineStore('query', {
                   term.endVal = value.split("TO")[1].trim()
                }
             }
-            if ( term.field == "date_filter") {
-               // set date filter in the poolDateFilters map
-               this.poolDateFilters.set(this.targetPool, {startDate: term.value, comparison: term.comparison, endDate: term.endVal})
-            } else {
-               this.advanced.push(term)
-            }
+            this.advanced.push(term)
          }
       },
 
       setAdvancedSearch() {
          this.mode = "advanced"
-         if ( this.basic.value != "") {
+         if ( this.basic != "") {
             this.advanced.splice(0, this.advanced.length)
-            this.advanced.push({ op: "AND", value: this.basic.value, field: this.basic.field, comparison: "EQUAL", endVal: "" })
+            this.advanced.push({ op: "AND", value: this.basic, field: "keyword", comparison: "EQUAL", endVal: "" })
          }
       },
       setTargetPool(pool) {
@@ -307,13 +263,16 @@ export const useQueryStore = defineStore('query', {
          this.advanced.splice(idx, 1)
       },
       clear() {
-         this.basic = {field: "keyword", value: ""}
+         this.basic = ""
          this.advanced.forEach( a => {
             a.op = "AND"
             a.value = ""
          })
          this.targetPool = ""
-         this.poolDateFilters = new Map()
+      },
+      widenSearch() {
+         this.targetPool = ""
+         this.searchSources = "all"
       },
    }
 })

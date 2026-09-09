@@ -13,23 +13,15 @@
             :style="{color: props.color}"
          >
             <slot name="title"></slot>
-            <i v-if="props.collapseButton" class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
+            <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
          </button>
-         <div class="extras">
-            <button v-if="props.closeButton" :style="{color: props.color}" @click="emit('close')"
-               aria-label="close accordion"
-            >
-               <i class="accordion-icon fal fa-xmark"></i>
-            </button>
-            <button v-if="hasSettings" aria-label="folder settings" class="settings-btn"
-               @click="emit('settingsClicked')" @keydown.prevent.enter="emit('settingsClicked')" @keydown.space.prevent="emit('settingsClicked')"
-               :aria-expanded="settingsExpandedStr"
-               :aria-controls="`${props.id}-settings`"
-               :style="{color: props.color}"
-            >
-               <i class="settings-icon fa-cog" :class="{fal: !props.showSettings, fas: props.showSettings}"></i>
-            </button>
-         </div>
+         <button v-if="hasSettings" aria-label="folder settings" class="settings-btn"
+            @click="emit('settingsClicked')" @keydown.prevent.enter="emit('settingsClicked')" @keydown.space.prevent="emit('settingsClicked')"
+            :aria-expanded="settingsExpandedStr"
+            :aria-controls="`${props.id}-settings`"
+         >
+            <i class="settings-icon fa-cog" :class="{fal: !props.showSettings, fas: props.showSettings}"></i>
+         </button>
       </h3>
       <transition
          @before-enter="onBeforeEnter"
@@ -71,19 +63,11 @@
 
 <script setup>
 import { ref, computed, watch, useSlots, nextTick } from 'vue'
-const emit = defineEmits( ['accordion-clicked', 'accordion-expanded', 'accordion-collapsed', 'settingsClicked', 'close'])
+const emit = defineEmits( ['accordion-clicked', 'accordion-expanded', 'accordion-collapsed', 'settingsClicked'])
 const props = defineProps({
    id: {
       type: String,
       reqired: true
-   },
-   closeButton: {
-      type: Boolean,
-      default: false
-   },
-   collapseButton: {
-      type: Boolean,
-      default: true
    },
    closeOthers: {
       type: Number,
@@ -233,28 +217,6 @@ function onAfterLeave(el) {
    margin:0;
    font-size: 1em;
 
-   .extras {
-      display: flex;
-      flex-flow: row nowrap;
-      gap: 5px;
-      margin-right: 5px;
-      button {
-         cursor: pointer;
-         border-radius: 20px;
-         border: 1px dotted transparent;
-         &:hover {
-            border-color: white;
-         }
-         &:focus {
-            outline: 2px dotted $uva-brand-blue-100;
-            outline-offset: 3px;
-         }
-         i {
-            font-size: 1.2em;   
-         }
-      }
-   }
-
    h3 {
       font-size: 1em;
       font-weight: normal;
@@ -271,14 +233,19 @@ function onAfterLeave(el) {
          outline: none;
          font-size: 1em;
       }
+      .settings-btn {
+         cursor: pointer;
+         margin-right: 5px;
+         .settings-icon {
+            font-size: 1.25em;
+         }
+      }
    }
 
    .accordion-settings {
       padding: 0 10px 10px 10px;
-      background: white;
+      background: $uva-grey-200;
       border: 1px solid $uva-grey-100;
-      border-top: 0;
-      border-bottom-width: 3px;
       text-align: right;
    }
 
@@ -302,14 +269,9 @@ function onAfterLeave(el) {
          font-size: 1.25em;
          transform: rotate(0deg);
          transition-duration: 250ms;
-         margin: 0 0 0 10px;
+         margin: 0 5px 0 10px;
          display: inline-block;
          margin-left: auto;
-         border-radius: 20px;;
-         border: 1px dotted transparent;
-         &:hover {
-            border-color: white;
-         }
       }
    }
 
@@ -318,12 +280,12 @@ function onAfterLeave(el) {
       padding: 0;
    }
    .accordion-content {
+      overflow: hidden;
       transition: all 250ms ease-out;
       margin:0;
       padding:0;
       text-align: left;
       background: white;
-      position: relative;
    }
 }
 </style>

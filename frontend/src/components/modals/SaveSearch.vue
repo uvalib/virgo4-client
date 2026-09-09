@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton severity="secondary" icon="fa-light fa-floppy-disk" label="Save Search" @click="openSaveClicked" />
+   <VirgoButton @click="openSaveClicked">Save Search</VirgoButton>
    <Dialog v-model:visible="searches.showSaveDialog" :modal="true" position="top" header="Save Search" @show="opened" :draggable="false">
       <div class="save-panel">
          <template v-if="showSignInMessage">

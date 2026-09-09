@@ -139,9 +139,11 @@ const displayReason = (( event, reason) => {
    }
 })
 const suggestionClick = ((suggType, val) => {
+   queryStore.userSearched = true
    if (suggType == 'author') {
       analytics.trigger('Results', 'AUTHOR_SUGGEST_CLICKED', val)
    } else if (suggType == 'book') {
+      queryStore.widenSearch()   // soem of the book suggestions are in WC, HathiTrust or JRML. Expand search to enclude everything
       analytics.trigger('Results', 'BOOK_SUGGEST_CLICKED', val)
    } else if (suggType == 'image') {
       analytics.trigger('Results', 'IMAGE_SUGGEST_CLICKED', val)
@@ -172,16 +174,15 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .header {
-   margin-top: 15px;
    display: flex;
    justify-content: space-between;
    align-items: baseline;
    padding: 5px 10px;
-   background-color: $uva-grey-200;
-   border: 1px solid $uva-grey-100;
-   color: $uva-grey-B;
+   background-color: $uva-brand-blue;
+   color: white;
+   border-radius: 0.3rem 0.3rem 0 0;
    .p-button {
-      color:  $uva-grey-B;
+      color: white;
       font-weight: bold;
       &:hover {
          background: white;
@@ -193,7 +194,7 @@ onMounted(() => {
    padding: 1rem;
    background-color: white;
    border: 1px solid $uva-grey-100;
-   border-top: none;
+   border-radius: 0.3rem;
    display: flex;
    flex-direction: column;
    text-align: left;

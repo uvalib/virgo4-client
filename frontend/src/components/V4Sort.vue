@@ -15,7 +15,6 @@ import { computed } from 'vue'
 import { usePoolStore } from "@/stores/pool"
 import { useSortStore } from "@/stores/sort"
 import { useRouter, useRoute } from 'vue-router'
-import { usePreferencesStore } from "@/stores/preferences"
 import analytics from '@/analytics'
 import { useRouteUtils } from '@/composables/routeutils'
 
@@ -24,7 +23,6 @@ const route = useRoute()
 const routeUtils = useRouteUtils(router, route)
 const poolStore = usePoolStore()
 const sortStore = useSortStore()
-const preferences = usePreferencesStore()
 
 const props = defineProps({
    pool: {
@@ -39,7 +37,6 @@ const canSort = computed(() => {
 
 const sortChanged = ( async () => {
    analytics.trigger('Results', 'SORT_CHANGED', `${route.query.mode}|${sortStore.activeSort}`)
-   preferences.setPoolSort(props.pool.id, sortStore.activeSort)
    routeUtils.sortChanged()
 })
 </script>
@@ -49,6 +46,10 @@ div.v4-sort {
    color :$uva-text-color-base;
    padding: 0;
    margin-top: 0;
+
+   label {
+      font-weight: bold;
+   }
    select {
       margin-left: 10px;
       cursor: pointer;
