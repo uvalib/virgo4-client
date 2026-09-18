@@ -3,12 +3,6 @@
       <VirgoButton severity="secondary" variant="link" style="padding:0" @click="showDialog = true" label="Help me search"/>
       <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Help me search" :draggable="false" @show="tipsOpened">
          <div class="tips">
-            <div class="section">How to search</div>
-            <ul class="dots">
-               <li>Selecting "Everything" will result in a sorted list of any record in Virgo.</li>
-               <li>Selecting "Catalog Only" results only in items UVA owns, minus articles and images.</li>
-               <li>After searching, you can use Filters to narrow your query.</li>
-            </ul>
             <div class="section">Search tips</div>
             <ul>
                <li class="no-pad">
@@ -28,6 +22,7 @@
                   <p>Use an asterisk ( * ) for wildcard searches:</p>
                   <p class="example">octo*<br/>Returns both "octopus" and "octothorpe".</p>
                </li>
+               <li>After searching, you can use Filters to narrow your query.</li>
             </ul>
             <div class="note">
                <b>NOTE: </b>Nested parentheses within a query are not supported.

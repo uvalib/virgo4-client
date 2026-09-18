@@ -1,7 +1,7 @@
 <template>
    <div class="date-wrapper">
       <div class="date-section">
-         <label>Date Published</label>
+         <label>Date</label>
          <div class="date-entry">
             <select v-model="dateType" name="date-type" @change="dateTypeChanged" aria-label="date range type">
                <option value="AFTER">AFTER</option>
