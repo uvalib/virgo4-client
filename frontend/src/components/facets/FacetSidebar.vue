@@ -43,7 +43,6 @@
             <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters</button> 
          </div>
          <AppliedFilters v-if="appliedFiltersCount > 0 && showGlobalFilterControls == false" />
-         <DateFilter v-if="canDateFilter && filtersUnavailable == false && filterStore.updatingFacets == false" />
          <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
             <div class="working">
                Loading filters...
@@ -53,7 +52,16 @@
             </div>
          </div>
          <template v-if="filtersUnavailable == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
-            <AccordionContent v-if="facetValuesCount(facetInfo) > 0"
+            <AccordionContent v-if="facetInfo.id == 'DATE_PLACEHOLDER' && prefs.isFilterExcluded(currPoolID, 'DATE_PLACEHOLDER') == false" 
+               :id="facetInfo.id" :background=colors.grey200 :expanded="true"
+               :closeButton="resultStore.selectedResults.pool.id != 'articles'" @close="excludeFilter(facetInfo)"
+            >
+               <template v-slot:title>Date</template>
+               <div class="date-container">
+                  <DateFilter  />
+               </div>
+            </AccordionContent>
+            <AccordionContent v-else-if="facetValuesCount(facetInfo) > 0"
                :id="facetInfo.id" :background=colors.grey200 :expanded="idx < 4"
                :closeButton="resultStore.selectedResults.pool.id != 'articles'" @close="excludeFilter(facetInfo)"
             >
@@ -187,12 +195,6 @@ const excludedFilters = computed(() =>{
 const hasFilterExclusions = computed(()=>{
    return prefs.filterExclusions(resultStore.selectedResults.pool.id).length > 0
 })
-const canDateFilter = computed(() => {
-   if (resultStore.selectedResults.pool.mode == 'image') return false
-   if ( hasFacets.value == false ) return false
-   return true
-})
-
 const startSidebarExpanded = computed(()=>{
    filterStore.closed = width.value < 810
    return width.value > 810
@@ -506,6 +508,11 @@ const filterSelected = ((facetID, facetValue) => {
             text-decoration: underline;
             font-weight: 500;
          }
+      }
+      div.date-container {
+         border: 1px solid $uva-grey-100;
+         border-top: 0;  
+         padding: 10px;
       }
       div.facet-container {
          div.facet-search, div.facet-sort, div.apply-controls {

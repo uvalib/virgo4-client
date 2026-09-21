@@ -1,7 +1,6 @@
 <template>
    <div class="date-wrapper">
       <div class="date-section">
-         <label>Date</label>
          <div class="date-entry">
             <select v-model="dateType" name="date-type" @change="dateTypeChanged" aria-label="date range type">
                <option value="AFTER">AFTER</option>
@@ -135,9 +134,7 @@ const applyDateFilterClicked = (() => {
    flex-direction: column;
    color: $uva-grey-B;
    background: white;
-   border-bottom: 1px solid $uva-grey-100;
-   padding: 0 0 15px 0;
-   margin-bottom: 5px;
+   padding: 0;
    display: flex;
    gap: 10px;
    

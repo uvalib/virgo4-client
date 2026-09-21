@@ -250,7 +250,15 @@ export const useFilterStore = defineStore('filter', {
             }
          } )
       
+         // reset the list and add a placeholder for date. Update sequence if saved
          tgtFacets.splice(0, tgtFacets.length)
+         let datePlaceholder = {id: "DATE_PLACEHOLDER", name: "Date", hidden: false, sequence: 1, buckets: []}
+         let sf = sequencedFacets.find( sf => sf.id == datePlaceholder.id)
+         if (sf) {
+            datePlaceholder.sequence = sf.sequence
+         }
+         tgtFacets.push( datePlaceholder )
+
          data.facets.forEach( (facet,idx) => {
             // NOTES: since the pool details now includes a date filter, the FilterDate facet is not needed. Skip it
             if (facet.id != "FilterDate" && facet.id != "PublicationYear" ) {
@@ -259,7 +267,8 @@ export const useFilterStore = defineStore('filter', {
                   facet.name = "Peer Review Status"
                }
 
-               facet.sequence = (idx+1+maxSeq)
+               // set a default sequence, then override with preferenes
+               facet.sequence = (idx+2+maxSeq) // +2 because the DATE_FILTER placeholder is 1
                let sf = sequencedFacets.find( sf => sf.id == facet.id)
                if (sf) {
                   facet.sequence = sf.sequence
