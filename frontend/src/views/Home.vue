@@ -23,6 +23,9 @@
                >
                <VirgoButton @click="searchClicked" class="search">Search</VirgoButton>
             </div>
+        
+               <SourceSelector />
+          
             <div class="search-mode">
                <router-link @click="resultStore.resetSearch()" to="/search?mode=advanced">Advanced Search</router-link>
                <template v-if="userStore.isSignedIn">
@@ -48,7 +51,7 @@ import Welcome from "@/components/Welcome.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import { scrollToItem } from '@/utils'
 import analytics from '@/analytics'
-import { onBeforeMount, computed } from 'vue'
+import { onBeforeMount } from 'vue'
 import { useRouter, useRoute, parseQuery } from 'vue-router'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -61,6 +64,7 @@ import { useBookmarkStore } from "@/stores/bookmark"
 import { watchDeep } from '@vueuse/core'
 import { useRouteUtils } from '@/composables/routeutils'
 import axios from 'axios'
+import SourceSelector from "../components/SourceSelector.vue"
 
 const router = useRouter()
 const route = useRoute()
@@ -196,58 +200,44 @@ async function searchClicked() {
       color: #444;
    }
    .search-panel {
-      margin: 0 auto 0 auto;
+      margin: 0 auto 20px auto;
       text-align: center;
       padding: 10px 2vw 10px 2vw;
-   }
-   .basic-search {
       display: flex;
-      flex-flow: row nowrap;
-      align-items: stretch;
-      justify-content: flex-start;
-      max-width: 800px;
-      margin: 0 auto 0 auto;
-
-      select {
-         border-radius: 0.3rem 0 0 0.3rem;
-         font-size: 1rem;
-      }
-
-      input[type=text].basic {
-         font-size: 1.15em;
-         padding: 0.5vw 0.75vw;
-         border-right: 0;
-         //border-left: 0;
-         margin: 0 !important;
-         border-radius: 0.3rem 0 0 0.3rem;
-         flex: 1 1 auto;
-         min-width: 100px;
-      }
-      .search {
-         border-radius: 0 0.3rem 0.3rem 0;
-         margin: 0;
-      }
-   }
-   div.advanced {
-      margin-top: 10px;
-      font-size: 1em;
-      text-align: right;
-   }
-   div.translate-message {
-      margin: 5px 0 15px 0;
-      font-size: 0.85em;
-   }
-   .controls-wrapper  {
-      max-width: 800px;
-      margin: 15px auto 20px auto;
-      display: flex;
-      flex-flow: row wrap;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      gap: 15px;
+
+      .basic-search {
+         display: flex;
+         flex-flow: row nowrap;
+         align-items: stretch;
+         justify-content: flex-start;
+         max-width: 800px;
+         width: 100%;
+
+         select {
+            border-radius: 0.3rem 0 0 0.3rem;
+            font-size: 1rem;
+         }
+
+         input[type=text].basic {
+            font-size: 1.15em;
+            padding: 0.5vw 0.75vw;
+            border-right: 0;
+            margin: 0 !important;
+            border-radius: 0.3rem 0 0 0.3rem;
+            flex: 1 1 auto;
+            min-width: 100px;
+         }
+         .search {
+            border-radius: 0 0.3rem 0.3rem 0;
+            margin: 0;
+         }
+      }
    }
    .search-mode {
-      text-align: center;
-      margin: 20px 0 10px 0;
+      width: 100%;
       display: flex;
       flex-flow: row wrap;
       justify-content: center;

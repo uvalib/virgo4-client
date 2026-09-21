@@ -12,18 +12,20 @@
       <div class="results-wrapper" >
          <div class="results-main">
             <div class="pool-tabs">
-               <div class="tab" v-for="(r,idx) in sourceTabs" :key="idx" :class="{showing: idx == resultStore.selectedResultsIdx}">
-                  <button class="pool" @click="poolSelected(r.pool.id)">
-                     <span>
-                        <div class="name">{{r.pool.name}}</div>
-                        <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
-                     </span>
-                  </button>
-                  <button v-if="user.isExperimental && canExclude(r.pool.id)" :aria-label="`exclude ${r.pool.name}`" :title="`exclude ${r.pool.name}`" 
-                     class="exclude" @click="excludePoolClicked(r.pool)">
-                     <i  class="fal fa-xmark"></i>
-                  </button>
-               </div>
+               <template v-for="(r,idx) in sourceTabs" >
+                  <div class="tab" :key="idx" :class="{showing: idx == resultStore.selectedResultsIdx}" v-if="showTab(r.pool.id)">
+                     <button class="pool" @click="poolSelected(r.pool.id)">
+                        <span>
+                           <div class="name">{{r.pool.name}}</div>
+                           <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
+                        </span>
+                     </button>
+                     <button v-if="user.isExperimental && canExclude(r.pool.id)" :aria-label="`exclude ${r.pool.name}`" :title="`exclude ${r.pool.name}`" 
+                        class="exclude" @click="excludePoolClicked(r.pool)">
+                        <i  class="fal fa-xmark"></i>
+                     </button>
+                  </div>
+               </template>
                <OtherPoolsPicker v-if="showMore" @selected="poolSelected" />
             </div>
             <PoolResultDetail />
@@ -39,7 +41,7 @@ import PoolResultDetail from "@/components/PoolResultDetail.vue"
 import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -59,15 +61,20 @@ const systemStore = useSystemStore()
 const user = useUserStore()
 const preferences = usePreferencesStore()
 
-const showMore = ref(resultStore.results.length > systemStore.maxPoolTabs)
-
 const canExclude = ((poolID) => {
    if ( !resultStore.selectedResults ) return false
    if ( user.isSignedIn == false ) return false
    return ( poolID != 'uva_library')
 })
 
-
+const showMore = computed(() => {
+   if ( queryStore.searchScope != "all") return false
+   return (resultStore.results.length > systemStore.maxPoolTabs)
+})
+const showTab = (( poolID ) => {
+   if ( queryStore.searchScope == "all") return true
+   return ( queryStore.searchScope == poolID )
+})
 
 const queryString = computed(()=>{
    return queryStore.string.replace(/\{|\}/g, "")
@@ -124,7 +131,6 @@ const excludePoolClicked = ( (pool) => {
          resultStore.selectPoolResults(0) // catalog is always 0
          queryStore.targetPool = resultStore.results[0].pool.id
          resultStore.dropResults( pool.id )
-         queryStore.targetPool = "uva_library"
          routeUtils.poolChanged()
       }
    })

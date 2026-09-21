@@ -115,7 +115,6 @@ const excludePoolClicked = ( (event, pool) => {
          resultStore.selectPoolResults(0) // catalog is always 0
          queryStore.targetPool = resultStore.results[0].pool.id
          resultStore.dropResults( pool.id )
-         queryStore.targetPool = "uva_library"
          routeUtils.poolChanged()
       }
    })

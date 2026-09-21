@@ -29,6 +29,7 @@ export const useQueryStore = defineStore('query', {
          { value: "published", label: "Publisher/Place of Publication", type: "text"}
       ],
       targetPool: "",
+      searchScope: "all",
       searchTargetOnly: false,
       poolDateFilters: new Map(),
       keepSettings: true

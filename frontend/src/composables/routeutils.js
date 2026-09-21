@@ -105,10 +105,9 @@ export function useRouteUtils( router,route ) {
  
          await searchCallback( queryFilterMode )
 
-         if (query.sort === undefined || query.pool === undefined) {
-            // Ensure pool and sort are always part of the URL. This will re-trigger queryParamsChanged.
+         if (query.sort === undefined ) {
+            // Ensure sort is always part of the URL. This will re-trigger queryParamsChanged.
             let newQ = Object.assign({}, query)
-            newQ.pool = resultStore.selectedResults.pool.id
             sortStore.setActivePool(resultStore.selectedResults.pool.id)
             newQ.sort = sortStore.activeSort
             router.replace({path: "/search", query: newQ})
@@ -140,6 +139,7 @@ export function useRouteUtils( router,route ) {
       queryStore.searchTargetOnly = false
 
       let newQ = Object.assign({}, route.query)
+      newQ.pool = queryStore.targetPool
 
       if ( newSearch &&  queryStore.keepSettings == false ) {
          console.log("RESET FILTERS / SORT FOR NEW QUERRY")
