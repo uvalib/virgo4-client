@@ -41,8 +41,9 @@
                <FormKit v-if="resultStore.hasResults==false && resultStore.searching == false" type="select" label="Sort by" v-model="sortStore.preSearchSort"
                   outer-class="$reset sort" inner-class="$reset sort"
                   :options="sortOptions" @change="sortChanged()" />
+               <SourceSelector v-if="resultStore.hasResults==false" />
             </div>
-            <V4FormActions :hasCancel="false" submitLabel="Search" submitID="do-advanced-request" />
+            <FormKit id="do-advanced-request" type="submit" label="Search" wrapper-class="submit-button" />
          </FormKit>
       </div>
    </div>
@@ -64,6 +65,7 @@ import { useSortStore } from "@/stores/sort"
 import { useFilterStore } from "@/stores/filter"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useRouteUtils } from '@/composables/routeutils'
+import SourceSelector from "../SourceSelector.vue"
 
 const router = useRouter()
 const route = useRoute()
@@ -167,8 +169,7 @@ onMounted(()=>{
    padding: 0 3vw 0 3vw;
 }
 .advanced-panel {
-   margin: 0 auto 0 auto;
-   text-align: center;
+   width: 100%;
    padding: 10px 5px;
    display: flex;
    flex-flow: row wrap;
@@ -176,11 +177,6 @@ onMounted(()=>{
    .advanced-wrap {
       flex: 1 1 70%;
       margin: 0;
-      :deep(form) {
-         display: flex;
-         flex-direction: column;
-         gap: 15px;
-      }
    }
 
    .search-term {
@@ -222,10 +218,15 @@ onMounted(()=>{
    }
    .controls {
       display: flex;
-      flex-flow: row wrap;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
    }
+}
+
+:deep(.submit-button) {
+   width: fit-content;
+   margin-left: auto;
 }
 
 .form-acts {
