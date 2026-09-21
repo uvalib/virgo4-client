@@ -27,7 +27,7 @@
             <Message variant="simple" severity="success" v-if="saved=='expand'" :life="2000" >Saved</Message>
          </div>
       </div>
-       <div class="grouping">
+       <div v-if="user.isExperimental" class="grouping">
          <h4>Exclude from search</h4>
          <div v-for="p in pools.canExcludeList" class="check">
             <label>
@@ -44,13 +44,13 @@
 import { ref } from 'vue'
 import { usePreferencesStore } from "@/stores/preferences"
 import { usePoolStore } from "@/stores/pool"
-import { useQueryStore } from "@/stores/query"
+import { useUserStore } from "@/stores/user"
 import Message from 'primevue/message'
 import analytics from '@/analytics'
 
 const preferences = usePreferencesStore()
 const pools = usePoolStore()
-const queryStore = useQueryStore()
+const user = useUserStore()
 const saved = ref("")
 
 const collapseGroupsClicked = ( async () => {

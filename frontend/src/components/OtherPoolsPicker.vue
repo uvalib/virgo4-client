@@ -10,7 +10,7 @@
                <div class="poolname">{{ selection.pool.name }}</div>
                <div class="total">({{  selection.total }})</div>
             </div>
-            <button :aria-label="`exclude ${selection.pool.name}`" :title="`exclude ${selection.pool.name}`" 
+            <button v-if="user.isExperimental" :aria-label="`exclude ${selection.pool.name}`" :title="`exclude ${selection.pool.name}`" 
                class="exclude" @click="excludePoolClicked($event, selection.pool)"
             >
                <i  class="fal fa-xmark"></i>
@@ -34,6 +34,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useResultStore } from "@/stores/result"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useQueryStore } from "@/stores/query"
+import { useUserStore } from "@/stores/user"
 import Select from 'primevue/select'
 import { storeToRefs } from "pinia"
 import * as utils from '../utils'
@@ -48,6 +49,7 @@ const routeUtils = useRouteUtils(router, route)
 const resultStore = useResultStore()
 const preferences = usePreferencesStore()
 const queryStore = useQueryStore()
+const user = useUserStore()
 
 const selectedPoolID = ref("")
 

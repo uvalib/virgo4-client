@@ -19,7 +19,7 @@
                         <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
                      </span>
                   </button>
-                  <button v-if="canExclude(r.pool.id)" :aria-label="`exclude ${r.pool.name}`" :title="`exclude ${r.pool.name}`" 
+                  <button v-if="user.isExperimental && canExclude(r.pool.id)" :aria-label="`exclude ${r.pool.name}`" :title="`exclude ${r.pool.name}`" 
                      class="exclude" @click="excludePoolClicked(r.pool)">
                      <i  class="fal fa-xmark"></i>
                   </button>
