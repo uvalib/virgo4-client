@@ -28,7 +28,7 @@ export const useQueryStore = defineStore('query', {
          { value: "date", label: "Date", type: "date" },
          { value: "published", label: "Publisher/Place of Publication", type: "text"}
       ],
-      targetPool: "",
+      targetPool: "uva_library",
       searchScope: "all",
       searchTargetOnly: false,
       poolDateFilters: new Map(),
@@ -313,7 +313,7 @@ export const useQueryStore = defineStore('query', {
             a.op = "AND"
             a.value = ""
          })
-         this.targetPool = ""
+         this.targetPool = "uva_library"
          this.poolDateFilters = new Map()
       },
    }
