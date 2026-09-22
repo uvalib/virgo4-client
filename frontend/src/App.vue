@@ -363,7 +363,7 @@ body {
    position: fixed !important;
    top: 0;
    width: 100%;
-   z-index: 500;
+   z-index: 1;
 }
 
 #app {

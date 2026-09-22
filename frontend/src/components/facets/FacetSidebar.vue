@@ -667,7 +667,7 @@ const filterSelected = ((facetID, facetValue) => {
    bottom: 0px;
    padding: 0px;
    margin: 0;
-   z-index: 5000;
+   z-index: 1;
    background-color: white;
    .body {
       max-height: calc(100vh - 40px); // max height is height of screen
