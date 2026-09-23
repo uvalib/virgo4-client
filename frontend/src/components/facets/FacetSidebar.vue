@@ -3,7 +3,7 @@
       <div class="header">
          <span class="title">Refine your results</span>
          <span class="controls">
-            <button aria-label="filter settings" @click="showSettings = !showSettings">
+            <button v-if="user.isExperimental" aria-label="filter settings" @click="showSettings = !showSettings">
                <i class="fa-cog" :class="{fal: !showSettings, fas: showSettings}"></i>
             </button>
             <button @click="sidebarClosed" aria-label="close filters">
@@ -38,6 +38,9 @@
       </div>
 
       <div class="body">
+         <div v-if="user.isExperimental == false" style="display: flex;flex-direction: column;">
+            <FacetOrder :facets="facets" @apply="setFacetOrder"/>
+         </div>
          <div class="apply-controls floating" v-if="showGlobalFilterControls">
             <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
             <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters</button> 
