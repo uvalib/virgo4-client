@@ -3,7 +3,7 @@
    <div class="items">
       <div class="parent"  v-for="boundIn in item.availability.boundWith">
          <div><strong>Bound in Parent</strong></div>
-         <router-link class="info"  :to="'/items/u' + boundIn.titleID" :class="{current: isCurrent(boundIn)}">
+         <router-link class="info"  :to="'/sources/uva_library/items/u' + boundIn.titleID" :class="{current: isCurrent(boundIn)}">
             <div>{{ boundIn.callNumber }}</div>
             <div>{{ boundIn.title }}</div>
          </router-link>
@@ -27,12 +27,12 @@
             </template>
             <Column field="callNumber" header="Call Number" sortable>
                <template #body="slotProps">
-                  <router-link :to="'/items/u' + slotProps.data.titleID">{{ slotProps.data.callNumber }}</router-link>
+                  <router-link :to="'/sources/uva_library/items/u' + slotProps.data.titleID">{{ slotProps.data.callNumber }}</router-link>
                </template>
             </Column>
             <Column field="title" header="Title" sortable>
                <template #body="slotProps">
-                  <router-link :to="'/items/u' + slotProps.data.titleID">{{ slotProps.data.title }}</router-link>
+                  <router-link :to="'/sources/uva_library/items/u' + slotProps.data.titleID">{{ slotProps.data.title }}</router-link>
                </template>
             </Column>
          </DataTable>
