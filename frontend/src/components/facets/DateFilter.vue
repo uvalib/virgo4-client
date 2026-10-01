@@ -15,7 +15,7 @@
             </template>
          </div>
          <div class="date-acts">
-            <VirgoButton severity="secondary" :label="dateLabel" size="small" @click="applyDateFilterClicked"/>
+            <VirgoButton severity="info" :label="dateLabel" size="small" @click="applyDateFilterClicked"/>
          </div>
       </div>
       <div class="error" v-if="dateErr">{{ dateErr }}</div>
@@ -157,12 +157,7 @@ const applyDateFilterClicked = (() => {
          }
       }
       .date-acts {
-         display: flex;
-         flex-flow: row nowrap;
-         gap: 10px;
-         button {
-            flex-grow: 1;
-         }
+         text-align: right;
       }
    }
  }

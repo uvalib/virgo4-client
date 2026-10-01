@@ -6,9 +6,6 @@
             <button v-if="user.isExperimental" aria-label="filter settings" @click="showSettings = !showSettings">
                <i class="fa-cog" :class="{fal: !showSettings, fas: showSettings}"></i>
             </button>
-            <button @click="sidebarClosed" aria-label="close filters">
-               <i class="fal fa-xmark"></i>
-            </button>
          </span>
       </div>
 
@@ -38,9 +35,6 @@
       </div>
 
       <div class="body">
-         <div v-if="user.isExperimental == false" style="display: flex;flex-direction: column;">
-            <FacetOrder :facets="facets" @apply="setFacetOrder"/>
-         </div>
          <div class="apply-controls floating" v-if="showGlobalFilterControls">
             <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
             <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters</button> 
@@ -66,7 +60,8 @@
             </AccordionContent>
             <AccordionContent v-else-if="facetValuesCount(facetInfo) > 0"
                :id="facetInfo.id" :background=colors.grey200 :expanded="idx < 4"
-               :closeButton="resultStore.selectedResults.pool.id != 'articles'" @close="excludeFilter(facetInfo)"
+               :closeButton="resultStore.selectedResults.pool.id != 'articles'" closeIcon="fa-light fa-filter-slash"
+               @close="excludeFilter(facetInfo)"
             >
                <template v-slot:title>{{ facetInfo.name }}</template>
                <div class="facet-container">
@@ -75,8 +70,8 @@
                         <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search"  aria-label="search filter values"/>
                      </div>
                      <div class="facet-sort">
-                        <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`fal ${filterSort(facetInfo.id,'alpha')}`"></i></button>
-                        <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`fal ${filterSort(facetInfo.id,'count')}`"></i></button>
+                        <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`${filterSort(facetInfo.id,'alpha')}`"></i></button>
+                        <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`${filterSort(facetInfo.id,'count')}`"></i></button>
                      </div>
                   </template>
                   <div class="apply-controls" v-if="prefs.orFilterMode == 'SINGLE' && filterStore.hasPendingChanges(currPoolID) && targetFacetID == facetInfo.id">
@@ -104,18 +99,23 @@
                </div>
             </AccordionContent>
          </template>
-            <AccordionContent v-if="hasFilterExclusions" id="filter-exclusions" :background=colors.grey200 :expanded="false" >
-               <template v-slot:title>Excluded Filters</template>
-               <div class="excluded-list">
-                  <template  v-for="filter in excludedFilters" :key="`${filter}-exclusion`">
-                     <button class="remove" :aria-label="`Restore ${filter.value} filter`" @click="removeExclusion(filter)" :title="`Restore ${filter.name} filter`">
-                        <i class="fas fa-times-circle"></i>
-                        <span>{{ filter.name }}</span>
-                     </button>
-                  </template>
-                  <VirgoButton label="Restore All" severity="secondary" size="small" @click="removeAllExclusions()"/>
+         <AccordionContent v-if="hasFilterExclusions" id="filter-exclusions" :background=colors.grey200 :expanded="false" >
+            <template v-slot:title>Excluded Filters</template>
+            <div class="excluded-list">
+               <template  v-for="filter in excludedFilters" :key="`${filter}-exclusion`">
+                  <button class="remove" :aria-label="`Restore ${filter.value} filter`" @click="removeExclusion(filter)" :title="`Restore ${filter.name} filter`">
+                     <span>{{ filter.name }}</span>
+                     <i class="fa-sharp fas fa-circle-up"></i>
+                  </button>
+               </template>
+               <div style="text-align: right">
+                  <VirgoButton label="Restore All" severity="info" size="small" @click="removeAllExclusions()"/>
                </div>
-            </AccordionContent>
+            </div>
+         </AccordionContent>
+         <div v-if="user.isExperimental == false" style="text-align: left;">
+            <FacetOrder :facets="facets" @apply="setFacetOrder"/>
+         </div>
       </div>
    </div>
    <div v-else class="padding"></div>
@@ -350,16 +350,36 @@ const setFilterSort = ((filter, sortType) => {
    analytics.trigger('Filters', 'FILTER_SORT_CHANGED', `${filter.id}:${sortType}_${order}`)
 })
 
+// filterID is the target filter, type is the sort type for this icon: alpha or count
 const filterSort = ((filterID, type) => {
-   let out = "fa-arrow-down-short-wide" // ASCENDING
    let filter = filterStore.poolFacets(resultStore.selectedResults.pool.id).find(f => f.id == filterID)
-   if (filter ) {
-      if (filter.sort != type ) {
-         out = "fa-arrow-down-arrow-up"  
-      } else if (filter.order == "desc") {
-         out = "fa-arrow-down-wide-short"   
+   if ( !filter ) return ""
+
+   // filter has .sort to define if sort is alpha or count and .order for asc or desc 
+   if (filterID == 'FilterSubject') {
+      console.log(`filter ${filterID} type ${type}`)
+      console.log(`${filter.sort} ${filter.order}`)
+   }
+   if (filter.sort != type ) {
+      // this type of sort is not in use, show down ip
+      return "fal fa-arrow-down-arrow-up"  
+   } 
+   
+   let out = ""
+   if (type == "count") {
+      if (filter.order == "asc") {
+         out = "fal fa-arrow-up-short-wide"
+      } else {
+         out = "fal fa-arrow-down-wide-short"
+      }
+   } else {
+      if (filter.order == "asc") {
+         out = "fal fa-arrow-up-a-z"
+      } else {
+         out = "fal fa-arrow-down-z-a"
       }
    }
+   
    return out
 })
 
@@ -401,8 +421,9 @@ const filterSelected = ((facetID, facetValue) => {
       flex-flow: row nowrap;
       justify-content: space-between;
       align-items: center;
-      background: $uva-grey-200;
-      border: 1px solid $uva-grey-100;
+      background:$uva-brand-blue;
+      color: white;
+      border: 1px solid $uva-brand-blue;
       padding: 10px 10px 8px 10px;
       .controls {
          display: flex;
@@ -414,9 +435,11 @@ const filterSelected = ((facetID, facetValue) => {
             border-radius: 20px;
             border: 1px dotted transparent;
             padding: 2px;
+            background-color: transparent;
+            color: white;
             &:hover {
-               border-color: $uva-grey;
-               background-color: white;
+               border-color: $uva-brand-blue-200;
+               background-color:$uva-brand-blue-200;
             }
             &:focus {
                outline: 2px dotted $uva-brand-blue-100;
@@ -614,7 +637,7 @@ const filterSelected = ((facetID, facetValue) => {
          border-top: 0;
          button.remove {
             border: 1px solid $uva-grey-100;
-            padding: 6px 8px;
+            padding: 6px 2px 6px 8px;
             border-radius: 0.3rem;
             margin: 0px;
             background: white;
@@ -623,9 +646,10 @@ const filterSelected = ((facetID, facetValue) => {
             text-align: left;
             font-size: 0.9rem;
             display: flex;
+            justify-content: space-between;
             i {
                margin: 1px 5px 0 0;
-               color: $uva-red;
+               color: $uva-green-A;
                font-size: 1rem;
             }
             &:hover {

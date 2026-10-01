@@ -8,12 +8,14 @@
          </button>
          <template  v-for="filter in appliedFilters" :key="`${filter}-values`">
             <button class="remove" @click="removeFilter(filter)" :aria-label="`remove filter ${filter.value}`">
-               <i class="fas fa-times-circle"></i>
                <span v-if="filter.facet_name" aria-hidden="true">{{filter.facet_name}}: {{filter.value}}</span>
                <span v-else aria-hidden="true">{{filter.value}}</span>
+               <i class="fas fa-times-circle"></i>
             </button>
          </template>
-         <VirgoButton @click="clearClicked" label="Clear Active Filters" severity="secondary" size="small"/>
+         <div style="text-align: right;">
+            <VirgoButton @click="clearClicked" label="Clear Active Filters" severity="info" size="small"/>
+         </div>
       </div>
    </div>
 </template>
@@ -110,7 +112,7 @@ function clearClicked() {
       gap: 5px;
       button.remove {
          border: 1px solid $uva-grey-100;
-         padding: 6px 8px;
+         padding: 6px 2px 6px 8px;
          border-radius: 0.3rem;
          margin: 0px;
          background: white;
@@ -119,6 +121,7 @@ function clearClicked() {
          text-align: left;
          font-size: 0.9rem;
          display: flex;
+         justify-content: space-between;
          i {
             margin: 1px 5px 0 0;
             color: $uva-red;

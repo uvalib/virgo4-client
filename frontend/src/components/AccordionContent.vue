@@ -19,7 +19,7 @@
             <button v-if="props.closeButton" :style="{color: props.color}" @click="emit('close')"
                aria-label="close accordion"
             >
-               <i class="accordion-icon fal fa-xmark"></i>
+               <i class="accordion-icon" :class="props.closeIcon"></i>
             </button>
             <button v-if="hasSettings" aria-label="folder settings" class="settings-btn"
                @click="emit('settingsClicked')" @keydown.prevent.enter="emit('settingsClicked')" @keydown.space.prevent="emit('settingsClicked')"
@@ -80,6 +80,10 @@ const props = defineProps({
    closeButton: {
       type: Boolean,
       default: false
+   },
+   closeIcon: {
+      type: String,
+      default: "fal fa-xmark"
    },
    collapseButton: {
       type: Boolean,

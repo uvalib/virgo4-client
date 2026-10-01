@@ -189,8 +189,8 @@ export const useFilterStore = defineStore('filter', {
 
          tgtF.buckets = tgtF.buckets.sort( (a,b) => {
             if (tgtF.sort == 'alpha') {
-               if (a.value > b.value) return -1*dir
-               if (a.value < b.value) return dir
+               if (a.value.toLowerCase() > b.value.toLowerCase()) return -1*dir
+               if (a.value.toLowerCase() < b.value.toLowerCase()) return dir
                return 0
             } else {
                if (a.count > b.count) return -1*dir
@@ -250,15 +250,7 @@ export const useFilterStore = defineStore('filter', {
             }
          } )
       
-         // reset the list and add a placeholder for date. Update sequence if saved
          tgtFacets.splice(0, tgtFacets.length)
-         let datePlaceholder = {id: "DATE_PLACEHOLDER", name: "Date", hidden: false, sequence: 1, buckets: []}
-         let sf = sequencedFacets.find( sf => sf.id == datePlaceholder.id)
-         if (sf) {
-            datePlaceholder.sequence = sf.sequence
-         }
-         tgtFacets.push( datePlaceholder )
-
          data.facets.forEach( (facet,idx) => {
             // NOTES: since the pool details now includes a date filter, the FilterDate facet is not needed. Skip it
             if (facet.id != "FilterDate" && facet.id != "PublicationYear" ) {
@@ -268,7 +260,7 @@ export const useFilterStore = defineStore('filter', {
                }
 
                // set a default sequence, then override with preferenes
-               facet.sequence = (idx+2+maxSeq) // +2 because the DATE_FILTER placeholder is 1
+               facet.sequence = (idx+1+maxSeq) 
                let sf = sequencedFacets.find( sf => sf.id == facet.id)
                if (sf) {
                   facet.sequence = sf.sequence
@@ -308,6 +300,16 @@ export const useFilterStore = defineStore('filter', {
                if (sortPref) {
                   // if preferences overrode the configured sort, resort to reflect the change
                   this.setSortOrder(data.pool, facet.id, facet.sort, facet.order )
+               }
+
+               if (facet.id == "FilterFormat") {
+                  // insert date palceholder after this
+                  let datePlaceholder = {id: "DATE_PLACEHOLDER", name: "Date", hidden: false, sequence: (idx+2+maxSeq), buckets: []}
+                  let sf = sequencedFacets.find( sf => sf.id == datePlaceholder.id)
+                  if (sf) {
+                     datePlaceholder.sequence = sf.sequence
+                  }
+                  tgtFacets.push( datePlaceholder )
                }
             }
          })

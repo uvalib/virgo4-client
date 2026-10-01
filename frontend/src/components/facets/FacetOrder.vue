@@ -1,14 +1,20 @@
 <template>
-   <VirgoButton severity="secondary" size="small" label="Set filter order" @click="showDialog = true" />
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Set Filter Order"  @show="opened">
+   <VirgoButton severity="secondary" size="small" label="Change Filter Order" icon="fa-light fa-sliders" @click="showDialog = true" />
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Change Filter Order"  @show="opened">
       <div class="help">Select a facet or facets and use the<br/>arrow buttons to change ordering.</div>
       <OrderList v-model="workingFacets" dataKey="id">
-         <template #option="{ option, selected }">
+         <template #option="{ option }">
             <div>
                <span>{{ option.name }}</span>
             </div>
          </template>
       </OrderList>
+      <div v-if="user.isSignedIn" class="signin">
+         Changes to the filter order will be persisted with your account.
+      </div>
+      <div v-else class="signin">
+         Changes to the filter order will only be persisted if you are <router-link to="/signin">signed in</router-link>.
+      </div>
       <template #footer>
          <VirgoButton severity="secondary" @click="showDialog = false" label="Cancel"/>
          <VirgoButton @click="applyClicked" label="Apply"/>
@@ -20,7 +26,9 @@
 import Dialog from 'primevue/dialog'
 import OrderList from 'primevue/orderlist'
 import { ref } from 'vue'
+import { useUserStore } from "@/stores/user"
 
+const user = useUserStore()
 const showDialog = ref(false)
 const workingFacets = ref([])
 
@@ -47,6 +55,10 @@ const opened = (() => {
 <style lang="scss" scoped>
 .help {
    margin-bottom: 15px;
+}
+.signin {
+   margin-top: 15px;
+   max-width: 225px;
 }
 :deep(.p-listbox-list-container) {
    .p-listbox-option {
