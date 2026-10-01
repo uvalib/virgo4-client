@@ -252,16 +252,17 @@ export const useFilterStore = defineStore('filter', {
       
          tgtFacets.splice(0, tgtFacets.length)
          let dateFilterAdded = false
-         let datePlaceholder = {id: "DATE_PLACEHOLDER", name: "Date", hidden: false, sequence: 1, buckets: []}
-         let sf = sequencedFacets.find( sf => sf.id == datePlaceholder.id)
-         if (sf) {
-            datePlaceholder.sequence = sf.sequence
-            tgtFacets.push( datePlaceholder )
-            dateFilterAdded = true
-         }
          data.facets.forEach( (facet,idx) => {
-            // NOTES: since the pool details now includes a date filter, the FilterDate facet is not needed. Skip it
-            if (facet.id != "FilterDate" && facet.id != "PublicationYear" ) {
+            // Override pool configured date filters with a custom filter that supports ranges. Only add one
+            if (dateFilterAdded == false && (facet.id == "FilterDate" || facet.id == "PublicationYear") ) {
+               let datePlaceholder = {id: "DATE_PLACEHOLDER", name: "Date", hidden: false, sequence: (idx+1+maxSeq) , buckets: []}
+               let sf = sequencedFacets.find( sf => sf.id == datePlaceholder.id)
+               if (sf) {
+                  datePlaceholder.sequence = sf.sequence
+               }
+               tgtFacets.push( datePlaceholder )
+               dateFilterAdded = true
+            } else {
                delete facet.type
                if (facet.id=="PeerReviewedOnly") {
                   facet.name = "Peer Review Status"
@@ -308,13 +309,6 @@ export const useFilterStore = defineStore('filter', {
                if (sortPref) {
                   // if preferences overrode the configured sort, resort to reflect the change
                   this.setSortOrder(data.pool, facet.id, facet.sort, facet.order )
-               }
-
-               if ((facet.id == "FilterFormat" || idx == 3) && dateFilterAdded == false) {
-                  // insert date palceholder after this if it hasnt already bee added
-                  datePlaceholder.sequence = (idx+2+maxSeq)
-                  tgtFacets.push( datePlaceholder )
-                  dateFilterAdded = true
                }
             }
          })
