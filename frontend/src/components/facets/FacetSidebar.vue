@@ -6,6 +6,9 @@
             <button v-if="user.isExperimental" aria-label="filter settings" @click="showSettings = !showSettings">
                <i class="fa-cog" :class="{fal: !showSettings, fas: showSettings}"></i>
             </button>
+            <button v-if="!startSidebarExpanded" @click="sidebarClosed" aria-label="close filters">
+               <i class="fal fa-xmark"></i>
+            </button>
          </span>
       </div>
 
@@ -50,7 +53,7 @@
          </div>
          <template v-if="filtersUnavailable == false" v-for="(facetInfo,idx) in facets" :key="facetInfo.id" >
             <AccordionContent v-if="facetInfo.id == 'DATE_PLACEHOLDER' && prefs.isFilterExcluded(currPoolID, 'DATE_PLACEHOLDER') == false" 
-               :id="facetInfo.id" :background=colors.grey200 :expanded="true"
+               :id="facetInfo.id" :background=colors.grey200 :expanded="true" closeIcon="fa-light fa-filter-slash"
                :closeButton="resultStore.selectedResults.pool.id != 'articles'" @close="excludeFilter(facetInfo)"
             >
                <template v-slot:title>Date</template>
@@ -393,6 +396,10 @@ const filterSelected = ((facetID, facetValue) => {
 </script>
 <style lang="scss" scoped>
 @media only screen and (min-width: 768px) {
+   .facet-sidebar {
+      min-width: 400px;   
+      max-width: 400px;  
+   }
    .padding {
       width: 5px;
    }
@@ -409,9 +416,7 @@ const filterSelected = ((facetID, facetValue) => {
     }
 }
 .facet-sidebar {
-   margin: 0px 0px 15px 0px;
-   min-width: 400px;   
-   max-width: 400px;    
+   margin: 0px 0px 15px 0px;  
    position: relative;
    top: -1px;
    left: -1px;

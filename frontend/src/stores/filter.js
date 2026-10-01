@@ -251,6 +251,14 @@ export const useFilterStore = defineStore('filter', {
          } )
       
          tgtFacets.splice(0, tgtFacets.length)
+         let dateFilterAdded = false
+         let datePlaceholder = {id: "DATE_PLACEHOLDER", name: "Date", hidden: false, sequence: 1, buckets: []}
+         let sf = sequencedFacets.find( sf => sf.id == datePlaceholder.id)
+         if (sf) {
+            datePlaceholder.sequence = sf.sequence
+            tgtFacets.push( datePlaceholder )
+            dateFilterAdded = true
+         }
          data.facets.forEach( (facet,idx) => {
             // NOTES: since the pool details now includes a date filter, the FilterDate facet is not needed. Skip it
             if (facet.id != "FilterDate" && facet.id != "PublicationYear" ) {
@@ -302,14 +310,11 @@ export const useFilterStore = defineStore('filter', {
                   this.setSortOrder(data.pool, facet.id, facet.sort, facet.order )
                }
 
-               if (facet.id == "FilterFormat") {
-                  // insert date palceholder after this
-                  let datePlaceholder = {id: "DATE_PLACEHOLDER", name: "Date", hidden: false, sequence: (idx+2+maxSeq), buckets: []}
-                  let sf = sequencedFacets.find( sf => sf.id == datePlaceholder.id)
-                  if (sf) {
-                     datePlaceholder.sequence = sf.sequence
-                  }
+               if ((facet.id == "FilterFormat" || idx == 3) && dateFilterAdded == false) {
+                  // insert date palceholder after this if it hasnt already bee added
+                  datePlaceholder.sequence = (idx+2+maxSeq)
                   tgtFacets.push( datePlaceholder )
+                  dateFilterAdded = true
                }
             }
          })
