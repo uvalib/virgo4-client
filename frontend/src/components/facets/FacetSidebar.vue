@@ -6,7 +6,7 @@
             <button v-if="user.isExperimental" aria-label="filter settings" @click="showSettings = !showSettings">
                <i class="fa-cog" :class="{fal: !showSettings, fas: showSettings}"></i>
             </button>
-            <button v-if="!startSidebarExpanded" @click="sidebarClosed" aria-label="close filters">
+            <button v-if="!startSidebarExpanded" @click="sidebarClosed" aria-label="close filters" id="close-facet-btn" @keydown.tab="firstBtnBlurred">
                <i class="fal fa-xmark"></i>
             </button>
          </span>
@@ -14,7 +14,6 @@
 
       <div v-if="showSettings" class="settings">
          <FacetMode/>
-         <FacetOrder :facets="facets" @apply="setFacetOrder"/>
          <div class="note">
             Within a category, filter values can be combined with AND or OR. For example, selecting "English" and "French" under Language:
             <ul>
@@ -116,8 +115,8 @@
                </div>
             </div>
          </AccordionContent>
-         <div v-if="user.isExperimental == false" style="text-align: left;">
-            <FacetOrder :facets="facets" @apply="setFacetOrder"/>
+         <div style="text-align: left;">
+            <FacetOrder :facets="facets" @apply="setFacetOrder" @blur="lastBtnBlurred" id="facet-order-control"/>
          </div>
       </div>
    </div>
@@ -126,7 +125,7 @@
 
 <script setup>
 import AccordionContent from "@/components/AccordionContent.vue"
-import { computed, ref } from 'vue'
+import { computed, ref, watch, nextTick } from 'vue'
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { usePoolStore } from "@/stores/pool"
@@ -144,6 +143,7 @@ import DateFilter from "@/components/facets/DateFilter.vue"
 import { useConfirm } from "primevue/useconfirm"
 import FacetOrder from "@/components/facets/FacetOrder.vue"
 import FacetMode from "@/components/facets/FacetMode.vue"
+import { storeToRefs } from "pinia"
 
 const { width } = useWindowSize()
 const route = useRoute()
@@ -159,6 +159,43 @@ const confirm = useConfirm()
 
 const showSettings = ref(false)
 const targetFacetID = ref("")
+
+// focus trap: when opened, focus on the close button. 
+const { closed } = storeToRefs(filterStore)
+watch( closed, (newValue) => {
+   if (newValue == false ) {
+      setFocusID('close-facet-btn')
+   }
+})
+// focus trap (mobile view only): shift-tab on first button cycles back to last control: the ordering dialog  
+const firstBtnBlurred = ((event) => {
+   // when in mobile mode and first control is shift-tabbed, 
+   // wrap focus to last button
+   if (!startSidebarExpanded.value && event.shiftKey) {
+      event.preventDefault()
+      event.stopPropagation() 
+      setFocusID('facet-order-control')
+   }
+})
+
+// focus trap (mobile view only): when the last item is tabbed, cucle back to the close button
+const lastBtnBlurred = ((event) => {
+   if (!startSidebarExpanded.value) {
+      event.preventDefault()
+      event.stopPropagation() 
+      setFocusID('close-facet-btn')
+   }
+})
+
+// focus trap helper; set focus to the given ID after the dm has been updated
+const setFocusID = ( (id) => {
+   nextTick( () => {
+      let ele = document.getElementById(id)
+      if (ele) {
+         ele.focus()
+      }
+   })
+})
 
 const showSidebar = computed(() => {
    // main reasons not to show: if no facet support, user closed the sidebar or an error
@@ -359,10 +396,6 @@ const filterSort = ((filterID, type) => {
    if ( !filter ) return ""
 
    // filter has .sort to define if sort is alpha or count and .order for asc or desc 
-   if (filterID == 'FilterSubject') {
-      console.log(`filter ${filterID} type ${type}`)
-      console.log(`${filter.sort} ${filter.order}`)
-   }
    if (filter.sort != type ) {
       // this type of sort is not in use, show down ip
       return "fal fa-arrow-down-arrow-up"  

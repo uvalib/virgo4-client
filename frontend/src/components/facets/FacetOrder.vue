@@ -1,5 +1,6 @@
 <template>
-   <VirgoButton severity="secondary" size="small" label="Change Filter Order" icon="fa-light fa-sliders" @click="showDialog = true" />
+   <VirgoButton severity="secondary" size="small" label="Change Filter Order" icon="fa-light fa-sliders" 
+      @click="showDialog = true" @keydown.tab="tabKeyPressed" :id="props.id"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Change Filter Order"  @show="opened">
       <div class="help">Select a facet or facets and use the<br/>arrow buttons to change ordering.</div>
       <OrderList v-model="workingFacets" dataKey="id">
@@ -32,12 +33,22 @@ const user = useUserStore()
 const showDialog = ref(false)
 const workingFacets = ref([])
 
-const emit = defineEmits( ['apply'])
+const emit = defineEmits( ['apply', 'blur'])
 const props = defineProps({
    facets: {
       type: Array,
-      reqired: true
+      required: true
    },
+   id: {
+      type: String,
+      required: true
+   }
+})
+
+const tabKeyPressed = ((event) => {
+   if (event.shiftKey == false ) {
+      emit('blur', event)
+   }
 })
 
 const applyClicked = (() => {
