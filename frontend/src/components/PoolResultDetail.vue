@@ -12,7 +12,7 @@
          <CollectionContext />
          <div class="actions-section">
             <div class="left-acts">
-               <VirgoButton v-if="hasFacets && selectedResults.statusCode != 408"" @click="filtersClicked()" :label="filterLabel" :icon="filterIcon" severity="secondary" />
+               <VirgoButton v-if="hasFacets && selectedResults.statusCode != 408" @click="filtersClicked()" :label="filterLabel" :icon="filterIcon" severity="secondary" />
                <SaveSearch />
                <VirgoButton v-if="showPrintButton" severity="secondary" @click="printResults" label="Print Results" icon="fa-light fa-print"/>
                <VirgoButton v-if="canUseSuggestor" severity="secondary" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb"/>
