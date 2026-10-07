@@ -1,7 +1,9 @@
 <template>
-   <div v-if="showSidebar" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" role="group">
+   <div v-if="showSidebar" class="facet-sidebar" :class="{overlay: !startSidebarExpanded}" 
+      :role="sidebarRole" :aria-modal="sidebarModal" :aria-labelledby="sidebarLabeledBy"
+   >
       <div class="header">
-         <span class="title">Refine your results</span>
+         <span id="sidebar-title" class="title">Refine your results</span>
          <span class="controls">
             <button v-if="user.isExperimental" aria-label="filter settings" @click="showSettings = !showSettings">
                <i class="fa-cog" :class="{fal: !showSettings, fas: showSettings}"></i>
@@ -205,6 +207,20 @@ const setFocusID = ( (id) => {
          ele.focus()
       }
    })
+})
+
+// Roles and aria properties required for accessibility. Vue will remove a property that has a null value
+const sidebarRole = computed(() => {
+   if ( startSidebarExpanded.value) return "group"
+   return "dialog"
+})
+const sidebarModal = computed(() => {
+   if ( startSidebarExpanded.value) return null
+   return true
+})
+const sidebarLabeledBy = computed(() => {
+   if ( startSidebarExpanded.value) return null
+   return "sidebar-title"
 })
 
 const showSidebar = computed(() => {
