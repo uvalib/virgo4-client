@@ -12,7 +12,9 @@
          <CollectionContext />
          <div class="actions-section">
             <div class="left-acts">
-               <VirgoButton v-if="hasFacets && selectedResults.statusCode != 408" @click="filtersClicked()" :label="filterLabel" :icon="filterIcon" severity="secondary" />
+               <VirgoButton v-if="hasFacets && selectedResults.statusCode != 408" id="toggle-filter-btn"
+                  @click="filtersClicked()" :label="filterLabel" :icon="filterIcon" severity="secondary" 
+               />
                <SaveSearch />
                <VirgoButton v-if="showPrintButton" severity="secondary" @click="printResults" label="Print Results" icon="fa-light fa-print"/>
                <VirgoButton v-if="canUseSuggestor" severity="secondary" @click="suggestor.toggle" label="Suggestions" icon="fas fa-lightbulb"/>
@@ -21,7 +23,7 @@
          </div>
       </div>
       <div class="detail-content">
-         <FacetSidebar />
+         <FacetSidebar trigger="toggle-filter-btn" />
          <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
             <template v-if="selectedResults.statusCode == 408">
                <span>Search timed out</span>

@@ -160,14 +160,24 @@ const confirm = useConfirm()
 const showSettings = ref(false)
 const targetFacetID = ref("")
 
+// focus trap: need the id of the button that opens the sidebar so it can be focused on close
+const props = defineProps({
+   trigger: {
+      type: String,
+      required: true
+   },
+})
+
 // focus trap: when opened, focus on the close button. 
 const { closed } = storeToRefs(filterStore)
 watch( closed, (newValue) => {
-   if (newValue == false ) {
+   if (newValue == false && !startSidebarExpanded.value ) {
       setFocusID('close-facet-btn')
+   } else if (newValue == true && !startSidebarExpanded.value ) {
+      setFocusID(props.trigger)
    }
 })
-// focus trap (mobile view only): shift-tab on first button cycles back to last control: the ordering dialog  
+// focus trap: shift-tab on first button cycles back to last control: the ordering dialog  
 const firstBtnBlurred = ((event) => {
    // when in mobile mode and first control is shift-tabbed, 
    // wrap focus to last button
@@ -178,7 +188,7 @@ const firstBtnBlurred = ((event) => {
    }
 })
 
-// focus trap (mobile view only): when the last item is tabbed, cucle back to the close button
+// focus trap: when the last item is tabbed, cucle back to the close button
 const lastBtnBlurred = ((event) => {
    if (!startSidebarExpanded.value) {
       event.preventDefault()
