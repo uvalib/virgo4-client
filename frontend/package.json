@@ -24,9 +24,9 @@
     "xml-beautifier": "^0.5.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.9",
+    "@vitejs/plugin-vue": "^6.0.10",
     "sass-embedded": "^1.105.1",
-    "vite": "^8.3.3"
+    "vite": "^8.3.4"
   },
   "allowScripts": {
     "@firebase/util@1.15.3": true,
