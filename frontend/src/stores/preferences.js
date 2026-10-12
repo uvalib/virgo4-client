@@ -14,7 +14,8 @@ export const usePreferencesStore = defineStore('preferences', {
       orFilterMode: "ALL",    // apply values for one filter at a time (SINGLE) of any (ALL)
       sort: {},               // default sort order for each pool; ket is poolID, value is sort order (ex: SortRelevance_desc)
       collapseGroups: false,
-      collapseDetails: false,
+      // collapseDetails: false,
+      expandDetails: false,
       aiDebug: false,
       aiFeatures: [],
       aiModel: "default",
@@ -84,9 +85,9 @@ export const usePreferencesStore = defineStore('preferences', {
             return tgt.excluded
          }
       },
-      expandDetails: state => {
-         return !state.collapseDetails
-      }
+      // expandDetails: state => {
+      //    return !state.collapseDetails
+      // }
    },
 
    actions: {
@@ -94,8 +95,11 @@ export const usePreferencesStore = defineStore('preferences', {
          if (prefsObj.collapseGroups ) {
             this.collapseGroups = prefsObj.collapseGroups
          }
-         if (prefsObj.collapseDetails ) {
-            this.collapseDetails = prefsObj.collapseDetails
+         // if (prefsObj.collapseDetails ) {
+         //    this.collapseDetails = prefsObj.collapseDetails
+         // }
+         if (prefsObj.expandDetails ) {
+            this.expandDetails = prefsObj.expandDetails
          }
          if ( prefsObj.trackingOptOut) {
             const { cookies } = useCookies()
@@ -268,8 +272,12 @@ export const usePreferencesStore = defineStore('preferences', {
          this.collapseGroups = !this.collapseGroups
          await this.save()
       },
-      async toggleCollapseDetails() {
-         this.collapseDetails = !this.collapseDetails
+      // async toggleCollapseDetails() {
+      //    this.collapseDetails = !this.collapseDetails
+      //    await this.save()
+      // },
+      async toggleExpandDetails() {
+         this.expandDetails = !this.expandDetails
          await this.save()
       },
       async updatePickupLibrary( pl ) {
@@ -306,7 +314,8 @@ export const usePreferencesStore = defineStore('preferences', {
             trackingOptOut: this.trackingOptOut,
             pickupLibrary: this.pickupLibrary,
             collapseGroups: this.collapseGroups,
-            collapseDetails: this.collapseDetails,
+            // collapseDetails: this.collapseDetails,
+            expandDetails: this.expandDetails,
             searchTemplate: this.searchTemplate,
             searchExclusions: this.searchExclusions,
             filters: this.filters,
