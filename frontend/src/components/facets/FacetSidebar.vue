@@ -8,7 +8,7 @@
             <button v-if="user.isExperimental" aria-label="filter settings" @click="showSettings = !showSettings">
                <i class="fa-cog" :class="{fal: !showSettings, fas: showSettings}"></i>
             </button>
-            <button v-if="!startSidebarExpanded" @click="sidebarClosed" aria-label="close filters" id="close-facet-btn" @keydown.tab="firstBtnBlurred">
+            <button v-if="!startSidebarExpanded" @click="sidebarClosed" aria-label="close filters" id="close-facet-btn" @keydown.tab="closeBtnBlurred">
                <i class="fal fa-xmark"></i>
             </button>
          </span>
@@ -39,10 +39,6 @@
       </div>
 
       <div class="body">
-         <div class="apply-controls floating" v-if="showGlobalFilterControls">
-            <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
-            <button class="apply" @click="applyOrFilter()"><i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters</button> 
-         </div>
          <AppliedFilters v-if="appliedFiltersCount > 0 && showGlobalFilterControls == false" />
          <div v-if="filterStore.updatingFacets || (facetsLoaded == false && resultStore.searching)" class="dimmer">
             <div class="working">
@@ -118,7 +114,13 @@
             </div>
          </AccordionContent>
          <div style="text-align: left;">
-            <FacetOrder :facets="facets" @apply="setFacetOrder" @blur="lastBtnBlurred" id="facet-order-control"/>
+            <FacetOrder :facets="facets" @apply="setFacetOrder" @blur="orderBtnBlurred" id="facet-order-control"/>
+         </div>
+          <div class="sticky-apply-controls" v-if="showGlobalFilterControls">
+            <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
+            <button id="apply-facet-btn" class="apply" @click="applyOrFilter()" @keydown.tab="applyFilterBtnBlurred">
+               <i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters
+            </button> 
          </div>
       </div>
    </div>
@@ -179,20 +181,34 @@ watch( closed, (newValue) => {
       setFocusID(props.trigger)
    }
 })
+
 // focus trap: shift-tab on first button cycles back to last control: the ordering dialog  
-const firstBtnBlurred = ((event) => {
+const closeBtnBlurred = ((event) => {
    // when in mobile mode and first control is shift-tabbed, 
    // wrap focus to last button
    if (!startSidebarExpanded.value && event.shiftKey) {
       event.preventDefault()
       event.stopPropagation() 
-      setFocusID('facet-order-control')
+      if ( showGlobalFilterControls.value ) {
+         setFocusID('apply-facet-btn')
+      } else {
+         setFocusID('facet-order-control')
+      }
    }
 })
 
-// focus trap: when the last item is tabbed, cucle back to the close button
-const lastBtnBlurred = ((event) => {
-   if (!startSidebarExpanded.value) {
+// focus trap: when apply UI is not visibile and the order button is tabbed, circle back to the close button
+const orderBtnBlurred = ((event) => {
+   if (!startSidebarExpanded.value && showGlobalFilterControls.value === false) {
+      event.preventDefault()
+      event.stopPropagation() 
+      setFocusID('close-facet-btn')
+   }
+})
+
+// focus trap: when apply UI is visible and apply item is tabbed, circle back to the close button
+const applyFilterBtnBlurred = ((event) => {
+   if (!startSidebarExpanded.value && showGlobalFilterControls.value && event.shiftKey == false) {
       event.preventDefault()
       event.stopPropagation() 
       setFocusID('close-facet-btn')
@@ -462,17 +478,17 @@ const filterSelected = ((facetID, facetValue) => {
    .padding {
       width: 5px;
    }
-   .apply-controls.floating {
-      width: 30%;
-    }
+   .sticky-apply-controls {
+       margin: 0 -16px -16px -16px;   
+   }
 }
 @media only screen and (max-width: 768px) {
    .padding {
       display: none;
    }
-    .apply-controls.floating {
-      width: 95%;
-    }
+   .sticky-apply-controls {
+      margin: 0 -10px 0 -10px;     
+   }
 }
 .facet-sidebar {
    margin: 0px 0px 15px 0px;  
@@ -551,24 +567,25 @@ const filterSelected = ((facetID, facetValue) => {
          opacity: 0.5;
       }
 
-      .apply-controls.floating {
-         position: fixed;
-         bottom: 15px;
-         left: 15px;
+      div.sticky-apply-controls {
          display: flex;
-         z-index: 100;
          flex-flow: row nowrap;
          justify-content: space-between;
          padding: 10px;
-         border: 2px solid $uva-teal-B;
-         background: $uva-teal-200;
-         box-shadow: 2px 2px 10px 0px $uva-grey-A;
-         border-radius: 0.5rem;
+         border: 3px solid $uva-blue-alt;
+         background: $uva-blue-alt-400;
+         position: sticky;
+         bottom: 0;
+        
          button {
             text-align: center;
             padding: 4px 8px 4px 4px;
             border-radius: 0.3rem;
             font-size: 1em;
+             &:focus {
+               outline: 1px dashed $uva-brand-blue;
+               outline-offset: 2px;
+            }
          }
          button.apply {
             background-color: $uva-brand-blue-100;

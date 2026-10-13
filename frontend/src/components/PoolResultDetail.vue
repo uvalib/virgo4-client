@@ -127,7 +127,7 @@ const filterLabel = computed(()=>{
 })
 const filterIcon = computed(()=>{
    if ( filters.closed==false) {
-      return "fa-regular fa-eye-slash"
+      return "fa-light fa-eye-slash"
    }
    return "fa-light fa-eye"
 })

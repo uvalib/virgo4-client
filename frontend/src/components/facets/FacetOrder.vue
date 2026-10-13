@@ -11,10 +11,10 @@
          </template>
       </OrderList>
       <div v-if="user.isSignedIn" class="signin">
-         Changes to the filter order will be persisted with your account.
+         Since you're signed in, this filter order will be saved with your account.
       </div>
       <div v-else class="signin">
-         Changes to the filter order will only be persisted if you are <router-link to="/signin">signed in</router-link>.
+         To save this filter order, you must be <router-link to="/signin">signed in</router-link>.
       </div>
       <template #footer>
          <VirgoButton severity="secondary" @click="showDialog = false" label="Cancel"/>
