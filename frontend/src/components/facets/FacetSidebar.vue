@@ -116,12 +116,18 @@
          <div style="text-align: left;">
             <FacetOrder :facets="facets" @apply="setFacetOrder" @blur="orderBtnBlurred" id="facet-order-control"/>
          </div>
-          <div class="sticky-apply-controls" v-if="showGlobalFilterControls">
+         <div class="sticky-apply-controls" v-if="showGlobalFilterControls && startSidebarExpanded">
             <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
             <button id="apply-facet-btn" class="apply" @click="applyOrFilter()" @keydown.tab="applyFilterBtnBlurred">
                <i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters
             </button> 
          </div>
+      </div>
+      <div class="sticky-apply-controls" v-if="showGlobalFilterControls && !startSidebarExpanded">
+         <button class="cancel" @click="cancelOrFilter()"><i class="fal fa-xmark"></i>Cancel</button> 
+         <button id="apply-facet-btn" class="apply" @click="applyOrFilter()" @keydown.tab="applyFilterBtnBlurred">
+            <i class="fal fa-check"></i>Apply {{ filterStore.pendingChangeCount(currPoolID) }} filters
+         </button> 
       </div>
    </div>
    <div v-else class="padding"></div>
@@ -487,7 +493,7 @@ const filterSelected = ((facetID, facetValue) => {
       display: none;
    }
    .sticky-apply-controls {
-      margin: 0 -10px 0 -10px;     
+      margin: 0;     
    }
 }
 .facet-sidebar {
@@ -550,6 +556,37 @@ const filterSelected = ((facetID, facetValue) => {
       background-color: white;
    }
 
+   div.sticky-apply-controls {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      padding: 10px;
+      border: 3px solid $uva-blue-alt;
+      background: $uva-blue-alt-400;
+      position: sticky;
+      bottom: 0;
+      
+      button {
+         text-align: center;
+         padding: 4px 8px 4px 4px;
+         border-radius: 0.3rem;
+         font-size: 1em;
+            &:focus {
+            outline: 1px dashed $uva-brand-blue;
+            outline-offset: 2px;
+         }
+      }
+      button.apply {
+         background-color: $uva-brand-blue-100;
+         color: white;
+         border: 1px solid $uva-brand-blue;
+      }
+      button.cancel {
+         background-color: $uva-grey-200;
+         border: 1px solid $uva-grey;
+      }
+   }
+
    .body {
       border: 1px solid $uva-grey-100;
       border-top: 0;
@@ -565,37 +602,6 @@ const filterSelected = ((facetID, facetValue) => {
 
       .dim {
          opacity: 0.5;
-      }
-
-      div.sticky-apply-controls {
-         display: flex;
-         flex-flow: row nowrap;
-         justify-content: space-between;
-         padding: 10px;
-         border: 3px solid $uva-blue-alt;
-         background: $uva-blue-alt-400;
-         position: sticky;
-         bottom: 0;
-        
-         button {
-            text-align: center;
-            padding: 4px 8px 4px 4px;
-            border-radius: 0.3rem;
-            font-size: 1em;
-             &:focus {
-               outline: 1px dashed $uva-brand-blue;
-               outline-offset: 2px;
-            }
-         }
-         button.apply {
-            background-color: $uva-brand-blue-100;
-            color: white;
-            border: 1px solid $uva-brand-blue;
-         }
-         button.cancel {
-            background-color: $uva-grey-200;
-            border: 1px solid $uva-grey;
-         }
       }
 
       button.filter {
@@ -780,8 +786,7 @@ const filterSelected = ((facetID, facetValue) => {
    .body {
       max-height: calc(100vh - 40px); // max height is height of screen
       overflow: scroll;
-      padding-left: 20px;
-      padding-right: 20px;
+      padding: 25px 25px 75px 25px;
    }
 }
 .spinner-animation {
