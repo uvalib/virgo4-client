@@ -443,24 +443,51 @@ const filterSort = ((filterID, type) => {
    let filter = filterStore.poolFacets(resultStore.selectedResults.pool.id).find(f => f.id == filterID)
    if ( !filter ) return ""
 
-   // filter has .sort to define if sort is alpha or count and .order for asc or desc 
-   if (filter.sort != type ) {
-      // this type of sort is not in use, show down ip
-      return "fal fa-arrow-down-arrow-up"  
-   } 
+
+   // For conventional sort beavior, uncomment this block and throw away the nonsense below it.
+   // // filter has .sort to define if sort is alpha or count and .order for asc or desc 
+   // if (filter.sort != type ) {
+   //    // this type of sort is not in use, show down ip
+   //    return "fal fa-arrow-down-arrow-up"  
+   // } 
+   
+   // let out = ""
+   // if (type == "count") {
+   //    if (filter.order == "asc") {
+   //       out = "fal fa-arrow-up-short-wide"
+   //    } else {
+   //       out = "fal fa-arrow-down-wide-short"
+   //    }
+   // } else {
+   //    if (filter.order == "asc") {
+   //       out = "fal fa-arrow-up-a-z"
+   //    } else {
+   //       out = "fal fa-arrow-down-z-a"
+   //    }
+   // }
    
    let out = ""
    if (type == "count") {
-      if (filter.order == "asc") {
-         out = "fal fa-arrow-up-short-wide"
-      } else {
+      if (filter.sort != type ) {
          out = "fal fa-arrow-down-wide-short"
+      } else {
+         if (filter.order == "asc") {
+            out = "fal fa-arrow-down-wide-short"
+         } else {
+            out = "fal fa-arrow-up-short-wide"
+         }
       }
    } else {
-      if (filter.order == "asc") {
-         out = "fal fa-arrow-up-a-z"
-      } else {
+      if (filter.sort != type ) {
          out = "fal fa-arrow-down-z-a"
+      } else {
+         if (filter.order == "asc") {
+            // out = "fal fa-arrow-up-a-z"
+            out = "fal fa-arrow-down-z-a"
+         } else {
+            // out = "fal fa-arrow-down-z-a"
+            out = "fal fa-arrow-up-a-z"
+         }
       }
    }
    
