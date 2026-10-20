@@ -70,8 +70,8 @@
                         <input type="text" :placeholder="`Search for ${facetInfo.name}`" v-model="facetInfo.search"  aria-label="search filter values"/>
                      </div>
                      <div class="facet-sort">
-                        <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`${filterSort(facetInfo.id,'alpha')}`"></i></button>
-                        <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`${filterSort(facetInfo.id,'count')}`"></i></button>
+                        <button @click="setFilterSort(facetInfo,'alpha')">Sort by name<i :class="`${filterSortIcon(facetInfo.id,'alpha')}`"></i></button>
+                        <button @click="setFilterSort(facetInfo,'count')">Sort by count<i :class="`${filterSortIcon(facetInfo.id,'count')}`"></i></button>
                      </div>
                   </template>
                   <div class="apply-controls" v-if="prefs.orFilterMode == 'SINGLE' && filterStore.hasPendingChanges(currPoolID) && targetFacetID == facetInfo.id">
@@ -439,7 +439,7 @@ const setFilterSort = ((filter, sortType) => {
 })
 
 // filterID is the target filter, type is the sort type for this icon: alpha or count
-const filterSort = ((filterID, type) => {
+const filterSortIcon = ((filterID, type) => {
    let filter = filterStore.poolFacets(resultStore.selectedResults.pool.id).find(f => f.id == filterID)
    if ( !filter ) return ""
 
@@ -472,21 +472,19 @@ const filterSort = ((filterID, type) => {
          out = "fal fa-arrow-down-wide-short"
       } else {
          if (filter.order == "asc") {
-            out = "fal fa-arrow-down-wide-short"
-         } else {
             out = "fal fa-arrow-up-short-wide"
+         } else {
+            out = "fal fa-arrow-down-wide-short"
          }
       }
    } else {
       if (filter.sort != type ) {
-         out = "fal fa-arrow-down-z-a"
+         out = "fal fa-arrow-up-a-z"
       } else {
          if (filter.order == "asc") {
-            // out = "fal fa-arrow-up-a-z"
-            out = "fal fa-arrow-down-z-a"
-         } else {
-            // out = "fal fa-arrow-down-z-a"
             out = "fal fa-arrow-up-a-z"
+         } else {
+            out = "fal fa-arrow-down-z-a"
          }
       }
    }
