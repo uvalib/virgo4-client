@@ -14,7 +14,7 @@
                <div class="search-box">
                   <input autocomplete="off" type="text" id="search"
                      @keyup.enter="searchClicked"
-                     v-model="queryStore.basic"
+                     v-model="queryStore.basic.value"
                   >
                   <VirgoButton label="Search" @click="searchClicked"  />
                </div>
@@ -52,6 +52,8 @@ const browseClicked = (() => {
 const searchClicked = (() => {
    filter.reset()
    filter.toggleFilter("presearch", collection.filter, collection.title)
+   // the collection search box is always a keyword search, regardless of the field used in a prior search
+   queryStore.basic.field = "keyword"
    queryStore.setTargetPool(item.details.source)
    routeUtils.collectionSearchChanged()
 })
