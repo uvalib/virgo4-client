@@ -56,6 +56,17 @@ onBeforeRouteUpdate(async (to) => {
 })
 
 const getDetails = ( async (src, id, initialPage) => {
+   // Legacy /items/ID URLs are routed to src=legacy. Look up the item's pool and redirect;
+   // the redirect triggers onBeforeRouteUpdate, which loads the full item details.
+   if ( src == "legacy" ) {
+      loadingDetails.value = true
+      await item.lookupCatalogKeyDetail( id )
+      if (item.notFound) {
+         loadingDetails.value = false
+      }
+      return
+   }
+
    // If a user is not signed in check if this pool is one of those that are unavailable to them
    if (user.isSignedIn == false && preferences.isPoolExcluded(route.params.src)) {
       console.log(route.params.src+ " is excluded for guest users")

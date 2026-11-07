@@ -363,6 +363,44 @@ export const useItemStore = defineStore('item', {
          })
       },
 
+      // Legacy URLs (/items/ID) do not include a source. Look up the ID across all pools and
+      // redirect to the full /sources/POOL/items/ID URL. The redirect triggers a full record get.
+      async lookupCatalogKeyDetail(catalogKey) {
+         this.clearDetails()
+         this.clearAvailability()
+         this.notFound = false
+
+         // strip punctuation that may be lingering at end of key from a bad cut/paste
+         catalogKey = cleanIdentifier(catalogKey)
+
+         let req = {
+            query: `identifier: {${catalogKey}}`,
+            pagination: { start: 0, rows: 1 },
+         }
+
+         try {
+            const system = useSystemStore()
+            let response = await axios.post(`${system.searchAPI}/api/search`, req)
+            if (response.data.total_hits == 1 ) {
+               this.setCatalogKeyDetails(response.data)
+               await this.router.replace(`/sources/${this.details.source}/items/${this.details.identifier}`)
+            } else {
+               this.clearDetails()
+               let q = `identifier: {${catalogKey}}`
+               await this.router.replace(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
+            }
+         } catch(error) {
+            this.clearDetails()
+            this.details.searching = false
+            if ( error.response && error.response.status == 404) {
+               console.warn(`Catalog Key ${catalogKey} not found`)
+               this.notFound = true
+            } else {
+               useSystemStore().setError(error)
+            }
+         }
+      },
+
       async getCitations({format, itemURL}) {
          const system = useSystemStore()
          let url = `${system.citationsURL}/format/${format}?item=${encodeURI(itemURL)}`
@@ -370,3 +408,10 @@ export const useItemStore = defineStore('item', {
       },
    }
 })
+
+function cleanIdentifier(identifier) {
+   // strip spaces and punctuation that may be attached to an identifier that was cut and pasted
+   let clean = identifier.trim()
+   clean = clean.replace(/(:|;|,|-|"|!|'|\?|\.|\]|\))+$/, '')
+   return clean
+}
