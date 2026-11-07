@@ -224,6 +224,16 @@ export const useQueryStore = defineStore('query', {
          this.basic = {field: "keyword", value: ""}
          this.advanced.splice(0, this.advanced.length)
 
+         // queries should be formatted like 'field: {...', but some older queries (and external
+         // links like /search?q=cats) lack the field and braces. Treat these as a basic keyword search
+         if ( !queryParams.match(/^\w+:\s?{/) ) {
+            this.basic.value = queryParams
+            if (this.mode == "advanced") {
+               this.advanced.push({ op: "AND", value: queryParams, field: "keyword", comparison: "EQUAL", endVal: "" })
+            }
+            return
+         }
+
          while (queryParams.length > 0) {
             // A valid query has a field and term surrounded by { }. Find the braces...
             let braceIdx = queryParams.indexOf("{")

@@ -150,8 +150,9 @@ const suggestionClick = ((suggType, val) => {
 
 const didYouMeanClick = (() => {
    analytics.trigger('Results', 'DID_YOU_MEAN_CLICKED', suggestor.didYouMean)
-   queryStore.basic = suggestor.didYouMean
-   router.push("/search?q="+encodeURIComponent(suggestor.didYouMean))
+   queryStore.mode = "basic"
+   queryStore.basic = {field: "keyword", value: suggestor.didYouMean}
+   router.push("/search?q="+encodeURIComponent(queryStore.string))
 })
 
 const getRelatedLink = ((sug) => {
