@@ -88,6 +88,7 @@ import V4Sort from "@/components/V4Sort.vue"
 import SaveSearch from "@/components/modals/SaveSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
 import { ref,computed, nextTick } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from "@/stores/user"
 import { useResultStore } from "@/stores/result"
 import { usePoolStore } from "@/stores/pool"
@@ -100,6 +101,8 @@ import analytics from '@/analytics'
 import FacetSidebar from "@/components/facets/FacetSidebar.vue"
 import SearchSuggestions from "@/components/SearchSuggestions.vue"
 
+const router = useRouter()
+const route = useRoute()
 const systemStore = useSystemStore()
 const resultStore = useResultStore()
 const poolStore = usePoolStore()
