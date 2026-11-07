@@ -16,9 +16,10 @@
          <div :id="`${props.id}-list`" aria-live="polite" class="truncated-links" :class="{inline: props.inline}">
             <div v-for="(val,idx) in truncatedLinks" class="link-wrap"  :key="`${props.id}-${idx}`">
                <span v-if="!props.inline" class="number">{{idx+1}}.</span>
-               <template v-for="linkInfo in (val,lIdx)">
-                  <span v-if="lIdx>0"> -- </span>
-                  <router-link :to="linkInfo.url" class="link">{{linkInfo.label}}</router-link>
+               <template v-for="(linkInfo,lIdx) in val">
+                  <span v-if="lIdx>0">&nbsp;--&nbsp;</span>
+                  <!-- the first link of each entry gets an ID so expand/toggle can set focus to the first entry -->
+                  <router-link :to="linkInfo.url" class="link" :id="lIdx == 0 ? `${props.id}-link-${idx+1}` : undefined">{{linkInfo.label}}</router-link>
                </template>
                <span v-if="props.inline && idx < truncatedLinks.length-1" class="sep">;</span>
             </div>
