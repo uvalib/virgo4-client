@@ -64,21 +64,21 @@ type AccountRequest struct {
 
 // IsGraduate returns true if this user is a graduate student
 func (u *ILSUserInfo) IsGraduate() bool {
-	match, _ := regexp.MatchString("(?i)graduate student", u.Description)
-	if match {
-		return true
-	}
-	match, _ = regexp.MatchString("GRADUATE", u.Profile)
+	// match, _ := regexp.MatchString("(?i)graduate student", u.Description)
+	// if match {
+	// 	return true
+	// }
+	match, _ := regexp.MatchString("GRADUATE", u.Profile)
 	return match
 }
 
 // IsUndergraduate returns true if this user is an undergraduate student
 func (u *ILSUserInfo) IsUndergraduate() bool {
-	match, _ := regexp.MatchString("(?i)undergraduate", u.Description)
-	if match {
-		return true
-	}
-	match, _ = regexp.MatchString("UNDERGRAD", u.Profile)
+	// match, _ := regexp.MatchString("(?i)undergraduate", u.Description)
+	// if match {
+	// 	return true
+	// }
+	match, _ := regexp.MatchString("UNDERGRAD", u.Profile)
 	return match
 }
 
@@ -90,11 +90,11 @@ func (u *ILSUserInfo) IsAlumni() bool {
 
 // IsFaculty returns true if this user is faculty
 func (u *ILSUserInfo) IsFaculty() bool {
-	match, _ := regexp.MatchString("(?i)faculty", u.Description)
-	if match {
-		return true
-	}
-	match, _ = regexp.MatchString("FACULTY", u.Profile)
+	// match, _ := regexp.MatchString("(?i)faculty", u.Description)
+	// if match {
+	// 	return true
+	// }
+	match, _ := regexp.MatchString("FACULTY", u.Profile)
 	return match
 }
 
@@ -106,11 +106,11 @@ func (u *ILSUserInfo) IsInstructor() bool {
 
 // IsStaff returns true if this user is staff
 func (u *ILSUserInfo) IsStaff() bool {
-	match, _ := regexp.MatchString("(?i)staff", u.Description)
-	if match {
-		return true
-	}
-	match, _ = regexp.MatchString("EMPLOYEE", u.Profile)
+	// match, _ := regexp.MatchString("(?i)staff", u.Description)
+	// if match {
+	// 	return true
+	// }
+	match, _ := regexp.MatchString("EMPLOYEE", u.Profile)
 	return match
 }
 
