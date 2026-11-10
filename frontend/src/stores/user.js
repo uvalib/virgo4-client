@@ -639,9 +639,14 @@ export const useUserStore = defineStore('user', {
          }).catch ( error => {
             this.lookingUp = false
             console.log("Unable to request new account: "+error)
-            let msg = "System error, we regret the inconvenience. If this problem persists, "
-            msg += "<a href='https://search.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-            system.setError(msg)
+            if (error.response?.status == 409) {
+               let msg = `Registration failed: ${error.response.data}`
+               system.setError(msg)
+            } else {
+               let msg = "System error, we regret the inconvenience. If this problem persists, "
+               msg += "<a href='https://search.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+               system.setError(msg)
+            }
          })
       },
       illiadRegistrationSubmitted() {
