@@ -640,7 +640,7 @@ export const useUserStore = defineStore('user', {
             this.lookingUp = false
             console.log("Unable to request new account: "+error)
             if (error.response?.status == 409) {
-               let msg = `Registration failed: ${error.response.data}. `
+               let msg = `Registration failed: ${error.response.data}.<br/>`
                msg += "Please contact <a href='mailto:lib-circ@virginia.edu'>lib-circ@virginia.edu</a> for help accessing your account."
                system.setError(msg)
             } else {
