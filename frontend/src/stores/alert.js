@@ -70,6 +70,11 @@ export const useAlertStore = defineStore('alert', {
          started = true
          try {
             await loader(src)
+            // a bundle that loads but does not register the element must not leave a plain HTMLElement behind:
+            // clearSeenAlerts() runs during sign-out and would throw on a missing clearSeen()
+            if (!customElements.get("uvalib-alerts")) {
+               throw new Error("uvalib-alerts element is not defined by the loaded bundle")
+            }
             const el = document.createElement("uvalib-alerts")
             el.setAttribute("headless", "")
             el.setAttribute("storage-key", AlertsStorage)

@@ -119,6 +119,21 @@ describe('alert store on <uvalib-alerts>', () => {
       expect(document.querySelector('uvalib-alerts')).toBeNull()
    })
 
+   it('a bundle that does not define the element is a load failure and sign-out still works', async () => {
+      const system = useSystemStore()
+      const report = vi.spyOn(system, 'reportError').mockImplementation(() => {})
+      const store = useAlertStore()
+      const defined = customElements.get('uvalib-alerts')
+      vi.spyOn(customElements, 'get').mockImplementation(name => (name === 'uvalib-alerts' ? undefined : defined))
+      await store.setConfig(cfg, okLoader)
+      expect(report).toHaveBeenCalledTimes(1)
+      expect(document.querySelector('uvalib-alerts')).toBeNull()
+      localStorage.setItem('v4SeenAlerts', '["x"]')
+      expect(() => store.clearSeenAlerts()).not.toThrow()
+      expect(() => store.dismissAlert('x')).not.toThrow()
+      expect(localStorage.getItem('v4SeenAlerts')).toBeNull()
+   })
+
    it('does nothing when alerts are not configured', async () => {
       const store = useAlertStore()
       await store.setConfig({}, okLoader)
