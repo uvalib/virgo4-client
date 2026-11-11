@@ -14,15 +14,6 @@ type SMTPConfig struct {
 	Sender string
 }
 
-// FirebaseConfig wraps up all of the firebase connection configuration
-type FirebaseConfig struct {
-	APIKey      string `json:"apiKey"`
-	AuthDomain  string `json:"authDomain"`
-	DatabaseURL string `json:"databaseURL"`
-	ProjectID   string `json:"projectId"`
-	AppID       string `json:"appId"`
-}
-
 // DBConfig wraps up all of the DB configuration
 type DBConfig struct {
 	Host string
@@ -64,7 +55,7 @@ type ServiceConfig struct {
 	DB             DBConfig
 	SMTP           SMTPConfig
 	Illiad         IlliadConfig
-	Firebase       FirebaseConfig
+	AlertsURL      string
 }
 
 // LoadConfig will load the service configuration from env/cmdline
@@ -107,12 +98,8 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.SMTP.Pass, "smtppass", "", "SMTP Password")
 	flag.StringVar(&cfg.SMTP.Sender, "smtpsender", "virgo4@virginia.edu", "SMTP sender email")
 
-	// Firebase connection (just gets passed to client)
-	flag.StringVar(&cfg.Firebase.APIKey, "fbkey", "", "Firebase API key")
-	flag.StringVar(&cfg.Firebase.AppID, "fbapp", "", "Firebase app ID")
-	flag.StringVar(&cfg.Firebase.AuthDomain, "fbdomain", "", "Firebase auth domain")
-	flag.StringVar(&cfg.Firebase.DatabaseURL, "fbdb", "", "Firebase database URL")
-	flag.StringVar(&cfg.Firebase.ProjectID, "fbproject", "", "Firebase projectID")
+	// <uvalib-alerts> base URL (just gets passed to client)
+	flag.StringVar(&cfg.AlertsURL, "alertsurl", "", "Base URL of the uvalib-alerts CDN (config.json, alerts.json, v1/uvalib-alerts.js)")
 
 	flag.Parse()
 
@@ -160,14 +147,10 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("jwtkey param is required")
 	}
 
-	if cfg.Firebase.APIKey == "" {
-		cfg.Firebase.AppID = ""
-		cfg.Firebase.AuthDomain = ""
-		cfg.Firebase.DatabaseURL = ""
-		cfg.Firebase.ProjectID = ""
-		log.Printf("Firebase connectivity is not configured")
+	if cfg.AlertsURL == "" {
+		log.Printf("Alerts are not configured")
 	} else {
-		log.Printf("Firebase configured for project ID: %s", cfg.Firebase.ProjectID)
+		log.Printf("Alerts configured: %s", cfg.AlertsURL)
 	}
 
 	return &cfg
