@@ -210,6 +210,13 @@ const marcXML = computed(()=>{
 })
 
 const toggleExpandedView = (() => {
+   if ( detailExpanded.value) {
+      console.log("COLLAPSE")
+      analytics.trigger('Details', 'COLLAPSE_DETAILS_CLICKED', "")
+   } else {
+      console.log("EXPAND")
+      analytics.trigger('Details', 'EXPAND_DETAILS_CLICKED', "")
+   }
    detailExpanded.value = !detailExpanded.value
 })
 
