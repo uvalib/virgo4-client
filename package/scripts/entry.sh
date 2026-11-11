@@ -15,6 +15,12 @@ if [ -n "${V4_SMPT_PASS}" ]; then
    SMTP_PASS_OPT="-smtppass ${V4_SMPT_PASS}"
 fi
 
+# uvalib-alerts base URL (optional; alerts are disabled without it)
+ALERTS_URL_OPT=""
+if [ -n "${V4_ALERTS_URL}" ]; then
+   ALERTS_URL_OPT="-alertsurl ${V4_ALERTS_URL}"
+fi
+
 # run application
 
 cd bin; ./v4srv \
@@ -38,14 +44,10 @@ cd bin; ./v4srv \
    -jwtkey ${V4_JWT_KEY} \
    -hsilliad ${V4_HSL_ILLIAD_URL} \
    -shelf ${V4_SHELF_BROWSE} \
-   -fbkey ${V4_FB_KEY} \
-   -fbdomain ${V4_FB_DOMAIN} \
-   -fbdb ${V4_FB_DB} \
-   -fbproject ${V4_FB_PROJECT} \
-   -fbapp ${V4_FB_APP} \
    -suggestions ${V4_SUGGESTIONS} \
    ${SMTP_USER_OPT} \
-   ${SMTP_PASS_OPT}
+   ${SMTP_PASS_OPT} \
+   ${ALERTS_URL_OPT}
 
 # return the status
 exit $?
