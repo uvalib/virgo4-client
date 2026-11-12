@@ -26,7 +26,7 @@
                      </button>
                   </div>
                </template>
-               <OtherPoolsPicker v-if="showMore" @selected="poolSelected" />
+               <OtherPoolsPicker v-if="showOther" @selected="poolSelected" />
             </div>
             <PoolResultDetail />
          </div>
@@ -41,7 +41,7 @@ import PoolResultDetail from "@/components/PoolResultDetail.vue"
 import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -61,16 +61,14 @@ const systemStore = useSystemStore()
 const user = useUserStore()
 const preferences = usePreferencesStore()
 
+const showOther = ref(false)
+
 const canExclude = ((poolID) => {
    if ( !resultStore.selectedResults ) return false
    if ( user.isSignedIn == false ) return false
    return ( poolID != 'uva_library')
 })
 
-const showMore = computed(() => {
-   if ( queryStore.searchScope != "all") return false
-   return (resultStore.results.length > systemStore.maxPoolTabs)
-})
 const showTab = (( poolID ) => {
    if ( queryStore.searchScope == "all") return true
    return ( queryStore.searchScope == poolID )
@@ -92,14 +90,14 @@ const sourceTabs = computed(()=>{
       }
    })
 
-
+   showOther.value = true
    if ( resultStore.results.length == 1) {
-      showMore.value = false   
+      showOther.value = false   
    } else {
       // if there is only 1 in the other list, promote it to a top-level tab and set a flag to remove More
       if (other.length == 1) {
          tabs.push( other[0])
-         showMore.value = false
+         showOther.value = false
       }
    }
    return tabs
