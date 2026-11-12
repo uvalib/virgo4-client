@@ -213,7 +213,7 @@ export const useSystemStore = defineStore('system', {
          let host = window.location.hostname
          return axios.get("/config", {headers: {V4Host:host}}).then((response) => {
             this.setConfig(response.data)
-            if (response.data.firebase) {
+            if (response.data.alerts) {
                const alertStore = useAlertStore()
                alertStore.setConfig(response.data)
             }

@@ -37,7 +37,7 @@ type ServiceContext struct {
 	CatalogPoolURL  string
 	JWTKey          string
 	Dev             DevConfig
-	Firebase        FirebaseConfig
+	AlertsURL       string
 	GDB             *gorm.DB
 	SMTP            SMTPConfig
 	Illiad          IlliadConfig
@@ -70,7 +70,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		SMTP:           cfg.SMTP,
 		Illiad:         cfg.Illiad,
 		Dev:            cfg.Dev,
-		Firebase:       cfg.Firebase,
+		AlertsURL:      cfg.AlertsURL,
 	}
 
 	log.Printf("INFO: connecting GORM to postgress...")
@@ -258,49 +258,61 @@ func getLatestMigrationNumber() int {
 	return maxNum
 }
 
+type illiadCfg struct {
+	Departments []string `json:"departments"`
+	Buildings   []string `json:"buildings"`
+	Schools     []string `json:"schools"`
+}
+
+// alertsConfig tells the client where <uvalib-alerts> lives (config.json, alerts.json, v1/uvalib-alerts.js)
+type alertsConfig struct {
+	Src string `json:"src"`
+}
+
+type clientConfig struct {
+	SearchAPI       string          `json:"searchAPI"`
+	SuggestionsAPI  string          `json:"suggestionsAPI"`
+	CitationsURL    string          `json:"citationsURL"`
+	ColectionsURL   string          `json:"collectionsURL"`
+	ShelfBrowseURL  string          `json:"shelfBrowseURL"`
+	HealthSciURL    string          `json:"hsILLiadURL"`
+	ILLiad          illiadCfg       `json:"illiad"`
+	KioskMode       bool            `json:"kiosk"`
+	DevServer       bool            `json:"devServer"`
+	Alerts          *alertsConfig   `json:"alerts,omitempty"`
+	PickupLibraries []pickupLibrary `json:"pickupLibraries"`
+}
+
+// baseConfig builds the client configuration that needs no database or file access
+func (svc *ServiceContext) baseConfig(v4Host string) clientConfig {
+	cfg := clientConfig{SearchAPI: svc.SearchAPI, SuggestionsAPI: svc.SuggestionsAPI, CitationsURL: svc.CitationsURL,
+		ColectionsURL:  svc.CollectionsURL,
+		ShelfBrowseURL: svc.ShelfBrowseURL,
+		HealthSciURL:   svc.Illiad.HealthSciURL, KioskMode: false,
+	}
+	if svc.AlertsURL != "" {
+		cfg.Alerts = &alertsConfig{Src: svc.AlertsURL}
+	}
+	if strings.Contains(v4Host, "-kiosk") || svc.Dev.Kiosk {
+		log.Printf("This request is from a kiosk")
+		cfg.KioskMode = true
+	}
+	if strings.Contains(v4Host, "-dev") || svc.Dev.AuthUser != "" {
+		log.Printf("This request is from a dev server")
+		cfg.DevServer = true
+	}
+	return cfg
+}
+
 // GetConfig returns front-end configuration data as JSON
 func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	type mapTarget struct {
 		Pool   string `json:"pool"`
 		Filter string `json:"filter"`
 	}
-	type illiadCfg struct {
-		Departments []string `json:"departments"`
-		Buildings   []string `json:"buildings"`
-		Schools     []string `json:"schools"`
-	}
-	type config struct {
-		SearchAPI       string          `json:"searchAPI"`
-		SuggestionsAPI  string          `json:"suggestionsAPI"`
-		CitationsURL    string          `json:"citationsURL"`
-		ColectionsURL   string          `json:"collectionsURL"`
-		ShelfBrowseURL  string          `json:"shelfBrowseURL"`
-		HealthSciURL    string          `json:"hsILLiadURL"`
-		ILLiad          illiadCfg       `json:"illiad"`
-		KioskMode       bool            `json:"kiosk"`
-		DevServer       bool            `json:"devServer"`
-		Firebase        *FirebaseConfig `json:"firebase,omitempty"`
-		PickupLibraries []pickupLibrary `json:"pickupLibraries"`
-	}
-	cfg := config{SearchAPI: svc.SearchAPI, SuggestionsAPI: svc.SuggestionsAPI, CitationsURL: svc.CitationsURL,
-		ColectionsURL:  svc.CollectionsURL,
-		ShelfBrowseURL: svc.ShelfBrowseURL,
-		HealthSciURL:   svc.Illiad.HealthSciURL, KioskMode: false,
-	}
-	if svc.Firebase.APIKey != "" {
-		cfg.Firebase = &svc.Firebase
-	}
-
 	v4HostHeader := c.Request.Header.Get("V4Host")
 	log.Printf("Config request V4Host header: %s", v4HostHeader)
-	if strings.Contains(v4HostHeader, "-kiosk") || svc.Dev.Kiosk {
-		log.Printf("This request is from a kiosk")
-		cfg.KioskMode = true
-	}
-	if strings.Contains(v4HostHeader, "-dev") || svc.Dev.AuthUser != "" {
-		log.Printf("This request is from a dev server")
-		cfg.DevServer = true
-	}
+	cfg := svc.baseConfig(v4HostHeader)
 
 	dbResp := svc.GDB.Order("name asc").Find(&cfg.PickupLibraries)
 	if dbResp.Error != nil {
