@@ -90,7 +90,7 @@ const sourceTabs = computed(()=>{
       }
    })
 
-   showOther.value = true
+   showOther.value = (queryStore.searchScope == "all")
    if ( resultStore.results.length == 1) {
       showOther.value = false   
    } else {
