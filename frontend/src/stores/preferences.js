@@ -135,7 +135,7 @@ export const usePreferencesStore = defineStore('preferences', {
             this.filters = prefsObj.filters
          }
          this.facetMode = prefsObj.facetMode || "OR"
-         this.orFilterMode = prefsObj.orFilterMode || "SINGLE"
+         this.orFilterMode = prefsObj.orFilterMode || "ALL"
          this.sort =  prefsObj.sort || {}
 
          this.aiDebug = prefsObj.aiDebug || false
