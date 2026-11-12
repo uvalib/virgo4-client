@@ -138,11 +138,13 @@ export const useResultStore = defineStore('result', {
 
          if ( poolResults.pagination.start == 0 ) {
             // if this is a request for the first page, clear out any existing results for this pool
-            // this happens when sort order is changed. Also remove the original pool total from
-            // the collective pool hits total
-            this.total -= tgtPoolResults.total
+            // this happens when sort order is changed
             tgtPoolResults.hits = []
          }
+
+         // replace this pool's contribution to the collective hits total. This must happen for every page,
+         // not just the first; otherwise each 'Load More' adds the pool total again
+         this.total -= tgtPoolResults.total
          tgtPoolResults.total = poolResults.pagination.total
          this.total += poolResults.pagination.total
          
