@@ -4,7 +4,7 @@
          <!-- sign in and ils account required for all but direct and aeon-->
          <MicroFormDialog v-if="request.hasOption('microform')" />
          <PlaceHoldDialog v-if="request.hasOption('hold')" />
-         <ScanRequestDialog v-if="request.hasOption('scan')" />
+         <ScanRequestDialog v-if="request.hasOption('scan') && user.canUseILLiad" />
          <VideoReserveDialog v-if="user.canMakeReserves && request.hasOption('videoReserve')" />
          <AeonRequestDialog v-if="request.hasOption('aeon')" />
          <VirgoButton v-if="request.hasOption('directLink')" label="Request a scan"
