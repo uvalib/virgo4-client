@@ -40,15 +40,17 @@ const routeUtils = useRouteUtils(router, route)
 
 const { searchScope } = storeToRefs(queryStore)
 watch( searchScope, () => {
-   queryStore.targetPool = queryStore.searchScope
-   analytics.trigger('Search', 'SCOPE_CHANGED', `${queryStore.mode}|${ queryStore.targetPool }`)
+   analytics.trigger('Search', 'SCOPE_CHANGED', `${queryStore.mode}|${ queryStore.searchScope }`)
+
+   // 'all' is a scope, not a pool. targetPool must always be a real pool ID or
+   // single-pool searches (filter / sort) will fail to find the pool
+   let tgtPool = queryStore.searchScope
+   if ( tgtPool == 'all') tgtPool = 'uva_library'
+   queryStore.targetPool = tgtPool
 
    if ( resultsStore.hasResults ) {
-      let tgtPool = queryStore.searchScope
-      if ( tgtPool == 'all') tgtPool = 'uva_library'
       let tgtIdx = resultsStore.results.findIndex( r => r.pool.id == tgtPool )
       resultsStore.selectPoolResults(tgtIdx)
-      queryStore.targetPool = tgtPool
       routeUtils.poolChanged()
    }
 })

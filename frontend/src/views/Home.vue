@@ -133,9 +133,11 @@ const handleQueryParamChange = ( async() => {
    routeUtils.queryParamsChanged(async (filterModeOverride) => {
       assertive(`search in progress`)
 
-      if ( queryStore.searchTargetOnly ) {
+      // targetPool may not be a known pool (ex: older URLs with pool=all); fall back to searching all pools
+      const tgtPool = poolStore.poolDetails(queryStore.targetPool)
+      if ( queryStore.searchTargetOnly && tgtPool ) {
          console.log("SEARCH ONLY "+queryStore.targetPool)
-         await resultStore.searchPool({pool: poolStore.poolDetails(queryStore.targetPool)}, filterModeOverride)
+         await resultStore.searchPool({pool: tgtPool}, filterModeOverride)
       } else {
       console.log("SEARCH ALL POOLS")
          await resultStore.searchAllPools( filterModeOverride )
