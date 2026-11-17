@@ -263,7 +263,7 @@ const poolSelected = (( poolID ) => {
 @media only screen and (max-width: 768px) {
    div.search-results {
       margin: 0;
-      padding: 0 2vw 20px 2vw;
+      padding: 0 1vw 20px 1vw;
       .buttons {
          margin-top: 10px;
          display: flex;
