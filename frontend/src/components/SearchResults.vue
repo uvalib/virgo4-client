@@ -252,7 +252,7 @@ const poolSelected = (( poolID ) => {
 @media only screen and (min-width: 768px) {
    div.search-results {
       margin: 0;
-      padding: 0 4vw 20px 4vw;
+      padding: 0 1vw 20px 1vw;
       .buttons {
          display: flex;
          flex-flow: row nowrap;
