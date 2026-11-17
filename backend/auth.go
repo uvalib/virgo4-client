@@ -377,11 +377,11 @@ func (svc *ServiceContext) generateJWT(v4User *User, authMethod v4jwt.AuthEnum, 
 		v4Claims.Barcode = ilsUser.Barcode
 		v4Claims.HomeLibrary = ilsUser.HomeLibrary
 		v4Claims.Profile = ilsUser.Profile
-		v4Claims.CanLEO = (ilsUser.HomeLibrary != "UVA-LIB")
+		v4Claims.CanLEO = (ilsUser.HomeLibrary != "UVA-LIB" && !ilsUser.CommunityUser)
 		v4Claims.CanLEOPlus = false // TODO update with rules once they have been decided
 		v4Claims.CanPurchase = ilsUser.CanPurchase()
 		v4Claims.CanPlaceReserve = ilsUser.CanPlaceReserve()
-		v4Claims.CanUseILLiad = (authMethod == v4jwt.Netbadge && ilsUser.HomeLibrary != "HEALTHSCI")
+		v4Claims.CanUseILLiad = (authMethod == v4jwt.Netbadge && ilsUser.HomeLibrary != "HEALTHSCI" && !ilsUser.CommunityUser)
 		v4Claims.UseSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
 	}
 

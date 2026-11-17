@@ -23,10 +23,10 @@ export const useRequestStore = defineStore('request', {
 
       requestStats: {
          remediationRequests: 0,
-         remediationLimit: 0,
+         remediationLimit: 10,
          remediationDisabled: false,
          otherRequests: 0,
-         otherRequestsLimit: 0,
+         otherRequestsLimit: 25,
          otherRequestsDisabled: false
       },
 
@@ -153,6 +153,17 @@ export const useRequestStore = defineStore('request', {
       getStandaloneRequestUsage() {
          this.working = true
          this.failed = false
+
+         // reset request info to default values. If the stats request fails (sometimes it times out), the UI will be reasonable
+         this.requestStats = {
+            remediationRequests: 0,
+            remediationLimit: 10,
+            remediationDisabled: false,
+            otherRequests: 0,
+            otherRequestsLimit: 25,
+            otherRequestsDisabled: false
+         }
+         
          axios.get('/api/requests/standalone/outstanding').then( resp => {
             this.requestStats = resp.data
          }).catch(e => {

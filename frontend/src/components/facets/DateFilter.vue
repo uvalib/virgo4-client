@@ -151,9 +151,9 @@ const applyDateFilterClicked = (() => {
          flex-flow: row wrap;
          justify-content: flex-start;
          align-items: center;
-         gap: 8px;
+         gap: 5px;
          input {
-            width: 90px;
+            width: 60px;
          }
       }
       .date-acts {

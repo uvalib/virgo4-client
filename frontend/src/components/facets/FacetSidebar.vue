@@ -86,11 +86,10 @@
                         </template>
                         <template v-else>
                            <label class="filter-check">
-                              <!-- FIXME -->
                               <input type="checkbox" @change="orFilterToggled(facetInfo.id, fv)"  
                                  :checked="fv.selected || fv.pending == 'add'" :disabled="isFacetDisabled(facetInfo.id)"
                               />
-                              <span :class="{dim: isFacetDisabled(facetInfo.id)}">{{ fv.value }}</span>
+                              <span class="filter-name" :class="{dim: isFacetDisabled(facetInfo.id)}">{{ fv.value }}</span>
                            </label>
                            <span :class="{dim: isFacetDisabled(facetInfo.id)}" class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>     
                         </template>
@@ -503,7 +502,7 @@ const filterSelected = ((facetID, facetValue) => {
 <style lang="scss" scoped>
 @media only screen and (min-width: 768px) {
    .facet-sidebar {
-      min-width: 400px;   
+      min-width: 285px;   
       max-width: 400px;  
    }
    .padding {
