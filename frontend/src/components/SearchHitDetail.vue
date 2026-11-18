@@ -104,6 +104,12 @@ const shouldDisplay = ((field) => {
 </script>
 
 <style lang="scss" scoped>
+.cover-img {
+   border-radius: 0.3rem;
+   margin: 5px;
+   max-width: 200px;
+   display: inline-block;
+}
 .digital-content {
    display: flex;
    flex-flow: row;
@@ -159,17 +165,6 @@ const shouldDisplay = ((field) => {
 
    a.img-link {
       display: inline-block;
-   }
-   .cover-img {
-      border-radius: 0.3rem;
-      margin: 5px;
-      max-height: 140px;
-      max-width: 140px;
-      display: inline-block;
-   }
-   .cover-img.small {
-      max-height: 124px;
-      max-width: 100px;
    }
 }
 
