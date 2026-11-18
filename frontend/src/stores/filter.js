@@ -313,6 +313,22 @@ export const useFilterStore = defineStore('filter', {
             }
          })
 
+         // restore any previously selected filters that were not handled above. This ensures
+         // the facet sidebar will always appear and contain buttons to remove previously 
+         // selected filters
+         selected.forEach( s => {
+            let nafIdx = tgtFacets.findIndex( f => f.id == s.facet_id)
+            let naf = null
+            if ( nafIdx == -1) {
+               naf = {id: s.facet_id, buckets: []}
+               nafIdx = tgtFacets.length
+            } else {
+               naf = tgtFacets[nafIdx]
+            }
+            naf.buckets.push({value: s.value, selected: true})
+            tgtFacets.splice(nafIdx, 1, naf)
+         })
+
          tgtFacets = tgtFacets.sort( (a,b) => {
                if (a.sequence > b.sequence) return 1
                if (a.sequence < b.sequence) return -1
@@ -620,7 +636,7 @@ export const useFilterStore = defineStore('filter', {
             let endTime = new Date();
             var timeDiff = endTime - startTime; 
             console.log("TIME TO GET FACETS "+timeDiff+" MS")
-            let facets = response.data.facet_list
+            let facets = response?.data?.facet_list
             if (!facets) {
                facets = []
             }
