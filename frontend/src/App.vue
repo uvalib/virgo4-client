@@ -349,7 +349,7 @@ body {
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
    color: $uva-grey-A;
-   background: $uva-blue-alt-B;
+   background: white;
 
    .screen-reader-text {
       clip: rect(1px, 1px, 1px, 1px);
@@ -374,7 +374,7 @@ body {
    color: $uva-text-color-base;
    margin: 0;
    padding: 0;
-   background: $uva-grey-200;
+   background: white;
    outline: 0;
    border: 0;
 

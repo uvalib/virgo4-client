@@ -504,6 +504,7 @@ const filterSelected = ((facetID, facetValue) => {
    .facet-sidebar {
       min-width: 250px;   
       max-width: 400px;  
+      width: 370px;
    }
    .padding {
       width: 5px;
