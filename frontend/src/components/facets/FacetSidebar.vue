@@ -502,7 +502,7 @@ const filterSelected = ((facetID, facetValue) => {
 <style lang="scss" scoped>
 @media only screen and (min-width: 768px) {
    .facet-sidebar {
-      min-width: 285px;   
+      min-width: 250px;   
       max-width: 400px;  
    }
    .padding {
@@ -732,8 +732,8 @@ const filterSelected = ((facetID, facetValue) => {
                gap: 5px;
                align-items: center;
                input[type=checkbox] {
-                  width: 20px;
-                  height: 20px;
+                  min-width: 20px;
+                  min-height: 20px;
                }
             }
          }
