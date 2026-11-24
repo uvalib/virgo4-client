@@ -134,8 +134,10 @@ const handleQueryParamChange = ( async() => {
       assertive(`search in progress`)
 
       // targetPool may not be a known pool (ex: older URLs with pool=all); fall back to searching all pools
+      // A single pool search updates existing results for the pool, so it also requires those results to be present
       const tgtPool = poolStore.poolDetails(queryStore.targetPool)
-      if ( queryStore.searchTargetOnly && tgtPool ) {
+      const haveTgtResults = resultStore.results.some( r => r.pool.id == queryStore.targetPool )
+      if ( queryStore.searchTargetOnly && tgtPool && haveTgtResults ) {
          console.log("SEARCH ONLY "+queryStore.targetPool)
          await resultStore.searchPool({pool: tgtPool}, filterModeOverride)
       } else {

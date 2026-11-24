@@ -184,13 +184,20 @@ export function useRouteUtils( router,route ) {
    const collectionSearchChanged = ( () => {
       const queryStore = useQueryStore()
       const filters = useFilterStore()
+      const resultStore = useResultStore()
 
       let newQ = Object.assign({}, route.query)
       delete newQ.page
 
+      // A collection search is a new query, so all pools must be searched. A single pool search
+      // only works when there are already results for that pool, which is not the case when the
+      // user arrives at the collection page directly (ex: from a LibGuide link).
+      // The all-pool search selects the target pool tab; ignoreExclusion ensures the collection
+      // pool is searched even if the user has excluded it in preferences.
       queryStore.userSearched = true
-      queryStore.searchTargetOnly = true
+      queryStore.searchTargetOnly = false
       queryStore.setBasicSearch()
+      resultStore.ignoreExclusion = queryStore.targetPool
 
       // use the poolQuersyString here to ensure any pool-specific addons are included
       newQ.q = queryStore.poolQueryString
